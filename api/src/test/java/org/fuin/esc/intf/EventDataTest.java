@@ -21,7 +21,6 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.nio.charset.Charset;
 
-import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -40,7 +39,7 @@ public class EventDataTest {
 
     private static final String TYPE = "MyEvent";
 
-    private static final MimeType MIME_TYPE = mimeType("application/xml; encoding=utf-8; version=1.0.0");
+    private static final VersionedMimeType MIME_TYPE = mimeType("application/xml; encoding=utf-8; version=1.0.0");
 
     private static final byte[] DATA = "<myEvent/>".getBytes(Charset
             .forName("utf-8"));
@@ -70,9 +69,9 @@ public class EventDataTest {
         assertThat(testee.getData()).isEqualTo(DATA);
     }
 
-    private static MimeType mimeType(final String mimeType) {
+    private static VersionedMimeType mimeType(final String mimeType) {
         try {
-            return new MimeType(mimeType);
+            return new VersionedMimeType(mimeType);
         } catch (final MimeTypeParseException ex) {
             throw new RuntimeException(ex);
         }
