@@ -111,14 +111,18 @@ public class EventDataTest extends AbstractXmlTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert
                 .assertXMLEqual(
+                      // @formatter:off
                         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                                + "<event-data id=\"5741bcf1-9292-446b-84c1-957ed53b8d88\">"
-                                + "<data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
-                                + "<![CDATA[<myEvent/>]]>"
-                                + "</data>"
-                                + "<meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
-                                + "<![CDATA[{ \"a\" : \"1\" }]]>" + "</meta>"
-                                + "</event-data>", xml);
+                      + "<event-data id=\"5741bcf1-9292-446b-84c1-957ed53b8d88\">"
+                      + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
+                      + "        <![CDATA[<myEvent/>]]>"
+                      + "    </data>"
+                      + "    <meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
+                      + "        <![CDATA[{ \"a\" : \"1\" }]]>" 
+                      + "    </meta>"
+                      + "</event-data>"
+                      // @formatter:on
+                      , xml);
 
     }
 
