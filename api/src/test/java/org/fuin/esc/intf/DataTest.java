@@ -43,7 +43,7 @@ import org.junit.Test;
  * Tests the {@link Data} class.
  */
 // CHECKSTYLE:OFF Test
-public class DataTest {
+public class DataTest extends AbstractXmlTest {
 
     private static final String TYPE = "MyEvent";
 
@@ -109,11 +109,7 @@ public class DataTest {
         final Data original = testee;
 
         // TEST
-        String xml = marshal(original, createXmlAdapter(), Data.class);
-        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
-                + "<![CDATA[" + "<myEvent/>" + "]]>" + "</data>";
-
+        String xml = marshalToStr(original, createXmlAdapter(), Data.class);
         final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
 
         // VERIFY
@@ -125,39 +121,6 @@ public class DataTest {
 
     private XmlAdapter<?, ?>[] createXmlAdapter() {
         return new XmlAdapter[] { new VersionedMimeTypeConverter() };
-    }
-
-    public static <T> String marshalToStr(final T data,
-            final XmlAdapter<?, ?>[] adapters,
-            final Class<?>... classesToBeBound) {
-        try {
-            final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
-            final Marshaller marshaller = ctx.createMarshaller();
-            if (adapters != null) {
-                for (XmlAdapter<?, ?> adapter : adapters) {
-                    marshaller.setAdapter(adapter);
-                }
-            }
-            final StringWriter writer = new StringWriter();
-            final XMLOutputFactory xof = XMLOutputFactory.newInstance();
-            final XMLStreamWriter sw = xof.createXMLStreamWriter(writer);
-            final XMLStreamWriterAdapter swa = new XMLStreamWriterAdapter(sw) {
-                @Override
-                public void writeCharacters(String text)
-                        throws XMLStreamException {
-                    if (text.startsWith("<![CDATA[") && text.endsWith("]]>")) {
-                        final String str = text.substring(9, text.length() - 3);
-                        super.writeCData(str);
-                    } else {
-                        super.writeCharacters(text);
-                    }
-                }
-            };
-            marshaller.marshal(data, swa);
-            return writer.toString();
-        } catch (final JAXBException | XMLStreamException ex) {
-            throw new RuntimeException("Error marshalling test data", ex);
-        }
     }
 
 }

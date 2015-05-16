@@ -17,19 +17,29 @@
  */
 package org.fuin.esc.intf;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
+import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.UUIDStr;
+import org.fuin.objects4j.vo.ValueObject;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code
  * methods are defined on the <code>id</code>.
  */
 @Immutable
-public final class EventData {
+@XmlRootElement(name = "event-data")
+public class EventData implements Serializable, ValueObject {
+
+    private static final long serialVersionUID = 1000L;
 
     /**
      * The ID of the event, used as part of the idempotent write check. This is
@@ -38,15 +48,25 @@ public final class EventData {
      */
     @NotNull
     @UUIDStr
+    @XmlAttribute(name = "id")
     private String id;
 
     /** The event data. */
     @NotNull
+    @XmlElement(name = "data")
     private Data data;
 
-    /** Used to create the necessary meta data. */
+    /** The meta data. */
     @NotNull
-    private MetaDataBuilder metaDataBuilder;
+    @XmlElement(name = "meta")
+    private Data meta;
+
+    /**
+     * Protected constructor for deserialization.
+     */
+    protected EventData() {
+        super();
+    }
 
     /**
      * Constructor with XML meta data.
@@ -58,22 +78,20 @@ public final class EventData {
      *            representation.
      * @param data
      *            Event data.
-     * @param metaDataBuilder
-     *            Meta data builder.
+     * @param meta
+     *            Meta data.
      * 
      */
     public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final Data data,
-            @NotNull final MetaDataBuilder metaDataBuilder) {
+            @NotNull final Data data, @Nullable final Data meta) {
         super();
 
         Contract.requireArgNotNull("eventId", id);
         Contract.requireArgNotNull("data", data);
-        Contract.requireArgNotNull("metaDataBuilder", metaDataBuilder);
 
         this.id = id;
         this.data = data;
-        this.metaDataBuilder = metaDataBuilder;
+        this.meta = meta;
 
     }
 
@@ -100,13 +118,13 @@ public final class EventData {
     }
 
     /**
-     * Returns a builder that builds up the meta data byte array.
+     * Returns the meta data.
      * 
-     * @return The meta data builder.
+     * @return Meta data.
      */
     @NeverNull
-    public final MetaDataBuilder getMetaDataBuilder() {
-        return metaDataBuilder;
+    public final Data getMeta() {
+        return meta;
     }
 
     // CHECKSTYLE:OFF Generated code
