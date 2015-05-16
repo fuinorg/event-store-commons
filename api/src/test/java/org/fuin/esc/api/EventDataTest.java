@@ -28,10 +28,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.esc.api.Data;
-import org.fuin.esc.api.EventData;
-import org.fuin.esc.api.VersionedMimeType;
-import org.fuin.esc.api.VersionedMimeTypeConverter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,7 +106,6 @@ public class EventDataTest extends AbstractXmlTest {
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
                 EventData.class);
-        System.out.println(xml);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
@@ -134,7 +129,7 @@ public class EventDataTest extends AbstractXmlTest {
         final EventData original = testee;
 
         // TEST
-        String xml = marshalToStr(original, createXmlAdapter(), EventData.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), EventData.class);
         final EventData copy = unmarshal(xml, createXmlAdapter(),
                 EventData.class);
 
@@ -154,7 +149,7 @@ public class EventDataTest extends AbstractXmlTest {
     }
 
     private XmlAdapter<?, ?>[] createXmlAdapter() {
-        return new XmlAdapter[] { new VersionedMimeTypeConverter() };
+        return new XmlAdapter[] {};
     }
 
 }

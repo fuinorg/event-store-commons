@@ -19,25 +19,15 @@ package org.fuin.esc.api;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.deserialize;
-import static org.fuin.units4j.Units4JUtils.marshal;
 import static org.fuin.units4j.Units4JUtils.serialize;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.esc.api.Data;
-import org.fuin.esc.api.VersionedMimeType;
-import org.fuin.esc.api.VersionedMimeTypeConverter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -112,7 +102,8 @@ public class DataTest extends AbstractXmlTest {
         final Data original = testee;
 
         // TEST
-        String xml = marshalToStr(original, createXmlAdapter(), Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(),
+                Data.class);
         final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
 
         // VERIFY
@@ -122,8 +113,32 @@ public class DataTest extends AbstractXmlTest {
 
     }
 
+    @Test
+    public final void testIcon() throws Exception {
+
+        // PREPARE
+        final String type = "Icon";
+        final VersionedMimeType mimeType = VersionedMimeType
+                .create("image/png");
+        final byte[] png = IOUtils.toByteArray(getClass().getResourceAsStream(
+                "/ok.png"));
+        final String content = Base64.encodeBase64String(png);
+        final Data original = new Data(type, mimeType, content);
+
+        // TEST
+        final String xml = marshalToStr(original, createXmlAdapter(),
+                Data.class);
+        final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
+
+        // VERIFY
+        assertThat(copy.getType()).isEqualTo(type);
+        assertThat(copy.getMimeType()).isEqualTo(mimeType);
+        assertThat(copy.getContent()).isEqualTo(content);
+
+    }
+
     private XmlAdapter<?, ?>[] createXmlAdapter() {
-        return new XmlAdapter[] { new VersionedMimeTypeConverter() };
+        return new XmlAdapter[] {};
     }
 
 }
