@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Stores events.
  */
-public interface EventStore extends ReadOnlyEventStore {
+public interface WritableEventStore extends ReadOnlyEventStore {
 
     /**
      * Deletes a stream from the event store.

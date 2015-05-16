@@ -17,15 +17,12 @@
  */
 package org.fuin.esc.intf;
 
-import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
-import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.UUIDStr;
-import org.w3c.dom.Document;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code
@@ -43,24 +40,13 @@ public final class EventData {
     @UUIDStr
     private String id;
 
-    /**
-     * Type of the event that describes the event uniquely within the list of
-     * all events.
-     */
+    /** The event data. */
     @NotNull
-    private String type;
+    private Data data;
 
-    /** Mime type of the data. */
+    /** Used to create the necessary meta data. */
     @NotNull
-    private VersionedMimeType mimeType;
-
-    /** Data in format defined by the mime type. */
-    @NotNull
-    private byte[] data;
-
-    private JsonObject metaJson;
-
-    private Document metaDom;
+    private MetaDataBuilder metaDataBuilder;
 
     /**
      * Constructor with XML meta data.
@@ -70,91 +56,24 @@ public final class EventData {
      *            check. This is type string to allow different UUID
      *            implementations. It has to be a valid UUID string
      *            representation.
-     * @param type
-     *            Type of the event that describes the event uniquely within the
-     *            list of all events.
-     * @param mimeType
-     *            Mime type of the data.
      * @param data
-     *            Data in format defined by the mime type.
-     * @param metaDom
-     *            Meta data expressed as XML data.
+     *            Event data.
+     * @param metaDataBuilder
+     *            Meta data builder.
      * 
      */
     public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final String type,
-            @NotNull final VersionedMimeType mimeType,
-            @NotNull final byte[] data, @Nullable final Document metaDom) {
-        this(id, type, mimeType, data, null, metaDom);
-    }
-
-    /**
-     * Constructor with JSON meta data.
-     * 
-     * @param id
-     *            The ID of the event, used as part of the idempotent write
-     *            check. This is type string to allow different UUID
-     *            implementations. It has to be a valid UUID string
-     *            representation.
-     * @param type
-     *            Type of the event that describes the event uniquely within the
-     *            list of all events.
-     * @param mimeType
-     *            Mime type of the data.
-     * @param data
-     *            Data in format defined by the mime type.
-     * @param metaJson
-     *            Meta data expressed as JSON data.
-     * 
-     */
-    public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final String type,
-            @NotNull final VersionedMimeType mimeType,
-            @NotNull final byte[] data, @Nullable final JsonObject metaJson) {
-        this(id, type, mimeType, data, metaJson, null);
-    }
-
-    /**
-     * Constructor without meta data.
-     * 
-     * @param id
-     *            The ID of the event, used as part of the idempotent write
-     *            check. This is type string to allow different UUID
-     *            implementations. It has to be a valid UUID string
-     *            representation.
-     * @param type
-     *            Type of the event that describes the event uniquely within the
-     *            list of all events.
-     * @param mimeType
-     *            Mime type of the data.
-     * @param data
-     *            Data in format defined by the mime type.
-     */
-    public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final String type,
-            @NotNull final VersionedMimeType mimeType,
-            @NotNull final byte[] data) {
-        this(id, type, mimeType, data, null, null);
-    }
-
-    private EventData(@NotNull @UUIDStr final String id,
-            @NotNull final String type,
-            @NotNull final VersionedMimeType mimeType,
-            @NotNull final byte[] data, @Nullable final JsonObject metaJson,
-            final Document metaDom) {
+            @NotNull final Data data,
+            @NotNull final MetaDataBuilder metaDataBuilder) {
         super();
 
         Contract.requireArgNotNull("eventId", id);
-        Contract.requireArgNotNull("type", type);
-        Contract.requireArgNotNull("mimeType", mimeType);
         Contract.requireArgNotNull("data", data);
+        Contract.requireArgNotNull("metaDataBuilder", metaDataBuilder);
 
         this.id = id;
-        this.type = type;
-        this.mimeType = mimeType;
         this.data = data;
-        this.metaJson = metaJson;
-        this.metaDom = metaDom;
+        this.metaDataBuilder = metaDataBuilder;
 
     }
 
@@ -171,60 +90,23 @@ public final class EventData {
     }
 
     /**
-     * Returns the type of the event that describes the event uniquely within
-     * the list of all events.
-     * 
-     * @return Unique and never changing type name.
-     */
-    @NeverNull
-    public final String getType() {
-        return type;
-    }
-
-    /**
-     * Returns the Internet Media Type that classifies the data.
-     * 
-     * @return Mime type.
-     */
-    @NeverNull
-    public final VersionedMimeType getMimeType() {
-        return mimeType;
-    }
-
-    /**
-     * Returns the raw data block.
+     * Returns the event data.
      * 
      * @return Event data.
      */
     @NeverNull
-    public final byte[] getData() {
+    public final Data getData() {
         return data;
     }
 
     /**
-     * Meta data expressed as JSON object. Either
-     * {@link EventData#getMetaJson()} or {@link #getMetaDom()} may be non-
-     * <code>null</code>. This means only one of them and never both can have a
-     * non-<code>null</code> value.
+     * Returns a builder that builds up the meta data byte array.
      * 
-     * @return The meta data.
+     * @return The meta data builder.
      */
-    @Nullable
-    public final JsonObject getMetaJson() {
-        return metaJson;
-    }
-
-    /**
-     * Meta data expressed as XML document. Either
-     * {@link EventData#getMetaJson()} or {@link #getMetaDom()} may be non-
-     * <code>null</code>. This means only one of them and never both can have a
-     * non-<code>null</code> value.
-     * 
-     * @return The meta data.
-     */
-    @Nullable
-    public final Document getMetaDom() {
-        return metaDom;
+    @NeverNull
+    public final MetaDataBuilder getMetaDataBuilder() {
+        return metaDataBuilder;
     }
 
     // CHECKSTYLE:OFF Generated code

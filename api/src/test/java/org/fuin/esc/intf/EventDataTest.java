@@ -18,11 +18,6 @@
 package org.fuin.esc.intf;
 
 import static org.fest.assertions.Assertions.assertThat;
-
-import java.nio.charset.Charset;
-
-import javax.activation.MimeTypeParseException;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.junit.After;
@@ -39,16 +34,19 @@ public class EventDataTest {
 
     private static final String TYPE = "MyEvent";
 
-    private static final VersionedMimeType MIME_TYPE = mimeType("application/xml; encoding=utf-8; version=1.0.0");
+    private static final VersionedMimeType MIME_TYPE = VersionedMimeType
+            .create("application/xml; encoding=utf-8; version=1");
 
-    private static final byte[] DATA = "<myEvent/>".getBytes(Charset
-            .forName("utf-8"));
+    private static final String CONTENT = "<myEvent/>";
+
+    private static final Data EVENT_DATA = new Data(TYPE, MIME_TYPE, CONTENT);
 
     private EventData testee;
 
     @Before
     public void setup() {
-        testee = new EventData(ID, TYPE, MIME_TYPE, DATA);
+        final MetaDataBuilder metaDataBuilder = null;
+        testee = new EventData(ID, EVENT_DATA, metaDataBuilder);
     }
 
     @After
@@ -64,17 +62,9 @@ public class EventDataTest {
     @Test
     public void testGetter() {
         assertThat(testee.getId()).isEqualTo(ID);
-        assertThat(testee.getType()).isEqualTo(TYPE);
-        assertThat(testee.getMimeType()).isEqualTo(MIME_TYPE);
-        assertThat(testee.getData()).isEqualTo(DATA);
-    }
-
-    private static VersionedMimeType mimeType(final String mimeType) {
-        try {
-            return new VersionedMimeType(mimeType);
-        } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException(ex);
-        }
+        assertThat(testee.getData().getType()).isEqualTo(TYPE);
+        assertThat(testee.getData().getMimeType()).isEqualTo(MIME_TYPE);
+        assertThat(testee.getData().getContent()).isEqualTo(CONTENT);
     }
 
 }

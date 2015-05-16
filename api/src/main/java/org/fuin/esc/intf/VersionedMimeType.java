@@ -6,18 +6,25 @@ import javax.activation.MimeTypeParseException;
 
 /**
  * Enhances the {@link javax.activation.MimeType} class with equals and hash
- * code based on the base type.
+ * code based on the base type, sub type, encoding and version.
  */
 public final class VersionedMimeType extends javax.activation.MimeType {
 
     private static final String VERSION = "version";
 
-    private static final String DEFAULT_VERSION = "1.0.0";
+    private static final String DEFAULT_VERSION = "1";
 
     private static final String ENCODING = "encoding";
 
     private static final String DEFAULT_ENCODING = "utf-8";
 
+    /**
+     * Default constructor for de-serialization.
+     */
+    public VersionedMimeType() {
+        super();
+    }
+    
     /**
      * Constructor with all data.
      * 
@@ -55,21 +62,9 @@ public final class VersionedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Returns the primary and sub type (if available).
-     * 
-     * @return Type.
-     */
-    public final String getType() {
-        if (getSubType() == null) {
-            return getPrimaryType();
-        }
-        return getPrimaryType() + "/" + getSubType();
-    }
-
-    /**
      * Returns the version from the parameters.
      * 
-     * @return Version or '1.0.0' if not available.
+     * @return Version or '1' if not available.
      */
     public final String getVersion() {
         final String parameter = getParameter(VERSION);
@@ -142,5 +137,42 @@ public final class VersionedMimeType extends javax.activation.MimeType {
     }
 
     // CHECKSTYLE:ON
+
+    /**
+     * Constructor with all data.
+     * 
+     * @param str
+     *            Contains base type, sub type and parameters.
+     */
+    public static VersionedMimeType create(final String str) {
+        try {
+            return new VersionedMimeType(str);
+        } catch (final MimeTypeParseException ex) {
+            throw new RuntimeException("Failed to create versioned mime type: "
+                    + str, ex);
+        }
+    }
+
+    /**
+     * Constructor with all data.
+     * 
+     * @param primary
+     *            Primary type.
+     * @param sub
+     *            Sub type.
+     * @param encoding
+     *            Encoding.
+     * @param version
+     *            Version.
+     */
+    public static VersionedMimeType create(final String primary,
+            final String sub, final Charset encoding, final String version) {
+        try {
+            return new VersionedMimeType(primary, sub, encoding, version);
+        } catch (final MimeTypeParseException ex) {
+            throw new RuntimeException("Failed to create versioned mime type: "
+                    + primary + "/" + sub, ex);
+        }
+    }
 
 }

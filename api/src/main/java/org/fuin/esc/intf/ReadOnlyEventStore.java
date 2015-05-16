@@ -84,29 +84,5 @@ public interface ReadOnlyEventStore extends Closeable {
             @NotNull StreamId streamId, int start, int count)
             throws StreamNotFoundException, StreamDeletedException;
 
-    /**
-     * Reads count events from an Event Stream backwards (e.g. newest to oldest)
-     * from position
-     * 
-     * @param streamId
-     *            The Event Stream to read from
-     * @param start
-     *            The position to start reading from
-     * @param count
-     *            The count to read from the position
-     * 
-     * @return An slice containing the results of the read operation
-     * 
-     * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the
-     *             repository.
-     * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was
-     *             deleted.
-     */
-    public StreamEventsSlice readStreamEventsBackward(
-            @NotNull StreamId streamId, int start, int count)
-            throws StreamNotFoundException, StreamDeletedException;
-
 }
 // CHECKSTYLE:ON:RedundantThrows

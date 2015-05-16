@@ -52,13 +52,13 @@ public class StreamEventsSliceTest {
     public static void beforeClass() throws MimeTypeParseException {
         events = new ArrayList<EventData>();
         events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c",
-                "MyEvent", new VersionedMimeType(
+                new Data("MyEvent", new VersionedMimeType(
                         "application/xml; encoding=utf-8; version=1.0.0"),
-                "<myEvent/>".getBytes(Charset.forName("utf-8"))));
+                        "<myEvent/>"), null));
         events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c",
-                "MyEvent", new VersionedMimeType(
+                new Data("MyEvent", new VersionedMimeType(
                         "application/xml; encoding=iso646-us; version=1.1.0"),
-                "<myEvent/>".getBytes(Charset.forName("iso646-us"))));
+                "<myEvent/>"), null));
     }
 
     @Before
@@ -82,7 +82,7 @@ public class StreamEventsSliceTest {
         assertThat(testee.getNextEventNumber()).isEqualTo(NEXT);
         assertThat(testee.isEndOfStream()).isEqualTo(EOS);
         assertThat(testee.getEvents()).isEqualTo(events);
-        
+
     }
 
 }
