@@ -30,9 +30,10 @@
 
 	<modules>
 		<module>esc-api</module>
-		<module>esc-test</module>
+        <module>esc-mem</module>
 		<module>esc-esj</module>
 		<module>esc-jpa</module>
+        <module>esc-test</module>
 	</modules>
 
 	<build>

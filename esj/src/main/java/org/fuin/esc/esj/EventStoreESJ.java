@@ -119,6 +119,12 @@ public class EventStoreESJ implements WritableEventStore {
     }
 
     @Override
+    public StreamEventsSlice readAllEventsForward(int start, int count) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public void deleteStream(StreamId streamId, int expectedVersion)
             throws StreamNotFoundException, StreamVersionConflictException,
             StreamDeletedException {
@@ -137,6 +143,13 @@ public class EventStoreESJ implements WritableEventStore {
 
     }
 
+    @Override
+    public void deleteStream(StreamId streamId) throws StreamNotFoundException,
+            StreamDeletedException {
+        // TODO Auto-generated method stub
+        
+    }
+    
     @Override
     public int appendToStream(final StreamId streamId,
             final int expectedVersion, final CommonEvent... events)
@@ -195,4 +208,20 @@ public class EventStoreESJ implements WritableEventStore {
 
         return 0;
     }
+
+    @Override
+    public int appendToStream(StreamId streamId, List<CommonEvent> events)
+            throws StreamNotFoundException, StreamDeletedException,
+            ProjectionNotWritableException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public int appendToStream(StreamId streamId, CommonEvent... events)
+            throws StreamNotFoundException, StreamDeletedException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }
