@@ -36,6 +36,8 @@ public class CommonEventTest {
 
     private static final String ID = "5741bcf1-9292-446b-84c1-957ed53b8d88";
 
+    private static final String TYPE = "MyEvent";
+    
     private static MyEvent DATA = new MyEvent("Peter");
 
     private static JsonObject META = Json.createObjectBuilder()
@@ -45,7 +47,7 @@ public class CommonEventTest {
 
     @Before
     public void setup() {
-        testee = new CommonEvent(ID, DATA, META);
+        testee = new CommonEvent(ID, TYPE, DATA, META);
     }
 
     @After
