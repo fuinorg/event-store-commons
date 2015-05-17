@@ -1,2 +1,2 @@
 # esc-test
-Event store commons test classes.
+Provides tests for all event store commons implementations.

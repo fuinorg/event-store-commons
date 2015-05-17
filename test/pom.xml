@@ -13,7 +13,7 @@
 	<artifactId>esc-test</artifactId>
 	<packaging>jar</packaging>
 	<name>esc-test</name>
-	<description>Event store commons test classes.</description>
+	<description>Provides tests for all event store commons implementations.</description>
 
 	<scm>
 		<url>https://github.com/fuinorg/event-store-commons/</url>
