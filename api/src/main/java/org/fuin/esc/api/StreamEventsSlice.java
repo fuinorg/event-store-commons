@@ -116,7 +116,8 @@ public final class StreamEventsSlice {
         result = prime * result + (endOfStream ? 1231 : 1237);
         result = prime * result + fromEventNumber;
         result = prime * result + nextEventNumber;
-        result = prime * result + ((events == null) ? 0 : Arrays.hashCode(events.toArray()));
+        result = prime * result
+                + ((events == null) ? 0 : Arrays.hashCode(events.toArray()));
         return result;
     }
 
@@ -139,7 +140,7 @@ public final class StreamEventsSlice {
             if (other.events != null) {
                 return false;
             }
-        } else { 
+        } else {
             if (other.events == null) {
                 return false;
             }

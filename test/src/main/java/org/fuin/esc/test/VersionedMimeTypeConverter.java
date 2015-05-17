@@ -15,34 +15,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.api;
+package org.fuin.esc.test;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.objects4j.common.ThreadSafe;
 
 /**
- * Converts a string into a CDATA XML and back. CAUTION: Only works together
- * with {@link XMLStreamWriterAdapter} because otherwise the CDATA xml value
- * will be escaped.
+ * Converts a {@link VersionedMimeType} into a String and back.
  */
 @ThreadSafe
-public final class CDataXmlAdapter extends XmlAdapter<String, String> {
+public final class VersionedMimeTypeConverter extends
+        XmlAdapter<String, VersionedMimeType> {
 
     @Override
-    public final String marshal(final String value) throws Exception {
+    public final String marshal(final VersionedMimeType value) throws Exception {
         if (value == null) {
             return null;
         }
-        return "<![CDATA[" + value + "]]>";
+        return value.toString();
     }
 
     @Override
-    public final String unmarshal(final String value) throws Exception {
-        if (value == null) {
-            return null;
-        }
-        return value;
+    public final VersionedMimeType unmarshal(final String value)
+            throws Exception {
+        return new VersionedMimeType(value);
     }
 
 }

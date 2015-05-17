@@ -19,18 +19,15 @@ package org.fuin.esc.api;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.activation.MimeTypeParseException;
+import javax.json.Json;
+import javax.json.JsonObject;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import org.fuin.esc.api.Data;
-import org.fuin.esc.api.EventData;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.VersionedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,15 +51,10 @@ public class StreamEventsSliceTest {
 
     @BeforeClass
     public static void beforeClass() throws MimeTypeParseException {
-        events = new ArrayList<EventData>();
-        events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c",
-                new Data("MyEvent", new VersionedMimeType(
-                        "application/xml; encoding=utf-8; version=1.0.0"),
-                        "<myEvent/>"), null));
-        events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c",
-                new Data("MyEvent", new VersionedMimeType(
-                        "application/xml; encoding=iso646-us; version=1.1.0"),
-                "<myEvent/>"), null));
+        final JsonObject meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
+        events = new ArrayList<EventData>();        
+        events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c", new MyEvent("Peter"), meta));
+        events.add(new EventData("41d48b30-42be-459d-9359-4b20909191f2", new MyEvent("Mary Jane"), meta));
     }
 
     @Before

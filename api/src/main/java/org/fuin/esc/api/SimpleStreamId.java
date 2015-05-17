@@ -79,7 +79,7 @@ public final class SimpleStreamId implements StreamId {
     }
 
     // CHECKSTYLE:OFF Generated code
-    
+
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -106,5 +106,5 @@ public final class SimpleStreamId implements StreamId {
     }
 
     // CHECKSTYLE:ON
-    
+
 }

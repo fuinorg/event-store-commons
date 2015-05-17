@@ -15,11 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.api;
+package org.fuin.esc.test;
 
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
@@ -33,6 +36,7 @@ import org.fuin.objects4j.vo.ValueObject;
  * methods are defined on the <code>id</code>.
  */
 @Immutable
+@XmlRootElement(name = "event-data")
 public class EventData implements Serializable, ValueObject {
 
     private static final long serialVersionUID = 1000L;
@@ -44,14 +48,18 @@ public class EventData implements Serializable, ValueObject {
      */
     @NotNull
     @UUIDStr
+    @XmlAttribute(name = "id")
     private String id;
 
     /** The event data. */
     @NotNull
-    private Object data;
+    @XmlElement(name = "data")
+    private Data data;
 
     /** The meta data. */
-    private Object meta;
+    @NotNull
+    @XmlElement(name = "meta")
+    private Data meta;
 
     /**
      * Protected constructor for deserialization.
@@ -75,7 +83,7 @@ public class EventData implements Serializable, ValueObject {
      * 
      */
     public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final Object data, @Nullable final Object meta) {
+            @NotNull final Data data, @Nullable final Data meta) {
         super();
 
         Contract.requireArgNotNull("eventId", id);
@@ -105,7 +113,7 @@ public class EventData implements Serializable, ValueObject {
      * @return Event data.
      */
     @NeverNull
-    public final Object getData() {
+    public final Data getData() {
         return data;
     }
 
@@ -114,8 +122,8 @@ public class EventData implements Serializable, ValueObject {
      * 
      * @return Meta data.
      */
-    @Nullable
-    public final Object getMeta() {
+    @NeverNull
+    public final Data getMeta() {
         return meta;
     }
 
@@ -129,7 +137,6 @@ public class EventData implements Serializable, ValueObject {
         return result;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public final boolean equals(Object obj) {
         if (this == obj)

@@ -1,4 +1,4 @@
-package org.fuin.esc.api;
+package org.fuin.esc.test;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;

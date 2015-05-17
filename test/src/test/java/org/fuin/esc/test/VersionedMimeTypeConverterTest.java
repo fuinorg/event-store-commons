@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.api;
+package org.fuin.esc.test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 
 import javax.activation.MimeTypeParseException;
 
-import org.fuin.esc.api.VersionedMimeType;
 import org.junit.Test;
 
 //TESTCODE:BEGIN

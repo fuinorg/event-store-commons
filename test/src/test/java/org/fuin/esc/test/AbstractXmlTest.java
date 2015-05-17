@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.api;
+package org.fuin.esc.test;
 
 import java.io.StringWriter;
 
@@ -27,7 +27,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.fuin.esc.api.XMLStreamWriterAdapter;
 import org.fuin.units4j.Units4JUtils;
 
 /**
