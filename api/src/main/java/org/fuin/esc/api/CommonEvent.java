@@ -65,7 +65,24 @@ public final class CommonEvent implements Serializable, ValueObject {
     }
 
     /**
-     * Constructor with XML meta data.
+     * Constructor without meta data.
+     * 
+     * @param id
+     *            The ID of the event, used as part of the idempotent write
+     *            check. This is type string to allow different UUID
+     *            implementations. It has to be a valid UUID string
+     *            representation.
+     * @param data
+     *            Event data.
+     * 
+     */
+    public CommonEvent(@NotNull @UUIDStr final String id,
+            @NotNull final String type, @NotNull final Object data) {
+        this(id, type, data, null);
+    }
+
+    /**
+     * Constructor with meta data.
      * 
      * @param id
      *            The ID of the event, used as part of the idempotent write
