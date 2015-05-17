@@ -84,5 +84,18 @@ public interface ReadOnlyEventStore extends Closeable {
             @NotNull StreamId streamId, int start, int count)
             throws StreamNotFoundException, StreamDeletedException;
 
+    /**
+     * Reads count events from all events forward (e.g. oldest to newest)
+     * starting from position start
+     * 
+     * @param start
+     *            The starting point to read from
+     * @param count
+     *            The count of items to read
+     * 
+     * @return A slice containing the results of the read operation
+     */
+    public StreamEventsSlice readAllEventsForward(int start, int count);
+
 }
 // CHECKSTYLE:ON:RedundantThrows
