@@ -66,7 +66,8 @@ public interface WritableEventStore extends ReadOnlyEventStore {
             throws StreamNotFoundException, StreamDeletedException;
 
     /**
-     * Appends a list of events to a stream.
+     * Appends a list of events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -78,7 +79,8 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             The stream does not exist in the repository.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
      * @throws StreamVersionConflictException
@@ -92,7 +94,8 @@ public interface WritableEventStore extends ReadOnlyEventStore {
             ProjectionNotWritableException;
 
     /**
-     * Appends one or more events to a stream.
+     * Appends one or more events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -104,8 +107,8 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the
-     *             repository.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was
      *             deleted.
@@ -115,5 +118,52 @@ public interface WritableEventStore extends ReadOnlyEventStore {
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull CommonEvent... events) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException;
+
+    /**
+     * Appends a list of events to a stream regardless of what version the
+     * stream has. If the stream does not exist, the implementation may create
+     * it on the fly.
+     * 
+     * @param streamId
+     *            The unique identifier of the stream to append the events to.
+     * @param events
+     *            List of events to write to the stream
+     * 
+     * @return The next expected version for the stream.
+     * 
+     * @throws StreamNotFoundException
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
+     * @throws StreamDeletedException
+     *             The stream previously existed but was deleted.
+     * @throws ProjectionNotWritableException
+     *             The given stream identifier points to a projection.
+     */
+    public int appendToStream(@NotNull StreamId streamId,
+            @NotNull List<CommonEvent> events) throws StreamNotFoundException,
+            StreamDeletedException, ProjectionNotWritableException;
+
+    /**
+     * Appends one or more events to a stream regardless of what version the
+     * stream has. If the stream does not exist, the implementation may create
+     * it on the fly.
+     * 
+     * @param streamId
+     *            The unique identifier of the stream to append the events to.
+     * @param events
+     *            Array of events to write to the stream
+     * 
+     * @return The next expected version for the stream.
+     * 
+     * @throws StreamNotFoundException
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
+     * @throws StreamDeletedException
+     *             A stream with the given name previously existed but was
+     *             deleted.
+     */
+    public int appendToStream(@NotNull StreamId streamId,
+            @NotNull CommonEvent... events) throws StreamNotFoundException,
+            StreamDeletedException;
 
 }
