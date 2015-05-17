@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 public interface WritableEventStore extends ReadOnlyEventStore {
 
     /**
-     * Deletes a stream from the event store.
+     * Deletes a stream from the event store if it has a given version.
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
@@ -46,6 +46,24 @@ public interface WritableEventStore extends ReadOnlyEventStore {
     public void deleteStream(@NotNull StreamId streamId, int expectedVersion)
             throws StreamNotFoundException, StreamVersionConflictException,
             StreamDeletedException;
+
+    /**
+     * Deletes a stream from the event store regardless of the current version.
+     * 
+     * @param streamId
+     *            The unique identifier of the stream to be deleted
+     * @param expectedVersion
+     *            The version the stream should have when being deleted.
+     * 
+     * @throws StreamNotFoundException
+     *             A stream with the given name does not exist in the
+     *             repository.
+     * @throws StreamDeletedException
+     *             A stream with the given name previously existed but was
+     *             deleted.
+     */
+    public void deleteStream(@NotNull StreamId streamId)
+            throws StreamNotFoundException, StreamDeletedException;
 
     /**
      * Appends a list of events to a stream.
