@@ -56,7 +56,7 @@ public interface ReadOnlyEventStore extends Closeable {
      *             A stream with the given name previously existed but was
      *             deleted.
      */
-    public EventData readEvent(@NotNull StreamId streamId, int eventNumber)
+    public CommonEvent readEvent(@NotNull StreamId streamId, int eventNumber)
             throws EventNotFoundException, StreamNotFoundException,
             StreamDeletedException;
 

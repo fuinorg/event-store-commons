@@ -38,7 +38,7 @@ public final class StreamEventsSlice {
 
     private final boolean endOfStream;
 
-    private final List<EventData> events;
+    private final List<CommonEvent> events;
 
     /**
      * Constructor with all data.
@@ -55,14 +55,14 @@ public final class StreamEventsSlice {
      *            Determines whether or not this is the end of the stream.
      */
     public StreamEventsSlice(final int fromEventNumber,
-            final List<EventData> events, final int nextEventNumber,
+            final List<CommonEvent> events, final int nextEventNumber,
             final boolean endOfStream) {
 
         this.fromEventNumber = fromEventNumber;
         if (events == null || events.size() == 0) {
-            this.events = new ArrayList<EventData>();
+            this.events = new ArrayList<CommonEvent>();
         } else {
-            this.events = new ArrayList<EventData>(events);
+            this.events = new ArrayList<CommonEvent>(events);
         }
         this.nextEventNumber = nextEventNumber;
         this.endOfStream = endOfStream;
@@ -84,7 +84,7 @@ public final class StreamEventsSlice {
      * @return Unmodifiable list of events.
      */
     @NeverNull
-    public List<EventData> getEvents() {
+    public List<CommonEvent> getEvents() {
         return Collections.unmodifiableList(events);
     }
 

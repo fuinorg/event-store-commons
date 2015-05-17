@@ -33,7 +33,7 @@ import org.fuin.objects4j.vo.ValueObject;
  * methods are defined on the <code>id</code>.
  */
 @Immutable
-public class EventData implements Serializable, ValueObject {
+public final class CommonEvent implements Serializable, ValueObject {
 
     private static final long serialVersionUID = 1000L;
 
@@ -46,6 +46,10 @@ public class EventData implements Serializable, ValueObject {
     @UUIDStr
     private String id;
 
+    /** Never changing unique event type name. */
+    @NotNull
+    private String type;
+
     /** The event data. */
     @NotNull
     private Object data;
@@ -56,7 +60,7 @@ public class EventData implements Serializable, ValueObject {
     /**
      * Protected constructor for deserialization.
      */
-    protected EventData() {
+    protected CommonEvent() {
         super();
     }
 
@@ -74,14 +78,17 @@ public class EventData implements Serializable, ValueObject {
      *            Meta data.
      * 
      */
-    public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final Object data, @Nullable final Object meta) {
+    public CommonEvent(@NotNull @UUIDStr final String id,
+            @NotNull final String type, @NotNull final Object data,
+            @Nullable final Object meta) {
         super();
 
-        Contract.requireArgNotNull("eventId", id);
+        Contract.requireArgNotNull("id", id);
+        Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("data", data);
 
         this.id = id;
+        this.type = type;
         this.data = data;
         this.meta = meta;
 
@@ -97,6 +104,16 @@ public class EventData implements Serializable, ValueObject {
     @NeverNull
     public final String getId() {
         return id;
+    }
+
+    /**
+     * Returns the event type.
+     * 
+     * @return Never changing unique event type name.
+     */
+    @NeverNull
+    public final String getType() {
+        return type;
     }
 
     /**
@@ -129,16 +146,15 @@ public class EventData implements Serializable, ValueObject {
         return result;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public final boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof EventData))
+        if (!(obj instanceof CommonEvent))
             return false;
-        EventData other = (EventData) obj;
+        CommonEvent other = (CommonEvent) obj;
         if (id == null) {
             if (other.id != null)
                 return false;

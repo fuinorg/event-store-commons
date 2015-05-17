@@ -45,16 +45,16 @@ public class StreamEventsSliceTest {
 
     private static final boolean EOS = true;
 
-    private static List<EventData> events;
+    private static List<CommonEvent> events;
 
     private StreamEventsSlice testee;
 
     @BeforeClass
     public static void beforeClass() throws MimeTypeParseException {
         final JsonObject meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
-        events = new ArrayList<EventData>();        
-        events.add(new EventData("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c", new MyEvent("Peter"), meta));
-        events.add(new EventData("41d48b30-42be-459d-9359-4b20909191f2", new MyEvent("Mary Jane"), meta));
+        events = new ArrayList<CommonEvent>();        
+        events.add(new CommonEvent("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c", new MyEvent("Peter"), meta));
+        events.add(new CommonEvent("41d48b30-42be-459d-9359-4b20909191f2", new MyEvent("Mary Jane"), meta));
     }
 
     @Before
