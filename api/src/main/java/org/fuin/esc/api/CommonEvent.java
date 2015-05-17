@@ -182,4 +182,9 @@ public final class CommonEvent implements Serializable, ValueObject {
 
     // CHECKSTYLE:ON
 
+    @Override
+    public String toString() {
+        return type + " " + id;
+    }
+    
 }
