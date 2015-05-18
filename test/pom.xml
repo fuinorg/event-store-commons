@@ -28,12 +28,25 @@
 
 	<dependencies>
 
-		<!-- compile -->
-
+        <dependency>
+            <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-api</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-mem</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
 		<dependency>
 			<groupId>org.fuin</groupId>
 			<artifactId>objects4j</artifactId>
 			<version>0.6.1</version>
+            <scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -41,27 +54,29 @@
 			<artifactId>validation-api</artifactId>
 			<version>1.1.0.Final</version>
 			<optional>true</optional>
+            <scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.1</version>
+            <scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.6</version>
+            <scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.json</groupId>
 			<artifactId>javax.json-api</artifactId>
 			<version>1.0</version>
+            <scope>test</scope>
 		</dependency>
-
-		<!-- test -->
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -136,6 +151,37 @@
 			<scope>test</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>1.1.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>1.1.5</version>
+            <scope>test</scope>
+        </dependency>
+
 	</dependencies>
+
+    <build>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
 
 </project>
