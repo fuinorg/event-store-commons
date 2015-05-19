@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
@@ -36,8 +38,8 @@ import org.fuin.objects4j.vo.ValueObject;
  * methods are defined on the <code>id</code>.
  */
 @Immutable
-@XmlRootElement(name = "event-data")
-public class EventData implements Serializable, ValueObject {
+@XmlRootElement(name = "event")
+public final class Event implements Serializable, ValueObject {
 
     private static final long serialVersionUID = 1000L;
 
@@ -64,7 +66,7 @@ public class EventData implements Serializable, ValueObject {
     /**
      * Protected constructor for deserialization.
      */
-    protected EventData() {
+    protected Event() {
         super();
     }
 
@@ -82,8 +84,8 @@ public class EventData implements Serializable, ValueObject {
      *            Meta data.
      * 
      */
-    public EventData(@NotNull @UUIDStr final String id,
-            @NotNull final Data data, @Nullable final Data meta) {
+    public Event(@NotNull @UUIDStr final String id, @NotNull final Data data,
+            @Nullable final Data meta) {
         super();
 
         Contract.requireArgNotNull("eventId", id);
@@ -143,9 +145,9 @@ public class EventData implements Serializable, ValueObject {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof EventData))
+        if (!(obj instanceof Event))
             return false;
-        EventData other = (EventData) obj;
+        Event other = (Event) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -155,5 +157,17 @@ public class EventData implements Serializable, ValueObject {
     }
 
     // CHECKSTYLE:ON
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("id", id).append("data", data)
+                .append("meta", meta).toString();
+    }
+
+    public static Event valueOf(final CommonEvent selEvent) {
+        final Data data = Data.valueOf(selEvent.getType(), selEvent.getData());
+        final Data meta = Data.valueOf("meta", selEvent.getMeta());
+        return new Event(selEvent.getId(), data, meta);
+    }
 
 }

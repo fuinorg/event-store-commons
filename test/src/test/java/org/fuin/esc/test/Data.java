@@ -17,14 +17,22 @@
  */
 package org.fuin.esc.test;
 
-import java.io.Serializable;
+import static org.fuin.units4j.Units4JUtils.marshal;
+import static org.fuin.units4j.Units4JUtils.unmarshal;
 
+import java.io.Serializable;
+import java.io.StringReader;
+
+import javax.activation.MimeTypeParseException;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
@@ -35,7 +43,7 @@ import org.fuin.objects4j.vo.ValueObject;
  */
 @Immutable
 @XmlRootElement(name = "data")
-public class Data implements ValueObject, Serializable {
+public final class Data implements ValueObject, Serializable {
 
     private static final long serialVersionUID = 1000L;
 
@@ -85,6 +93,7 @@ public class Data implements ValueObject, Serializable {
         this.type = type;
         this.mimeType = mimeType;
         this.content = content;
+
     }
 
     /**
@@ -133,6 +142,73 @@ public class Data implements ValueObject, Serializable {
      */
     public final boolean isJson() {
         return mimeType.getBaseType().equals("application/json");
+    }
+
+    /**
+     * Unmarshals the content into an object. Content is required to be
+     * "application/xml" or "application/json".
+     * 
+     * @param classesToBeBound In case the XML JAXB unmarshalling is used, you have to pass the classes for the content here.
+     * 
+     * @return Object created from content.
+     */
+    @SuppressWarnings("unchecked")
+    public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {
+
+        if (!(isJson() || isXml())) {
+            throw new IllegalStateException(
+                    "Can only unmarshal JSON or XML content, not: " + mimeType);
+        }
+
+        // We can only handle JSON...
+        if (isJson()) {
+            return (T) Json.createReader(new StringReader(content)).readObject();
+        }
+        // ...or XML
+        return unmarshal(content, classesToBeBound);
+    }
+
+    @Override
+    public final String toString() {
+        return new ToStringBuilder(this).append("type", type)
+                .append("mimeType", mimeType).append("content", content)
+                .toString();
+    }
+
+    /**
+     * Creates a new instance from a given object.
+     * 
+     * @param type
+     *            Name of the type.
+     * @param obj
+     *            Object to convert.
+     * 
+     * @return Either JSON or XML UTF-8 encoded content without a version.
+     */
+    public static Data valueOf(final String type, final Object obj) {
+        return new Data(type, mimeType(obj), content(obj));
+    }
+
+    private static VersionedMimeType mimeType(final Object obj) {
+        try {
+            // We can only handle JSON...
+            if (obj instanceof JsonObject) {
+                return new VersionedMimeType("application/json; encoding=utf-8");
+            }
+            // ...or XML
+            return new VersionedMimeType("application/xml; encoding=utf-8");
+        } catch (final MimeTypeParseException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static String content(final Object obj) {
+        // We can only handle JSON...
+        if (obj instanceof JsonObject) {
+            return obj.toString();
+        }
+        // ...or XML
+        return marshal(obj, obj.getClass());
     }
 
 }

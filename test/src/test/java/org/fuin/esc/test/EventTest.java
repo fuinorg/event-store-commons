@@ -33,10 +33,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link EventData} class.
+ * Tests the {@link Event} class.
  */
 // CHECKSTYLE:OFF Test
-public class EventDataTest extends AbstractXmlTest {
+public class EventTest extends AbstractXmlTest {
 
     private static final String ID = "5741bcf1-9292-446b-84c1-957ed53b8d88";
 
@@ -60,11 +60,11 @@ public class EventDataTest extends AbstractXmlTest {
     private static final Data META = new Data(META_TYPE, META_MIME_TYPE,
             META_CONTENT);
 
-    private EventData testee;
+    private Event testee;
 
     @Before
     public void setup() {
-        testee = new EventData(ID, DATA, META);
+        testee = new Event(ID, DATA, META);
     }
 
     @After
@@ -74,7 +74,7 @@ public class EventDataTest extends AbstractXmlTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(EventData.class).verify();
+        EqualsVerifier.forClass(Event.class).verify();
     }
 
     @Test
@@ -86,11 +86,11 @@ public class EventDataTest extends AbstractXmlTest {
     public void testSerializeDeserialize() {
 
         // PREPARE
-        final EventData original = testee;
+        final Event original = testee;
 
         // TEST
         final byte[] data = serialize(original);
-        final EventData copy = deserialize(data);
+        final Event copy = deserialize(data);
 
         // VERIFY
         assertEqualsConstantValues(copy);
@@ -101,11 +101,11 @@ public class EventDataTest extends AbstractXmlTest {
     public final void testMarshalUnmarshalXML() throws Exception {
 
         // PREPARE
-        final EventData original = testee;
+        final Event original = testee;
 
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
-                EventData.class);
+                Event.class);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
@@ -113,13 +113,14 @@ public class EventDataTest extends AbstractXmlTest {
                 .assertXMLEqual(
                 // @formatter:off
                         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                                + "<event-data id=\"5741bcf1-9292-446b-84c1-957ed53b8d88\">"
+                                + "<event id=\"5741bcf1-9292-446b-84c1-957ed53b8d88\">"
                                 + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
                                 + "        <![CDATA[<myEvent/>]]>"
                                 + "    </data>"
                                 + "    <meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
                                 + "        <![CDATA[{ \"a\" : \"1\" }]]>"
-                                + "    </meta>" + "</event-data>"
+                                + "    </meta>" 
+                                + "</event>"
                         // @formatter:on
                         , xml);
 
@@ -129,20 +130,20 @@ public class EventDataTest extends AbstractXmlTest {
     public final void testMarshalUnmarshalEquals() throws Exception {
 
         // PREPARE
-        final EventData original = testee;
+        final Event original = testee;
 
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
-                EventData.class);
-        final EventData copy = unmarshal(xml, createXmlAdapter(),
-                EventData.class);
+                Event.class);
+        final Event copy = unmarshal(xml, createXmlAdapter(),
+                Event.class);
 
         // VERIFY
         assertEqualsConstantValues(copy);
 
     }
 
-    private void assertEqualsConstantValues(EventData ed) {
+    private void assertEqualsConstantValues(Event ed) {
         assertThat(ed.getId()).isEqualTo(ID);
         assertThat(ed.getData().getType()).isEqualTo(DATA_TYPE);
         assertThat(ed.getData().getMimeType()).isEqualTo(DATA_MIME_TYPE);

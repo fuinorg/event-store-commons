@@ -22,12 +22,16 @@ import static org.fuin.units4j.Units4JUtils.deserialize;
 import static org.fuin.units4j.Units4JUtils.serialize;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 
+import javax.activation.MimeTypeParseException;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fuin.units4j.Units4JUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +47,7 @@ public class DataTest extends AbstractXmlTest {
     private static final VersionedMimeType MIME_TYPE = VersionedMimeType
             .create("application/xml; version=1; encoding=utf-8");
 
-    private static final String CONTENT = "<myEvent/>";
+    private static final String CONTENT = "<book-added-event name=\"Shining\" author=\"Stephen King\" />";
 
     private Data testee;
 
@@ -134,6 +138,83 @@ public class DataTest extends AbstractXmlTest {
         assertThat(copy.getType()).isEqualTo(type);
         assertThat(copy.getMimeType()).isEqualTo(mimeType);
         assertThat(copy.getContent()).isEqualTo(content);
+
+    }
+
+    @Test
+    public void testUnmarshalXmlContent() {
+
+        // TEST
+        final BookAddedEvent event = testee
+                .unmarshalContent(BookAddedEvent.class);
+
+        // VERIFY
+        assertThat(event).isNotNull();
+        assertThat(event.getName()).isEqualTo("Shining");
+        assertThat(event.getAuthor()).isEqualTo("Stephen King");
+
+    }
+
+    @Test
+    public void testUnmarshalJsonContent() throws MimeTypeParseException {
+
+        // PREPARE
+        final Data data = new Data("BookAddedEvent", new VersionedMimeType(
+                "application/json; encoding=utf-8"),
+                "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
+
+        // TEST
+        final JsonObject event = data.unmarshalContent();
+
+        // VERIFY
+        assertThat(event.getString("name")).isEqualTo("Shining");
+        assertThat(event.getString("author")).isEqualTo("Stephen King");
+
+    }
+
+    @Test
+    public void testValueOfXml() throws MimeTypeParseException {
+
+        // PREPARE
+        final BookAddedEvent event = new BookAddedEvent("Shining",
+                "Stephen King");
+
+        // TEST
+        final Data data = Data.valueOf("BookAddedEvent", event);
+
+        // VERIFY
+        assertThat(data.getType()).isEqualTo("BookAddedEvent");
+        assertThat(data.getMimeType()).isEqualTo(
+                new VersionedMimeType("application/xml; encoding=utf-8"));
+        assertThat(data.getContent())
+                .isEqualTo(
+                        Units4JUtils.XML_PREFIX
+                                + "<book-added-event name=\"Shining\" author=\"Stephen King\"/>");
+        assertThat(data.isXml()).isTrue();
+        assertThat(data.isJson()).isFalse();
+
+    }
+
+    @Test
+    public void testValueOfJson() throws MimeTypeParseException {
+
+        // PREPARE
+        final JsonObject event = Json.createObjectBuilder()
+                .add("name", "Shining").add("author", "Stephen King").build();
+
+        // TEST
+        final Data data = Data.valueOf("BookAddedEvent", event);
+
+        System.out.println(event.toString());
+
+        // VERIFY
+        assertThat(data.getType()).isEqualTo("BookAddedEvent");
+        assertThat(data.getMimeType()).isEqualTo(
+                new VersionedMimeType("application/json; encoding=utf-8"));
+        assertThat(data.getContent()).isEqualTo(
+                "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
+        assertThat(data.isXml()).isFalse();
+        assertThat(data.isJson()).isTrue();
 
     }
 

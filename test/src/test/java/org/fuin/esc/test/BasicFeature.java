@@ -1,13 +1,18 @@
 package org.fuin.esc.test;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
+import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.WritableEventStore;
 import org.fuin.esc.mem.InMemoryEventStore;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -15,6 +20,8 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
 public class BasicFeature {
+
+    private static final int MAX_EVENTS = 10;
 
     private WritableEventStore eventStore;
 
@@ -31,7 +38,8 @@ public class BasicFeature {
     }
 
     @Given("^The stream \"([^\"]*)\" does not exist$")
-    public void The_stream_does_not_exist(String streamName) throws Throwable {
+    public void assertThatStreamDoesNotExist(String streamName)
+            throws Throwable {
         try {
             eventStore.deleteStream(new SimpleStreamId(streamName));
             fail("The stream should not exist: " + streamName);
@@ -40,18 +48,26 @@ public class BasicFeature {
         }
     }
 
-    @When("^I write the following events to \"([^\"]*)\"$")
-    public void I_write_the_following_events_to(String streamName,
-            String eventsXml) throws Throwable {
-        // Express the Regexp above with the code you wish you had
-        throw new PendingException();
+    @When("^I write the following events to stream \"([^\"]*)\"$")
+    public void appendEventsTo(String streamName, String eventsXml)
+            throws Throwable {
+        final Events toAppend = unmarshal(eventsXml, Events.class);
+        eventStore.appendToStream(new SimpleStreamId(streamName), toAppend.asCommonEvents(BookAddedEvent.class));
     }
 
-    @Then("^I expect that reading all from stream \"([^\"]*)\" returns the following events$")
-    public void I_expect_that_reading_all_from_stream_returns_the_following_events(
-            String streamName, String eventsXml) throws Throwable {
-        // Express the Regexp above with the code you wish you had
-        throw new PendingException();
+    @Then("^reading all events from stream \"([^\"]*)\" should return the following slices$")
+    public void assertReadingAllEvents(String streamName, String slicesXml)
+            throws Throwable {
+        final Slices expected = unmarshal(slicesXml, Slices.class);
+        final Slices actual = new Slices();
+        StreamEventsSlice slice = eventStore.readStreamEventsForward(
+                new SimpleStreamId(streamName), 0, MAX_EVENTS);
+        while (!slice.isEndOfStream()) {
+            actual.append(Slice.valueOf(slice));
+            slice = eventStore.readStreamEventsForward(new SimpleStreamId(
+                    streamName), slice.getNextEventNumber(), MAX_EVENTS);
+        }        
+        assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
     }
 
 }
