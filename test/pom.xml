@@ -37,6 +37,13 @@
         
         <dependency>
             <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-spi</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.fuin.esc</groupId>
             <artifactId>esc-mem</artifactId>
             <version>0.1.0-SNAPSHOT</version>
             <scope>test</scope>

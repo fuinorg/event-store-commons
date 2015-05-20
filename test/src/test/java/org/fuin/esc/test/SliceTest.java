@@ -31,6 +31,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fuin.esc.spi.VersionedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

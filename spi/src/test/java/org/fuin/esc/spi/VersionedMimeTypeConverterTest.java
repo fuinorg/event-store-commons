@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.activation.MimeTypeParseException;
 
@@ -39,8 +41,8 @@ public class VersionedMimeTypeConverterTest {
         assertThat(testee.getBaseType()).isEqualTo("application/xml");
         assertThat(testee.getPrimaryType()).isEqualTo("application");
         assertThat(testee.getSubType()).isEqualTo("xml");
-        assertThat(testee.getEncoding()).isEqualTo(Charset.forName("utf-8"));
-        assertThat(testee.getVersion()).isEqualTo("1");
+        assertThat(testee.getEncoding()).isNull();
+        assertThat(testee.getVersion()).isNull();
         assertThat(testee.getParameters().size()).isEqualTo(0);
 
     }
@@ -67,16 +69,21 @@ public class VersionedMimeTypeConverterTest {
     public final void testTypeConstruction() throws MimeTypeParseException {
 
         // PREPARE & TEST
+        final Map<String, String> params = new HashMap<String, String>();
+        params.put("a", "1");
         final VersionedMimeType testee = new VersionedMimeType(
-                "application", "json", Charset.forName("iso-8859-1"), "2");
+                "application", "json", Charset.forName("iso-8859-1"), "2", params);
 
         // VERIFY
         assertThat(testee.getBaseType()).isEqualTo("application/json");
         assertThat(testee.getPrimaryType()).isEqualTo("application");
         assertThat(testee.getSubType()).isEqualTo("json");
         assertThat(testee.getEncoding()).isEqualTo(Charset.forName("ISO-8859-1"));
+        assertThat(testee.getParameter(VersionedMimeType.ENCODING)).isEqualTo("ISO-8859-1");
         assertThat(testee.getVersion()).isEqualTo("2");
-        assertThat(testee.getParameters().size()).isEqualTo(2);
+        assertThat(testee.getParameter(VersionedMimeType.VERSION)).isEqualTo("2");
+        assertThat(testee.getParameter("a")).isEqualTo("1");
+        assertThat(testee.getParameters().size()).isEqualTo(3);
 
     }
     

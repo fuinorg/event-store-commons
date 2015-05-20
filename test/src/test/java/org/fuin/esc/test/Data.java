@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fuin.esc.spi.VersionedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;

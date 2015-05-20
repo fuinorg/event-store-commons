@@ -30,6 +30,7 @@
 
 	<modules>
 		<module>esc-api</module>
+        <module>esc-spi</module>
         <module>esc-mem</module>
 		<module>esc-esj</module>
 		<module>esc-jpa</module>

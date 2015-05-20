@@ -15,11 +15,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-@XmlJavaTypeAdapter(type = VersionedMimeType.class, value = VersionedMimeTypeConverter.class)
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.File;
 
-import org.fuin.esc.spi.VersionedMimeType;
-import org.fuin.esc.spi.VersionedMimeTypeConverter;
+import org.fuin.units4j.AssertCoverage;
+import org.junit.Test;
 
+/**
+ * General tests for all classes.
+ */
+public class BaseTest {
+
+    @Test
+    public final void testCoverage() {
+        // Make sure all classes have a test
+        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
+    }
+
+}

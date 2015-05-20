@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-@XmlJavaTypeAdapter(type = VersionedMimeType.class, value = VersionedMimeTypeConverter.class)
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+/**
+ * Combined registry for serializer and deserializer.
+ */
+public interface SerializerDeserializerRegistry extends SerializerRegistry, DeserializerRegistry {
 
-import org.fuin.esc.spi.VersionedMimeType;
-import org.fuin.esc.spi.VersionedMimeTypeConverter;
-
+}

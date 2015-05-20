@@ -31,6 +31,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fuin.esc.spi.VersionedMimeType;
 import org.fuin.units4j.Units4JUtils;
 import org.junit.After;
 import org.junit.Before;
