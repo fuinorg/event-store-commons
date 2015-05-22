@@ -1,2 +1,2 @@
 # esc-spi
-The service provider interface provides helpful classes for implementing an event store or an adapter to it.
+The service provider interface provides helpful classes for creating an event store implementation or adapter.
