@@ -1,3 +1,4 @@
+// CHECKSTYLE:OFF Code from Cucumber code base
 package org.fuin.esc.test;
 
 import java.io.IOException;
@@ -128,3 +129,4 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
     }
     
 }
+// CHECKTYLE:ON
