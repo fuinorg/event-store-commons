@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-@XmlJavaTypeAdapter(type = VersionedMimeType.class, value = VersionedMimeTypeConverter.class)
+@XmlJavaTypeAdapter(type = EnhancedMimeType.class, value = VersionedMimeTypeConverter.class)
 package org.fuin.esc.test;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.fuin.esc.spi.VersionedMimeType;
-import org.fuin.esc.spi.VersionedMimeTypeConverter;
+import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.spi.EnhancedMimeType;
 

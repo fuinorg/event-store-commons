@@ -30,7 +30,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.esc.spi.VersionedMimeType;
+import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class SliceTest extends AbstractXmlTest {
     public void setup() throws Exception {
         events = new ArrayList<Event>();
         events.add(new Event("f6a8d009-5613-4e4d-9e46-15a30daa2d28", new Data(
-                "MyEvent", new VersionedMimeType(
+                "MyEvent", new EnhancedMimeType(
                         "application/xml; version=2; encoding=utf-8"),
                 "<my-event/>"), null));
         testee = new Slice(FROM, events, NEXT, EOS);

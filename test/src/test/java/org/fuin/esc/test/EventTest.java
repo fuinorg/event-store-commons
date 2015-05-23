@@ -27,7 +27,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.esc.spi.VersionedMimeType;
+import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class EventTest extends AbstractXmlTest {
 
     private static final String DATA_TYPE = "MyEvent";
 
-    private static final VersionedMimeType DATA_MIME_TYPE = VersionedMimeType
+    private static final EnhancedMimeType DATA_MIME_TYPE = EnhancedMimeType
             .create("application/xml; encoding=utf-8; version=1");
 
     private static final String DATA_CONTENT = "<myEvent/>";
@@ -52,7 +52,7 @@ public class EventTest extends AbstractXmlTest {
 
     private static final String META_TYPE = "MyMeta";
 
-    private static final VersionedMimeType META_MIME_TYPE = VersionedMimeType
+    private static final EnhancedMimeType META_MIME_TYPE = EnhancedMimeType
             .create("application/json; encoding=utf-8");
 
     private static final String META_CONTENT = "{ \"a\" : \"1\" }";

@@ -35,6 +35,6 @@ public interface Deserializer {
      * @param <T>
      *            Type the data is converted into.
      */
-    public <T> T unmarshal(byte[] data, VersionedMimeType mimeType);
+    public <T> T unmarshal(byte[] data, EnhancedMimeType mimeType);
 
 }

@@ -30,7 +30,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.fuin.esc.spi.VersionedMimeType;
+import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.units4j.Units4JUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class DataTest extends AbstractXmlTest {
 
     private static final String TYPE = "MyEvent";
 
-    private static final VersionedMimeType MIME_TYPE = VersionedMimeType
+    private static final EnhancedMimeType MIME_TYPE = EnhancedMimeType
             .create("application/xml; version=1; encoding=utf-8");
 
     private static final String CONTENT = "<book-added-event name=\"Shining\" author=\"Stephen King\" />";
@@ -122,7 +122,7 @@ public class DataTest extends AbstractXmlTest {
 
         // PREPARE
         final String type = "Icon";
-        final VersionedMimeType mimeType = VersionedMimeType
+        final EnhancedMimeType mimeType = EnhancedMimeType
                 .create("image/png");
         final byte[] png = IOUtils.toByteArray(getClass().getResourceAsStream(
                 "/ok.png"));
@@ -159,7 +159,7 @@ public class DataTest extends AbstractXmlTest {
     public void testUnmarshalJsonContent() throws MimeTypeParseException {
 
         // PREPARE
-        final Data data = new Data("BookAddedEvent", new VersionedMimeType(
+        final Data data = new Data("BookAddedEvent", new EnhancedMimeType(
                 "application/json; encoding=utf-8"),
                 "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
 
@@ -185,7 +185,7 @@ public class DataTest extends AbstractXmlTest {
         // VERIFY
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
         assertThat(data.getMimeType()).isEqualTo(
-                new VersionedMimeType("application/xml; encoding=utf-8"));
+                new EnhancedMimeType("application/xml; encoding=utf-8"));
         assertThat(data.getContent())
                 .isEqualTo(
                         Units4JUtils.XML_PREFIX
@@ -210,7 +210,7 @@ public class DataTest extends AbstractXmlTest {
         // VERIFY
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
         assertThat(data.getMimeType()).isEqualTo(
-                new VersionedMimeType("application/json; encoding=utf-8"));
+                new EnhancedMimeType("application/json; encoding=utf-8"));
         assertThat(data.getContent()).isEqualTo(
                 "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
         assertThat(data.isXml()).isFalse();

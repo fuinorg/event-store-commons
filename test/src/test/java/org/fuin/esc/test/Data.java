@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.esc.spi.VersionedMimeType;
+import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
@@ -55,7 +55,7 @@ public final class Data implements ValueObject, Serializable {
     /** Internet Media Type that classifies the raw event data. */
     @NotNull
     @XmlAttribute(name = "mime-type")
-    private VersionedMimeType mimeType;
+    private EnhancedMimeType mimeType;
 
     /** Raw event data in format defined by the mime type and encoding. */
     @NotNull
@@ -82,7 +82,7 @@ public final class Data implements ValueObject, Serializable {
      *            Content.
      */
     public Data(@NotNull final String type,
-            @NotNull final VersionedMimeType mimeType,
+            @NotNull final EnhancedMimeType mimeType,
             @NotNull final String content) {
         super();
 
@@ -112,7 +112,7 @@ public final class Data implements ValueObject, Serializable {
      * @return Mime type.
      */
     @NeverNull
-    public final VersionedMimeType getMimeType() {
+    public final EnhancedMimeType getMimeType() {
         return mimeType;
     }
 
@@ -194,14 +194,14 @@ public final class Data implements ValueObject, Serializable {
         return new Data(type, mimeType(obj), content(obj));
     }
 
-    private static VersionedMimeType mimeType(final Object obj) {
+    private static EnhancedMimeType mimeType(final Object obj) {
         try {
             // We can only handle JSON...
             if (obj instanceof JsonObject) {
-                return new VersionedMimeType("application/json; encoding=utf-8");
+                return new EnhancedMimeType("application/json; encoding=utf-8");
             }
             // ...or XML
-            return new VersionedMimeType("application/xml; encoding=utf-8");
+            return new EnhancedMimeType("application/xml; encoding=utf-8");
         } catch (final MimeTypeParseException ex) {
             throw new RuntimeException(ex);
         }

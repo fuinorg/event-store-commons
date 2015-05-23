@@ -35,6 +35,6 @@ public interface DeserializerRegistry {
      *         deserializer was found for the type.
      */
     public Deserializer getDeserializer(@NotNull String type,
-            @NotNull VersionedMimeType mimeType);
+            @NotNull EnhancedMimeType mimeType);
 
 }

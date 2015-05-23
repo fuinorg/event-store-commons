@@ -35,7 +35,7 @@ import javax.json.JsonWriter;
  */
 public final class JsonDeSerializer implements Serializer, Deserializer {
 
-    private final VersionedMimeType mimeType;
+    private final EnhancedMimeType mimeType;
 
     /**
      * Constructor with UTF-8 encoding.
@@ -52,7 +52,7 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
      */
     public JsonDeSerializer(final Charset encoding) {
         super();
-        this.mimeType = VersionedMimeType.create("application", "json",
+        this.mimeType = EnhancedMimeType.create("application", "json",
                 encoding);
     }
 
@@ -78,7 +78,7 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
     @SuppressWarnings("unchecked")
     @Override
     public final <T> T unmarshal(final byte[] data,
-            final VersionedMimeType mimeType) {
+            final EnhancedMimeType mimeType) {
         final Reader reader = new InputStreamReader(new ByteArrayInputStream(
                 data), mimeType.getEncoding());
         final JsonReader jsonReader = Json.createReader(reader);

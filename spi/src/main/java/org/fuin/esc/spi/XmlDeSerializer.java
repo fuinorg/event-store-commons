@@ -44,7 +44,7 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
     private static final Logger LOG = LoggerFactory
             .getLogger(XmlDeSerializer.class);
 
-    private final VersionedMimeType mimeType;
+    private final EnhancedMimeType mimeType;
 
     private final Marshaller marshaller;
 
@@ -89,7 +89,7 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
             final XmlAdapter<?, ?>[] adapters,
             final Class<?>... classesToBeBound) {
         super();
-        this.mimeType = VersionedMimeType
+        this.mimeType = EnhancedMimeType
                 .create("application", "xml", encoding);
         try {
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
@@ -142,7 +142,7 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
     @SuppressWarnings("unchecked")
     @Override
     public final <T> T unmarshal(final byte[] data,
-            final VersionedMimeType mimeType) {
+            final EnhancedMimeType mimeType) {
         try {
             final Reader reader = new InputStreamReader(
                     new ByteArrayInputStream(data), mimeType.getEncoding());

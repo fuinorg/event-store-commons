@@ -91,7 +91,7 @@ public final class SimpleSerializerDeserializerRegistry implements
 
     @Override
     public final Deserializer getDeserializer(final String type,
-            final VersionedMimeType mimeType) {
+            final EnhancedMimeType mimeType) {
 
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("mimeType", mimeType);

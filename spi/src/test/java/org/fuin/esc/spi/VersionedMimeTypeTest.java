@@ -29,16 +29,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link  VersionedMimeType} class.
+ * Tests the {@link  EnhancedMimeType} class.
  */
 // CHECKSTYLE:OFF Test
 public class VersionedMimeTypeTest {
 
-    private VersionedMimeType testee;
+    private EnhancedMimeType testee;
 
     @Before
     public void setup() throws MimeTypeParseException {
-        testee = new VersionedMimeType("application/xml;version=1.0.2;encoding=utf-8");
+        testee = new EnhancedMimeType("application/xml;version=1.0.2;encoding=utf-8");
     }
 
     @After
@@ -50,7 +50,7 @@ public class VersionedMimeTypeTest {
     public void testConstrcutionPrimarySub() throws MimeTypeParseException {
         
         // PREPARE & TEST
-        final VersionedMimeType testee = new VersionedMimeType("application", "json");
+        final EnhancedMimeType testee = new EnhancedMimeType("application", "json");
         
         //VERIFY
         assertThat(testee.getPrimaryType()).isEqualTo("application");
@@ -63,7 +63,7 @@ public class VersionedMimeTypeTest {
     public void testConstrcutionPrimarySubEncoding() throws MimeTypeParseException {
         
         // PREPARE & TEST
-        final VersionedMimeType testee = new VersionedMimeType("application", "json", Charset.forName("utf-8"));
+        final EnhancedMimeType testee = new EnhancedMimeType("application", "json", Charset.forName("utf-8"));
         
         //VERIFY
         assertThat(testee.getPrimaryType()).isEqualTo("application");
@@ -78,15 +78,15 @@ public class VersionedMimeTypeTest {
         // PREPARE & TEST
         final Map<String, String> params = new HashMap<String, String>();
         params.put("a", "1");
-        final VersionedMimeType testee = new VersionedMimeType("application", "json", Charset.forName("utf-8"), "1.0.2", params);
+        final EnhancedMimeType testee = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1.0.2", params);
         
         //VERIFY
         assertThat(testee.getPrimaryType()).isEqualTo("application");
         assertThat(testee.getSubType()).isEqualTo("json");
         assertThat(testee.getEncoding()).isEqualTo(Charset.forName("utf-8"));
-        assertThat(testee.getParameter(VersionedMimeType.ENCODING)).isEqualTo("UTF-8");
+        assertThat(testee.getParameter(EnhancedMimeType.ENCODING)).isEqualTo("UTF-8");
         assertThat(testee.getVersion()).isEqualTo("1.0.2");
-        assertThat(testee.getParameter(VersionedMimeType.VERSION)).isEqualTo("1.0.2");
+        assertThat(testee.getParameter(EnhancedMimeType.VERSION)).isEqualTo("1.0.2");
         assertThat(testee.getParameter("a")).isEqualTo("1");
         assertThat(testee.getParameters().size()).isEqualTo(3);
     }
