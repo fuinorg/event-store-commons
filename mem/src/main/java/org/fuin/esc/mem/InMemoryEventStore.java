@@ -164,7 +164,8 @@ public class InMemoryEventStore implements WritableEventStore {
     @Override
     public int appendToStream(StreamId streamId, int expectedVersion,
             CommonEvent... events) throws StreamNotFoundException,
-            StreamVersionConflictException, StreamDeletedException {
+            StreamVersionConflictException, StreamDeletedException,
+            ProjectionNotWritableException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, 0);
@@ -191,7 +192,8 @@ public class InMemoryEventStore implements WritableEventStore {
 
     @Override
     public int appendToStream(StreamId streamId, CommonEvent... events)
-            throws StreamNotFoundException, StreamDeletedException {
+            throws StreamNotFoundException, StreamDeletedException,
+            ProjectionNotWritableException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);
