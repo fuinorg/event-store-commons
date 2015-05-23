@@ -19,7 +19,6 @@ package org.fuin.esc.api;
 import static org.fest.assertions.Assertions.assertThat;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import org.fuin.esc.api.SimpleStreamId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

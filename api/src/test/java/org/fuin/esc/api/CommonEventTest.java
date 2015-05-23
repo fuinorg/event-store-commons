@@ -36,7 +36,7 @@ public class CommonEventTest {
     private static final String ID = "5741bcf1-9292-446b-84c1-957ed53b8d88";
 
     private static final String TYPE = "MyEvent";
-    
+
     private static MyEvent DATA = new MyEvent("Peter");
 
     private static JsonObject META = Json.createObjectBuilder()

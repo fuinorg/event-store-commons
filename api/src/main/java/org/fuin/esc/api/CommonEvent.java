@@ -71,6 +71,8 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            check. This is type string to allow different UUID
      *            implementations. It has to be a valid UUID string
      *            representation.
+     * @param type
+     *            Unique name of the type of data.
      * @param data
      *            Event data.
      * 
@@ -88,6 +90,8 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            check. This is type string to allow different UUID
      *            implementations. It has to be a valid UUID string
      *            representation.
+     * @param type
+     *            Unique name of the type of data.
      * @param data
      *            Event data.
      * @param meta
@@ -185,5 +189,5 @@ public final class CommonEvent implements Serializable, ValueObject {
     public String toString() {
         return type + " " + id;
     }
-    
+
 }

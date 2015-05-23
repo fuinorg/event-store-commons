@@ -51,8 +51,6 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
-     * @param expectedVersion
-     *            The version the stream should have when being deleted.
      * 
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the

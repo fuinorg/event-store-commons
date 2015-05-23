@@ -20,9 +20,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.deserialize;
 import static org.fuin.units4j.Units4JUtils.serialize;
 
-import org.fuin.esc.api.ProjectionNotWritableException;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

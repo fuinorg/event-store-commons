@@ -26,7 +26,7 @@ import org.fuin.objects4j.common.NeverNull;
  * Signals that a an attempt was made to write to a projection.
  */
 @Immutable
-public final class ProjectionNotWritableException extends RuntimeException {
+public final class ProjectionNotWritableException extends Exception {
 
     private static final long serialVersionUID = 1L;
 

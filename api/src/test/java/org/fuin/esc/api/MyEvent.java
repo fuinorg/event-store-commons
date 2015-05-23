@@ -7,16 +7,18 @@ package org.fuin.esc.api;
 public class MyEvent {
 
     private String name;
-    
+
     public MyEvent(final String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -27,7 +29,9 @@ public class MyEvent {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -46,8 +50,6 @@ public class MyEvent {
             return false;
         return true;
     }
-    
-    
-    
+
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON
