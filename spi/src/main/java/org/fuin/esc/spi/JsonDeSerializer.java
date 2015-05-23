@@ -52,8 +52,13 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
      */
     public JsonDeSerializer(final Charset encoding) {
         super();
-        this.mimeType = EnhancedMimeType.create("application", "json",
-                encoding);
+        this.mimeType = EnhancedMimeType
+                .create("application", "json", encoding);
+    }
+
+    @Override
+    public final EnhancedMimeType getMimeType() {
+        return mimeType;
     }
 
     @Override

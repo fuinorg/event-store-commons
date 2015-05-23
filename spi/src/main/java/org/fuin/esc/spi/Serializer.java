@@ -26,6 +26,13 @@ import org.fuin.objects4j.common.NeverNull;
 public interface Serializer {
 
     /**
+     * Returns the mime type used to serialize the object.
+     * 
+     * @return Content type information.
+     */
+    public EnhancedMimeType getMimeType();
+
+    /**
      * Converts the given object into a byte representation.
      * 
      * @param obj

@@ -171,6 +171,24 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
+     * Returns the information if the base type is "application/json".
+     * 
+     * @return TRUE if it's JSON content, else FALSE:
+     */
+    public final boolean isJson() {
+        return getBaseType().equals("application/json");
+    }
+
+    /**
+     * Returns the information if the base type is "application/xml".
+     * 
+     * @return TRUE if it's XML content, else FALSE:
+     */
+    public final boolean isXml() {
+        return getBaseType().equals("application/xml");
+    }
+
+    /**
      * Creates an instance with all data and exceptions wrapped to runtime
      * exceptions.
      * 

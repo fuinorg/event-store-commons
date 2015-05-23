@@ -127,6 +127,11 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
     }
 
     @Override
+    public final EnhancedMimeType getMimeType() {
+        return mimeType;
+    }
+    
+    @Override
     public final byte[] marshal(final Object obj) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);

@@ -32,7 +32,7 @@ import org.junit.Test;
  * Tests the {@link  EnhancedMimeType} class.
  */
 // CHECKSTYLE:OFF Test
-public class VersionedMimeTypeTest {
+public class EnhancedMimeTypeTest {
 
     private EnhancedMimeType testee;
 
