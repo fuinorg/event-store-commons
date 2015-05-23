@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.spi;
 
-/** 
+/**
  * Combines a serializer and deserializer.
  */
 public interface SerializerDeserializer extends Serializer, Deserializer {

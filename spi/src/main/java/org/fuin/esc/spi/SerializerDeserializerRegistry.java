@@ -19,6 +19,7 @@ package org.fuin.esc.spi;
 /**
  * Combined registry for serializer and deserializer.
  */
-public interface SerializerDeserializerRegistry extends SerializerRegistry, DeserializerRegistry {
+public interface SerializerDeserializerRegistry extends SerializerRegistry,
+        DeserializerRegistry {
 
 }

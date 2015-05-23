@@ -86,7 +86,7 @@ public final class SimpleSerializerDeserializerRegistry implements
     /**
      * Convenience method to add an combined XML serializer/deserializer.
      * 
-     * @param vcds
+     * @param sd
      *            Deserializer to add.
      */
     public final void add(@NotNull final SerializerDeserializer sd) {
@@ -120,7 +120,7 @@ public final class SimpleSerializerDeserializerRegistry implements
         private final String type;
         private final VersionedMimeType mimeType;
 
-        public Key(final String type, VersionedMimeType mimeType) {
+        public Key(final String type, final VersionedMimeType mimeType) {
             this.type = type;
             this.mimeType = mimeType;
         }

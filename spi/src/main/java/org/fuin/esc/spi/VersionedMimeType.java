@@ -116,7 +116,9 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      */
     public VersionedMimeType(@NotNull final String primary,
             @NotNull final String sub, @Nullable final Charset encoding,
-            @Nullable final String version, @Nullable final Map<String, String> params) throws MimeTypeParseException {
+            @Nullable final String version,
+            @Nullable final Map<String, String> params)
+            throws MimeTypeParseException {
         super(primary, sub);
         if (encoding != null) {
             super.setParameter(ENCODING, encoding.name());
@@ -126,14 +128,18 @@ public final class VersionedMimeType extends javax.activation.MimeType {
         }
         if (params != null) {
             final Iterator<String> it = params.keySet().iterator();
-            while( it.hasNext()) {
+            while (it.hasNext()) {
                 final String key = it.next();
                 final String value = params.get(key);
                 if (key.equals(ENCODING)) {
-                    throw new IllegalArgumentException("Setting encoding with the parameters is not allowed. Use the 'encoding' argument instead.");
+                    throw new IllegalArgumentException(
+                            "Setting encoding with the parameters is not allowed. "
+                                    + "Use the 'encoding' argument instead.");
                 }
                 if (key.equals(VERSION)) {
-                    throw new IllegalArgumentException("Setting version with the parameters is not allowed. Use the 'version' argument instead.");
+                    throw new IllegalArgumentException(
+                            "Setting version with the parameters is not allowed. "
+                                    + "Use the 'version' argument instead.");
                 }
                 super.setParameter(key, value);
             }
@@ -149,21 +155,23 @@ public final class VersionedMimeType extends javax.activation.MimeType {
     public final String getVersion() {
         return getParameter(VERSION);
     }
-    
+
     /**
      * Unsupported operation.
      */
-    @Override    
+    @Override
     public final void setPrimaryType(final String primary) {
-        throw new UnsupportedOperationException("Changing the primary type after construction is not allowed!");
+        throw new UnsupportedOperationException(
+                "Changing the primary type after construction is not allowed!");
     }
-    
+
     /**
      * Unsupported operation.
      */
     @Override
     public final void setSubType(final String sub) {
-        throw new UnsupportedOperationException("Changing the sub type after construction is not allowed!");
+        throw new UnsupportedOperationException(
+                "Changing the sub type after construction is not allowed!");
     }
 
     /**
@@ -171,9 +179,10 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      */
     @Override
     public void setParameter(final String name, final String value) {
-        throw new UnsupportedOperationException("Changing parameters after construction is not allowed!");
+        throw new UnsupportedOperationException(
+                "Changing parameters after construction is not allowed!");
     }
-    
+
     /**
      * Returns the encoding from the parameters.
      * 
@@ -246,6 +255,8 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * 
      * @param str
      *            Contains base type, sub type and parameters.
+     *            
+     * @return New instance.
      */
     @NeverNull
     public static VersionedMimeType create(@NotNull final String str) {
@@ -265,6 +276,8 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Primary type.
      * @param sub
      *            Sub type.
+     *            
+     * @return New instance.
      */
     @NeverNull
     public static VersionedMimeType create(@NotNull final String primary,
@@ -282,6 +295,8 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Sub type.
      * @param encoding
      *            Encoding.
+     *            
+     * @return New instance.
      */
     @NeverNull
     public static VersionedMimeType create(@NotNull final String primary,
@@ -303,13 +318,16 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Version.
      * @param parameters
      *            Additional parameters.
+     *            
+     * @return New instance.
      */
     @NeverNull
     public static VersionedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding,
             final String version, final Map<String, String> parameters) {
         try {
-            return new VersionedMimeType(primary, sub, encoding, version, parameters);
+            return new VersionedMimeType(primary, sub, encoding, version,
+                    parameters);
         } catch (final MimeTypeParseException ex) {
             throw new RuntimeException("Failed to create versioned mime type: "
                     + primary + "/" + sub, ex);

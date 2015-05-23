@@ -48,6 +48,7 @@ public final class JsonDeSerializer implements SerializerDeserializer {
     public JsonDeSerializer(final String type) {
         this(type, Charset.forName("utf-8"));
     }
+
     /**
      * Constructor with type and encoding.
      * 
@@ -59,7 +60,8 @@ public final class JsonDeSerializer implements SerializerDeserializer {
     public JsonDeSerializer(final String type, final Charset encoding) {
         super();
         this.type = type;
-        this.mimeType = VersionedMimeType.create("application", "json", encoding);
+        this.mimeType = VersionedMimeType.create("application", "json",
+                encoding);
     }
 
     @Override
