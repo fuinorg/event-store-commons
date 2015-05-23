@@ -36,7 +36,7 @@ import org.fuin.objects4j.common.Contract;
 /**
  * In-memory implementation for unit testing.
  */
-public class InMemoryEventStore implements WritableEventStore {
+public final class InMemoryEventStore implements WritableEventStore {
 
     private List<CommonEvent> all;
 
@@ -44,6 +44,9 @@ public class InMemoryEventStore implements WritableEventStore {
 
     private Map<StreamId, List<CommonEvent>> deletedStreams;
 
+    /**
+     * Default constructor.
+     */
     public InMemoryEventStore() {
         super();
         all = new ArrayList<CommonEvent>();
@@ -62,7 +65,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public CommonEvent readEvent(final StreamId streamId, final int eventNumber)
+    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber)
             throws EventNotFoundException, StreamNotFoundException,
             StreamDeletedException {
 
@@ -77,8 +80,8 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public StreamEventsSlice readStreamEventsForward(StreamId streamId,
-            int start, int count) throws StreamNotFoundException,
+    public final StreamEventsSlice readStreamEventsForward(final StreamId streamId,
+            final int start, final int count) throws StreamNotFoundException,
             StreamDeletedException {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -100,7 +103,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public StreamEventsSlice readAllEventsForward(int start, int count) {
+    public final StreamEventsSlice readAllEventsForward(final int start, final int count) {
 
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
@@ -118,7 +121,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public void deleteStream(StreamId streamId, int expected)
+    public final void deleteStream(final StreamId streamId, final int expected)
             throws StreamNotFoundException, StreamVersionConflictException,
             StreamDeletedException {
 
@@ -132,7 +135,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public void deleteStream(StreamId streamId) throws StreamNotFoundException,
+    public final void deleteStream(final StreamId streamId) throws StreamNotFoundException,
             StreamDeletedException {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -144,7 +147,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public int appendToStream(final StreamId streamId,
+    public final int appendToStream(final StreamId streamId,
             final int expectedVersion, final List<CommonEvent> toAppend)
             throws StreamNotFoundException, StreamVersionConflictException,
             StreamDeletedException, ProjectionNotWritableException {
@@ -162,8 +165,8 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public int appendToStream(StreamId streamId, int expectedVersion,
-            CommonEvent... events) throws StreamNotFoundException,
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException,
             ProjectionNotWritableException {
 
@@ -176,7 +179,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public int appendToStream(final StreamId streamId,
+    public final int appendToStream(final StreamId streamId,
             final List<CommonEvent> toAppend) throws StreamNotFoundException,
             StreamDeletedException, ProjectionNotWritableException {
 
@@ -191,7 +194,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public int appendToStream(StreamId streamId, CommonEvent... events)
+    public final int appendToStream(final StreamId streamId, final CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException,
             ProjectionNotWritableException {
 
@@ -214,7 +217,7 @@ public class InMemoryEventStore implements WritableEventStore {
         return events;
     }
 
-    private List<CommonEvent> getStream(final StreamId streamId, int expected)
+    private List<CommonEvent> getStream(final StreamId streamId, final int expected)
             throws StreamDeletedException, StreamNotFoundException,
             StreamVersionConflictException {
         final List<CommonEvent> events = getStream(streamId);
@@ -238,7 +241,7 @@ public class InMemoryEventStore implements WritableEventStore {
     }
 
     private List<CommonEvent> createIfNotExists(final StreamId streamId,
-            int expected) throws StreamDeletedException,
+            final int expected) throws StreamDeletedException,
             StreamVersionConflictException {
 
         try {
