@@ -36,8 +36,7 @@ public class JsonDeSerializerTest {
 
     @Before
     public void setup() throws MimeTypeParseException {
-        testee = new JsonDeSerializer(
-                "application/xml;version=1.0.2;encoding=utf-8");
+        testee = new JsonDeSerializer();
     }
 
     @After
@@ -54,7 +53,7 @@ public class JsonDeSerializerTest {
 
         // TEST
         final byte[] data = testee.marshal(original);
-        final JsonObject copy = testee.unmarshal(data);
+        final JsonObject copy = testee.unmarshal(data, VersionedMimeType.create("application/json; encoding=utf-8"));
 
         // VERIFY
         assertThat(copy.keySet()).contains("name", "age");

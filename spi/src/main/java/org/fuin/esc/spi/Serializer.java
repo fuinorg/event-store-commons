@@ -26,22 +26,6 @@ import org.fuin.objects4j.common.NeverNull;
 public interface Serializer {
 
     /**
-     * Returns the unique identifier for the type of data.
-     * 
-     * @return Unique and never changing type name.
-     */
-    @NeverNull
-    public String getType();
-
-    /**
-     * Returns the mime type the serializer supports.
-     * 
-     * @return Mime type.
-     */
-    @NeverNull
-    public VersionedMimeType getMimeType();
-
-    /**
      * Converts the given object into a byte representation.
      * 
      * @param obj

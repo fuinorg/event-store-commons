@@ -16,6 +16,7 @@
  */
 package org.fuin.esc.spi;
 
+
 /**
  * Serializes an object.
  */
@@ -26,12 +27,14 @@ public interface Deserializer {
      * 
      * @param data
      *            Serialized object.
+     * @param mimeType
+     *            Type of the data in the byte array.
      * 
      * @return Deserialized object.
      * 
      * @param <T>
      *            Type the data is converted into.
      */
-    public <T> T unmarshal(byte[] data);
+    public <T> T unmarshal(byte[] data, VersionedMimeType mimeType);
 
 }

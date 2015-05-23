@@ -27,7 +27,7 @@ import org.fuin.objects4j.common.Contract;
  * Contains all known serializers and deserializers.
  */
 public final class SimpleSerializerDeserializerRegistry implements
-        SerializerDeserializerRegistry {
+        SerializerRegistry, DeserializerRegistry {
 
     private final Map<String, Serializer> serMap;
 
@@ -47,20 +47,20 @@ public final class SimpleSerializerDeserializerRegistry implements
      * 
      * @param type
      *            Type of the data.
-     * @param mimeType
-     *            Mime type.
+     * @param contentType
+     *            Content type like "application/xml" or "application/json"
+     *            (without parameters - Only base type).
      * @param deserializer
      *            Deserializer.
      */
     public final void addDeserializer(@NotNull final String type,
-            final VersionedMimeType mimeType,
-            @NotNull final Deserializer deserializer) {
+            final String contentType, @NotNull final Deserializer deserializer) {
 
         Contract.requireArgNotNull("type", type);
-        Contract.requireArgNotNull("mimeType", mimeType);
+        Contract.requireArgNotNull("contentType", contentType);
         Contract.requireArgNotNull("deserializer", deserializer);
 
-        final Key key = new Key(type, mimeType);
+        final Key key = new Key(type, contentType);
         desMap.put(key, deserializer);
 
     }
@@ -83,18 +83,6 @@ public final class SimpleSerializerDeserializerRegistry implements
 
     }
 
-    /**
-     * Convenience method to add an combined XML serializer/deserializer.
-     * 
-     * @param sd
-     *            Deserializer to add.
-     */
-    public final void add(@NotNull final SerializerDeserializer sd) {
-        Contract.requireArgNotNull("sd", sd);
-        this.addSerializer(sd.getType(), sd);
-        this.addDeserializer(sd.getType(), sd.getMimeType(), sd);
-    }
-
     @Override
     public Serializer getSerializer(final String type) {
         Contract.requireArgNotNull("type", type);
@@ -108,21 +96,21 @@ public final class SimpleSerializerDeserializerRegistry implements
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("mimeType", mimeType);
 
-        final Key key = new Key(type, mimeType);
+        final Key key = new Key(type, mimeType.getBaseType());
         return desMap.get(key);
     }
 
     /**
-     * Key used to find an appropriate deserialize.
+     * Key used to find an appropriate deserializer.
      */
     private static class Key {
 
         private final String type;
-        private final VersionedMimeType mimeType;
+        private final String contentType;
 
-        public Key(final String type, final VersionedMimeType mimeType) {
+        public Key(final String type, final String contentType) {
             this.type = type;
-            this.mimeType = mimeType;
+            this.contentType = contentType;
         }
 
         // CHECKSTYLE:OFF Generated code
@@ -133,7 +121,7 @@ public final class SimpleSerializerDeserializerRegistry implements
             int result = 1;
             result = prime * result + ((type == null) ? 0 : type.hashCode());
             result = prime * result
-                    + ((mimeType == null) ? 0 : mimeType.hashCode());
+                    + ((contentType == null) ? 0 : contentType.hashCode());
             return result;
         }
 
@@ -151,10 +139,10 @@ public final class SimpleSerializerDeserializerRegistry implements
                     return false;
             } else if (!type.equals(other.type))
                 return false;
-            if (mimeType == null) {
-                if (other.mimeType != null)
+            if (contentType == null) {
+                if (other.contentType != null)
                     return false;
-            } else if (!mimeType.equals(other.mimeType))
+            } else if (!contentType.equals(other.contentType))
                 return false;
             return true;
         }

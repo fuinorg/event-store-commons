@@ -30,48 +30,30 @@ import javax.json.JsonStructure;
 import javax.json.JsonWriter;
 
 /**
- * Serializes and deserializes a JSON object that only has one version and is
- * always "application/json" with "utf-8" encoded content.
+ * Serializes and deserializes a JSON object. The content type for serialization
+ * is always "application/json".
  */
-public final class JsonDeSerializer implements SerializerDeserializer {
-
-    private final String type;
+public final class JsonDeSerializer implements Serializer, Deserializer {
 
     private final VersionedMimeType mimeType;
 
     /**
-     * Constructor only with type. Assumes UTF-8 encoding.
-     * 
-     * @param type
-     *            Name of the type that can be serialized/deserialized.
+     * Constructor with UTF-8 encoding.
      */
-    public JsonDeSerializer(final String type) {
-        this(type, Charset.forName("utf-8"));
+    public JsonDeSerializer() {
+        this(Charset.forName("utf-8"));
     }
 
     /**
      * Constructor with type and encoding.
      * 
-     * @param type
-     *            Type that can be serialized/deserialized.
      * @param encoding
      *            Default encoding to use.
      */
-    public JsonDeSerializer(final String type, final Charset encoding) {
+    public JsonDeSerializer(final Charset encoding) {
         super();
-        this.type = type;
         this.mimeType = VersionedMimeType.create("application", "json",
                 encoding);
-    }
-
-    @Override
-    public final String getType() {
-        return type;
-    }
-
-    @Override
-    public final VersionedMimeType getMimeType() {
-        return mimeType;
     }
 
     @Override
@@ -82,8 +64,8 @@ public final class JsonDeSerializer implements SerializerDeserializer {
                             + obj.getClass());
         }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-        final Writer writer = new OutputStreamWriter(bos, getMimeType()
-                .getEncoding());
+        final Writer writer = new OutputStreamWriter(bos,
+                mimeType.getEncoding());
         final JsonWriter jsonWriter = Json.createWriter(writer);
         try {
             jsonWriter.write((JsonStructure) obj);
@@ -95,9 +77,10 @@ public final class JsonDeSerializer implements SerializerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final byte[] data) {
+    public final <T> T unmarshal(final byte[] data,
+            final VersionedMimeType mimeType) {
         final Reader reader = new InputStreamReader(new ByteArrayInputStream(
-                data), getMimeType().getEncoding());
+                data), mimeType.getEncoding());
         final JsonReader jsonReader = Json.createReader(reader);
         try {
             return (T) jsonReader.read();

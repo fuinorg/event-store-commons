@@ -24,7 +24,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import javax.activation.MimeTypeParseException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -37,15 +36,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Serializes and deserializes a class of a given type that only has one version
- * and is always "application/xml" with "utf-8" encoded content.
+ * Serializes and deserializes an object from/to XML. The content type for
+ * serialization is always "application/xml".
  */
-public final class XmlDeSerializer implements SerializerDeserializer {
+public final class XmlDeSerializer implements Serializer, Deserializer {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(XmlDeSerializer.class);
-
-    private final String type;
 
     private final VersionedMimeType mimeType;
 
@@ -54,44 +51,55 @@ public final class XmlDeSerializer implements SerializerDeserializer {
     private final Unmarshaller unmarshaller;
 
     /**
-     * Constructor without XML adapter.
+     * Constructor that creates a JAXB context internally and uses UTF-8
+     * encoding.
      * 
-     * @param type
-     *            Type that can be serialized/deserialized.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
-    public XmlDeSerializer(final String type,
-            final Class<?>... classesToBeBound) {
-        this(type, null, classesToBeBound);
+    public XmlDeSerializer(final Class<?>... classesToBeBound) {
+        this(Charset.forName("utf-8"), classesToBeBound);
     }
 
     /**
-     * Constructor with type and JAXB context classes.
+     * Constructor that creates a JAXB context internally.
      * 
-     * @param type
-     *            Type that can be serialized/deserialized.
+     * @param encoding
+     *            Encoding to use.
+     * @param classesToBeBound
+     *            Classes to use for the JAXB context.
+     */
+    public XmlDeSerializer(final Charset encoding,
+            final Class<?>... classesToBeBound) {
+        this(encoding, null, classesToBeBound);
+    }
+
+    /**
+     * Constructor with JAXB context classes.
+     * 
+     * @param encoding
+     *            Encoding to use.
      * @param adapters
      *            Adapters to associate with the JAXB context or
      *            <code>null</code>.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
-    public XmlDeSerializer(final String type,
+    public XmlDeSerializer(final Charset encoding,
             final XmlAdapter<?, ?>[] adapters,
             final Class<?>... classesToBeBound) {
         super();
-        this.type = type;
-        this.mimeType = mimeType();
+        this.mimeType = VersionedMimeType
+                .create("application", "xml", encoding);
         try {
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
             marshaller = ctx.createMarshaller();
             unmarshaller = ctx.createUnmarshaller();
             if ((adapters == null) || (adapters.length == 0)) {
-                LOG.debug("No adapters set for: " + type);
+                LOG.debug("No adapters set");
             } else {
                 for (XmlAdapter<?, ?> adapter : adapters) {
-                    LOG.debug("Set adapter for: " + type + " [" + adapter + "]");
+                    LOG.debug("Set adapter : " + adapter);
                     marshaller.setAdapter(adapter);
                     unmarshaller.setAdapter(adapter);
                 }
@@ -118,31 +126,12 @@ public final class XmlDeSerializer implements SerializerDeserializer {
         }
     }
 
-    private VersionedMimeType mimeType() {
-        try {
-            return new VersionedMimeType("application", "xml",
-                    Charset.forName("utf-8"));
-        } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @Override
-    public final String getType() {
-        return type;
-    }
-
-    @Override
-    public final VersionedMimeType getMimeType() {
-        return mimeType;
-    }
-
     @Override
     public final byte[] marshal(final Object obj) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-            final Writer writer = new OutputStreamWriter(bos, getMimeType()
-                    .getEncoding());
+            final Writer writer = new OutputStreamWriter(bos,
+                    mimeType.getEncoding());
             marshaller.marshal(obj, writer);
             return bos.toByteArray();
         } catch (final JAXBException ex) {
@@ -152,10 +141,11 @@ public final class XmlDeSerializer implements SerializerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final byte[] data) {
+    public final <T> T unmarshal(final byte[] data,
+            final VersionedMimeType mimeType) {
         try {
             final Reader reader = new InputStreamReader(
-                    new ByteArrayInputStream(data), getMimeType().getEncoding());
+                    new ByteArrayInputStream(data), mimeType.getEncoding());
             return (T) unmarshaller.unmarshal(reader);
         } catch (final JAXBException ex) {
             throw new RuntimeException("Error de-serializing data", ex);

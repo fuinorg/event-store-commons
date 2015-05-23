@@ -24,9 +24,6 @@ import java.util.Map;
 
 import javax.activation.MimeTypeParseException;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,11 +44,6 @@ public class VersionedMimeTypeTest {
     @After
     public void teardown() {
         testee = null;
-    }
-
-    @Test
-    public void testEqualsHashCode() {
-        EqualsVerifier.forClass(VersionedMimeType.class).suppress(Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS).verify();
     }
 
     @Test

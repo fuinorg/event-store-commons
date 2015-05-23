@@ -27,8 +27,8 @@ import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * Enhances the {@link javax.activation.MimeType} class with equals and hash
- * code based on the base type, sub type, encoding and version.
+ * Enhances the {@link javax.activation.MimeType} class with convenience methods
+ * for accessing version and encoding parameters.
  */
 public final class VersionedMimeType extends javax.activation.MimeType {
 
@@ -157,33 +157,6 @@ public final class VersionedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Unsupported operation.
-     */
-    @Override
-    public final void setPrimaryType(final String primary) {
-        throw new UnsupportedOperationException(
-                "Changing the primary type after construction is not allowed!");
-    }
-
-    /**
-     * Unsupported operation.
-     */
-    @Override
-    public final void setSubType(final String sub) {
-        throw new UnsupportedOperationException(
-                "Changing the sub type after construction is not allowed!");
-    }
-
-    /**
-     * Unsupported operation.
-     */
-    @Override
-    public void setParameter(final String name, final String value) {
-        throw new UnsupportedOperationException(
-                "Changing parameters after construction is not allowed!");
-    }
-
-    /**
      * Returns the encoding from the parameters.
      * 
      * @return Encoding or <code>null</code> as default if not available.
@@ -197,65 +170,13 @@ public final class VersionedMimeType extends javax.activation.MimeType {
         return Charset.forName(parameter);
     }
 
-    // CHECKSTYLE:OFF Generated code
-
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime
-                * result
-                + ((getPrimaryType() == null) ? 0 : getPrimaryType().hashCode());
-        result = prime * result
-                + ((getSubType() == null) ? 0 : getSubType().hashCode());
-        result = prime * result
-                + ((getEncoding() == null) ? 0 : getEncoding().hashCode());
-        result = prime * result
-                + ((getVersion() == null) ? 0 : getVersion().hashCode());
-        return result;
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof VersionedMimeType))
-            return false;
-        VersionedMimeType other = (VersionedMimeType) obj;
-        if (getPrimaryType() == null) {
-            if (other.getPrimaryType() != null)
-                return false;
-        } else if (!getPrimaryType().equals(other.getPrimaryType()))
-            return false;
-        if (getSubType() == null) {
-            if (other.getSubType() != null)
-                return false;
-        } else if (!getSubType().equals(other.getSubType()))
-            return false;
-        if (getEncoding() == null) {
-            if (other.getEncoding() != null)
-                return false;
-        } else if (!getEncoding().equals(other.getEncoding()))
-            return false;
-        if (getVersion() == null) {
-            if (other.getVersion() != null)
-                return false;
-        } else if (!getVersion().equals(other.getVersion()))
-            return false;
-        return true;
-    }
-
-    // CHECKSTYLE:ON
-
     /**
      * Creates an instance with all data and exceptions wrapped to runtime
      * exceptions.
      * 
      * @param str
      *            Contains base type, sub type and parameters.
-     *            
+     * 
      * @return New instance.
      */
     @NeverNull
@@ -276,7 +197,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Primary type.
      * @param sub
      *            Sub type.
-     *            
+     * 
      * @return New instance.
      */
     @NeverNull
@@ -295,7 +216,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Sub type.
      * @param encoding
      *            Encoding.
-     *            
+     * 
      * @return New instance.
      */
     @NeverNull
@@ -318,7 +239,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      *            Version.
      * @param parameters
      *            Additional parameters.
-     *            
+     * 
      * @return New instance.
      */
     @NeverNull
