@@ -30,7 +30,7 @@ import org.fuin.objects4j.common.Nullable;
  * Enhances the {@link javax.activation.MimeType} class with convenience methods
  * for accessing version and encoding parameters.
  */
-public final class VersionedMimeType extends javax.activation.MimeType {
+public final class EnhancedMimeType extends javax.activation.MimeType {
 
     /** Version parameter name. */
     public static final String VERSION = "version";
@@ -41,7 +41,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
     /**
      * Default constructor for de-serialization.
      */
-    public VersionedMimeType() {
+    public EnhancedMimeType() {
         super();
     }
 
@@ -54,7 +54,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the string is not valid.
      */
-    public VersionedMimeType(@NotNull final String str)
+    public EnhancedMimeType(@NotNull final String str)
             throws MimeTypeParseException {
         super(str);
     }
@@ -70,7 +70,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public VersionedMimeType(@NotNull final String primary,
+    public EnhancedMimeType(@NotNull final String primary,
             @NotNull final String sub) throws MimeTypeParseException {
         super(primary, sub);
     }
@@ -88,7 +88,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public VersionedMimeType(@NotNull final String primary,
+    public EnhancedMimeType(@NotNull final String primary,
             @NotNull final String sub, @Nullable final Charset encoding)
             throws MimeTypeParseException {
         super(primary, sub);
@@ -114,7 +114,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public VersionedMimeType(@NotNull final String primary,
+    public EnhancedMimeType(@NotNull final String primary,
             @NotNull final String sub, @Nullable final Charset encoding,
             @Nullable final String version,
             @Nullable final Map<String, String> params)
@@ -180,9 +180,9 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NeverNull
-    public static VersionedMimeType create(@NotNull final String str) {
+    public static EnhancedMimeType create(@NotNull final String str) {
         try {
-            return new VersionedMimeType(str);
+            return new EnhancedMimeType(str);
         } catch (final MimeTypeParseException ex) {
             throw new RuntimeException("Failed to create versioned mime type: "
                     + str, ex);
@@ -201,7 +201,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NeverNull
-    public static VersionedMimeType create(@NotNull final String primary,
+    public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub) {
         return create(primary, sub, null, null, null);
     }
@@ -220,7 +220,7 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NeverNull
-    public static VersionedMimeType create(@NotNull final String primary,
+    public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding) {
         return create(primary, sub, encoding, null, null);
     }
@@ -243,11 +243,11 @@ public final class VersionedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NeverNull
-    public static VersionedMimeType create(@NotNull final String primary,
+    public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding,
             final String version, final Map<String, String> parameters) {
         try {
-            return new VersionedMimeType(primary, sub, encoding, version,
+            return new EnhancedMimeType(primary, sub, encoding, version,
                     parameters);
         } catch (final MimeTypeParseException ex) {
             throw new RuntimeException("Failed to create versioned mime type: "
