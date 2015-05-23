@@ -24,6 +24,7 @@ import org.junit.Test;
 /**
  * General tests for all classes.
  */
+// CHECKSTYLE:OFF Test code
 public class BaseTest {
 
     @Test
@@ -33,3 +34,4 @@ public class BaseTest {
     }
 
 }
+//CHECKSTYLE:ON
