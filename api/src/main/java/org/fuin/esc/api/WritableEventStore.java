@@ -111,10 +111,13 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      *             deleted.
      * @throws StreamVersionConflictException
      *             The expected version didn't match the actual version.
+     * @throws ProjectionNotWritableException
+     *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull CommonEvent... events) throws StreamNotFoundException,
-            StreamVersionConflictException, StreamDeletedException;
+            StreamVersionConflictException, StreamDeletedException,
+            ProjectionNotWritableException;
 
     /**
      * Appends a list of events to a stream regardless of what version the
@@ -158,9 +161,11 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was
      *             deleted.
+     * @throws ProjectionNotWritableException
+     *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId,
             @NotNull CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException;
+            StreamDeletedException, ProjectionNotWritableException;
 
 }
