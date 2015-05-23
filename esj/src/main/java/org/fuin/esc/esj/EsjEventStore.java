@@ -52,7 +52,7 @@ import org.fuin.objects4j.common.Contract;
  * Adapter for the <a herf="https://github.com/valdasraps/esj">esj</a> event
  * store client {@link EventStore}.
  */
-public final class EventStoreESJ implements WritableEventStore {
+public final class EsjEventStore implements WritableEventStore {
 
     /**
      * Name used for querying the serializer/deserializer registry for the meta
@@ -102,7 +102,7 @@ public final class EventStoreESJ implements WritableEventStore {
      * @param metaDataBuilder
      *            Builder used to create/add meta data.
      */
-    public EventStoreESJ(final InetAddress host, final int port,
+    public EsjEventStore(final InetAddress host, final int port,
             final Settings settings, final ExecutorService executor,
             final String user, final String password,
             final SerializerRegistry serRegistry,
