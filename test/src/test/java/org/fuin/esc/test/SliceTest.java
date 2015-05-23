@@ -21,8 +21,8 @@ import static org.fuin.units4j.Units4JUtils.deserialize;
 import static org.fuin.units4j.Units4JUtils.serialize;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -54,10 +54,10 @@ public class SliceTest extends AbstractXmlTest {
     @Before
     public void setup() throws Exception {
         events = new ArrayList<Event>();
-        events.add(new Event("f6a8d009-5613-4e4d-9e46-15a30daa2d28",
-                new Data("MyEvent", new VersionedMimeType(
+        events.add(new Event("f6a8d009-5613-4e4d-9e46-15a30daa2d28", new Data(
+                "MyEvent", new VersionedMimeType(
                         "application/xml; version=2; encoding=utf-8"),
-                        "<my-event/>"), null));
+                "<my-event/>"), null));
         testee = new Slice(FROM, events, NEXT, EOS);
     }
 
@@ -104,20 +104,18 @@ public class SliceTest extends AbstractXmlTest {
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
                 Slice.class);
-        
+
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert
                 .assertXMLEqual(
                 // @formatter:off
                         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                        + "<slice from-stream-no=\"0\" next-stream-no=\"1\" end-of-stream=\"true\">"
-                            + "<event id=\"f6a8d009-5613-4e4d-9e46-15a30daa2d28\">"
-                            + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=2; encoding=utf-8\">"
-                            + "        <![CDATA[<my-event/>]]>"
-                            + "    </data>"
-                            + "</event>"
-                         + "</slice>"
+                                + "<slice from-stream-no=\"0\" next-stream-no=\"1\" end-of-stream=\"true\">"
+                                + "<event id=\"f6a8d009-5613-4e4d-9e46-15a30daa2d28\">"
+                                + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=2; encoding=utf-8\">"
+                                + "        <![CDATA[<my-event/>]]>"
+                                + "    </data>" + "</event>" + "</slice>"
                         // @formatter:on
                         , xml);
 
@@ -132,8 +130,7 @@ public class SliceTest extends AbstractXmlTest {
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
                 Slice.class);
-        final Slice copy = unmarshal(xml, createXmlAdapter(),
-                Slice.class);
+        final Slice copy = unmarshal(xml, createXmlAdapter(), Slice.class);
 
         // VERIFY
         assertThat(copy).isEqualTo(original);

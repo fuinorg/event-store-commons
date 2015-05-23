@@ -163,6 +163,13 @@ public final class Event implements Serializable, ValueObject {
                 .append("meta", meta).toString();
     }
 
+    /**
+     * Creates an event using a common event.
+     * 
+     * @param selEvent Event to copy.
+     * 
+     * @return New instance.
+     */
     public static Event valueOf(final CommonEvent selEvent) {
         final Data data = Data.valueOf(selEvent.getType(), selEvent.getData());
         final Data meta = Data.valueOf("meta", selEvent.getMeta());

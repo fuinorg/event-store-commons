@@ -20,9 +20,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
-import java.util.List;
-
-import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamNotFoundException;
@@ -35,6 +32,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
+// CHECKSTYLE:OFF Test code
 public class BasicFeature {
 
     private static final int MAX_EVENTS = 10;
@@ -68,7 +66,8 @@ public class BasicFeature {
     public void appendEventsTo(String streamName, String eventsXml)
             throws Throwable {
         final Events toAppend = unmarshal(eventsXml, Events.class);
-        eventStore.appendToStream(new SimpleStreamId(streamName), toAppend.asCommonEvents(BookAddedEvent.class));
+        eventStore.appendToStream(new SimpleStreamId(streamName),
+                toAppend.asCommonEvents(BookAddedEvent.class));
     }
 
     @Then("^reading all events from stream \"([^\"]*)\" should return the following slices$")
@@ -82,8 +81,9 @@ public class BasicFeature {
             actual.append(Slice.valueOf(slice));
             slice = eventStore.readStreamEventsForward(new SimpleStreamId(
                     streamName), slice.getNextEventNumber(), MAX_EVENTS);
-        }        
+        }
         assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
     }
 
 }
+//CHECKSTYLE:ON

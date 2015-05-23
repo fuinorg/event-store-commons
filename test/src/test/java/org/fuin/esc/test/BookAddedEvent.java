@@ -19,6 +19,9 @@ package org.fuin.esc.test;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Example event.
+ */
 @XmlRootElement(name = "book-added-event")
 public class BookAddedEvent {
 
@@ -27,12 +30,21 @@ public class BookAddedEvent {
 
     @XmlAttribute
     private String author;
-    
+
+    /**
+     * Protected default constructor for deserialization.
+     */
     protected BookAddedEvent() {
         super();
     }
 
-    public BookAddedEvent(String name, String author) {
+    /**
+     * Constructor with name and author.
+     * 
+     * @param name Name.
+     * @param author Author.
+     */
+    public BookAddedEvent(final String name, final String author) {
         super();
         this.name = name;
         this.author = author;
@@ -41,15 +53,15 @@ public class BookAddedEvent {
     /**
      * @return the name
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
     /**
      * @return the author
      */
-    public String getAuthor() {
+    public final String getAuthor() {
         return author;
     }
-    
+
 }

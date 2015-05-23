@@ -40,7 +40,7 @@ public final class Slices implements Serializable {
     private List<Slice> slices;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Slices() {
         super();
@@ -61,7 +61,8 @@ public final class Slices implements Serializable {
     /**
      * Appends slices to the list.
      * 
-     * @param slices Slices to add.
+     * @param slices
+     *            Slices to add.
      */
     public void append(final List<Slice> slices) {
         if (slices != null && slices.size() > 0) {
@@ -72,9 +73,10 @@ public final class Slices implements Serializable {
     /**
      * Appends slices to the list.
      * 
-     * @param slices Slices to add.
+     * @param slices
+     *            Slices to add.
      */
-    public void append(final Slice...slices) {
+    public void append(final Slice... slices) {
         if (slices != null && slices.length > 0) {
             this.slices.addAll(Arrays.asList(slices));
         }

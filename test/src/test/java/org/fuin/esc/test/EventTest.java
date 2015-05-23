@@ -119,8 +119,7 @@ public class EventTest extends AbstractXmlTest {
                                 + "    </data>"
                                 + "    <meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
                                 + "        <![CDATA[{ \"a\" : \"1\" }]]>"
-                                + "    </meta>" 
-                                + "</event>"
+                                + "    </meta>" + "</event>"
                         // @formatter:on
                         , xml);
 
@@ -135,8 +134,7 @@ public class EventTest extends AbstractXmlTest {
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
                 Event.class);
-        final Event copy = unmarshal(xml, createXmlAdapter(),
-                Event.class);
+        final Event copy = unmarshal(xml, createXmlAdapter(), Event.class);
 
         // VERIFY
         assertEqualsConstantValues(copy);

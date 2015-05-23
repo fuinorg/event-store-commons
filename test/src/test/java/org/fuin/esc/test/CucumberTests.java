@@ -15,6 +15,7 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.fuin.esc.test;
+
 import org.junit.runner.RunWith;
 
 import cucumber.api.CucumberOptions;
@@ -26,13 +27,11 @@ import cucumber.api.CucumberOptions;
 // @formatter:off
 @RunWith(EscCucumber.class)
 @EscCucumberArgs({ "mem", "esj" })
-@CucumberOptions(features = { "src/test/resources/features/" }, 
-                 glue = { "org.fuin.esc.test" }, 
-                 strict = true, 
-                 monochrome = true,
-                 format = {"pretty", "html:target/cucumber-html-report", "junit:target/cucumber-junit-report/allcukes.xml" })
+@CucumberOptions(features = { "src/test/resources/features/" }, glue = { "org.fuin.esc.test" }, strict = true, monochrome = true, format = {
+        "pretty", "html:target/cucumber-html-report",
+        "junit:target/cucumber-junit-report/allcukes.xml" })
 // @formatter:on
 public class CucumberTests {
 
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON

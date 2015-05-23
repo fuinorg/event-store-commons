@@ -184,7 +184,8 @@ public final class Slice implements Serializable {
     /**
      * Creates a slice from a stream event slice.
      * 
-     * @param sel Slice to copy.
+     * @param sel
+     *            Slice to copy.
      * 
      * @return Copied information with changed type.
      */

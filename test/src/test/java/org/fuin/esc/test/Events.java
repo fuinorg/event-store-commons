@@ -41,7 +41,7 @@ public final class Events implements Serializable {
     private List<Event> events;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Events() {
         super();
@@ -96,15 +96,19 @@ public final class Events implements Serializable {
     /**
      * Returns this object as a list of common event objects.
      * 
-     * @param classesToBeBound In case the XML JAXB unmarshalling is used, you have to pass the classes for the content here.
+     * @param classesToBeBound
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
      * 
      * @return Converted list.
      */
     public List<CommonEvent> asCommonEvents(final Class<?>... classesToBeBound) {
         final List<CommonEvent> list = new ArrayList<CommonEvent>();
         for (final Event event : events) {
-            final Object meta = event.getMeta().unmarshalContent(classesToBeBound);
-            final Object data = event.getData().unmarshalContent(classesToBeBound);
+            final Object meta = event.getMeta().unmarshalContent(
+                    classesToBeBound);
+            final Object data = event.getData().unmarshalContent(
+                    classesToBeBound);
             list.add(new CommonEvent(event.getId(), event.getData().getType(),
                     data, meta));
         }

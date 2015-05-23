@@ -148,9 +148,13 @@ public final class Data implements ValueObject, Serializable {
      * Unmarshals the content into an object. Content is required to be
      * "application/xml" or "application/json".
      * 
-     * @param classesToBeBound In case the XML JAXB unmarshalling is used, you have to pass the classes for the content here.
+     * @param classesToBeBound
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
      * 
      * @return Object created from content.
+     * 
+     * @param <T> Type expected to be returned.
      */
     @SuppressWarnings("unchecked")
     public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {
@@ -162,7 +166,8 @@ public final class Data implements ValueObject, Serializable {
 
         // We can only handle JSON...
         if (isJson()) {
-            return (T) Json.createReader(new StringReader(content)).readObject();
+            return (T) Json.createReader(new StringReader(content))
+                    .readObject();
         }
         // ...or XML
         return unmarshal(content, classesToBeBound);

@@ -40,9 +40,10 @@ import cucumber.runtime.snippets.SummaryPrinter;
  * {@link CucumberOptions}.
  */
 public class EscCucumber extends ParentRunner<FeatureRunner> {
-    
-    public static final String SYSTEM_PROPERTY = EscCucumber.class.getSimpleName() + "Arg";
-    
+
+    public static final String SYSTEM_PROPERTY = EscCucumber.class
+            .getSimpleName() + "Arg";
+
     private final JUnitReporter jUnitReporter;
     private final List<FeatureRunner> children = new ArrayList<FeatureRunner>();
     private final Runtime runtime;
@@ -57,6 +58,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
      * @throws org.junit.runners.model.InitializationError
      *             if there is another problem
      */
+    @SuppressWarnings("unchecked")
     public EscCucumber(Class<?> clazz) throws InitializationError, IOException {
         super(clazz);
         ClassLoader classLoader = clazz.getClassLoader();
@@ -69,7 +71,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         } else {
             argList.addAll(Arrays.asList(args.value()));
         }
-        
+
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(
                 clazz, new Class[] { CucumberOptions.class });
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
@@ -81,12 +83,12 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader),
                 runtimeOptions.formatter(classLoader),
                 runtimeOptions.isStrict());
-        
+
         for (final String arg : argList) {
             addChildren(runtimeOptions.cucumberFeatures(resourceLoader), arg);
-        
+
         }
-        
+
     }
 
     @Override
@@ -112,13 +114,16 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         new SummaryPrinter(System.out).print(runtime);
     }
 
-    private void addChildren(final List<CucumberFeature> cucumberFeatures, final String arg) throws InitializationError {
+    private void addChildren(final List<CucumberFeature> cucumberFeatures,
+            final String arg) throws InitializationError {
         for (final CucumberFeature cucumberFeature : cucumberFeatures) {
-            children.add(new FeatureRunner(cucumberFeature, runtime, jUnitReporter) {
+            children.add(new FeatureRunner(cucumberFeature, runtime,
+                    jUnitReporter) {
                 @Override
                 public String getName() {
                     return "[" + arg + "] " + super.getName();
                 }
+
                 @Override
                 public void run(RunNotifier notifier) {
                     System.setProperty(SYSTEM_PROPERTY, arg);
@@ -127,6 +132,6 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
             });
         }
     }
-    
+
 }
 // CHECKTYLE:ON
