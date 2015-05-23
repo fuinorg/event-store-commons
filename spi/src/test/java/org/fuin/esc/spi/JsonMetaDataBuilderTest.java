@@ -24,7 +24,6 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import org.fuin.esc.spi.JsonMetaDataBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
