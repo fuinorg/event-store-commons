@@ -169,14 +169,22 @@ public final class EsjEventStore implements WritableEventStore {
     public final void deleteStream(final StreamId streamId,
             final int expectedVersion) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException {
+
+        Contract.requireArgNotNull("streamId", streamId);
+
         // TODO Auto-generated method stub
     }
 
     @Override
     public final void deleteStream(final StreamId streamId)
             throws StreamNotFoundException, StreamDeletedException {
-        // TODO Auto-generated method stub
-
+        try {
+            deleteStream(streamId, EventStore.VERSION_ANY);
+        } catch (final StreamVersionConflictException ex) {
+            throw new RuntimeException(
+                    "Delete any version was requested, but still got a version conflict",
+                    ex);
+        }
     }
 
     @Override
@@ -227,7 +235,7 @@ public final class EsjEventStore implements WritableEventStore {
     @Override
     public final int appendToStream(final StreamId streamId,
             final CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException {        
+            StreamDeletedException, StreamReadOnlyException {
         return appendToStream(streamId, Arrays.asList(events));
     }
 
