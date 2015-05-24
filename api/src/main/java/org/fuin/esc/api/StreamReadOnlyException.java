@@ -23,10 +23,10 @@ import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
 
 /**
- * Signals that a an attempt was made to write to a projection.
+ * Signals that a an attempt was made to write to a stream that is read only.
  */
 @Immutable
-public final class ProjectionNotWritableException extends Exception {
+public final class StreamReadOnlyException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,9 +38,8 @@ public final class ProjectionNotWritableException extends Exception {
      * @param streamId
      *            Unique name of the stream.
      */
-    public ProjectionNotWritableException(@NotNull final StreamId streamId) {
-        super("Stream '" + streamId
-                + "' is a projection, which means it's read only");
+    public StreamReadOnlyException(@NotNull final StreamId streamId) {
+        super("Stream '" + streamId + "' is read only");
         Contract.requireArgNotNull("streamId", streamId);
         this.streamId = streamId;
     }

@@ -82,13 +82,13 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      *             The stream previously existed but was deleted.
      * @throws StreamVersionConflictException
      *             The expected version didn't match the actual version.
-     * @throws ProjectionNotWritableException
+     * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull List<CommonEvent> events) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException,
-            ProjectionNotWritableException;
+            StreamReadOnlyException;
 
     /**
      * Appends one or more events to a stream. If the stream does not exist, the
@@ -111,13 +111,13 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      *             deleted.
      * @throws StreamVersionConflictException
      *             The expected version didn't match the actual version.
-     * @throws ProjectionNotWritableException
+     * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull CommonEvent... events) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException,
-            ProjectionNotWritableException;
+            StreamReadOnlyException;
 
     /**
      * Appends a list of events to a stream regardless of what version the
@@ -136,12 +136,12 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
-     * @throws ProjectionNotWritableException
+     * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId,
             @NotNull List<CommonEvent> events) throws StreamNotFoundException,
-            StreamDeletedException, ProjectionNotWritableException;
+            StreamDeletedException, StreamReadOnlyException;
 
     /**
      * Appends one or more events to a stream regardless of what version the
@@ -161,11 +161,11 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was
      *             deleted.
-     * @throws ProjectionNotWritableException
+     * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId,
             @NotNull CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException, ProjectionNotWritableException;
+            StreamDeletedException, StreamReadOnlyException;
 
 }

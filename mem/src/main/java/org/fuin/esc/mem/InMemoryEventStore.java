@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ProjectionNotWritableException;
+import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -150,7 +150,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     public final int appendToStream(final StreamId streamId,
             final int expectedVersion, final List<CommonEvent> toAppend)
             throws StreamNotFoundException, StreamVersionConflictException,
-            StreamDeletedException, ProjectionNotWritableException {
+            StreamDeletedException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, 0);
@@ -168,7 +168,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
             final CommonEvent... events) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException,
-            ProjectionNotWritableException {
+            StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, 0);
@@ -181,7 +181,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     @Override
     public final int appendToStream(final StreamId streamId,
             final List<CommonEvent> toAppend) throws StreamNotFoundException,
-            StreamDeletedException, ProjectionNotWritableException {
+            StreamDeletedException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -196,7 +196,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException,
-            ProjectionNotWritableException {
+            StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);

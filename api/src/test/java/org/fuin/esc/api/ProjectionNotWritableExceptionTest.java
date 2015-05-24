@@ -25,18 +25,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link ProjectionNotWritableException} class.
+ * Tests the {@link StreamReadOnlyException} class.
  */
 // CHECKSTYLE:OFF Test
 public class ProjectionNotWritableExceptionTest {
 
     private static final StreamId STREAM_ID = new SimpleStreamId("MyStream");
 
-    private ProjectionNotWritableException testee;
+    private StreamReadOnlyException testee;
 
     @Before
     public void setup() {
-        testee = new ProjectionNotWritableException(STREAM_ID);
+        testee = new StreamReadOnlyException(STREAM_ID);
     }
 
     @After
@@ -53,11 +53,11 @@ public class ProjectionNotWritableExceptionTest {
     public void testSerializeDeserialize() {
 
         // PREPARE
-        final ProjectionNotWritableException original = testee;
+        final StreamReadOnlyException original = testee;
 
         // TEST
         final byte[] data = serialize(original);
-        final ProjectionNotWritableException copy = deserialize(data);
+        final StreamReadOnlyException copy = deserialize(data);
 
         // VERIFY
         assertThat(copy.getMessage()).isEqualTo(original.getMessage());
