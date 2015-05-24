@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 public final class XmlMetaDataBuilder implements MetaDataBuilder<Document> {
 
     private Document document;
-    
+
     @Override
     public final void init(final Document obj) {
         if (obj == null) {

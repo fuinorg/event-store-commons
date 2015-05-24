@@ -18,6 +18,8 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
+import org.fuin.objects4j.common.Nullable;
+
 /**
  * Locates a deserializer for a given type, version and encoding combination.
  */
@@ -29,12 +31,23 @@ public interface DeserializerRegistry {
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
-     *            Mime type.
+     *            Mime type or <code>null</code> to use the default mime type.
      * 
      * @return Deserializer instance configured with the arguments or NULL if no
      *         deserializer was found for the type.
      */
     public Deserializer getDeserializer(@NotNull String type,
-            @NotNull EnhancedMimeType mimeType);
+            @Nullable EnhancedMimeType mimeType);
+
+    /**
+     * Tries to find a deserializer for the given type.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return Deserializer instance configured with the arguments or NULL if no
+     *         deserializer was found for the type.
+     */
+    public Deserializer getDeserializer(@NotNull String type);
 
 }

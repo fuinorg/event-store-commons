@@ -33,6 +33,8 @@ public final class SimpleSerializerDeserializerRegistry implements
 
     private final Map<Key, Deserializer> desMap;
 
+    private final Map<String, String> contentTypes;
+
     /**
      * Default constructor.
      */
@@ -40,6 +42,7 @@ public final class SimpleSerializerDeserializerRegistry implements
         super();
         serMap = new HashMap<String, Serializer>();
         desMap = new HashMap<Key, Deserializer>();
+        contentTypes = new HashMap<String, String>();
     }
 
     /**
@@ -62,6 +65,25 @@ public final class SimpleSerializerDeserializerRegistry implements
 
         final Key key = new Key(type, contentType);
         desMap.put(key, deserializer);
+
+    }
+
+    /**
+     * Sets the default content type to use if no content type is given.
+     * 
+     * @param type
+     *            Type of the data.
+     * @param contentType
+     *            Content type like "application/xml" or "application/json"
+     *            (without parameters - Only base type).
+     */
+    public final void setDefaultContentType(@NotNull final String type,
+            final String contentType) {
+
+        Contract.requireArgNotNull("type", type);
+        Contract.requireArgNotNull("contentType", contentType);
+
+        contentTypes.put(type, contentType);
 
     }
 
@@ -97,6 +119,21 @@ public final class SimpleSerializerDeserializerRegistry implements
         Contract.requireArgNotNull("mimeType", mimeType);
 
         final Key key = new Key(type, mimeType.getBaseType());
+        return desMap.get(key);
+    }
+
+    @Override
+    public final Deserializer getDeserializer(final String type) {
+
+        Contract.requireArgNotNull("type", type);
+
+        final String contentType = contentTypes.get(type);
+        if (contentType == null) {
+            throw new IllegalArgumentException(
+                    "No default content type was set for: " + type);
+        }
+
+        final Key key = new Key(type, contentType);
         return desMap.get(key);
     }
 
