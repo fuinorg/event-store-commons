@@ -33,6 +33,8 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @param expectedVersion
      *            The version the stream should have when being deleted.
      * 
+     * @return TRUE if the stream was deleted, else FALSE.
+     * 
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the
      *             repository.
@@ -42,7 +44,7 @@ public interface WritableEventStore extends ReadOnlyEventStore {
      * @throws StreamVersionConflictException
      *             The expected version didn't match the actual version.
      */
-    public void deleteStream(@NotNull StreamId streamId, int expectedVersion)
+    public boolean deleteStream(@NotNull StreamId streamId, int expectedVersion)
             throws StreamNotFoundException, StreamVersionConflictException,
             StreamDeletedException;
 

@@ -166,13 +166,16 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId,
+    public final boolean deleteStream(final StreamId streamId,
             final int expectedVersion) throws StreamNotFoundException,
             StreamVersionConflictException, StreamDeletedException {
 
         Contract.requireArgNotNull("streamId", streamId);
 
-        // TODO Auto-generated method stub
+        final DeleteStreamHandler handler = new DeleteStreamHandler(streamId, expectedVersion);
+        es.deleteStream(streamId.asString(), expectedVersion, handler);
+        return handler.getResult();
+        
     }
 
     @Override
