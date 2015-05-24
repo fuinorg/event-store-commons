@@ -66,19 +66,38 @@ public final class CommonEventConverter {
      * 
      * @return Converted common event.
      */
-    @SuppressWarnings("unchecked")
     public final CommonEvent convert(final ReadEventCompleted completed) {
 
-        final UUID id = completed.getEventId();
-        final String type = completed.getEventType();
+        return convert(completed.getEventId(), completed.getEventType(),
+                completed.getResponseData().toByteArray(), completed
+                        .getResponseMeta().toByteArray());
+
+    }
+
+    /**
+     * Converts the given completed into a common event.
+     * 
+     * @param id
+     *           Unique event identifier.
+     * @param type
+     *           Type of the event.
+     * @param dataBytes
+     *           Event data.
+     * @param metaBytes
+     *           Meta data.
+     * 
+     * @return Converted common event.
+     */
+    @SuppressWarnings("unchecked")
+    public final CommonEvent convert(final UUID id, final String type,
+            final byte[] dataBytes, final byte[] metaBytes) {
 
         // The event store has no way of storing the mime type for the meta data
         // and therefore we just ask for a deserializer without content type.
         final Deserializer metaDeser = deserRegistry
                 .getDeserializer(EsjEventStore.META_TYPE);
-        final Object meta = metaDeser.unmarshal(completed.getResponseMeta()
-                .toByteArray(), deserRegistry
-                .getDefaultMimeType(EsjEventStore.META_TYPE));
+        final Object meta = metaDeser.unmarshal(metaBytes,
+                deserRegistry.getDefaultMimeType(EsjEventStore.META_TYPE));
         metaDataAccessor.init(meta);
         final String contentTypeStr = metaDataAccessor
                 .getString("content-type");
@@ -88,8 +107,7 @@ public final class CommonEventConverter {
         // Use the data mime type from the meta data to deserialization
         final Deserializer dataDeser = deserRegistry.getDeserializer(type,
                 dataMimeType);
-        final Object data = dataDeser.unmarshal(completed.getResponseData()
-                .toByteArray(), dataMimeType);
+        final Object data = dataDeser.unmarshal(dataBytes, dataMimeType);
 
         return new CommonEvent(id.toString(), type, data, meta);
 

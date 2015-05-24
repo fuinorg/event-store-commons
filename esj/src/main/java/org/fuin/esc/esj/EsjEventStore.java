@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutorService;
 
 import lt.emasina.esj.EventStore;
 import lt.emasina.esj.Settings;
-import lt.emasina.esj.message.ReadEventCompleted;
+import lt.emasina.esj.message.ReadAllEventsForwardCompleted;
 import lt.emasina.esj.model.Event;
 import lt.emasina.esj.model.UserCredentials;
 
@@ -72,6 +72,8 @@ public final class EsjEventStore implements WritableEventStore {
 
     private final CommonEventConverter commonEventConverter;
 
+    private final StreamEventsSliceConverter sliceConverter;
+
     private EventStore es;
 
     /**
@@ -118,6 +120,8 @@ public final class EsjEventStore implements WritableEventStore {
         this.eventConverter = new EventConverter(serRegistry, metaDataBuilder);
         this.commonEventConverter = new CommonEventConverter(deserRegistry,
                 metaDataAccessor);
+        this.sliceConverter = new StreamEventsSliceConverter(deserRegistry,
+                metaDataAccessor);
     }
 
     @Override
@@ -155,17 +159,24 @@ public final class EsjEventStore implements WritableEventStore {
     public final StreamEventsSlice readStreamEventsForward(
             final StreamId streamId, final int start, final int count)
             throws StreamNotFoundException, StreamDeletedException {
-        // TODO Implement!
-        return null;
+
+        final ReadAllEventsForwardHandler handler = new ReadAllEventsForwardHandler(
+                streamId);
+        es.readAllEventsForward(streamId.asString(), start, count, handler);
+        final ReadAllEventsForwardCompleted result = handler.getResult();
+        return sliceConverter.convert(result, start);
+
     }
 
     @Override
     public final StreamEventsSlice readAllEventsForward(final int start,
             final int count) {
         try {
-            return readStreamEventsForward(new SimpleStreamId("$all"), start, count);
+            return readStreamEventsForward(new SimpleStreamId("$all"), start,
+                    count);
         } catch (final StreamNotFoundException | StreamDeletedException ex) {
-            throw new RuntimeException("$all should always exist, but did not", ex);
+            throw new RuntimeException("$all should always exist, but did not",
+                    ex);
         }
     }
 
@@ -176,10 +187,11 @@ public final class EsjEventStore implements WritableEventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
 
-        final DeleteStreamHandler handler = new DeleteStreamHandler(streamId, expectedVersion);
+        final DeleteStreamHandler handler = new DeleteStreamHandler(streamId,
+                expectedVersion);
         es.deleteStream(streamId.asString(), expectedVersion, handler);
         return handler.getResult();
-        
+
     }
 
     @Override
