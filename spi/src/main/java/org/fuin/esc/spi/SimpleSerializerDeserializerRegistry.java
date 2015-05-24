@@ -33,7 +33,7 @@ public final class SimpleSerializerDeserializerRegistry implements
 
     private final Map<Key, Deserializer> desMap;
 
-    private final Map<String, String> contentTypes;
+    private final Map<String, EnhancedMimeType> contentTypes;
 
     /**
      * Default constructor.
@@ -42,7 +42,7 @@ public final class SimpleSerializerDeserializerRegistry implements
         super();
         serMap = new HashMap<String, Serializer>();
         desMap = new HashMap<Key, Deserializer>();
-        contentTypes = new HashMap<String, String>();
+        contentTypes = new HashMap<String, EnhancedMimeType>();
     }
 
     /**
@@ -78,7 +78,7 @@ public final class SimpleSerializerDeserializerRegistry implements
      *            (without parameters - Only base type).
      */
     public final void setDefaultContentType(@NotNull final String type,
-            final String contentType) {
+            final EnhancedMimeType contentType) {
 
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("contentType", contentType);
@@ -126,13 +126,13 @@ public final class SimpleSerializerDeserializerRegistry implements
     public final Deserializer getDeserializer(final String type) {
         Contract.requireArgNotNull("type", type);
 
-        final String contentType = contentTypes.get(type);
+        final EnhancedMimeType contentType = contentTypes.get(type);
         if (contentType == null) {
             throw new IllegalArgumentException(
                     "No default content type was set for: " + type);
         }
 
-        final Key key = new Key(type, contentType);
+        final Key key = new Key(type, contentType.getBaseType());
         return desMap.get(key);
     }
 
@@ -140,11 +140,11 @@ public final class SimpleSerializerDeserializerRegistry implements
     public final EnhancedMimeType getDefaultMimeType(final String type) {
         Contract.requireArgNotNull("type", type);
 
-        final String contentType = contentTypes.get(type);
+        final EnhancedMimeType contentType = contentTypes.get(type);
         if (contentType == null) {
             return null;
         }
-        return EnhancedMimeType.create(contentType);
+        return contentType;
     }
 
     /**
