@@ -16,9 +16,12 @@
  */
 package org.fuin.esc.api;
 
+import javax.validation.constraints.NotNull;
+
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Signals a conflict between an expected and an actual version.
@@ -30,9 +33,9 @@ public final class StreamVersionConflictException extends Exception {
 
     private final StreamId streamId;
 
-    private final int expected;
+    private final Integer expected;
 
-    private final int actual;
+    private final Integer actual;
 
     /**
      * Constructor with all data.
@@ -44,15 +47,18 @@ public final class StreamVersionConflictException extends Exception {
      * @param actual
      *            Actual version.
      */
-    public StreamVersionConflictException(final StreamId streamId,
-            final int expected, final int actual) {
+    // CHECKSTYLE:OFF:AvoidInlineConditionals
+    public StreamVersionConflictException(@NotNull final StreamId streamId,
+            @NotNull final Integer expected, @Nullable final Integer actual) {
         super("Expected version " + expected + " for stream '" + streamId
-                + "', but was " + actual);
+                + (actual == null ? "'" : "', but was " + actual));
         Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgNotNull("expected", streamId);
         this.streamId = streamId;
         this.expected = expected;
         this.actual = actual;
     }
+    // CHECKSTYLE:ON:AvoidInlineConditionals
 
     /**
      * Returns the unique identifier of the stream.
@@ -69,16 +75,19 @@ public final class StreamVersionConflictException extends Exception {
      * 
      * @return Expected version.
      */
-    public final int getExpected() {
+    @NeverNull
+    public final Integer getExpected() {
         return expected;
     }
 
     /**
      * Returns the actual version.
      * 
-     * @return Actual version.
+     * @return Actual version or <code>null</code> if the event store didn't
+     *         tell us what version it expected.
      */
-    public final int getActual() {
+    @Nullable
+    public final Integer getActual() {
         return actual;
     }
 
