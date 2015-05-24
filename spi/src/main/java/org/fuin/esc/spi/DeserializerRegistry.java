@@ -36,6 +36,7 @@ public interface DeserializerRegistry {
      * @return Deserializer instance configured with the arguments or NULL if no
      *         deserializer was found for the type.
      */
+    @Nullable
     public Deserializer getDeserializer(@NotNull String type,
             @Nullable EnhancedMimeType mimeType);
 
@@ -48,6 +49,19 @@ public interface DeserializerRegistry {
      * @return Deserializer instance configured with the arguments or NULL if no
      *         deserializer was found for the type.
      */
+    @Nullable
     public Deserializer getDeserializer(@NotNull String type);
+
+    /**
+     * Returns the default mime type for the given type.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return Default mime type or NULL if nothing was configured for the given
+     *         type.
+     */
+    @Nullable
+    public EnhancedMimeType getDefaultMimeType(@NotNull String type);
 
 }

@@ -124,7 +124,6 @@ public final class SimpleSerializerDeserializerRegistry implements
 
     @Override
     public final Deserializer getDeserializer(final String type) {
-
         Contract.requireArgNotNull("type", type);
 
         final String contentType = contentTypes.get(type);
@@ -135,6 +134,17 @@ public final class SimpleSerializerDeserializerRegistry implements
 
         final Key key = new Key(type, contentType);
         return desMap.get(key);
+    }
+
+    @Override
+    public final EnhancedMimeType getDefaultMimeType(final String type) {
+        Contract.requireArgNotNull("type", type);
+
+        final String contentType = contentTypes.get(type);
+        if (contentType == null) {
+            return null;
+        }
+        return EnhancedMimeType.create(contentType);
     }
 
     /**
