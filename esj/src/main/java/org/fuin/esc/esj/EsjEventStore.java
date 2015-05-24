@@ -30,6 +30,7 @@ import lt.emasina.esj.model.UserCredentials;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
+import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -161,8 +162,11 @@ public final class EsjEventStore implements WritableEventStore {
     @Override
     public final StreamEventsSlice readAllEventsForward(final int start,
             final int count) {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return readStreamEventsForward(new SimpleStreamId("$all"), start, count);
+        } catch (final StreamNotFoundException | StreamDeletedException ex) {
+            throw new RuntimeException("$all should always exist, but did not", ex);
+        }
     }
 
     @Override
