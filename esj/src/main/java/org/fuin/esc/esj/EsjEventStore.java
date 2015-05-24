@@ -68,7 +68,7 @@ public final class EsjEventStore implements WritableEventStore {
     private final String password;
 
     private final EventConverter eventConverter;
-    
+
     private final CommonEventConverter commonEventConverter;
 
     private EventStore es;
@@ -115,7 +115,8 @@ public final class EsjEventStore implements WritableEventStore {
         this.user = user;
         this.password = password;
         this.eventConverter = new EventConverter(serRegistry, metaDataBuilder);
-        this.commonEventConverter = new CommonEventConverter(deserRegistry, metaDataAccessor);
+        this.commonEventConverter = new CommonEventConverter(deserRegistry,
+                metaDataAccessor);
     }
 
     @Override
@@ -214,16 +215,20 @@ public final class EsjEventStore implements WritableEventStore {
     public final int appendToStream(final StreamId streamId,
             final List<CommonEvent> events) throws StreamNotFoundException,
             StreamDeletedException, StreamReadOnlyException {
-        // TODO Auto-generated method stub
-        return 0;
+        try {
+            return appendToStream(streamId, EventStore.VERSION_ANY, events);
+        } catch (final StreamVersionConflictException ex) {
+            throw new RuntimeException(
+                    "Append to any version was requested, but still got a version conflict",
+                    ex);
+        }
     }
 
     @Override
     public final int appendToStream(final StreamId streamId,
             final CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException {
-        // TODO Auto-generated method stub
-        return 0;
+            StreamDeletedException, StreamReadOnlyException {        
+        return appendToStream(streamId, Arrays.asList(events));
     }
 
 }
