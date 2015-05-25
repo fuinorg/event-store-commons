@@ -17,9 +17,12 @@
 package org.fuin.esc.esj;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,8 +31,13 @@ import javax.json.Json;
 import lt.emasina.esj.Settings;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamDeletedException;
+import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.JsonMetaDataAccessor;
 import org.fuin.esc.spi.JsonMetaDataBuilder;
@@ -45,6 +53,8 @@ import org.junit.Test;
  */
 // CHECKSTYLE:OFF Test
 public class EsjEventStoreTest {
+
+    private final static String PREFIX = "EsjEventStoreTest.";
 
     private final static int VERSION_ANY = -2;
     private final static int VERSION_NO_STREAM = -1;
@@ -62,7 +72,8 @@ public class EsjEventStoreTest {
         final String password = "changeit";
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         final JsonDeSerializer jsonSerDeser = new JsonDeSerializer();
-        registry.setDefaultContentType(EsjEventStore.META_TYPE, jsonSerDeser.getMimeType());
+        registry.setDefaultContentType(EsjEventStore.META_TYPE,
+                jsonSerDeser.getMimeType());
         registry.addSerializer(EsjEventStore.META_TYPE, jsonSerDeser);
         registry.addSerializer("MyEvent", jsonSerDeser);
         registry.addDeserializer(EsjEventStore.META_TYPE, jsonSerDeser
@@ -83,17 +94,16 @@ public class EsjEventStoreTest {
     }
 
     @Test
-    public void testAppendToStreamArray() throws Exception {
+    public void testAppendToStreamSuccess() throws Exception {
 
         // PREPARE
-        final StreamId streamId = new SimpleStreamId("esc-esj-stream-1");
-        final CommonEvent eventOne = new CommonEvent(
-                "339aa3a7-d79d-4bc7-878c-f71a41a2d6da", "MyEvent", Json
-                        .createObjectBuilder().add("name", "Peter")
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testAppendToStreamSuccess");
+        final CommonEvent eventOne = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Peter")
                         .add("age", "22").build());
-        final CommonEvent eventTwo = new CommonEvent(
-                "3e998693-dbdc-437e-accd-d1af67427336", "MyEvent", Json
-                        .createObjectBuilder().add("name", "Mary-Jane")
+        final CommonEvent eventTwo = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Mary-Jane")
                         .add("age", "21").build());
 
         // TEST
@@ -107,6 +117,283 @@ public class EsjEventStoreTest {
         assertThat(event1).isEqualTo(eventOne);
         assertThat(event2).isEqualTo(eventTwo);
 
+    }
+
+    @Test
+    public void testAppendToStreamStreamVersionConflictException()
+            throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testAppendToStreamStreamVersionConflictException");
+        final CommonEvent event = new CommonEvent(randomUUID(), "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+
+        // TEST
+        try {
+            testee.appendToStream(streamId, 1, event);
+            fail("Expected exception");
+        } catch (final StreamVersionConflictException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testAppendToStreamStreamDeletedException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testAppendToStreamStreamDeletedException");
+        final CommonEvent eventOne = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Peter")
+                        .add("age", "22").build());
+        final CommonEvent eventTwo = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Mary-Jane")
+                        .add("age", "21").build());
+        testee.appendToStream(streamId, VERSION_ANY, eventOne);
+        testee.deleteStream(streamId);
+        
+        // TEST
+        try {
+            testee.appendToStream(streamId, VERSION_NO_STREAM, eventTwo);
+            fail("Expected exception");
+        } catch (final StreamDeletedException ex) {
+            // VERIFIED
+        }
+        
+    }
+
+    @Test
+    public void testAppendToStreamStreamReadOnlyException() {
+        fail("Implement!");
+    }
+
+    @Test
+    public void testDeleteStreamSuccess() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testDeleteStreamSuccess");
+        final CommonEvent event = new CommonEvent(randomUUID(), "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        final int nextVersion = testee.appendToStream(streamId, VERSION_ANY,
+                event);
+
+        // TEST
+        testee.deleteStream(streamId, nextVersion);
+
+        // VERIFY
+        try {
+            testee.readStreamEventsForward(streamId, nextVersion, 1);
+            fail("Expected exception");
+        } catch (final StreamDeletedException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testDeleteStreamStreamNotFoundException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testDeleteStreamStreamNotFoundException");
+
+        // TEST
+        try {
+            final boolean ok = testee.deleteStream(streamId, VERSION_ANY);
+            fail("Expected exception, but got: " + ok);
+        } catch (final StreamNotFoundException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testDeleteStreamStreamVersionConflictException()
+            throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testDeleteStreamStreamVersionConflictException");
+        final CommonEvent event = new CommonEvent(randomUUID(), "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        final int nextVersion = testee.appendToStream(streamId, VERSION_ANY,
+                event);
+
+        // TEST
+        try {
+            testee.deleteStream(streamId, nextVersion + 1);
+            fail("Expected exception");
+        } catch (final StreamVersionConflictException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testReadStreamEventsForwardSuccess() throws Exception {
+        
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadStreamEventsForwardSuccess");
+        final CommonEvent eventOne = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Peter")
+                        .add("age", "22").build());
+        final CommonEvent eventTwo = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Mary-Jane")
+                        .add("age", "21").build());
+        final CommonEvent eventThree = new CommonEvent(randomUUID(), "MyEvent",
+                Json.createObjectBuilder().add("name", "Harry")
+                        .add("age", "22").build());
+
+        testee.appendToStream(streamId, VERSION_ANY, eventOne, eventTwo, eventThree);
+
+        // TEST
+        final StreamEventsSlice slice1 = testee.readStreamEventsForward(streamId, 0, 2);
+        
+        // VERIFY
+        assertThat(slice1.getFromEventNumber()).isEqualTo(0);
+        assertThat(slice1.getNextEventNumber()).isEqualTo(2);
+        assertThat(slice1.isEndOfStream()).isFalse();
+        assertThat(slice1.getEvents()).containsExactly(eventOne, eventTwo);
+
+        // TEST
+        final StreamEventsSlice slice2 = testee.readStreamEventsForward(streamId, 2, 2);
+        
+        // VERIFY
+        assertThat(slice2.getFromEventNumber()).isEqualTo(2);
+        assertThat(slice2.getNextEventNumber()).isEqualTo(2);
+        assertThat(slice2.isEndOfStream()).isTrue();
+        assertThat(slice2.getEvents()).containsExactly(eventThree);
+        
+    }
+
+    @Test
+    public void testReadStreamEventsForwardStreamNotFoundException() throws Exception {
+        
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadStreamEventsForwardStreamNotFoundException");
+        
+        // TEST
+        try {
+            testee.readStreamEventsForward(streamId, 0, 1);
+            fail("Expected exception");
+        } catch (final StreamNotFoundException ex) {
+            // VERIFIED
+        }
+        
+    }
+
+    @Test
+    public void testReadStreamEventsForwardStreamDeletedException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadStreamEventsForwardStreamDeletedException");
+        final CommonEvent event = new CommonEvent(randomUUID(), "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        testee.appendToStream(streamId, VERSION_ANY,  event);
+        testee.deleteStream(streamId);
+
+        // TEST
+        try {
+            testee.readStreamEventsForward(streamId, 0, 1);
+            fail("Expected exception");
+        } catch (final StreamDeletedException ex) {
+            // VERIFIED
+        }
+        
+    }
+
+    @Test
+    public void testReadEventSuccess() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadEventSuccess");
+        final String id = randomUUID();
+        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        final int nextVersion = testee.appendToStream(streamId, VERSION_ANY,
+                event);
+
+        // TEST
+        final CommonEvent copy = testee.readEvent(streamId, nextVersion);
+
+        // VERIFY
+        assertThat(copy.getId()).isEqualTo(id);
+
+    }
+
+    @Test
+    public void testReadEventEventNotFoundException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadEventEventNotFoundException");
+        final String id = randomUUID();
+        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        final int nextVersion = testee.appendToStream(streamId, VERSION_ANY,
+                event);
+
+        // TEST
+        try {
+            testee.readEvent(streamId, nextVersion + 1);
+            fail("Expected exception");
+        } catch (final EventNotFoundException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testReadEventStreamNotFoundException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadEventStreamNotFoundException");
+
+        // TEST
+        try {
+            testee.readEvent(streamId, 1);
+            fail("Expected exception");
+        } catch (final StreamNotFoundException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    @Test
+    public void testReadEventStreamDeletedException() throws Exception {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId(PREFIX
+                + "testReadEventStreamDeletedException");
+        final String id = randomUUID();
+        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
+                .createObjectBuilder().add("name", "Peter").build());
+        final int nextVersion = testee.appendToStream(streamId, VERSION_ANY,
+                event);
+        final CommonEvent copy = testee.readEvent(streamId, nextVersion);
+        assertThat(copy.getId()).isEqualTo(id);
+        testee.deleteStream(streamId);
+
+        // TEST
+        try {
+            testee.readEvent(streamId, nextVersion + 1);
+            fail("Expected exception");
+        } catch (final StreamDeletedException ex) {
+            // VERIFIED
+        }
+
+    }
+
+    private String randomUUID() {
+        return UUID.randomUUID().toString();
     }
 
 }

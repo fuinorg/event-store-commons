@@ -26,6 +26,7 @@ import lt.emasina.esj.message.ClientMessageDtos.OperationResult;
 
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.objects4j.common.Contract;
 
@@ -55,9 +56,11 @@ public class ReadAllEventsForwardHandler extends AbstractCompletedHandler {
      * 
      * @throws StreamDeletedException
      *             The stream was deleted.
+     * @throws StreamNotFoundException
+     *             The given stream is unknown.
      */
     public final ReadAllEventsForwardCompleted getResult()
-            throws StreamDeletedException {
+            throws StreamDeletedException, StreamNotFoundException {
         waitForResult();
         if (getException() != null) {
             throw new RuntimeException(getException());
@@ -69,14 +72,16 @@ public class ReadAllEventsForwardHandler extends AbstractCompletedHandler {
     }
 
     private void verify(final ReadStreamResult operationResult)
-            throws StreamDeletedException {
+            throws StreamDeletedException, StreamNotFoundException {
 
         final int result = operationResult.getNumber();
         switch (result) {
-        case OperationResult.Success_VALUE:
+        case ReadStreamResult.Success_VALUE:
             return;
-        case OperationResult.StreamDeleted_VALUE:
+        case ReadStreamResult.StreamDeleted_VALUE:
             throw new StreamDeletedException(streamId);
+        case ReadStreamResult.NoStream_VALUE:
+            throw new StreamNotFoundException(streamId);
         default:
             throw new RuntimeException(operationResult.toString());
         }

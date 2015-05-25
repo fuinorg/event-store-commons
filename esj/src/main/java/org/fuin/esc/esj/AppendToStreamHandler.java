@@ -81,7 +81,7 @@ public final class AppendToStreamHandler extends AbstractCompletedHandler {
         case OperationResult.Success_VALUE:
             return;
         case OperationResult.WrongExpectedVersion_VALUE:
-            // TODO Is there a way to get the expected version back from the event store?
+            // TODO Is there a way to get the actual version back from the event store?
             throw new StreamVersionConflictException(streamId, expectedVersion,
                     null);
         case OperationResult.StreamDeleted_VALUE:

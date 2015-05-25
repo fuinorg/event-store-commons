@@ -189,7 +189,7 @@ public final class EsjEventStore implements WritableEventStore {
 
         final DeleteStreamHandler handler = new DeleteStreamHandler(streamId,
                 expectedVersion);
-        es.deleteStream(streamId.asString(), expectedVersion, handler);
+        es.deleteStream(streamId.asString(), expectedVersion, true, handler);
         return handler.getResult();
 
     }
@@ -209,7 +209,7 @@ public final class EsjEventStore implements WritableEventStore {
     @Override
     public final int appendToStream(final StreamId streamId,
             final int expectedVersion, final CommonEvent... events)
-            throws StreamNotFoundException, StreamVersionConflictException,
+            throws StreamVersionConflictException,
             StreamDeletedException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -223,7 +223,7 @@ public final class EsjEventStore implements WritableEventStore {
     @Override
     public final int appendToStream(final StreamId streamId,
             final int expectedVersion, final List<CommonEvent> commonEvents)
-            throws StreamNotFoundException, StreamVersionConflictException,
+            throws StreamVersionConflictException,
             StreamDeletedException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
