@@ -7,18 +7,15 @@ package org.fuin.esc.mem;
 public class MyEvent {
 
     private String name;
-    
+
     public MyEvent(final String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -27,9 +24,6 @@ public class MyEvent {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -46,8 +40,11 @@ public class MyEvent {
             return false;
         return true;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON

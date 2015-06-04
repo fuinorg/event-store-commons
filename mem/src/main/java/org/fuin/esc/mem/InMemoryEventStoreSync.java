@@ -130,12 +130,12 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
-        for (int i = start; (i >= (start - count)) && (i >= 0); i--) {
+        for (int i = start; (i > (start - count)) && (i >= 0); i--) {
             result.add(events.get(i));
         }
 
         final int fromEventNumber = start;
-        final int nextEventNumber = (start - count);
+        final int nextEventNumber = start - result.size();
         final boolean endOfStream = (start - count) < 0;
 
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
