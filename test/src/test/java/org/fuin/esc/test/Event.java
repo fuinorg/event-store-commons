@@ -27,7 +27,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.UUIDStr;
 import org.fuin.objects4j.vo.ValueObject;
@@ -103,7 +102,7 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @return Unique event identifier.
      */
-    @NeverNull
+    @NotNull
     public final String getId() {
         return id;
     }
@@ -113,7 +112,7 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @return Event data.
      */
-    @NeverNull
+    @NotNull
     public final Data getData() {
         return data;
     }
@@ -123,7 +122,7 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @return Meta data.
      */
-    @NeverNull
+    @NotNull
     public final Data getMeta() {
         return meta;
     }

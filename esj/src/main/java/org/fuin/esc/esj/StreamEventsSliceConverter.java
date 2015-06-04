@@ -43,7 +43,7 @@ public class StreamEventsSliceConverter {
 
     private final DeserializerRegistry deserRegistry;
 
-    private final MetaDataAccessor metaDataAccessor;
+    private final MetaDataAccessor<Object> metaDataAccessor;
 
     /**
      * Constructor with mandatory data.
@@ -53,7 +53,7 @@ public class StreamEventsSliceConverter {
      * @param metaDataAccessor
      *            Used to access an unknown type of meta data.
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public StreamEventsSliceConverter(
             @NotNull final DeserializerRegistry deserRegistry,
             @NotNull final MetaDataAccessor metaDataAccessor) {

@@ -35,7 +35,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
@@ -101,7 +100,7 @@ public final class Data implements ValueObject, Serializable {
      * 
      * @return Unique and never changing type name.
      */
-    @NeverNull
+    @NotNull
     public final String getType() {
         return type;
     }
@@ -111,7 +110,7 @@ public final class Data implements ValueObject, Serializable {
      * 
      * @return Mime type.
      */
-    @NeverNull
+    @NotNull
     public final EnhancedMimeType getMimeType() {
         return mimeType;
     }
@@ -121,7 +120,7 @@ public final class Data implements ValueObject, Serializable {
      * 
      * @return Raw data.
      */
-    @NeverNull
+    @NotNull
     public final String getContent() {
         return content;
     }

@@ -21,22 +21,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
+import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamVersionConflictException;
-import org.fuin.esc.api.WritableEventStore;
 import org.fuin.objects4j.common.Contract;
+import org.jboss.weld.exceptions.IllegalArgumentException;
 
 /**
  * In-memory implementation for unit testing.
  */
-public final class InMemoryEventStore implements WritableEventStore {
+public final class InMemoryEventStoreSync implements EventStoreSync {
 
     private List<CommonEvent> all;
 
@@ -47,7 +49,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     /**
      * Default constructor.
      */
-    public InMemoryEventStore() {
+    public InMemoryEventStoreSync() {
         super();
         all = new ArrayList<CommonEvent>();
         streams = new HashMap<StreamId, List<CommonEvent>>();
@@ -55,20 +57,20 @@ public final class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public void open() {
+    public final void open() {
         // Do nothing
     }
 
     @Override
-    public void close() {
+    public final void close() {
         // Do nothing
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) throws EventNotFoundException,
-            StreamNotFoundException, StreamDeletedException {
+    public final CommonEvent readEvent(final Optional<Credentials> credentials,
+            final StreamId streamId, final int eventNumber) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
 
@@ -76,19 +78,26 @@ public final class InMemoryEventStore implements WritableEventStore {
         if (events.size() - 1 < eventNumber) {
             throw new EventNotFoundException(streamId, eventNumber);
         }
+
         return events.get(eventNumber);
     }
 
     @Override
-    public final StreamEventsSlice readStreamEventsForward(
-            final StreamId streamId, final int start, final int count)
-            throws StreamNotFoundException, StreamDeletedException {
+    public final StreamEventsSlice readEventsForward(
+            final Optional<Credentials> credentials, final StreamId streamId,
+            final int start, final int count) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
 
-        final List<CommonEvent> events = getStream(streamId);
+        final List<CommonEvent> events;
+        if (streamId == StreamId.ALL) {
+            events = all;
+        } else {
+            events = getStream(streamId);
+        }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
         for (int i = start; (i < (start + count)) && (i < events.size()); i++) {
@@ -97,49 +106,65 @@ public final class InMemoryEventStore implements WritableEventStore {
         final int fromEventNumber = start;
         final int nextEventNumber = (start + result.size());
         final boolean endOfStream = (result.size() < count);
+
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
                 endOfStream);
 
     }
 
     @Override
-    public final StreamEventsSlice readAllEventsForward(final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsBackward(
+            final Optional<Credentials> credentials, final StreamId streamId,
+            final int start, final int count) {
 
+        Contract.requireArgNotNull("credentials", credentials);
+        Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
 
-        final List<CommonEvent> result = new ArrayList<CommonEvent>();
-        for (int i = start; (i < (start + count)) && (i < all.size()); i++) {
-            result.add(all.get(i));
+        final List<CommonEvent> events;
+        if (streamId == StreamId.ALL) {
+            events = all;
+        } else {
+            events = getStream(streamId);
         }
+
+        final List<CommonEvent> result = new ArrayList<CommonEvent>();
+        for (int i = start; (i >= (start - count)) && (i >= 0); i--) {
+            result.add(events.get(i));
+        }
+
         final int fromEventNumber = start;
-        final int nextEventNumber = (start + result.size());
-        final boolean endOfStream = (result.size() < count);
+        final int nextEventNumber = (start - count);
+        final boolean endOfStream = (start - count) < 0;
+
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
                 endOfStream);
-
     }
 
     @Override
-    public final boolean deleteStream(final StreamId streamId,
-            final int expected) throws StreamNotFoundException,
-            StreamVersionConflictException, StreamDeletedException {
+    public final void deleteStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expected) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, 0);
+        if (streamId == StreamId.ALL) {
+            throw new IllegalArgumentException(
+                    "It's not possible to delete the 'all' stream");
+        }
 
         final List<CommonEvent> events = getStream(streamId, expected);
         deletedStreams.put(streamId, events);
         streams.remove(streamId);
-        return true;
 
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId)
-            throws StreamNotFoundException, StreamDeletedException {
+    public final void deleteStream(final Optional<Credentials> credentials,
+            final StreamId streamId) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
 
         final List<CommonEvent> events = getStream(streamId);
@@ -149,11 +174,11 @@ public final class InMemoryEventStore implements WritableEventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> toAppend)
-            throws StreamNotFoundException, StreamVersionConflictException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> toAppend) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, 0);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -162,53 +187,50 @@ public final class InMemoryEventStore implements WritableEventStore {
                 expectedVersion);
         all.addAll(toAppend);
         events.addAll(toAppend);
+
         return events.size() - 1;
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events)
-            throws StreamNotFoundException, StreamVersionConflictException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) {
 
-        Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("expectedVersion", expectedVersion, 0);
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(credentials, streamId, expectedVersion,
+                Arrays.asList(events));
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final List<CommonEvent> toAppend) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final List<CommonEvent> toAppend) {
 
+        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
         final List<CommonEvent> events = createIfNotExists(streamId);
         all.addAll(toAppend);
         events.addAll(toAppend);
+
         return events.size() - 1;
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final CommonEvent... events) {
 
-        Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, Arrays.asList(events));
+        return appendToStream(credentials, streamId, Arrays.asList(events));
 
     }
 
-    private List<CommonEvent> getStream(final StreamId streamId)
-            throws StreamDeletedException, StreamNotFoundException {
+    private List<CommonEvent> getStream(final StreamId streamId) {
         final List<CommonEvent> events = streams.get(streamId);
         if (events == null) {
             if (deletedStreams.containsKey(streamId)) {
@@ -220,8 +242,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     }
 
     private List<CommonEvent> getStream(final StreamId streamId,
-            final int expected) throws StreamDeletedException,
-            StreamNotFoundException, StreamVersionConflictException {
+            final int expected) {
         final List<CommonEvent> events = getStream(streamId);
         final int actual = events.size() - 1;
         if (expected != actual) {
@@ -230,8 +251,7 @@ public final class InMemoryEventStore implements WritableEventStore {
         return events;
     }
 
-    private List<CommonEvent> createIfNotExists(final StreamId streamId)
-            throws StreamDeletedException {
+    private List<CommonEvent> createIfNotExists(final StreamId streamId) {
 
         try {
             return getStream(streamId);
@@ -243,8 +263,7 @@ public final class InMemoryEventStore implements WritableEventStore {
     }
 
     private List<CommonEvent> createIfNotExists(final StreamId streamId,
-            final int expected) throws StreamDeletedException,
-            StreamVersionConflictException {
+            final int expected) {
 
         try {
             return getStream(streamId, expected);

@@ -14,24 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.api;
+package org.fuin.esc.mem;
 
-import java.io.File;
-
-import org.fuin.units4j.AssertCoverage;
-import org.junit.Test;
+import org.fuin.units4j.TestOmitted;
 
 /**
- * General tests for all classes.
+ * Tests the {@link InMemoryEventStoreAsync} class.
  */
-// CHECKSTYLE:OFF Test code
-public class BaseTest {
-
-    @Test
-    public final void testCoverage() {
-        // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
-    }
+@TestOmitted("Skipped because it does nothing more than wrapping result into CompletableFuture")
+public class InMemoryEventStoreAsyncTest {
 
 }
 // CHECKSTYLE:ON

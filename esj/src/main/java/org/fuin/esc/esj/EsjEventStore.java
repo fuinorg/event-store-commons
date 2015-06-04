@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import lt.emasina.esj.EventStore;
@@ -29,26 +30,27 @@ import lt.emasina.esj.model.Event;
 import lt.emasina.esj.model.UserCredentials;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamVersionConflictException;
-import org.fuin.esc.api.WritableEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.MetaDataAccessor;
 import org.fuin.esc.spi.MetaDataBuilder;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
+import org.jboss.weld.exceptions.UnsupportedOperationException;
 
 /**
  * Adapter for the <a herf="https://github.com/valdasraps/esj">esj</a> event
  * store client {@link EventStore}.
  */
-public final class EsjEventStore implements WritableEventStore {
+public final class EsjEventStore implements EventStoreSync {
 
     /**
      * Name used for querying the serializer/deserializer registry for the meta
@@ -100,8 +102,8 @@ public final class EsjEventStore implements WritableEventStore {
      * @param metaDataAccessor
      *            Used to read fields from an unknown meta data type.
      */
-    // CHECKSTYLE:OFF:ParameterNumber Not nice but OK here
     @SuppressWarnings("rawtypes")
+    // CHECKSTYLE:OFF:ParameterNumber More than seven is note nice, but OK here
     public EsjEventStore(final InetAddress host, final int port,
             final Settings settings, final ExecutorService executor,
             final String user, final String password,
@@ -109,7 +111,7 @@ public final class EsjEventStore implements WritableEventStore {
             final DeserializerRegistry deserRegistry,
             final MetaDataBuilder metaDataBuilder,
             final MetaDataAccessor metaDataAccessor) {
-        // CHECKSTYLE:ON:ParameterNumber
+        // CHECKSTYLE:ON
         super();
         this.host = host;
         this.port = port;
@@ -144,9 +146,10 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) throws EventNotFoundException,
-            StreamNotFoundException, StreamDeletedException {
+    public final CommonEvent readEvent(final Optional<Credentials> credentials,
+            final StreamId streamId, final int eventNumber)
+            throws EventNotFoundException, StreamNotFoundException,
+            StreamDeletedException {
 
         final ReadEventHandler handler = new ReadEventHandler(streamId,
                 eventNumber);
@@ -156,9 +159,10 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final StreamEventsSlice readStreamEventsForward(
-            final StreamId streamId, final int start, final int count)
-            throws StreamNotFoundException, StreamDeletedException {
+    public final StreamEventsSlice readEventsForward(
+            final Optional<Credentials> credentials, final StreamId streamId,
+            final int start, final int count) throws StreamNotFoundException,
+            StreamDeletedException {
 
         final ReadAllEventsForwardHandler handler = new ReadAllEventsForwardHandler(
                 streamId);
@@ -169,36 +173,33 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final StreamEventsSlice readAllEventsForward(final int start,
-            final int count) {
-        try {
-            return readStreamEventsForward(new SimpleStreamId("$all"), start,
-                    count);
-        } catch (final StreamNotFoundException | StreamDeletedException ex) {
-            throw new RuntimeException("$all should always exist, but did not",
-                    ex);
-        }
+    public final StreamEventsSlice readEventsBackward(
+            final Optional<Credentials> credentials, final StreamId streamId,
+            final int start, final int count) {
+        throw new UnsupportedOperationException(
+                "Reading backward is currently not supported");
     }
 
     @Override
-    public final boolean deleteStream(final StreamId streamId,
-            final int expectedVersion) throws StreamNotFoundException,
-            StreamVersionConflictException, StreamDeletedException {
+    public final void deleteStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expectedVersion)
+            throws StreamNotFoundException, StreamVersionConflictException,
+            StreamDeletedException {
 
         Contract.requireArgNotNull("streamId", streamId);
 
         final DeleteStreamHandler handler = new DeleteStreamHandler(streamId,
                 expectedVersion);
         es.deleteStream(streamId.asString(), expectedVersion, true, handler);
-        return handler.getResult();
 
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId)
-            throws StreamNotFoundException, StreamDeletedException {
+    public final void deleteStream(final Optional<Credentials> credentials,
+            final StreamId streamId) throws StreamNotFoundException,
+            StreamDeletedException {
         try {
-            deleteStream(streamId, EventStore.VERSION_ANY);
+            deleteStream(credentials, streamId, EventStore.VERSION_ANY);
         } catch (final StreamVersionConflictException ex) {
             throw new RuntimeException(
                     "Delete any version was requested, but still got a version conflict",
@@ -207,24 +208,26 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events)
-            throws StreamVersionConflictException,
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) throws StreamVersionConflictException,
             StreamDeletedException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(credentials, streamId, expectedVersion,
+                Arrays.asList(events));
 
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> commonEvents)
-            throws StreamVersionConflictException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> commonEvents)
+            throws StreamVersionConflictException, StreamDeletedException,
+            StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("commonEvents", commonEvents);
@@ -239,11 +242,13 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final List<CommonEvent> events) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final List<CommonEvent> events)
+            throws StreamNotFoundException, StreamDeletedException,
+            StreamReadOnlyException {
         try {
-            return appendToStream(streamId, EventStore.VERSION_ANY, events);
+            return appendToStream(credentials, streamId,
+                    EventStore.VERSION_ANY, events);
         } catch (final StreamVersionConflictException ex) {
             throw new RuntimeException(
                     "Append to any version was requested, but still got a version conflict",
@@ -252,10 +257,11 @@ public final class EsjEventStore implements WritableEventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final CommonEvent... events) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException {
-        return appendToStream(streamId, Arrays.asList(events));
+    public final int appendToStream(final Optional<Credentials> credentials,
+            final StreamId streamId, final CommonEvent... events)
+            throws StreamNotFoundException, StreamDeletedException,
+            StreamReadOnlyException {
+        return appendToStream(credentials, streamId, Arrays.asList(events));
     }
 
 }

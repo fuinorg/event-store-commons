@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -47,25 +46,25 @@ public final class StreamVersionConflictException extends RuntimeException {
      * @param actual
      *            Actual version.
      */
-    // CHECKSTYLE:OFF:AvoidInlineConditionals
     public StreamVersionConflictException(@NotNull final StreamId streamId,
             @NotNull final Integer expected, @Nullable final Integer actual) {
+        // CHECKSTYLE:OFF:AvoidInlineConditionals OK here
         super("Expected version " + expected + " for stream '" + streamId
                 + (actual == null ? "'" : "', but was " + actual));
+        // CHECKSTYLE:ON
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("expected", streamId);
         this.streamId = streamId;
         this.expected = expected;
         this.actual = actual;
     }
-    // CHECKSTYLE:ON:AvoidInlineConditionals
 
     /**
      * Returns the unique identifier of the stream.
      * 
      * @return Stream that was not found.
      */
-    @NeverNull
+    @NotNull
     public final StreamId getStreamId() {
         return streamId;
     }
@@ -75,7 +74,7 @@ public final class StreamVersionConflictException extends RuntimeException {
      * 
      * @return Expected version.
      */
-    @NeverNull
+    @NotNull
     public final Integer getExpected() {
         return expected;
     }

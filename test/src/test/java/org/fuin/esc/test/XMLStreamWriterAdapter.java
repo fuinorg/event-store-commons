@@ -24,7 +24,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Adapter for an {@link XMLStreamWriter}. CAUTION: If you override a method,
  * don't forget to call the "super" method!
  */
-// CHECKSTYLE:OFF:DesignForExtension
+// CHECKSTYLE:OFF DesignForExtension is not possible here 
 public class XMLStreamWriterAdapter implements XMLStreamWriter {
 
     /** All method calls are delegated to this writer. */
@@ -222,3 +222,4 @@ public class XMLStreamWriterAdapter implements XMLStreamWriter {
     }
 
 }
+//CHECKSTYLE:ON

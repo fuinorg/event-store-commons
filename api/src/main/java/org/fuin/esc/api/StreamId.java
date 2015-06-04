@@ -19,7 +19,8 @@ package org.fuin.esc.api;
 import java.io.Serializable;
 import java.util.List;
 
-import org.fuin.objects4j.common.NeverNull;
+import javax.validation.constraints.NotNull;
+
 import org.fuin.objects4j.vo.KeyValue;
 
 /**
@@ -27,12 +28,15 @@ import org.fuin.objects4j.vo.KeyValue;
  */
 public interface StreamId extends Serializable {
 
+    /** Uniquely identifies the stream that contains all events. */
+    public StreamId ALL = new SimpleStreamId(StreamId.class.getName() + "ALL");
+
     /**
      * Returns the name of the stream.
      * 
      * @return Unique name.
      */
-    @NeverNull
+    @NotNull
     public String getName();
 
     /**
@@ -63,7 +67,7 @@ public interface StreamId extends Serializable {
      * @return Ordered unmodifiable list of parameters - May be empty if no
      *         parameters exist.
      */
-    @NeverNull
+    @NotNull
     public List<KeyValue> getParameters();
 
     /**
@@ -71,7 +75,7 @@ public interface StreamId extends Serializable {
      * 
      * @return String representation of the identifier.
      */
-    @NeverNull
+    @NotNull
     public String asString();
 
 }

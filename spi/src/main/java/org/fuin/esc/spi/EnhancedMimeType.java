@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.activation.MimeTypeParseException;
 import javax.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -197,7 +196,7 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * 
      * @return New instance.
      */
-    @NeverNull
+    @NotNull
     public static EnhancedMimeType create(@NotNull final String str) {
         try {
             return new EnhancedMimeType(str);
@@ -218,7 +217,7 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * 
      * @return New instance.
      */
-    @NeverNull
+    @NotNull
     public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub) {
         return create(primary, sub, null, null, null);
@@ -237,7 +236,7 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * 
      * @return New instance.
      */
-    @NeverNull
+    @NotNull
     public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding) {
         return create(primary, sub, encoding, null, null);
@@ -260,7 +259,7 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * 
      * @return New instance.
      */
-    @NeverNull
+    @NotNull
     public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding,
             final String version, final Map<String, String> parameters) {

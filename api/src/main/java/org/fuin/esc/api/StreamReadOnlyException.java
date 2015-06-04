@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Signals that a an attempt was made to write to a stream that is read only.
@@ -49,7 +48,7 @@ public final class StreamReadOnlyException extends RuntimeException {
      * 
      * @return Stream that was not found.
      */
-    @NeverNull
+    @NotNull
     public final StreamId getStreamId() {
         return streamId;
     }

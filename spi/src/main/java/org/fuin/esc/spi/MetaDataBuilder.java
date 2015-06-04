@@ -18,7 +18,6 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -73,7 +72,7 @@ public interface MetaDataBuilder<TYPE> {
      * 
      * @return Created object.
      */
-    @NeverNull
+    @NotNull
     public TYPE build();
 
 }

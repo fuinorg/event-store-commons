@@ -22,11 +22,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Multiple slice of data from a stream.
@@ -87,7 +87,7 @@ public final class Slices implements Serializable {
      * 
      * @return Unmodifiable list of slices.
      */
-    @NeverNull
+    @NotNull
     public List<Slice> getSlices() {
         return Collections.unmodifiableList(slices);
     }

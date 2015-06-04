@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Signals that an event with the given number was not found.
@@ -58,7 +57,7 @@ public final class EventNotFoundException extends RuntimeException {
      * 
      * @return Stream with version that was not found.
      */
-    @NeverNull
+    @NotNull
     public final StreamId getStreamId() {
         return streamId;
     }

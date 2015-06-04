@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,7 +31,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * A slice of data from a stream.
@@ -102,7 +102,7 @@ public final class Slice implements Serializable {
      * 
      * @return Unmodifiable list of events.
      */
-    @NeverNull
+    @NotNull
     public List<Event> getEvents() {
         return Collections.unmodifiableList(events);
     }

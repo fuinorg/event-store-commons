@@ -22,12 +22,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Multiple events.
@@ -88,7 +88,7 @@ public final class Events implements Serializable {
      * 
      * @return Unmodifiable list of events.
      */
-    @NeverNull
+    @NotNull
     public List<Event> getEvents() {
         return Collections.unmodifiableList(events);
     }

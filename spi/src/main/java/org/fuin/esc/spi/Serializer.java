@@ -18,8 +18,6 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.NeverNull;
-
 /**
  * Serializes an object.
  */
@@ -43,7 +41,7 @@ public interface Serializer {
      * @param <T>
      *            Type the data is converted into.
      */
-    @NeverNull
+    @NotNull
     public <T> byte[] marshal(@NotNull T obj);
 
 }

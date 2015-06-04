@@ -18,16 +18,12 @@ package org.fuin.esc.esj;
 
 import javax.validation.constraints.NotNull;
 
-import lt.emasina.esj.message.ClientMessageDtos;
 import lt.emasina.esj.message.ClientMessageDtos.ReadStreamEventsCompleted.ReadStreamResult;
 import lt.emasina.esj.message.ReadAllEventsForwardCompleted;
-import lt.emasina.esj.message.WriteEventsCompleted;
-import lt.emasina.esj.message.ClientMessageDtos.OperationResult;
 
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.objects4j.common.Contract;
 
 /**

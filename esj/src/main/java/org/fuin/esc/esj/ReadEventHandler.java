@@ -22,7 +22,6 @@ import lt.emasina.esj.message.ClientMessageDtos;
 import lt.emasina.esj.message.ClientMessageDtos.ReadEventCompleted.ReadEventResult;
 import lt.emasina.esj.message.ReadEventCompleted;
 
-import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamId;

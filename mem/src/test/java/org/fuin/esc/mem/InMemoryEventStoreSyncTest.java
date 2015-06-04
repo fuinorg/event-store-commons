@@ -19,6 +19,7 @@ package org.fuin.esc.mem;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -27,16 +28,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link InMemoryEventStore} class.
+ * Tests the {@link InMemoryEventStoreSync} class.
  */
 // CHECKSTYLE:OFF Test
-public class InMemoryEventStoreTest {
+public class InMemoryEventStoreSyncTest {
 
-    private InMemoryEventStore testee;
+    private InMemoryEventStoreSync testee;
 
     @Before
     public void setup() {
-        testee = new InMemoryEventStore();
+        testee = new InMemoryEventStoreSync();
         testee.open();
     }
 
@@ -57,16 +58,17 @@ public class InMemoryEventStoreTest {
         final CommonEvent eventTwo = new CommonEvent(
                 "7cdcb63a-c3ca-4a85-be2c-f5675222542d", "MyEvent", new MyEvent(
                         "Two"));
-        
+
         // TEST
-        testee.appendToStream(streamId, 0, eventOne, eventTwo);
+        testee.appendToStream(Credentials.NONE, streamId, 0, eventOne, eventTwo);
 
         // VERIFY
-        final StreamEventsSlice slice = testee.readAllEventsForward(0, 2);
+        final StreamEventsSlice slice = testee.readEventsForward(
+                Credentials.NONE, StreamId.ALL, 0, 2);
         assertThat(slice.getEvents()).contains(eventOne, eventTwo);
         assertThat(slice.getFromEventNumber()).isEqualTo(0);
         assertThat(slice.getNextEventNumber()).isEqualTo(2);
-        
+
     }
 
 }

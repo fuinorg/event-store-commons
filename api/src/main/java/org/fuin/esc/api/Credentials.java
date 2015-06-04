@@ -16,15 +16,19 @@
  */
 package org.fuin.esc.api;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * A combination of user name and password.
  */
 public final class Credentials {
+
+    /** No credentials. */
+    public static final Optional<Credentials> NONE = Optional.empty();
 
     private String username;
 
@@ -51,7 +55,7 @@ public final class Credentials {
      * 
      * @return Unique name of the user.
      */
-    @NeverNull
+    @NotNull
     public final String getUsername() {
         return username;
     }
@@ -61,7 +65,7 @@ public final class Credentials {
      * 
      * @return Password used to log in.
      */
-    @NeverNull
+    @NotNull
     public final char[] getPassword() {
         return password;
     }

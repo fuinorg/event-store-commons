@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF Test
+// CHECKSTYLE:OFF
 package org.fuin.esc.mem;
 
 /**

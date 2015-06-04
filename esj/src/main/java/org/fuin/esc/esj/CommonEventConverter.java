@@ -36,7 +36,7 @@ public final class CommonEventConverter {
 
     private final DeserializerRegistry deserRegistry;
 
-    private final MetaDataAccessor metaDataAccessor;
+    private final MetaDataAccessor<Object> metaDataAccessor;
 
     /**
      * Constructor with all mandatory data.
@@ -46,7 +46,7 @@ public final class CommonEventConverter {
      * @param metaDataAccessor
      *            Used to access an unknown type of meta data.
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public CommonEventConverter(
             @NotNull final DeserializerRegistry deserRegistry,
             @NotNull final MetaDataAccessor metaDataAccessor) {
@@ -78,17 +78,16 @@ public final class CommonEventConverter {
      * Converts the given completed into a common event.
      * 
      * @param id
-     *           Unique event identifier.
+     *            Unique event identifier.
      * @param type
-     *           Type of the event.
+     *            Type of the event.
      * @param dataBytes
-     *           Event data.
+     *            Event data.
      * @param metaBytes
-     *           Meta data.
+     *            Meta data.
      * 
      * @return Converted common event.
      */
-    @SuppressWarnings("unchecked")
     public final CommonEvent convert(final UUID id, final String type,
             final byte[] dataBytes, final byte[] metaBytes) {
 

@@ -22,7 +22,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.UUIDStr;
 import org.fuin.objects4j.vo.ValueObject;
@@ -121,7 +120,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * 
      * @return Unique event identifier.
      */
-    @NeverNull
+    @NotNull
     public final String getId() {
         return id;
     }
@@ -131,7 +130,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * 
      * @return Never changing unique event type name.
      */
-    @NeverNull
+    @NotNull
     public final String getType() {
         return type;
     }
@@ -141,7 +140,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * 
      * @return Event data.
      */
-    @NeverNull
+    @NotNull
     public final Object getData() {
         return data;
     }

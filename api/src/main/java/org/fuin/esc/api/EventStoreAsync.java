@@ -16,22 +16,10 @@
  */
 package org.fuin.esc.api;
 
-import java.io.File;
-
-import org.fuin.units4j.AssertCoverage;
-import org.junit.Test;
-
 /**
- * General tests for all classes.
+ * Combines all event store features for asynchronous access.
  */
-// CHECKSTYLE:OFF Test code
-public class BaseTest {
-
-    @Test
-    public final void testCoverage() {
-        // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
-    }
+public interface EventStoreAsync extends AutoCloseable,
+        WritableEventStoreAsync, ReadableEventStoreAsync {
 
 }
-// CHECKSTYLE:ON
