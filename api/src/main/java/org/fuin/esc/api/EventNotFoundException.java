@@ -26,7 +26,7 @@ import org.fuin.objects4j.common.NeverNull;
  * Signals that an event with the given number was not found.
  */
 @Immutable
-public final class EventNotFoundException extends Exception {
+public final class EventNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

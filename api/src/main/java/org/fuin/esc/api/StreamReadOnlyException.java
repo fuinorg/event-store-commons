@@ -26,7 +26,7 @@ import org.fuin.objects4j.common.NeverNull;
  * Signals that a an attempt was made to write to a stream that is read only.
  */
 @Immutable
-public final class StreamReadOnlyException extends Exception {
+public final class StreamReadOnlyException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

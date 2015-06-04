@@ -26,7 +26,7 @@ import org.fuin.objects4j.common.NeverNull;
  * Signals that a stream with that ID doesn't exist.
  */
 @Immutable
-public final class StreamNotFoundException extends Exception {
+public final class StreamNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

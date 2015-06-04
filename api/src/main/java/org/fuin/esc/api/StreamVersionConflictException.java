@@ -27,7 +27,7 @@ import org.fuin.objects4j.common.Nullable;
  * Signals a conflict between an expected and an actual version.
  */
 @Immutable
-public final class StreamVersionConflictException extends Exception {
+public final class StreamVersionConflictException extends RuntimeException {
 
     private static final long serialVersionUID = 1000L;
 
