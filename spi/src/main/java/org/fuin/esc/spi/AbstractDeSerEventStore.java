@@ -18,7 +18,6 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventType;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +66,8 @@ public class AbstractDeSerEventStore {
      * 
      * @return Event ready to persist.
      */
-    protected final Data serialize(final EventType type, final Object data) {
+    protected final SerializedData serialize(final SerializedDataType type,
+            final Object data) {
         if (data == null) {
             return null;
         }
@@ -77,7 +77,7 @@ public class AbstractDeSerEventStore {
             throw new IllegalStateException("Couldn't get a serializer for: "
                     + type);
         }
-        return new Data(type, serializer.getMimeType(),
+        return new SerializedData(type, serializer.getMimeType(),
                 serializer.marshal(data));
     }
 
@@ -92,7 +92,7 @@ public class AbstractDeSerEventStore {
      * @param <T>
      *            Expected type of event.
      */
-    protected final <T> T deserialize(final Data data) {
+    protected final <T> T deserialize(final SerializedData data) {
         LOG.debug("Deserialize: type={}, mimeType={}", data.getType(),
                 data.getMimeType());
         final Deserializer deserializer = getDeserializerRegistry()

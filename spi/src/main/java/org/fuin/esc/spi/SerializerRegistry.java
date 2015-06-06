@@ -18,8 +18,6 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventType;
-
 /**
  * Locates a serializer for a given type.
  */
@@ -34,6 +32,6 @@ public interface SerializerRegistry {
      * @return Serializer instance or NULL if no serializer was found for the
      *         type.
      */
-    public Serializer getSerializer(@NotNull EventType type);
+    public Serializer getSerializer(@NotNull SerializedDataType type);
 
 }

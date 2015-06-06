@@ -17,6 +17,7 @@
 package org.fuin.esc.spi;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -210,11 +211,11 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Creates an instance with all data and exceptions wrapped to runtime
+     * Creates an instance with all data. Exceptions are wrapped to runtime
      * exceptions.
      * 
      * @param str
-     *            Contains base type, sub type and parameters.
+     *            Contains base type, sub type, version and parameters.
      * 
      * @return New instance.
      */
@@ -229,8 +230,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Creates an instance with primary and sub type (no parameters) and
-     * exceptions wrapped to runtime exceptions.
+     * Creates an instance with primary and sub type (no version, no
+     * parameters). Exceptions are wrapped to runtime exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -246,8 +247,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Creates an instance with primary, sub type and encoding and exceptions
-     * wrapped to runtime exceptions.
+     * Creates an instance with primary, sub type and encoding (no version).
+     * Exceptions are wrapped to runtime exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -262,6 +263,29 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     public static EnhancedMimeType create(@NotNull final String primary,
             @NotNull final String sub, final Charset encoding) {
         return create(primary, sub, encoding, null, null);
+    }
+
+    /**
+     * Creates an instance with primary, sub type, encoding and version.
+     * Exceptions are wrapped to runtime exceptions.
+     * 
+     * @param primary
+     *            Primary type.
+     * @param sub
+     *            Sub type.
+     * @param encoding
+     *            Encoding.
+     * @param version
+     *            Version.
+     * 
+     * @return New instance.
+     */
+    @NotNull
+    public static EnhancedMimeType create(@NotNull final String primary,
+            @NotNull final String sub, final Charset encoding,
+            final String version) {
+        return create(primary, sub, encoding, version,
+                new HashMap<String, String>());
     }
 
     /**

@@ -44,6 +44,7 @@ import org.fuin.esc.spi.JsonMetaDataAccessor;
 import org.fuin.esc.spi.JsonMetaDataBuilder;
 import org.fuin.esc.spi.MetaDataAccessor;
 import org.fuin.esc.spi.MetaDataBuilder;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.junit.After;
 import org.junit.Before;
@@ -76,10 +77,10 @@ public class EsjEventStoreTest {
         registry.setDefaultContentType(EsjEventStore.META_TYPE,
                 jsonSerDeser.getMimeType());
         registry.addSerializer(EsjEventStore.META_TYPE, jsonSerDeser);
-        registry.addSerializer(new EventType("MyEvent"), jsonSerDeser);
+        registry.addSerializer(new SerializedDataType("MyEvent"), jsonSerDeser);
         registry.addDeserializer(EsjEventStore.META_TYPE, jsonSerDeser
                 .getMimeType().getBaseType(), jsonSerDeser);
-        registry.addDeserializer(new EventType("MyEvent"), jsonSerDeser
+        registry.addDeserializer(new SerializedDataType("MyEvent"), jsonSerDeser
                 .getMimeType().getBaseType(), jsonSerDeser);
         final MetaDataBuilder metaDataBuilder = new JsonMetaDataBuilder();
         final MetaDataAccessor metaDataAccessor = new JsonMetaDataAccessor();

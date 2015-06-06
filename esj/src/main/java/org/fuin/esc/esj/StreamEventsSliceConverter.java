@@ -29,7 +29,6 @@ import lt.emasina.esj.message.ReadAllEventsForwardCompleted;
 import lt.emasina.esj.util.Bytes;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.MetaDataAccessor;
@@ -100,7 +99,7 @@ public class StreamEventsSliceConverter {
             // indexedEvent.getLink();
 
             final UUID id = Bytes.fromBytes(event.getEventId().toByteArray());
-            final EventType type = new EventType(event.getEventType());
+            final String type = event.getEventType();
             final ByteString data = event.getData();
             final ByteString meta = event.getMetadata();
 

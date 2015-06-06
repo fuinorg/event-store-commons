@@ -33,7 +33,6 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -43,6 +42,7 @@ import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.MetaDataAccessor;
 import org.fuin.esc.spi.MetaDataBuilder;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 import org.jboss.weld.exceptions.UnsupportedOperationException;
@@ -57,7 +57,8 @@ public final class EsjEventStore implements EventStoreSync {
      * Name used for querying the serializer/deserializer registry for the meta
      * data type.
      */
-    public static final EventType META_TYPE = new EventType("MetaData");
+    public static final SerializedDataType META_TYPE = new SerializedDataType(
+            "META_DATA");
 
     private final InetAddress host;
 

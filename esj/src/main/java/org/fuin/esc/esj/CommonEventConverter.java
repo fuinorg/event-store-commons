@@ -29,6 +29,7 @@ import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.MetaDataAccessor;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
 
 /**
@@ -70,9 +71,8 @@ public final class CommonEventConverter {
      */
     public final CommonEvent convert(final ReadEventCompleted completed) {
 
-        return convert(completed.getEventId(),
-                new EventType(completed.getEventType()), completed
-                        .getResponseData().toByteArray(), completed
+        return convert(completed.getEventId(), completed.getEventType(),
+                completed.getResponseData().toByteArray(), completed
                         .getResponseMeta().toByteArray());
 
     }
@@ -91,7 +91,7 @@ public final class CommonEventConverter {
      * 
      * @return Converted common event.
      */
-    public final CommonEvent convert(final UUID id, final EventType type,
+    public final CommonEvent convert(final UUID id, final String type,
             final byte[] dataBytes, final byte[] metaBytes) {
 
         // The event store has no way of storing the mime type for the meta data
@@ -107,11 +107,11 @@ public final class CommonEventConverter {
                 .create(contentTypeStr);
 
         // Use the data mime type from the meta data to deserialization
-        final Deserializer dataDeser = deserRegistry.getDeserializer(type,
-                dataMimeType);
+        final Deserializer dataDeser = deserRegistry.getDeserializer(
+                new SerializedDataType(type), dataMimeType);
         final Object data = dataDeser.unmarshal(dataBytes, dataMimeType);
 
-        return new CommonEvent(new EventId(id), type, data, meta);
+        return new CommonEvent(new EventId(id), new EventType(type), data, meta);
 
     }
 

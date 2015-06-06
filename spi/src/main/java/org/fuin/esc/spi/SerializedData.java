@@ -31,7 +31,7 @@ import org.fuin.objects4j.vo.ValueObject;
  * Represents a block of data in a serialized form.
  */
 @Immutable
-public class Data implements ValueObject, Serializable {
+public class SerializedData implements ValueObject, Serializable {
 
     private static final long serialVersionUID = 1000L;
 
@@ -50,7 +50,7 @@ public class Data implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
-    protected Data() {
+    protected SerializedData() {
         super();
     }
 
@@ -64,7 +64,7 @@ public class Data implements ValueObject, Serializable {
      * @param raw
      *            Raw data block.
      */
-    public Data(@NotNull final EventType type,
+    public SerializedData(@NotNull final SerializedDataType type,
             @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
@@ -83,8 +83,8 @@ public class Data implements ValueObject, Serializable {
      * @return Unique and never changing type name.
      */
     @NeverNull
-    public final EventType getType() {
-        return new EventType(type);
+    public final SerializedDataType getType() {
+        return new SerializedDataType(type);
     }
 
     /**
@@ -125,9 +125,9 @@ public class Data implements ValueObject, Serializable {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof Data))
+        if (!(obj instanceof SerializedData))
             return false;
-        Data other = (Data) obj;
+        SerializedData other = (SerializedData) obj;
         if (mimeType == null) {
             if (other.mimeType != null)
                 return false;

@@ -26,8 +26,8 @@ import lt.emasina.esj.model.Event;
 import lt.emasina.esj.model.converter.ByteArrayToByteStringConverter;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.spi.MetaDataBuilder;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.Serializer;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
@@ -36,12 +36,6 @@ import org.fuin.objects4j.common.Contract;
  * Converts one or more common events to ESJ events.
  */
 public final class EventConverter {
-
-    /**
-     * Name used for querying the serializer/deserializer registry for the meta
-     * data type.
-     */
-    public static final EventType META_TYPE = new EventType("MetaData");
 
     private final SerializerRegistry serRegistry;
 
@@ -79,9 +73,11 @@ public final class EventConverter {
     public final Event convert(final CommonEvent commonEvent) {
 
         final UUID id = commonEvent.getId().asBaseType();
-        final EventType type = commonEvent.getType();
-        final Serializer dataSer = serRegistry.getSerializer(type);
-        final Serializer metaSer = serRegistry.getSerializer(META_TYPE);
+        final String type = commonEvent.getType().asBaseType();
+        final Serializer dataSer = serRegistry
+                .getSerializer(new SerializedDataType(type));
+        final Serializer metaSer = serRegistry
+                .getSerializer(EsjEventStore.META_TYPE);
         final byte[] dataBytes = asDataBytes(commonEvent, dataSer);
         final byte[] metaBytes = asMetaBytes(commonEvent, dataSer, metaSer);
 
@@ -91,8 +87,7 @@ public final class EventConverter {
         final ByteArrayToByteStringConverter metaConv = new ByteArrayToByteStringConverter(
                 metaSer.getMimeType().isJson());
 
-        return new Event(id, type.asBaseType(), dataBytes, dataConv, metaBytes,
-                metaConv);
+        return new Event(id, type, dataBytes, dataConv, metaBytes, metaConv);
 
     }
 
