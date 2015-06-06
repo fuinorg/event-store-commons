@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import lt.emasina.esj.message.ReadEventCompleted;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -108,7 +109,7 @@ public final class CommonEventConverter {
                 dataMimeType);
         final Object data = dataDeser.unmarshal(dataBytes, dataMimeType);
 
-        return new CommonEvent(id.toString(), type, data, meta);
+        return new CommonEvent(new EventId(id), type, data, meta);
 
     }
 

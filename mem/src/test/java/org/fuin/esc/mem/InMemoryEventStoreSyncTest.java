@@ -19,10 +19,10 @@ package org.fuin.esc.mem;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Credentials;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -55,12 +55,10 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new CommonEvent(
-                "ba7ba6d7-90be-4271-bee2-b104cb38f39a", "MyEvent", new MyEvent(
-                        "One"));
-        final CommonEvent eventTwo = new CommonEvent(
-                "7cdcb63a-c3ca-4a85-be2c-f5675222542d", "MyEvent", new MyEvent(
-                        "Two"));
+        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("One"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("Two"));
 
         // TEST
         testee.appendToStream(Credentials.NONE, streamId, 0, eventOne, eventTwo);
@@ -79,16 +77,16 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("One"));
-        final CommonEvent eventTwo = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Two"));
-        final CommonEvent eventThree = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Three"));
-        final CommonEvent eventFour = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Four"));
-        final CommonEvent eventFive = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Five"));
+        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("One"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("Two"));
+        final CommonEvent eventThree = new CommonEvent(new EventId(),
+                "MyEvent", new MyEvent("Three"));
+        final CommonEvent eventFour = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("Four"));
+        final CommonEvent eventFive = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("Five"));
         final int version = testee.appendToStream(Credentials.NONE, streamId,
                 0, eventOne, eventTwo, eventThree, eventFour, eventFive);
 
@@ -129,12 +127,12 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("One"));
-        final CommonEvent eventTwo = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Two"));
-        final CommonEvent eventThree = new CommonEvent(UUID.randomUUID()
-                .toString(), "MyEvent", new MyEvent("Three"));
+        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("One"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
+                new MyEvent("Two"));
+        final CommonEvent eventThree = new CommonEvent(new EventId(),
+                "MyEvent", new MyEvent("Three"));
         testee.appendToStream(Credentials.NONE, streamId, 0, eventOne,
                 eventTwo, eventThree);
 

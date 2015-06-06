@@ -23,7 +23,6 @@ import javax.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.objects4j.vo.UUIDStr;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
@@ -35,14 +34,9 @@ public final class CommonEvent implements Serializable, ValueObject {
 
     private static final long serialVersionUID = 1000L;
 
-    /**
-     * The ID of the event, used as part of the idempotent write check. This is
-     * type string to allow different UUID implementations. It has to be a valid
-     * UUID string representation.
-     */
+    /** The ID of the event, used as part of the idempotent write check. */
     @NotNull
-    @UUIDStr
-    private String id;
+    private EventId id;
 
     /** Never changing unique event type name. */
     @NotNull
@@ -76,8 +70,8 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            Event data.
      * 
      */
-    public CommonEvent(@NotNull @UUIDStr final String id,
-            @NotNull final String type, @NotNull final Object data) {
+    public CommonEvent(@NotNull final EventId id, @NotNull final String type,
+            @NotNull final Object data) {
         this(id, type, data, null);
     }
 
@@ -97,9 +91,8 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            Meta data.
      * 
      */
-    public CommonEvent(@NotNull @UUIDStr final String id,
-            @NotNull final String type, @NotNull final Object data,
-            @Nullable final Object meta) {
+    public CommonEvent(@NotNull final EventId id, @NotNull final String type,
+            @NotNull final Object data, @Nullable final Object meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
@@ -121,7 +114,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * @return Unique event identifier.
      */
     @NotNull
-    public final String getId() {
+    public final EventId getId() {
         return id;
     }
 

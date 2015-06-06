@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.objects4j.vo.UUIDStr;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
@@ -41,15 +41,10 @@ public final class Event implements Serializable, ValueObject {
 
     private static final long serialVersionUID = 1000L;
 
-    /**
-     * The ID of the event, used as part of the idempotent write check. This is
-     * type string to allow different UUID implementations. It has to be a valid
-     * UUID string representation.
-     */
+    /** The ID of the event, used as part of the idempotent write check. */
     @NotNull
-    @UUIDStr
     @XmlAttribute(name = "id")
-    private String id;
+    private EventId id;
 
     /** The event data. */
     @NotNull
@@ -73,20 +68,18 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @param id
      *            The ID of the event, used as part of the idempotent write
-     *            check. This is type string to allow different UUID
-     *            implementations. It has to be a valid UUID string
-     *            representation.
+     *            check.
      * @param data
      *            Event data.
      * @param meta
      *            Meta data.
      * 
      */
-    public Event(@NotNull @UUIDStr final String id, @NotNull final Data data,
+    public Event(@NotNull final EventId id, @NotNull final Data data,
             @Nullable final Data meta) {
         super();
 
-        Contract.requireArgNotNull("eventId", id);
+        Contract.requireArgNotNull("id", id);
         Contract.requireArgNotNull("data", data);
 
         this.id = id;
@@ -97,13 +90,11 @@ public final class Event implements Serializable, ValueObject {
 
     /**
      * Returns the ID of the event, used as part of the idempotent write check.
-     * This is type string to allow different UUID implementations. It has to be
-     * a valid UUID string representation.
      * 
      * @return Unique event identifier.
      */
     @NotNull
-    public final String getId() {
+    public final EventId getId() {
         return id;
     }
 
@@ -165,7 +156,8 @@ public final class Event implements Serializable, ValueObject {
     /**
      * Creates an event using a common event.
      * 
-     * @param selEvent Event to copy.
+     * @param selEvent
+     *            Event to copy.
      * 
      * @return New instance.
      */

@@ -21,18 +21,24 @@ import java.util.Optional;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.Immutable;
+import org.fuin.objects4j.common.NotEmpty;
+import org.fuin.objects4j.vo.ValueObject;
 
 /**
- * A combination of user name and password.
+ * A combination of user name and password. Equals, hash code and comparable are
+ * based on the user name.
  */
-public final class Credentials {
+@Immutable
+public final class Credentials implements ValueObject, Comparable<Credentials> {
 
     /** No credentials. */
     public static final Optional<Credentials> NONE = Optional.empty();
 
-    private String username;
+    private final String username;
 
-    private char[] password;
+    private final char[] password;
 
     /**
      * Constructor with all mandatory data.
@@ -42,10 +48,13 @@ public final class Credentials {
      * @param password
      *            Password.
      */
-    public Credentials(@NotNull final String username,
+    public Credentials(@NotEmpty final String username,
             @NotNull final char[] password) {
-        Contract.requireArgNotNull("username", username);
+        Contract.requireArgNotEmpty("username", username);
         Contract.requireArgNotNull("password", password);
+        if (password.length == 0) {
+            throw new ContractViolationException("The argument 'password' cannot be an empty array");
+        }
         this.username = username;
         this.password = password;
     }
@@ -55,7 +64,7 @@ public final class Credentials {
      * 
      * @return Unique name of the user.
      */
-    @NotNull
+    @NotEmpty
     public final String getUsername() {
         return username;
     }
@@ -73,6 +82,31 @@ public final class Credentials {
     @Override
     public final String toString() {
         return username;
+    }
+
+    @Override
+    public final int compareTo(final Credentials other) {
+        return username.compareTo(other.username);
+    }
+
+    @Override
+    public final int hashCode() {
+        return username.hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Credentials)) {
+            return false;
+        }
+        final Credentials other = (Credentials) obj;
+        return username.equals(other.username);
     }
 
 }

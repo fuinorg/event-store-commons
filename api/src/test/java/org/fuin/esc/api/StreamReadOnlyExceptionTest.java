@@ -17,36 +17,26 @@
 package org.fuin.esc.api;
 
 import static org.fest.assertions.Assertions.assertThat;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
+import static org.fuin.units4j.Units4JUtils.deserialize;
+import static org.fuin.units4j.Units4JUtils.serialize;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link CommonEvent} class.
+ * Tests the {@link StreamReadOnlyException} class.
  */
 // CHECKSTYLE:OFF Test
-public class CommonEventTest {
+public class StreamReadOnlyExceptionTest {
 
-    private static final EventId ID = new EventId();
+    private static final StreamId STREAM_ID = new SimpleStreamId("MyStream");
 
-    private static final String TYPE = "MyEvent";
-
-    private static MyEvent DATA = new MyEvent("Peter");
-
-    private static JsonObject META = Json.createObjectBuilder()
-            .add("ip", "127.0.0.1").build();
-
-    private CommonEvent testee;
+    private StreamReadOnlyException testee;
 
     @Before
     public void setup() {
-        testee = new CommonEvent(ID, TYPE, DATA, META);
+        testee = new StreamReadOnlyException(STREAM_ID);
     }
 
     @After
@@ -55,15 +45,24 @@ public class CommonEventTest {
     }
 
     @Test
-    public void testEqualsHashCode() {
-        EqualsVerifier.forClass(CommonEvent.class).verify();
+    public void testGetter() {
+        assertThat(testee.getStreamId()).isEqualTo(STREAM_ID);
     }
 
     @Test
-    public void testGetter() {
-        assertThat(testee.getId()).isEqualTo(ID);
-        assertThat(testee.getData()).isEqualTo(DATA);
-        assertThat(testee.getMeta()).isEqualTo(META);
+    public void testSerializeDeserialize() {
+
+        // PREPARE
+        final StreamReadOnlyException original = testee;
+
+        // TEST
+        final byte[] data = serialize(original);
+        final StreamReadOnlyException copy = deserialize(data);
+
+        // VERIFY
+        assertThat(copy.getMessage()).isEqualTo(original.getMessage());
+        assertThat(copy.getStreamId()).isEqualTo(original.getStreamId());
+
     }
 
 }

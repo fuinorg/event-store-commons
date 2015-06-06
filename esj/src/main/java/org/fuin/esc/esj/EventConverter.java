@@ -77,7 +77,7 @@ public final class EventConverter {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public final Event convert(final CommonEvent commonEvent) {
 
-        final UUID id = UUID.fromString(commonEvent.getId());
+        final UUID id = commonEvent.getId().asBaseType();
         final String type = commonEvent.getType();
         final Serializer dataSer = serRegistry.getSerializer(type);
         final Serializer metaSer = serRegistry.getSerializer(META_TYPE);

@@ -27,6 +27,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +39,7 @@ import org.junit.Test;
 // CHECKSTYLE:OFF Test
 public class EventTest extends AbstractXmlTest {
 
-    private static final String ID = "5741bcf1-9292-446b-84c1-957ed53b8d88";
+    private static final EventId ID = new EventId();
 
     private static final String DATA_TYPE = "MyEvent";
 

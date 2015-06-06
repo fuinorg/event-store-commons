@@ -53,10 +53,10 @@ public class StreamEventsSliceTest {
         final JsonObject meta = Json.createObjectBuilder()
                 .add("ip", "127.0.0.1").build();
         events = new ArrayList<CommonEvent>();
-        events.add(new CommonEvent("e48f35ee-de38-4d63-ae0a-a2d1db2dbc5c",
-                "MyEvent", new MyEvent("Peter"), meta));
-        events.add(new CommonEvent("41d48b30-42be-459d-9359-4b20909191f2",
-                "MyEvent", new MyEvent("Mary Jane"), meta));
+        events.add(new CommonEvent(new EventId(), "MyEvent", new MyEvent(
+                "Peter"), meta));
+        events.add(new CommonEvent(new EventId(), "MyEvent", new MyEvent(
+                "Mary Jane"), meta));
     }
 
     @Before
