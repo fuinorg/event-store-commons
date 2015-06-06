@@ -54,7 +54,7 @@ public final class Data implements ValueObject, Serializable {
     /** Internet Media Type that classifies the raw event data. */
     @NotNull
     @XmlAttribute(name = "mime-type")
-    private EnhancedMimeType mimeType;
+    private String mimeType;
 
     /** Raw event data in format defined by the mime type and encoding. */
     @NotNull
@@ -90,7 +90,7 @@ public final class Data implements ValueObject, Serializable {
         Contract.requireArgNotNull("content", content);
 
         this.type = type;
-        this.mimeType = mimeType;
+        this.mimeType = mimeType.toString();
         this.content = content;
 
     }
@@ -112,7 +112,7 @@ public final class Data implements ValueObject, Serializable {
      */
     @NotNull
     public final EnhancedMimeType getMimeType() {
-        return mimeType;
+        return EnhancedMimeType.create(mimeType);
     }
 
     /**
@@ -131,7 +131,7 @@ public final class Data implements ValueObject, Serializable {
      * @return TRUE if the mime type is 'application/xml' else FALSE.
      */
     public final boolean isXml() {
-        return mimeType.getBaseType().equals("application/xml");
+        return getMimeType().getBaseType().equals("application/xml");
     }
 
     /**
@@ -140,7 +140,7 @@ public final class Data implements ValueObject, Serializable {
      * @return TRUE if the mime type is 'application/json' else FALSE.
      */
     public final boolean isJson() {
-        return mimeType.getBaseType().equals("application/json");
+        return getMimeType().getBaseType().equals("application/json");
     }
 
     /**
@@ -153,7 +153,8 @@ public final class Data implements ValueObject, Serializable {
      * 
      * @return Object created from content.
      * 
-     * @param <T> Type expected to be returned.
+     * @param <T>
+     *            Type expected to be returned.
      */
     @SuppressWarnings("unchecked")
     public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {

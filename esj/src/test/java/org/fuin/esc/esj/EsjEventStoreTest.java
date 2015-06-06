@@ -32,6 +32,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventNotFoundException;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -75,11 +76,11 @@ public class EsjEventStoreTest {
         registry.setDefaultContentType(EsjEventStore.META_TYPE,
                 jsonSerDeser.getMimeType());
         registry.addSerializer(EsjEventStore.META_TYPE, jsonSerDeser);
-        registry.addSerializer("MyEvent", jsonSerDeser);
+        registry.addSerializer(new EventType("MyEvent"), jsonSerDeser);
         registry.addDeserializer(EsjEventStore.META_TYPE, jsonSerDeser
                 .getMimeType().getBaseType(), jsonSerDeser);
-        registry.addDeserializer("MyEvent", jsonSerDeser.getMimeType()
-                .getBaseType(), jsonSerDeser);
+        registry.addDeserializer(new EventType("MyEvent"), jsonSerDeser
+                .getMimeType().getBaseType(), jsonSerDeser);
         final MetaDataBuilder metaDataBuilder = new JsonMetaDataBuilder();
         final MetaDataAccessor metaDataAccessor = new JsonMetaDataAccessor();
         testee = new EsjEventStore(host, port, settings, executor, user,
@@ -99,12 +100,12 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testAppendToStreamSuccess");
-        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter")
-                        .add("age", "22").build());
-        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Mary-Jane")
-                        .add("age", "21").build());
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Peter").add("age", "22").build());
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Mary-Jane").add("age", "21").build());
 
         // TEST
         final int nextVersion = testee.appendToStream(Credentials.NONE,
@@ -128,8 +129,9 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testAppendToStreamStreamVersionConflictException");
-        final CommonEvent event = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(new EventId(), new EventType(
+                "MyEvent"), Json.createObjectBuilder().add("name", "Peter")
+                .build());
 
         // TEST
         try {
@@ -147,12 +149,12 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testAppendToStreamStreamDeletedException");
-        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter")
-                        .add("age", "22").build());
-        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Mary-Jane")
-                        .add("age", "21").build());
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Peter").add("age", "22").build());
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Mary-Jane").add("age", "21").build());
         testee.appendToStream(Credentials.NONE, streamId, VERSION_ANY, eventOne);
         testee.deleteStream(Credentials.NONE, streamId);
 
@@ -178,8 +180,9 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testDeleteStreamSuccess");
-        final CommonEvent event = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(new EventId(), new EventType(
+                "MyEvent"), Json.createObjectBuilder().add("name", "Peter")
+                .build());
         final int nextVersion = testee.appendToStream(Credentials.NONE,
                 streamId, VERSION_ANY, event);
 
@@ -220,8 +223,9 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testDeleteStreamStreamVersionConflictException");
-        final CommonEvent event = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(new EventId(), new EventType(
+                "MyEvent"), Json.createObjectBuilder().add("name", "Peter")
+                .build());
         final int nextVersion = testee.appendToStream(Credentials.NONE,
                 streamId, VERSION_ANY, event);
 
@@ -241,15 +245,15 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testReadStreamEventsForwardSuccess");
-        final CommonEvent eventOne = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter")
-                        .add("age", "22").build());
-        final CommonEvent eventTwo = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Mary-Jane")
-                        .add("age", "21").build());
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Peter").add("age", "22").build());
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Mary-Jane").add("age", "21").build());
         final CommonEvent eventThree = new CommonEvent(new EventId(),
-                "MyEvent", Json.createObjectBuilder().add("name", "Harry")
-                        .add("age", "22").build());
+                new EventType("MyEvent"), Json.createObjectBuilder()
+                        .add("name", "Harry").add("age", "22").build());
 
         testee.appendToStream(Credentials.NONE, streamId, VERSION_ANY,
                 eventOne, eventTwo, eventThree);
@@ -301,8 +305,9 @@ public class EsjEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testReadStreamEventsForwardStreamDeletedException");
-        final CommonEvent event = new CommonEvent(new EventId(), "MyEvent",
-                Json.createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(new EventId(), new EventType(
+                "MyEvent"), Json.createObjectBuilder().add("name", "Peter")
+                .build());
         testee.appendToStream(Credentials.NONE, streamId, VERSION_ANY, event);
         testee.deleteStream(Credentials.NONE, streamId);
 
@@ -323,8 +328,8 @@ public class EsjEventStoreTest {
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testReadEventSuccess");
         final EventId id = new EventId();
-        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
-                .createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(id, new EventType("MyEvent"),
+                Json.createObjectBuilder().add("name", "Peter").build());
         final int nextVersion = testee.appendToStream(Credentials.NONE,
                 streamId, VERSION_ANY, event);
 
@@ -344,8 +349,8 @@ public class EsjEventStoreTest {
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testReadEventEventNotFoundException");
         final EventId id = new EventId();
-        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
-                .createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(id, new EventType("MyEvent"),
+                Json.createObjectBuilder().add("name", "Peter").build());
         final int nextVersion = testee.appendToStream(Credentials.NONE,
                 streamId, VERSION_ANY, event);
 
@@ -383,8 +388,8 @@ public class EsjEventStoreTest {
         final StreamId streamId = new SimpleStreamId(PREFIX
                 + "testReadEventStreamDeletedException");
         final EventId id = new EventId();
-        final CommonEvent event = new CommonEvent(id, "MyEvent", Json
-                .createObjectBuilder().add("name", "Peter").build());
+        final CommonEvent event = new CommonEvent(id, new EventType("MyEvent"),
+                Json.createObjectBuilder().add("name", "Peter").build());
         final int nextVersion = testee.appendToStream(Credentials.NONE,
                 streamId, VERSION_ANY, event);
         final CommonEvent copy = testee.readEvent(Credentials.NONE, streamId,

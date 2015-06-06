@@ -86,6 +86,7 @@ public class BasicFeature {
                     new SimpleStreamId(streamName), slice.getNextEventNumber(),
                     MAX_EVENTS);
         }
+        actual.append(Slice.valueOf(slice));
         assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
     }
 

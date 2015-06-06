@@ -40,7 +40,7 @@ public final class CommonEvent implements Serializable, ValueObject {
 
     /** Never changing unique event type name. */
     @NotNull
-    private String type;
+    private EventType type;
 
     /** The event data. */
     @NotNull
@@ -70,8 +70,8 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            Event data.
      * 
      */
-    public CommonEvent(@NotNull final EventId id, @NotNull final String type,
-            @NotNull final Object data) {
+    public CommonEvent(@NotNull final EventId id,
+            @NotNull final EventType type, @NotNull final Object data) {
         this(id, type, data, null);
     }
 
@@ -91,8 +91,9 @@ public final class CommonEvent implements Serializable, ValueObject {
      *            Meta data.
      * 
      */
-    public CommonEvent(@NotNull final EventId id, @NotNull final String type,
-            @NotNull final Object data, @Nullable final Object meta) {
+    public CommonEvent(@NotNull final EventId id,
+            @NotNull final EventType type, @NotNull final Object data,
+            @Nullable final Object meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
@@ -124,7 +125,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * @return Never changing unique event type name.
      */
     @NotNull
-    public final String getType() {
+    public final EventType getType() {
         return type;
     }
 

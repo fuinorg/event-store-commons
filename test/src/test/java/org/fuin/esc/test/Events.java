@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventType;
 
 /**
  * Multiple events.
@@ -109,8 +110,8 @@ public final class Events implements Serializable {
                     classesToBeBound);
             final Object data = event.getData().unmarshalContent(
                     classesToBeBound);
-            list.add(new CommonEvent(event.getId(), event.getData().getType(),
-                    data, meta));
+            list.add(new CommonEvent(event.getId(), new EventType(event
+                    .getData().getType()), data, meta));
         }
         return list;
     }

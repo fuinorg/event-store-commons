@@ -24,6 +24,7 @@ import lt.emasina.esj.message.ReadEventCompleted;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -69,8 +70,9 @@ public final class CommonEventConverter {
      */
     public final CommonEvent convert(final ReadEventCompleted completed) {
 
-        return convert(completed.getEventId(), completed.getEventType(),
-                completed.getResponseData().toByteArray(), completed
+        return convert(completed.getEventId(),
+                new EventType(completed.getEventType()), completed
+                        .getResponseData().toByteArray(), completed
                         .getResponseMeta().toByteArray());
 
     }
@@ -89,7 +91,7 @@ public final class CommonEventConverter {
      * 
      * @return Converted common event.
      */
-    public final CommonEvent convert(final UUID id, final String type,
+    public final CommonEvent convert(final UUID id, final EventType type,
             final byte[] dataBytes, final byte[] metaBytes) {
 
         // The event store has no way of storing the mime type for the meta data

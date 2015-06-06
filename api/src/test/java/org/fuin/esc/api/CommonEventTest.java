@@ -35,7 +35,7 @@ public class CommonEventTest {
 
     private static final EventId ID = new EventId();
 
-    private static final String TYPE = "MyEvent";
+    private static final EventType TYPE = new EventType("MyEvent");
 
     private static MyEvent DATA = new MyEvent("Peter");
 

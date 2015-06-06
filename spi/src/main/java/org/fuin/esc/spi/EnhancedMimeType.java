@@ -27,7 +27,8 @@ import org.fuin.objects4j.common.Nullable;
 
 /**
  * Enhances the {@link javax.activation.MimeType} class with convenience methods
- * for accessing version and encoding parameters.
+ * for accessing version and encoding parameters. Equals and hash code are base
+ * on the {@link #toString()} method.
  */
 public final class EnhancedMimeType extends javax.activation.MimeType {
 
@@ -291,6 +292,26 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
             throw new RuntimeException("Failed to create versioned mime type: "
                     + primary + "/" + sub, ex);
         }
+    }
+
+    @Override
+    public final int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof EnhancedMimeType)) {
+            return false;
+        }
+        final EnhancedMimeType other = (EnhancedMimeType) obj;
+        return toString().equals(other.toString());
     }
 
 }

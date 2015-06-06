@@ -33,6 +33,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -56,7 +57,7 @@ public final class EsjEventStore implements EventStoreSync {
      * Name used for querying the serializer/deserializer registry for the meta
      * data type.
      */
-    public static final String META_TYPE = "MetaData";
+    public static final EventType META_TYPE = new EventType("MetaData");
 
     private final InetAddress host;
 

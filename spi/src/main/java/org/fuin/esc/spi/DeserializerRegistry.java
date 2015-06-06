@@ -18,6 +18,7 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.EventType;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -37,7 +38,7 @@ public interface DeserializerRegistry {
      *         deserializer was found for the type.
      */
     @Nullable
-    public Deserializer getDeserializer(@NotNull String type,
+    public Deserializer getDeserializer(@NotNull EventType type,
             @Nullable EnhancedMimeType mimeType);
 
     /**
@@ -50,7 +51,7 @@ public interface DeserializerRegistry {
      *         deserializer was found for the type.
      */
     @Nullable
-    public Deserializer getDeserializer(@NotNull String type);
+    public Deserializer getDeserializer(@NotNull EventType type);
 
     /**
      * Returns the default mime type for the given type.
@@ -62,6 +63,6 @@ public interface DeserializerRegistry {
      *         type.
      */
     @Nullable
-    public EnhancedMimeType getDefaultMimeType(@NotNull String type);
+    public EnhancedMimeType getDefaultMimeType(@NotNull EventType type);
 
 }

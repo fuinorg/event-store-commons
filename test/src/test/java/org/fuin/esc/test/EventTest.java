@@ -114,7 +114,7 @@ public class EventTest extends AbstractXmlTest {
                 .assertXMLEqual(
                 // @formatter:off
                         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                                + "<event id=\"5741bcf1-9292-446b-84c1-957ed53b8d88\">"
+                                + "<event id=\"" + ID.asBaseType() + "\">"
                                 + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
                                 + "        <![CDATA[<myEvent/>]]>"
                                 + "    </data>"

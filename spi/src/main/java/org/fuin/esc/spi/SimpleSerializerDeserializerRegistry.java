@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.EventType;
 import org.fuin.objects4j.common.Contract;
 
 /**
@@ -29,20 +30,20 @@ import org.fuin.objects4j.common.Contract;
 public final class SimpleSerializerDeserializerRegistry implements
         SerializerRegistry, DeserializerRegistry {
 
-    private final Map<String, Serializer> serMap;
+    private final Map<EventType, Serializer> serMap;
 
     private final Map<Key, Deserializer> desMap;
 
-    private final Map<String, EnhancedMimeType> contentTypes;
+    private final Map<EventType, EnhancedMimeType> contentTypes;
 
     /**
      * Default constructor.
      */
     public SimpleSerializerDeserializerRegistry() {
         super();
-        serMap = new HashMap<String, Serializer>();
+        serMap = new HashMap<EventType, Serializer>();
         desMap = new HashMap<Key, Deserializer>();
-        contentTypes = new HashMap<String, EnhancedMimeType>();
+        contentTypes = new HashMap<EventType, EnhancedMimeType>();
     }
 
     /**
@@ -56,7 +57,7 @@ public final class SimpleSerializerDeserializerRegistry implements
      * @param deserializer
      *            Deserializer.
      */
-    public final void addDeserializer(@NotNull final String type,
+    public final void addDeserializer(@NotNull final EventType type,
             final String contentType, @NotNull final Deserializer deserializer) {
 
         Contract.requireArgNotNull("type", type);
@@ -77,7 +78,7 @@ public final class SimpleSerializerDeserializerRegistry implements
      *            Content type like "application/xml" or "application/json"
      *            (without parameters - Only base type).
      */
-    public final void setDefaultContentType(@NotNull final String type,
+    public final void setDefaultContentType(@NotNull final EventType type,
             final EnhancedMimeType contentType) {
 
         Contract.requireArgNotNull("type", type);
@@ -95,7 +96,7 @@ public final class SimpleSerializerDeserializerRegistry implements
      * @param serializer
      *            Serializer.
      */
-    public final void addSerializer(@NotNull final String type,
+    public final void addSerializer(@NotNull final EventType type,
             @NotNull final Serializer serializer) {
 
         Contract.requireArgNotNull("type", type);
@@ -106,13 +107,13 @@ public final class SimpleSerializerDeserializerRegistry implements
     }
 
     @Override
-    public Serializer getSerializer(final String type) {
+    public Serializer getSerializer(final EventType type) {
         Contract.requireArgNotNull("type", type);
         return serMap.get(type);
     }
 
     @Override
-    public final Deserializer getDeserializer(final String type,
+    public final Deserializer getDeserializer(final EventType type,
             final EnhancedMimeType mimeType) {
 
         Contract.requireArgNotNull("type", type);
@@ -123,7 +124,7 @@ public final class SimpleSerializerDeserializerRegistry implements
     }
 
     @Override
-    public final Deserializer getDeserializer(final String type) {
+    public final Deserializer getDeserializer(final EventType type) {
         Contract.requireArgNotNull("type", type);
 
         final EnhancedMimeType contentType = contentTypes.get(type);
@@ -137,7 +138,7 @@ public final class SimpleSerializerDeserializerRegistry implements
     }
 
     @Override
-    public final EnhancedMimeType getDefaultMimeType(final String type) {
+    public final EnhancedMimeType getDefaultMimeType(final EventType type) {
         Contract.requireArgNotNull("type", type);
 
         final EnhancedMimeType contentType = contentTypes.get(type);
@@ -152,10 +153,10 @@ public final class SimpleSerializerDeserializerRegistry implements
      */
     private static class Key {
 
-        private final String type;
+        private final EventType type;
         private final String contentType;
 
-        public Key(final String type, final String contentType) {
+        public Key(final EventType type, final String contentType) {
             this.type = type;
             this.contentType = contentType;
         }

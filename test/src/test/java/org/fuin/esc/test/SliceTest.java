@@ -42,6 +42,8 @@ import org.junit.Test;
 // CHECKSTYLE:OFF Test
 public class SliceTest extends AbstractXmlTest {
 
+    private static final EventId ID = new EventId();
+    
     private static final int FROM = 0;
 
     private static final int NEXT = 1;
@@ -55,7 +57,7 @@ public class SliceTest extends AbstractXmlTest {
     @Before
     public void setup() throws Exception {
         events = new ArrayList<Event>();
-        events.add(new Event(new EventId(), new Data(
+        events.add(new Event(ID, new Data(
                 "MyEvent", new EnhancedMimeType(
                         "application/xml; version=2; encoding=utf-8"),
                 "<my-event/>"), null));
@@ -113,7 +115,7 @@ public class SliceTest extends AbstractXmlTest {
                 // @formatter:off
                         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                                 + "<slice from-stream-no=\"0\" next-stream-no=\"1\" end-of-stream=\"true\">"
-                                + "<event id=\"f6a8d009-5613-4e4d-9e46-15a30daa2d28\">"
+                                + "<event id=\"" + ID + "\">"
                                 + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=2; encoding=utf-8\">"
                                 + "        <![CDATA[<my-event/>]]>"
                                 + "    </data>" + "</event>" + "</slice>"
