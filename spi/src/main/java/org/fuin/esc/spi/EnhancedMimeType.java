@@ -97,6 +97,27 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
+     * Constructor with primary, sub type, encoding and version.
+     * 
+     * @param primary
+     *            Primary type.
+     * @param sub
+     *            Sub type.
+     * @param encoding
+     *            Encoding.
+     * @param version
+     *            Version.
+     * 
+     * @throws MimeTypeParseException
+     *             If the primary type or sub type is not a valid token
+     */
+    public EnhancedMimeType(@NotNull final String primary,
+            @NotNull final String sub, @Nullable final Charset encoding,
+            @Nullable final String version) throws MimeTypeParseException {
+        this(primary, sub, encoding, version, null);
+    }
+
+    /**
      * Constructor with all data.
      * 
      * @param primary
