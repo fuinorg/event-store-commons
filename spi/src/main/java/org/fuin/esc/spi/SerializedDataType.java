@@ -17,7 +17,6 @@
 package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
@@ -28,7 +27,6 @@ import org.fuin.objects4j.vo.AbstractStringValueObject;
  * Uniquely identifies a type of serialized data.
  */
 @Immutable
-@XmlJavaTypeAdapter(SerializedDataTypeConverter.class)
 public final class SerializedDataType extends AbstractStringValueObject {
 
     private static final long serialVersionUID = 811127657088134517L;
