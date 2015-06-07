@@ -33,7 +33,6 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.objects4j.common.Contract;
-import org.jboss.weld.exceptions.IllegalArgumentException;
 
 /**
  * In-memory implementation for unit testing.
