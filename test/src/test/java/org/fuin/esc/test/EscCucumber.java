@@ -16,6 +16,7 @@ import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
 import cucumber.runtime.RuntimeOptionsFactory;
+import cucumber.runtime.SummaryPrinter;
 import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
@@ -23,7 +24,6 @@ import cucumber.runtime.junit.Assertions;
 import cucumber.runtime.junit.FeatureRunner;
 import cucumber.runtime.junit.JUnitReporter;
 import cucumber.runtime.model.CucumberFeature;
-import cucumber.runtime.snippets.SummaryPrinter;
 
 /**
  * Slightly changed version of {@link cucumber.api.junit.Cucumber} that can
@@ -58,7 +58,6 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
      * @throws org.junit.runners.model.InitializationError
      *             if there is another problem
      */
-    @SuppressWarnings("unchecked")
     public EscCucumber(Class<?> clazz) throws InitializationError, IOException {
         super(clazz);
         ClassLoader classLoader = clazz.getClassLoader();
@@ -73,7 +72,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         }
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(
-                clazz, new Class[] { CucumberOptions.class });
+                clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
         ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader,
