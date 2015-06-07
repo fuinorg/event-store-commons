@@ -33,13 +33,12 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ReadableEventStoreSync;
+import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamVersionConflictException;
-import org.fuin.esc.api.WritableEventStoreSync;
 import org.fuin.esc.spi.AbstractDeSerEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.SerializedData;
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * JPA Implementation of the event store.
  */
 public final class JpaEventStore extends AbstractDeSerEventStore implements
-        WritableEventStoreSync, ReadableEventStoreSync {
+        EventStoreSync {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(JpaEventStore.class);
