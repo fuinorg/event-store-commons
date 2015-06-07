@@ -23,9 +23,10 @@ public final class EscApiUtils {
 
     /** Version does not matter. */
     public static final int ANY_VERSION = -1;
-    
+
     private EscApiUtils() {
-        throw new UnsupportedOperationException("Cannot create instance of a utility class");
+        throw new UnsupportedOperationException(
+                "Cannot create instance of a utility class");
     }
-    
+
 }

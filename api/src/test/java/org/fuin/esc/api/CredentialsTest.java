@@ -26,14 +26,14 @@ public final class CredentialsTest {
 
     @Test
     public final void testConstructValid() {
-        
+
         // PREPARE
         final String name = "james";
         final char[] pw = new char[] { 'a', 'b', 'c' };
-        
+
         // TEST
         final Credentials testee = new Credentials(name, pw);
-        
+
         // VERIFY
         assertThat(testee.getUsername()).isEqualTo(name);
         assertThat(testee.getPassword()).isEqualTo(pw);

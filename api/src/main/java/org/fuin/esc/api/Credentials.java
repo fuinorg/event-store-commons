@@ -53,7 +53,8 @@ public final class Credentials implements ValueObject, Comparable<Credentials> {
         Contract.requireArgNotEmpty("username", username);
         Contract.requireArgNotNull("password", password);
         if (password.length == 0) {
-            throw new ContractViolationException("The argument 'password' cannot be an empty array");
+            throw new ContractViolationException(
+                    "The argument 'password' cannot be an empty array");
         }
         this.username = username;
         this.password = password;
