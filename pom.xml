@@ -32,7 +32,9 @@
 		<module>api</module>
         <module>spi</module>
         <module>mem</module>
+        <!-- Disabled because not in any repository yet 
 		<module>esj</module>
+		 -->
 		<module>jpa</module>
         <module>test</module>
 	</modules>
