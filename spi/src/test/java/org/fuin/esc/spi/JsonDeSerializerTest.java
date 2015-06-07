@@ -53,7 +53,8 @@ public class JsonDeSerializerTest {
 
         // TEST
         final byte[] data = testee.marshal(original);
-        final JsonObject copy = testee.unmarshal(data, EnhancedMimeType.create("application/json; encoding=utf-8"));
+        final JsonObject copy = testee.unmarshal(data,
+                EnhancedMimeType.create("application/json; encoding=utf-8"));
 
         // VERIFY
         assertThat(copy.keySet()).contains("name", "age");

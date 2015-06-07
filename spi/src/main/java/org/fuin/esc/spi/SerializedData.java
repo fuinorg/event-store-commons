@@ -21,7 +21,6 @@ import java.util.Arrays;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.NeverNull;

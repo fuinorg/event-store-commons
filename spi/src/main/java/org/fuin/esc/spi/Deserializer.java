@@ -16,7 +16,6 @@
  */
 package org.fuin.esc.spi;
 
-
 /**
  * Serializes an object.
  */

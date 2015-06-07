@@ -89,8 +89,7 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
             final XmlAdapter<?, ?>[] adapters,
             final Class<?>... classesToBeBound) {
         super();
-        this.mimeType = EnhancedMimeType
-                .create("application", "xml", encoding);
+        this.mimeType = EnhancedMimeType.create("application", "xml", encoding);
         try {
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
             marshaller = ctx.createMarshaller();
@@ -130,7 +129,7 @@ public final class XmlDeSerializer implements Serializer, Deserializer {
     public final EnhancedMimeType getMimeType() {
         return mimeType;
     }
-    
+
     @Override
     public final byte[] marshal(final Object obj) {
         try {
