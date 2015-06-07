@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Base class for event stores implementations that require serialization and
  * deserialization of the data and meta data.
  */
-public class AbstractDeSerEventStore {
+public abstract class AbstractDeSerEventStore {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractDeSerEventStore.class);
