@@ -24,6 +24,9 @@ import java.util.Map;
 
 import javax.activation.MimeTypeParseException;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,6 +107,13 @@ public class EnhancedMimeTypeTest {
         assertThat(testee.getSubType()).isEqualTo("xml");
         assertThat(testee.getVersion()).isEqualTo("1.0.2");
         assertThat(testee.getEncoding()).isEqualTo(Charset.forName("utf-8"));
+    }
+
+    @Test
+    public void testEqualsHashCode() {
+        EqualsVerifier.forClass(EnhancedMimeType.class)
+                .suppress(Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS)
+                .verify();
     }
 
 }
