@@ -62,6 +62,6 @@ public interface DeserializerRegistry {
      *         type.
      */
     @Nullable
-    public EnhancedMimeType getDefaultMimeType(@NotNull SerializedDataType type);
+    public EnhancedMimeType getDefaultContentType(@NotNull SerializedDataType type);
 
 }

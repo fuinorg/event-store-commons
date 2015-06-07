@@ -99,7 +99,7 @@ public final class CommonEventConverter {
         final Deserializer metaDeser = deserRegistry
                 .getDeserializer(EsjEventStore.META_TYPE);
         final Object meta = metaDeser.unmarshal(metaBytes,
-                deserRegistry.getDefaultMimeType(EsjEventStore.META_TYPE));
+                deserRegistry.getDefaultContentType(EsjEventStore.META_TYPE));
         metaDataAccessor.init(meta);
         final String contentTypeStr = metaDataAccessor
                 .getString("content-type");

@@ -138,7 +138,7 @@ public final class SimpleSerializerDeserializerRegistry implements
     }
 
     @Override
-    public final EnhancedMimeType getDefaultMimeType(
+    public final EnhancedMimeType getDefaultContentType(
             final SerializedDataType type) {
         Contract.requireArgNotNull("type", type);
 
