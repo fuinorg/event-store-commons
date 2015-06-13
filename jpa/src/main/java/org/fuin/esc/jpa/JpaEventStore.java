@@ -21,7 +21,6 @@ import static org.fuin.esc.api.EscApiUtils.ANY_VERSION;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -31,7 +30,6 @@ import javax.persistence.TypedQuery;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
@@ -105,30 +103,26 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final CommonEvent... events) {
-        return appendToStream(credentials, streamId, ANY_VERSION,
-                Arrays.asList(events));
-    }
-
-    @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
+    public final int appendToStream(final StreamId streamId,
             final CommonEvent... events) {
-        return appendToStream(credentials, streamId, expectedVersion,
-                Arrays.asList(events));
+        return appendToStream(streamId, ANY_VERSION, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final List<CommonEvent> events) {
-        return appendToStream(credentials, streamId, ANY_VERSION, events);
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final CommonEvent... events) {
+        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
+    public final int appendToStream(final StreamId streamId,
             final List<CommonEvent> events) {
+        return appendToStream(streamId, ANY_VERSION, events);
+    }
+
+    @Override
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final List<CommonEvent> events) {
 
         if (streamId.isProjection()) {
             throw new IllegalArgumentException("Projections are read only: "
@@ -167,8 +161,8 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final CommonEvent readEvent(final Optional<Credentials> credentials,
-            final StreamId streamId, final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId,
+            final int eventNumber) {
 
         final StringBuilder sb = new StringBuilder(createEventSelect(streamId));
         if (streamId.getParameters().size() == 0) {
@@ -190,8 +184,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsForward(final StreamId streamId,
             final int start, final int count) {
 
         return readStreamEvents(streamId, start, count, true);
@@ -199,8 +192,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
             final int start, final int count) {
 
         return readStreamEvents(streamId, start, count, false);
@@ -260,14 +252,13 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId) {
-        deleteStream(credentials, streamId, ANY_VERSION);
+    public final void deleteStream(final StreamId streamId) {
+        deleteStream(streamId, ANY_VERSION);
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion) {
+    public final void deleteStream(final StreamId streamId,
+            final int expectedVersion) {
 
         final JpaStream stream = em.find(JpaStream.class, streamId.getName(),
                 LockModeType.PESSIMISTIC_WRITE);

@@ -17,7 +17,6 @@
 package org.fuin.esc.api;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.validation.constraints.NotNull;
@@ -44,8 +43,6 @@ public interface WritableEventStoreAsync {
      * Appends one or more events to a stream. If the stream does not exist, the
      * implementation may create it on the fly.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to append the events to.
      * @param expectedVersion
@@ -68,7 +65,6 @@ public interface WritableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<Integer> appendToStream(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, int expectedVersion,
             @NotNull CommonEvent... events);
 
@@ -76,8 +72,6 @@ public interface WritableEventStoreAsync {
      * Appends one or more events to a stream. If the stream does not exist, the
      * implementation may create it on the fly.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to append the events to.
      * @param events
@@ -96,15 +90,12 @@ public interface WritableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<Integer> appendToStream(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, @NotNull CommonEvent... events);
 
     /**
      * Appends a list of events to a stream. If the stream does not exist, the
      * implementation may create it on the fly.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to append the events to.
      * @param expectedVersion
@@ -126,7 +117,6 @@ public interface WritableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<Integer> appendToStream(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, int expectedVersion,
             @NotNull List<CommonEvent> events);
 
@@ -134,8 +124,6 @@ public interface WritableEventStoreAsync {
      * Appends a list of events to a stream. If the stream does not exist, the
      * implementation may create it on the fly.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to append the events to.
      * @param events
@@ -153,14 +141,11 @@ public interface WritableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<Integer> appendToStream(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, @NotNull List<CommonEvent> events);
 
     /**
      * Deletes a stream from the event store if it has a given version.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to be deleted
      * @param expectedVersion
@@ -178,16 +163,13 @@ public interface WritableEventStoreAsync {
      *             The expected version didn't match the actual version.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(
-            @NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId, int expectedVersion);
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId,
+            int expectedVersion);
 
     /**
      * Deletes a stream from the event store not matter what the current version
      * is.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The unique identifier of the stream to be deleted
      * 
@@ -201,8 +183,6 @@ public interface WritableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(
-            @NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId);
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId);
 
 }

@@ -21,7 +21,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.SimpleStreamId;
@@ -62,11 +61,11 @@ public class InMemoryEventStoreSyncTest {
                 new EventType("MyEvent"), new MyEvent("Two"));
 
         // TEST
-        testee.appendToStream(Credentials.NONE, streamId, 0, eventOne, eventTwo);
+        testee.appendToStream(streamId, 0, eventOne, eventTwo);
 
         // VERIFY
-        final StreamEventsSlice slice = testee.readEventsForward(
-                Credentials.NONE, StreamId.ALL, 0, 2);
+        final StreamEventsSlice slice = testee.readEventsForward(StreamId.ALL,
+                0, 2);
         assertThat(slice.getEvents()).contains(eventOne, eventTwo);
         assertThat(slice.getFromEventNumber()).isEqualTo(0);
         assertThat(slice.getNextEventNumber()).isEqualTo(2);
@@ -88,12 +87,12 @@ public class InMemoryEventStoreSyncTest {
                 new EventType("MyEvent"), new MyEvent("Four"));
         final CommonEvent eventFive = new CommonEvent(new EventId(),
                 new EventType("MyEvent"), new MyEvent("Five"));
-        final int version = testee.appendToStream(Credentials.NONE, streamId,
-                0, eventOne, eventTwo, eventThree, eventFour, eventFive);
+        final int version = testee.appendToStream(streamId, 0, eventOne,
+                eventTwo, eventThree, eventFour, eventFive);
 
         // TEST Slice 1
         final StreamEventsSlice slice1 = testee.readEventsBackward(
-                Credentials.NONE, StreamId.ALL, version, 2);
+                StreamId.ALL, version, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventFive, eventFour);
@@ -103,7 +102,7 @@ public class InMemoryEventStoreSyncTest {
 
         // TEST Slice 2
         final StreamEventsSlice slice2 = testee.readEventsBackward(
-                Credentials.NONE, StreamId.ALL, slice1.getNextEventNumber(), 2);
+                StreamId.ALL, slice1.getNextEventNumber(), 2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree, eventTwo);
@@ -113,7 +112,7 @@ public class InMemoryEventStoreSyncTest {
 
         // TEST Slice 3
         final StreamEventsSlice slice3 = testee.readEventsBackward(
-                Credentials.NONE, StreamId.ALL, slice2.getNextEventNumber(), 2);
+                StreamId.ALL, slice2.getNextEventNumber(), 2);
 
         // VERIFY Slice 3
         assertThat(slice3.getEvents()).containsExactly(eventOne);
@@ -134,12 +133,11 @@ public class InMemoryEventStoreSyncTest {
                 new EventType("MyEvent"), new MyEvent("Two"));
         final CommonEvent eventThree = new CommonEvent(new EventId(),
                 new EventType("MyEvent"), new MyEvent("Three"));
-        testee.appendToStream(Credentials.NONE, streamId, 0, eventOne,
-                eventTwo, eventThree);
+        testee.appendToStream(streamId, 0, eventOne, eventTwo, eventThree);
 
         // TEST Slice 1
-        final StreamEventsSlice slice1 = testee.readEventsForward(
-                Credentials.NONE, StreamId.ALL, 0, 2);
+        final StreamEventsSlice slice1 = testee.readEventsForward(StreamId.ALL,
+                0, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventOne, eventTwo);
@@ -148,8 +146,8 @@ public class InMemoryEventStoreSyncTest {
         assertThat(slice1.isEndOfStream()).isFalse();
 
         // TEST Slice 2
-        final StreamEventsSlice slice2 = testee.readEventsForward(
-                Credentials.NONE, StreamId.ALL, slice1.getNextEventNumber(), 2);
+        final StreamEventsSlice slice2 = testee.readEventsForward(StreamId.ALL,
+                slice1.getNextEventNumber(), 2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree);

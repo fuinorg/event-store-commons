@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.StreamDeletedException;
@@ -92,15 +91,14 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
 
             // TEST
             beginTransaction();
-            final int version = testee.appendToStream(Credentials.NONE,
-                    streamId, 0, eventData);
+            final int version = testee.appendToStream(streamId, 0, eventData);
             commitTransaction();
 
             // VERIFY
             assertThat(version).isEqualTo(1);
             beginTransaction();
-            final StreamEventsSlice slice = testee.readEventsForward(
-                    Credentials.NONE, streamId, 1, 2);
+            final StreamEventsSlice slice = testee.readEventsForward(streamId,
+                    1, 2);
             commitTransaction();
             assertThat(slice.getFromEventNumber()).isEqualTo(1);
             assertThat(slice.getNextEventNumber()).isEqualTo(2);

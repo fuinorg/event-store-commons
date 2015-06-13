@@ -16,7 +16,6 @@
  */
 package org.fuin.esc.api;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.validation.constraints.NotNull;
@@ -43,8 +42,6 @@ public interface ReadableEventStoreAsync {
      * Reads count Events from an Event Stream forwards (e.g. oldest to newest)
      * starting from position start.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param start
@@ -64,15 +61,12 @@ public interface ReadableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<StreamEventsSlice> readEventsForward(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, int start, int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
      * starting from position start.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param start
@@ -92,14 +86,11 @@ public interface ReadableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<StreamEventsSlice> readEventsBackward(
-            @NotNull Optional<Credentials> credentials,
             @NotNull StreamId streamId, int start, int count);
 
     /**
      * Reads a single event from a stream.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param eventNumber
@@ -117,8 +108,7 @@ public interface ReadableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<CommonEvent> readEvent(
-            @NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId, int eventNumber);
+    public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId,
+            int eventNumber);
 
 }

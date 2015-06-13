@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import lt.emasina.esj.EventStore;
@@ -30,7 +29,6 @@ import lt.emasina.esj.model.Event;
 import lt.emasina.esj.model.UserCredentials;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
@@ -148,10 +146,9 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final CommonEvent readEvent(final Optional<Credentials> credentials,
-            final StreamId streamId, final int eventNumber)
-            throws EventNotFoundException, StreamNotFoundException,
-            StreamDeletedException {
+    public final CommonEvent readEvent(final StreamId streamId,
+            final int eventNumber) throws EventNotFoundException,
+            StreamNotFoundException, StreamDeletedException {
 
         final ReadEventHandler handler = new ReadEventHandler(streamId,
                 eventNumber);
@@ -161,8 +158,7 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsForward(final StreamId streamId,
             final int start, final int count) throws StreamNotFoundException,
             StreamDeletedException {
 
@@ -175,18 +171,16 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
             final int start, final int count) {
         throw new UnsupportedOperationException(
                 "Reading backward is currently not supported");
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion)
-            throws StreamNotFoundException, StreamVersionConflictException,
-            StreamDeletedException {
+    public final void deleteStream(final StreamId streamId,
+            final int expectedVersion) throws StreamNotFoundException,
+            StreamVersionConflictException, StreamDeletedException {
 
         Contract.requireArgNotNull("streamId", streamId);
 
@@ -197,11 +191,10 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId) throws StreamNotFoundException,
-            StreamDeletedException {
+    public final void deleteStream(final StreamId streamId)
+            throws StreamNotFoundException, StreamDeletedException {
         try {
-            deleteStream(credentials, streamId, EventStore.VERSION_ANY);
+            deleteStream(streamId, EventStore.VERSION_ANY);
         } catch (final StreamVersionConflictException ex) {
             throw new RuntimeException(
                     "Delete any version was requested, but still got a version conflict",
@@ -210,24 +203,22 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
-            final CommonEvent... events) throws StreamVersionConflictException,
-            StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final CommonEvent... events)
+            throws StreamVersionConflictException, StreamDeletedException,
+            StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(credentials, streamId, expectedVersion,
-                Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
 
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> commonEvents)
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final List<CommonEvent> commonEvents)
             throws StreamVersionConflictException, StreamDeletedException,
             StreamReadOnlyException {
 
@@ -244,13 +235,11 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final List<CommonEvent> events)
-            throws StreamNotFoundException, StreamDeletedException,
-            StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId,
+            final List<CommonEvent> events) throws StreamNotFoundException,
+            StreamDeletedException, StreamReadOnlyException {
         try {
-            return appendToStream(credentials, streamId,
-                    EventStore.VERSION_ANY, events);
+            return appendToStream(streamId, EventStore.VERSION_ANY, events);
         } catch (final StreamVersionConflictException ex) {
             throw new RuntimeException(
                     "Append to any version was requested, but still got a version conflict",
@@ -259,11 +248,10 @@ public final class EsjEventStore implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final CommonEvent... events)
-            throws StreamNotFoundException, StreamDeletedException,
-            StreamReadOnlyException {
-        return appendToStream(credentials, streamId, Arrays.asList(events));
+    public final int appendToStream(final StreamId streamId,
+            final CommonEvent... events) throws StreamNotFoundException,
+            StreamDeletedException, StreamReadOnlyException {
+        return appendToStream(streamId, Arrays.asList(events));
     }
 
 }

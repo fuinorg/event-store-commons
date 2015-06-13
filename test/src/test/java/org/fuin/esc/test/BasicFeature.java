@@ -20,7 +20,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -56,8 +55,7 @@ public class BasicFeature {
     public void assertThatStreamDoesNotExist(String streamName)
             throws Throwable {
         try {
-            eventStore.deleteStream(Credentials.NONE, new SimpleStreamId(
-                    streamName));
+            eventStore.deleteStream(new SimpleStreamId(streamName));
             fail("The stream should not exist: " + streamName);
         } catch (final StreamNotFoundException ex) {
             // OK
@@ -68,8 +66,8 @@ public class BasicFeature {
     public void appendEventsTo(String streamName, String eventsXml)
             throws Throwable {
         final Events toAppend = unmarshal(eventsXml, Events.class);
-        eventStore.appendToStream(Credentials.NONE, new SimpleStreamId(
-                streamName), toAppend.asCommonEvents(BookAddedEvent.class));
+        eventStore.appendToStream(new SimpleStreamId(streamName),
+                toAppend.asCommonEvents(BookAddedEvent.class));
     }
 
     @Then("^reading all events from stream \"([^\"]*)\" should return the following slices$")
@@ -77,12 +75,11 @@ public class BasicFeature {
             throws Throwable {
         final Slices expected = unmarshal(slicesXml, Slices.class);
         final Slices actual = new Slices();
-        StreamEventsSlice slice = eventStore
-                .readEventsForward(Credentials.NONE, new SimpleStreamId(
-                        streamName), 0, MAX_EVENTS);
+        StreamEventsSlice slice = eventStore.readEventsForward(
+                new SimpleStreamId(streamName), 0, MAX_EVENTS);
         while (!slice.isEndOfStream()) {
             actual.append(Slice.valueOf(slice));
-            slice = eventStore.readEventsForward(Credentials.NONE,
+            slice = eventStore.readEventsForward(
                     new SimpleStreamId(streamName), slice.getNextEventNumber(),
                     MAX_EVENTS);
         }

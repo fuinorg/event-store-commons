@@ -21,10 +21,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Credentials;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamDeletedException;
@@ -66,10 +64,9 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final CommonEvent readEvent(final Optional<Credentials> credentials,
-            final StreamId streamId, final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId,
+            final int eventNumber) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
 
@@ -82,11 +79,9 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsForward(final StreamId streamId,
             final int start, final int count) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
@@ -112,11 +107,9 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(
-            final Optional<Credentials> credentials, final StreamId streamId,
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
             final int start, final int count) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
@@ -142,10 +135,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expected) {
+    public final void deleteStream(final StreamId streamId, final int expected) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, 0);
         if (streamId == StreamId.ALL) {
@@ -160,10 +151,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final void deleteStream(final Optional<Credentials> credentials,
-            final StreamId streamId) {
+    public final void deleteStream(final StreamId streamId) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
 
         final List<CommonEvent> events = getStream(streamId);
@@ -173,11 +162,9 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final List<CommonEvent> toAppend) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, 0);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -192,22 +179,19 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final int expectedVersion,
-            final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(credentials, streamId, expectedVersion,
-                Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
 
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId,
+            final List<CommonEvent> toAppend) {
 
-        Contract.requireArgNotNull("credentials", credentials);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
@@ -220,12 +204,12 @@ public final class InMemoryEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final Optional<Credentials> credentials,
-            final StreamId streamId, final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId,
+            final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(credentials, streamId, Arrays.asList(events));
+        return appendToStream(streamId, Arrays.asList(events));
 
     }
 

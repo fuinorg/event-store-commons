@@ -16,8 +16,6 @@
  */
 package org.fuin.esc.api;
 
-import java.util.Optional;
-
 import javax.validation.constraints.NotNull;
 
 /**
@@ -39,8 +37,6 @@ public interface ReadableEventStoreSync {
      * Reads count Events from an Event Stream forwards (e.g. oldest to newest)
      * starting from position start.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param start
@@ -59,16 +55,13 @@ public interface ReadableEventStoreSync {
      *             deleted.
      */
     @NotNull
-    public StreamEventsSlice readEventsForward(
-            @NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId, int start, int count);
+    public StreamEventsSlice readEventsForward(@NotNull StreamId streamId,
+            int start, int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
      * starting from position start.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param start
@@ -87,15 +80,12 @@ public interface ReadableEventStoreSync {
      *             deleted.
      */
     @NotNull
-    public StreamEventsSlice readEventsBackward(
-            @NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId, int start, int count);
+    public StreamEventsSlice readEventsBackward(@NotNull StreamId streamId,
+            int start, int count);
 
     /**
      * Reads a single event from a stream.
      * 
-     * @param credentials
-     *            Optional credentials to use for authentication.
      * @param streamId
      *            The stream to read from.
      * @param eventNumber
@@ -113,7 +103,6 @@ public interface ReadableEventStoreSync {
      *             deleted.
      */
     @NotNull
-    public CommonEvent readEvent(@NotNull Optional<Credentials> credentials,
-            @NotNull StreamId streamId, int eventNumber);
+    public CommonEvent readEvent(@NotNull StreamId streamId, int eventNumber);
 
 }
