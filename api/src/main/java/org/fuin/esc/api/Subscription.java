@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Result of subscribing to a stream. The sub classes will contain
- * implementation specific data the is required to handle unsubscribe requests.
+ * implementation specific data that is required to handle unsubscribe requests.
  */
 public abstract class Subscription implements Serializable {
 
