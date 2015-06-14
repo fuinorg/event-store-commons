@@ -19,8 +19,11 @@ package org.fuin.esc.mem;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.SimpleStreamId;
@@ -40,7 +43,7 @@ public class InMemoryEventStoreSyncTest {
 
     @Before
     public void setup() {
-        testee = new InMemoryEventStoreSync();
+        testee = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
         testee.open();
     }
 
@@ -51,7 +54,7 @@ public class InMemoryEventStoreSyncTest {
     }
 
     @Test
-    public void testAppendToStreamArray() throws Exception {
+    public void testAppendToStreamArray() {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
@@ -73,7 +76,7 @@ public class InMemoryEventStoreSyncTest {
     }
 
     @Test
-    public void testReadEventsBackward() throws Exception {
+    public void testReadEventsBackward() {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
@@ -123,7 +126,7 @@ public class InMemoryEventStoreSyncTest {
     }
 
     @Test
-    public void testReadEventsForward() throws Exception {
+    public void testReadEventsForward() {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
@@ -157,12 +160,110 @@ public class InMemoryEventStoreSyncTest {
 
     }
 
+    @Test
+    public void testSubscribeToStreamNewEvents() {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId("MyStream");
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("One"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Two"));
+        final CommonEvent eventThree = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Three"));
+        testee.appendToStream(streamId, eventOne);
+        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
+
+        // TEST
+        testee.subscribeToStream(streamId, EscApiUtils.SUBSCRIBE_TO_NEW_EVENTS,
+                (subscription, event) -> {
+                    result.add(event);
+                }, (subscription, exception) -> {
+                    // Not used
+            });
+        testee.appendToStream(streamId, eventTwo, eventThree);
+        waitForResult(result, 1);
+
+        // VERIFY
+        assertThat(result).containsExactly(eventTwo, eventThree);
+
+    }
+
+    @Test
+    public void testSubscribeToStreamFromFirst() {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId("MyStream");
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Eins"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Zwei"));
+        final CommonEvent eventThree = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Drei"));
+        testee.appendToStream(streamId, eventOne, eventTwo, eventThree);
+        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
+
+        // TEST
+        testee.subscribeToStream(streamId, 0, (subscription, event) -> {
+            result.add(event);
+        }, (subscription, exception) -> {
+            // Not used
+            });
+        waitForResult(result, 3);
+
+        // VERIFY
+        assertThat(result).containsExactly(eventOne, eventTwo, eventThree);
+
+    }
+
+    @Test
+    public void testSubscribeToStreamFromX() {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId("MyStream");
+        final CommonEvent eventOne = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Eins"));
+        final CommonEvent eventTwo = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Zwei"));
+        final CommonEvent eventThree = new CommonEvent(new EventId(),
+                new EventType("MyEvent"), new MyEvent("Drei"));
+        testee.appendToStream(streamId, eventOne, eventTwo);
+        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
+
+        // TEST
+        testee.subscribeToStream(streamId, 1, (subscription, event) -> {
+            result.add(event);
+        }, (subscription, exception) -> {
+            // Not used
+            });
+        testee.appendToStream(streamId, eventThree);
+        waitForResult(result, 2);
+
+        // VERIFY
+        assertThat(result).containsExactly(eventTwo, eventThree);
+
+    }
+
     @SuppressWarnings("unused")
     private void println(String prefix, List<CommonEvent> events) {
         System.out.println(prefix);
         for (CommonEvent event : events) {
-            System.out.println(event + "{" + event.getData() + "}");
+            System.out.println(event + " {" + event.getData() + "}");
         }
+    }
+
+    private void waitForResult(final List<CommonEvent> result,
+            final int expected) {
+        int count = 0;
+        while (result.size() != expected && (count < 10)) {
+            try {
+                Thread.sleep(100);
+            } catch (final InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            count++;
+        }
+
     }
 
 }

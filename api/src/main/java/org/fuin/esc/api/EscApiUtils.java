@@ -24,6 +24,12 @@ public final class EscApiUtils {
     /** Version does not matter. */
     public static final int ANY_VERSION = -1;
 
+    /**
+     * Only events will be seen that are added after subscription was
+     * established.
+     */
+    public static final int SUBSCRIBE_TO_NEW_EVENTS = -1;
+
     private EscApiUtils() {
         throw new UnsupportedOperationException(
                 "Cannot create instance of a utility class");

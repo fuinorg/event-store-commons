@@ -16,19 +16,12 @@
  */
 package org.fuin.esc.api;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 /**
  * An event store that is capable of handling volatile subscriptions.
  */
-public interface SubscribableEventStore {
-
-    /**
-     * Only events will be seen that are added after subscription was
-     * established.
-     */
-    public static final int NEW_EVENTS = -1;
+public interface SubscribableEventStoreSync {
 
     /**
      * Subscribe a stream starting with a given event number.
@@ -36,7 +29,8 @@ public interface SubscribableEventStore {
      * @param streamId
      *            Unique stream identifier.
      * @param eventNumber
-     *            Number of the event to start (NEW_EVENTS = New events, 0 =
+     *            Number of the event to start (
+     *            {@link EscApiUtils#SUBSCRIBE_TO_NEW_EVENTS} = New events, 0 =
      *            First event, 1..N).
      * @param onEvent
      *            Will be called for an event.
@@ -44,21 +38,26 @@ public interface SubscribableEventStore {
      *            Will be called when the subscription was exceptionally
      *            dropped.
      * 
-     * @return Future with subscription result.
+     * @return Subscription result.
+     * 
+     * @throws StreamNotFoundException
+     *             A stream with the given name does not exist in the
+     *             repository.
+     * @throws StreamDeletedException
+     *             A stream with the given name previously existed but was
+     *             deleted.
      */
-    public CompletableFuture<Subscription> subscribeToStream(StreamId streamId,
-            int eventNumber, BiConsumer<Subscription, CommonEvent> onEvent,
+    public Subscription subscribeToStream(StreamId streamId, int eventNumber,
+            BiConsumer<Subscription, CommonEvent> onEvent,
             BiConsumer<Subscription, Exception> onDrop);
 
     /**
-     * Unsubscribe from a stream.
+     * Unsubscribe from a stream. If the given subscription does not exist,
+     * nothing happens.
      * 
      * @param subscription
      *            to be terminated.
-     * 
-     * @return Future with no result.
      */
-    public CompletableFuture<Void> unsubscribeFromStream(
-            Subscription subscription);
+    public void unsubscribeFromStream(Subscription subscription);
 
 }

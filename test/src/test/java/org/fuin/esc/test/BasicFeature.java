@@ -20,6 +20,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
+import java.util.concurrent.Executors;
+
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -43,7 +45,7 @@ public class BasicFeature {
     public void beforeFeature() {
         // Use the property to select the correct implementation:
         // System.getProperty(EscCucumber.SYSTEM_PROPERTY)
-        eventStore = new InMemoryEventStoreSync();
+        eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
     }
 
     @After
