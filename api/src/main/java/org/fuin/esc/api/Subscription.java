@@ -17,9 +17,10 @@
 package org.fuin.esc.api;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
+
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Result of subscribing to a stream. The sub classes will contain
@@ -29,9 +30,9 @@ public abstract class Subscription implements Serializable {
 
     private static final long serialVersionUID = 1000L;
 
-    private StreamId streamId;
+    private final StreamId streamId;
 
-    private Optional<Integer> lastEventNumber;
+    private final Integer lastEventNumber;
 
     /**
      * Constructor with all mandatory data.
@@ -42,7 +43,7 @@ public abstract class Subscription implements Serializable {
      *            Number of the last event written to the stream.
      */
     public Subscription(@NotNull final StreamId streamId,
-            @NotNull final Optional<Integer> lastEventNumber) {
+            @Nullable final Integer lastEventNumber) {
         this.streamId = streamId;
         this.lastEventNumber = lastEventNumber;
     }
@@ -62,8 +63,8 @@ public abstract class Subscription implements Serializable {
      * 
      * @return Event number.
      */
-    @NotNull
-    public final Optional<Integer> getLastEventNumber() {
+    @Nullable
+    public final Integer getLastEventNumber() {
         return lastEventNumber;
     }
 
