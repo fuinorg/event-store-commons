@@ -27,7 +27,7 @@ import org.fuin.objects4j.common.Contract;
  * Contains all known serializers and deserializers.
  */
 public final class SimpleSerializerDeserializerRegistry implements
-        SerializerRegistry, DeserializerRegistry {
+        SerDeserializerRegistry {
 
     private final Map<SerializedDataType, Serializer> serMap;
 
@@ -43,6 +43,26 @@ public final class SimpleSerializerDeserializerRegistry implements
         serMap = new HashMap<SerializedDataType, Serializer>();
         desMap = new HashMap<Key, Deserializer>();
         contentTypes = new HashMap<SerializedDataType, EnhancedMimeType>();
+    }
+
+    /**
+     * Convenience method that adds both, a new serializer and deserializer to the registry.
+     * 
+     * @param type
+     *            Type of the data.
+     * @param contentType
+     *            Content type like "application/xml" or "application/json"
+     *            (without parameters - Only base type).
+     * @param serDeserializer
+     *            Serializer and deserializer.
+     */
+    public final void add(@NotNull final SerializedDataType type,
+            final String contentType,
+            @NotNull final SerDeserializer serDeserializer) {
+
+        this.addSerializer(type, serDeserializer);
+        this.addDeserializer(type, contentType, serDeserializer);
+        
     }
 
     /**

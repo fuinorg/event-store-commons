@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * Serializes and deserializes an object from/to XML. The content type for
  * serialization is always "application/xml".
  */
-public final class XmlDeSerializer implements Serializer, Deserializer {
+public final class XmlDeSerializer implements SerDeserializer {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(XmlDeSerializer.class);
