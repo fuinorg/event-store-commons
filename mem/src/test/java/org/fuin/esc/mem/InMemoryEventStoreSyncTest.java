@@ -90,8 +90,9 @@ public class InMemoryEventStoreSyncTest {
                 new EventType("MyEvent"), new MyEvent("Four"));
         final CommonEvent eventFive = new CommonEvent(new EventId(),
                 new EventType("MyEvent"), new MyEvent("Five"));
-        final int version = testee.appendToStream(streamId, 0, eventOne,
+        final int nextVersion = testee.appendToStream(streamId, 0, eventOne,
                 eventTwo, eventThree, eventFour, eventFive);
+        final int version = nextVersion - 1;
 
         // TEST Slice 1
         final StreamEventsSlice slice1 = testee.readEventsBackward(

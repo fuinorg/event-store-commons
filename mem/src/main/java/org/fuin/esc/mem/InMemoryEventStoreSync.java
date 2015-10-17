@@ -134,7 +134,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-
+        
         final List<CommonEvent> events;
         if (streamId == StreamId.ALL) {
             events = all;
@@ -143,8 +143,10 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
-        for (int i = start; (i > (start - count)) && (i >= 0); i--) {
-            result.add(events.get(i));
+        if (start < events.size()) {
+            for (int i = start; (i > (start - count)) && (i >= 0); i--) {
+                result.add(events.get(i));
+            }
         }
 
         final int fromEventNumber = start;
@@ -197,7 +199,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
 
         notifyListeners(streamId, toAppend, 0);
 
-        return events.size() - 1;
+        return events.size();
 
     }
 
@@ -224,7 +226,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
 
         notifyListeners(streamId, toAppend, 0);
 
-        return events.size() - 1;
+        return events.size();
 
     }
 
