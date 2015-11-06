@@ -19,7 +19,6 @@ package org.fuin.esc.api;
 /**
  * Combines all event store features for synchronous access.
  */
-public interface EventStoreSync extends AutoCloseable, WritableEventStoreSync,
-        ReadableEventStoreSync {
+public interface EventStoreSync extends WritableEventStoreSync, ReadableEventStoreSync {
 
 }

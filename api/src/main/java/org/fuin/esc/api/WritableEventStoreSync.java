@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Interface for writing events to an event store synchronously..
  */
-public interface WritableEventStoreSync {
+public interface WritableEventStoreSync extends AutoCloseable {
 
     /**
      * Opens a connection to the repository.
