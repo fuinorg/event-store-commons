@@ -50,11 +50,9 @@ import org.slf4j.LoggerFactory;
 /**
  * JPA Implementation of the event store.
  */
-public final class JpaEventStore extends AbstractDeSerEventStore implements
-        EventStoreSync {
+public final class JpaEventStore extends AbstractDeSerEventStore implements EventStoreSync {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(JpaEventStore.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);
 
     private EntityManager em;
 
@@ -76,10 +74,8 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
      * @param serMetaType
      *            Type used to persist the meta data.
      */
-    public JpaEventStore(@NotNull final EntityManager em,
-            @NotNull final JpaIdStreamFactory streamFactory,
-            @NotNull final SerializerRegistry serRegistry,
-            @NotNull final DeserializerRegistry desRegistry,
+    public JpaEventStore(@NotNull final EntityManager em, @NotNull final JpaIdStreamFactory streamFactory,
+            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
             @NotNull final SerializedDataType serMetaType) {
         super(serRegistry, desRegistry);
         Contract.requireArgNotNull("em", em);
@@ -103,35 +99,27 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, ANY_VERSION, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) {
         return appendToStream(streamId, expectedVersion, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final List<CommonEvent> events) {
+    public final int appendToStream(final StreamId streamId, final List<CommonEvent> events) {
         return appendToStream(streamId, ANY_VERSION, events);
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> events) {
-
-        if (streamId.isProjection()) {
-            throw new IllegalArgumentException("Projections are read only: "
-                    + streamId);
-        }
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> events) {
 
         final String sql = createStreamSelect(streamId);
-        final TypedQuery<JpaStream> query = em
-                .createQuery(sql, JpaStream.class);
+        final TypedQuery<JpaStream> query = em.createQuery(sql, JpaStream.class);
         setParameters(query, streamId);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         final List<JpaStream> streams = query.getResultList();
@@ -144,10 +132,8 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
             if (stream.isDeleted()) {
                 throw new StreamDeletedException(streamId);
             }
-            if ((expectedVersion != ANY_VERSION)
-                    && (stream.getVersion() != expectedVersion)) {
-                throw new StreamVersionConflictException(streamId,
-                        expectedVersion, stream.getVersion());
+            if ((expectedVersion != ANY_VERSION) && (stream.getVersion() != expectedVersion)) {
+                throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
             }
         }
         for (int i = 0; i < events.size(); i++) {
@@ -161,8 +147,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
 
         final StringBuilder sb = new StringBuilder(createEventSelect(streamId));
         if (streamId.getParameters().size() == 0) {
@@ -184,42 +169,37 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         return readStreamEvents(streamId, start, count, true);
 
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
+            final int count) {
 
         return readStreamEvents(streamId, start, count, false);
 
     }
 
     @SuppressWarnings("unchecked")
-    private StreamEventsSlice readStreamEvents(final StreamId streamId,
-            final int start, final int count, final boolean forward)
-            throws StreamNotFoundException {
+    private StreamEventsSlice readStreamEvents(final StreamId streamId, final int start, final int count,
+            final boolean forward) throws StreamNotFoundException {
 
         if (streamId.isProjection()) {
-            final JpaProjection projection = em.find(JpaProjection.class,
-                    streamId.asString());
+            final JpaProjection projection = em.find(JpaProjection.class, streamId.asString());
             if (projection == null) {
                 throw new StreamNotFoundException(streamId);
             }
             if (!projection.isEnabled()) {
                 // The projection does exist, but is not ready yet
-                return new StreamEventsSlice(start,
-                        new ArrayList<CommonEvent>(), start, true);
+                return new StreamEventsSlice(start, new ArrayList<CommonEvent>(), start, true);
             }
         }
 
         // Prepare SQL
-        final String sql = createEventSelect(streamId)
-                + createOrderBy(streamId, forward);
+        final String sql = createEventSelect(streamId) + createOrderBy(streamId, forward);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
         setParameters(query, streamId);
@@ -227,8 +207,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
         query.setMaxResults(count);
 
         // Execute query
-        final List<JpaEvent> resultList = (List<JpaEvent>) query
-                .getResultList();
+        final List<JpaEvent> resultList = (List<JpaEvent>) query.getResultList();
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
@@ -236,8 +215,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
         final int nextEventNumber = (start + events.size());
         final boolean endOfStream = (events.size() < count);
 
-        return new StreamEventsSlice(fromEventNumber, events, nextEventNumber,
-                endOfStream);
+        return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
     }
 
     private String createOrderBy(final StreamId streamId, final boolean asc) {
@@ -257,11 +235,9 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId,
-            final int expectedVersion) {
+    public final void deleteStream(final StreamId streamId, final int expectedVersion) {
 
-        final JpaStream stream = em.find(JpaStream.class, streamId.getName(),
-                LockModeType.PESSIMISTIC_WRITE);
+        final JpaStream stream = em.find(JpaStream.class, streamId.getName(), LockModeType.PESSIMISTIC_WRITE);
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
@@ -269,17 +245,21 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
             throw new StreamDeletedException(streamId);
         }
         if (stream.getVersion() != expectedVersion) {
-            throw new StreamVersionConflictException(streamId, expectedVersion,
-                    stream.getVersion());
+            throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
         }
         stream.delete();
 
     }
 
     private String createStreamSelect(final StreamId streamId) {
+
+        if (streamId.isProjection()) {
+            throw new IllegalArgumentException("Projections do not have a stream table : "
+                    + streamId);
+        }
+
         final List<KeyValue> params = streamId.getParameters();
-        final StringBuilder sb = new StringBuilder("SELECT t FROM "
-                + streamId.getName() + "Stream t");
+        final StringBuilder sb = new StringBuilder("SELECT t FROM " + streamId.getName() + "Stream t");
         if (params.size() > 0) {
             sb.append(" WHERE ");
             for (int i = 0; i < params.size(); i++) {
@@ -295,18 +275,23 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
 
     private String createEventSelect(final StreamId streamId) {
         final List<KeyValue> params = streamId.getParameters();
-        final StringBuilder sb = new StringBuilder(
-                "SELECT ev.* FROM events ev, " + sqlName(streamId.getName())
-                        + "_events" + " s WHERE ev.id=s.events_id");
+        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeTableName(streamId)
+                + " s WHERE ev.id=s.events_id");
         if (params.size() > 0) {
             for (int i = 0; i < params.size(); i++) {
                 final KeyValue param = params.get(i);
                 sb.append(" AND ");
-                sb.append("s." + sqlName(param.getKey()) + "=:"
-                        + param.getKey());
+                sb.append("s." + sqlName(param.getKey()) + "=:" + param.getKey());
             }
         }
         return sb.toString();
+    }
+
+    private String nativeTableName(final StreamId streamId) {
+        if (streamId.isProjection()) {
+            return sqlName(streamId.getName());
+        }
+        return sqlName(streamId.getName()) + "_events";
     }
 
     private String sqlName(final String name) {
@@ -334,8 +319,7 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
     private CommonEvent asCommonEvent(final JpaEvent jpaEvent) {
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
-        return new CommonEvent(jpaEvent.getEventId(), jpaEvent.getData()
-                .getType(), data, meta);
+        return new CommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, meta);
     }
 
     private JpaEvent asJpaEvent(final CommonEvent commonEvent) {
@@ -344,14 +328,11 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
         }
 
         // Serialize data
-        final SerializedDataType serDataType = new SerializedDataType(
-                commonEvent.getType().asBaseType());
-        final SerializedData serData = serialize(serDataType,
-                commonEvent.getData());
+        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getType().asBaseType());
+        final SerializedData serData = serialize(serDataType, commonEvent.getData());
 
         // Serialize meta data
-        final SerializedData serMeta = serialize(serMetaType,
-                commonEvent.getMeta());
+        final SerializedData serMeta = serialize(serMetaType, commonEvent.getMeta());
 
         // Create the JPA event to store
         final JpaData jpaData = new JpaData(serData);
@@ -369,9 +350,8 @@ public final class JpaEventStore extends AbstractDeSerEventStore implements
         if (data == null) {
             return null;
         }
-        final SerializedData serializedData = new SerializedData(
-                new SerializedDataType(data.getType().asBaseType()),
-                data.getMimeType(), data.getRaw());
+        final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getType()
+                .asBaseType()), data.getMimeType(), data.getRaw());
         return deserialize(serializedData);
     }
 
