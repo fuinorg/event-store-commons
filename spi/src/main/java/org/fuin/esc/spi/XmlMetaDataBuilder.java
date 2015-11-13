@@ -20,6 +20,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.fuin.objects4j.common.Contract;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -28,8 +29,28 @@ import org.w3c.dom.Element;
  */
 public final class XmlMetaDataBuilder implements MetaDataBuilder<Document> {
 
+    private final String metaTag;
+    
     private Document document;
 
+    /**
+     * Default constructor. The tag name is set to "meta".
+     */
+    public XmlMetaDataBuilder() {
+        this("meta");
+    }
+
+    /**
+     * Constructor with meta tag name.
+     * 
+     * @param metaTag Tag name.
+     */
+    public XmlMetaDataBuilder(final String metaTag) {
+        super();
+        Contract.requireArgNotEmpty("metaTag", metaTag);
+        this.metaTag = metaTag;
+    }
+    
     @Override
     public final void init(final Document obj) {
         if (obj == null) {
@@ -38,7 +59,7 @@ public final class XmlMetaDataBuilder implements MetaDataBuilder<Document> {
                         .newInstance();
                 final DocumentBuilder builder = factory.newDocumentBuilder();
                 document = builder.newDocument();
-                document.appendChild(document.createElement("meta"));
+                document.appendChild(document.createElement(metaTag));
             } catch (final ParserConfigurationException ex) {
                 throw new RuntimeException(ex);
             }
