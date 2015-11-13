@@ -58,7 +58,21 @@ public final class XmlDeSerializer implements SerDeserializer {
      *            Classes to use for the JAXB context.
      */
     public XmlDeSerializer(final Class<?>... classesToBeBound) {
-        this(Charset.forName("utf-8"), classesToBeBound);
+        this(Charset.forName("utf-8"), true, classesToBeBound);
+    }
+
+    /**
+     * Constructor that creates a JAXB context internally and uses UTF-8
+     * encoding.
+     * 
+     * @param jaxbFragment
+     *            Generate the XML fragment or not.
+     * @param classesToBeBound
+     *            Classes to use for the JAXB context.
+     */
+    public XmlDeSerializer(final boolean jaxbFragment,
+            final Class<?>... classesToBeBound) {
+        this(Charset.forName("utf-8"), jaxbFragment, classesToBeBound);
     }
 
     /**
@@ -71,7 +85,20 @@ public final class XmlDeSerializer implements SerDeserializer {
      */
     public XmlDeSerializer(final Charset encoding,
             final Class<?>... classesToBeBound) {
-        this(encoding, null, classesToBeBound);
+        this(encoding, null, true, classesToBeBound);
+    }
+
+    /**
+     * Constructor that creates a JAXB context internally.
+     * 
+     * @param encoding
+     *            Encoding to use.
+     * @param classesToBeBound
+     *            Classes to use for the JAXB context.
+     */
+    public XmlDeSerializer(final Charset encoding, final boolean jaxbFragment,
+            final Class<?>... classesToBeBound) {
+        this(encoding, null, true, classesToBeBound);
     }
 
     /**
@@ -82,17 +109,20 @@ public final class XmlDeSerializer implements SerDeserializer {
      * @param adapters
      *            Adapters to associate with the JAXB context or
      *            <code>null</code>.
+     * @param jaxbFragment
+     *            Generate the XML fragment or not.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
     public XmlDeSerializer(final Charset encoding,
-            final XmlAdapter<?, ?>[] adapters,
+            final XmlAdapter<?, ?>[] adapters, final boolean jaxbFragment,
             final Class<?>... classesToBeBound) {
         super();
         this.mimeType = EnhancedMimeType.create("application", "xml", encoding);
         try {
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
             marshaller = ctx.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, jaxbFragment);
             unmarshaller = ctx.createUnmarshaller();
             if ((adapters == null) || (adapters.length == 0)) {
                 LOG.debug("No adapters set");
