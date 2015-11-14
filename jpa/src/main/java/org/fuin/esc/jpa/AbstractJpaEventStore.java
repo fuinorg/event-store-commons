@@ -30,8 +30,8 @@ import org.fuin.esc.api.ReadableEventStoreSync;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.spi.AbstractDeSerEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
@@ -43,11 +43,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Read only JPA implementation of the event store.
  */
-public abstract class AbstractJpaEventStore extends AbstractDeSerEventStore implements ReadableEventStoreSync {
+public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractJpaEventStore.class);
 
-    private EntityManager em;
+    private final EntityManager em;
+
+    private final SerializerRegistry serRegistry;
+
+    private final DeserializerRegistry desRegistry;
 
     /**
      * Constructor with all mandatory data.
@@ -61,11 +65,13 @@ public abstract class AbstractJpaEventStore extends AbstractDeSerEventStore impl
      */
     public AbstractJpaEventStore(@NotNull final EntityManager em,
             @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
-        super(serRegistry, desRegistry);
+        super();
         Contract.requireArgNotNull("em", em);
         Contract.requireArgNotNull("serRegistry", serRegistry);
         Contract.requireArgNotNull("desRegistry", desRegistry);
         this.em = em;
+        this.serRegistry = serRegistry;
+        this.desRegistry = desRegistry;
     }
 
     /**
@@ -75,6 +81,26 @@ public abstract class AbstractJpaEventStore extends AbstractDeSerEventStore impl
      */
     protected final EntityManager getEm() {
         return em;
+    }
+
+    /**
+     * Returns a registry of serializers.
+     * 
+     * @return Registry with known serializers.
+     */
+    @NotNull
+    protected final SerializerRegistry getSerializerRegistry() {
+        return serRegistry;
+    }
+
+    /**
+     * Returns a registry of deserializers.
+     * 
+     * @return Registry with known deserializers.
+     */
+    @NotNull
+    protected final DeserializerRegistry getDeserializerRegistry() {
+        return desRegistry;
     }
 
     @Override
@@ -159,6 +185,35 @@ public abstract class AbstractJpaEventStore extends AbstractDeSerEventStore impl
         return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
     }
 
+    /**
+     * Tries to find a serializer for the given type of object and converts it into a storable data block.
+     * 
+     * @param type
+     *            Type of event.
+     * @param data
+     *            Event of the given type.
+     * 
+     * @return Event ready to persist.
+     */
+    protected final SerializedData serialize(final SerializedDataType type, final Object data) {
+        return EscSpiUtils.serialize(serRegistry, type, data);
+    }
+
+    /**
+     * Tries to find a deserializer for the given data block.
+     * 
+     * @param data
+     *            Persisted data.
+     * 
+     * @return Unmarshalled event.
+     * 
+     * @param <T>
+     *            Expected type of event.
+     */
+    protected final <T> T deserialize(final SerializedData data) {
+        return EscSpiUtils.deserialize(desRegistry, data);
+    }
+
     private String createOrderBy(final StreamId streamId, final boolean asc) {
         final StringBuilder sb = new StringBuilder(" ORDER BY ");
         sb.append("ev.id");
@@ -225,7 +280,7 @@ public abstract class AbstractJpaEventStore extends AbstractDeSerEventStore impl
         }
         final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getType()
                 .asBaseType()), data.getMimeType(), data.getRaw());
-        return deserialize(serializedData);
+        return EscSpiUtils.deserialize(desRegistry, serializedData);
     }
 
 }
