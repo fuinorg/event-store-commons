@@ -35,17 +35,32 @@ public final class SimpleStreamId implements StreamId {
 
     private final String name;
 
+    private final boolean projection;
+    
     /**
-     * Constructor with name.
+     * Constructor for projection.
      * 
      * @param name
      *            Unique name.
      */
     public SimpleStreamId(@NotNull final String name) {
-        Contract.requireArgNotNull("name", name);
-        this.name = name;
+        this(name, true);
     }
 
+    /**
+     * Constructor with name and projection information.
+     * 
+     * @param name
+     *            Unique name.
+     * @param projection
+     *            Projection (read only) or stream (read/write).
+     */
+    public SimpleStreamId(@NotNull final String name, final boolean projection) {
+        Contract.requireArgNotNull("name", name);
+        this.name = name;
+        this.projection = projection;
+    }
+    
     @Override
     public final String getName() {
         return name;
@@ -53,7 +68,7 @@ public final class SimpleStreamId implements StreamId {
 
     @Override
     public final boolean isProjection() {
-        return true;
+        return projection;
     }
 
     @Override
