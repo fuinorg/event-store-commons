@@ -30,8 +30,9 @@ import javax.json.JsonStructure;
 import javax.json.JsonWriter;
 
 /**
- * Serializes and deserializes a JSON object. The content type for serialization
- * is always "application/json".
+ * Serializes and deserializes a JSON object. The content type for serialization is always "application/json".
+ * This implementation supports {@link JsonStructure} and
+ * <code>byte[]</data> for unmarshalling content. Type {@link JsonStructure} will simply return the input without any change.
  */
 public final class JsonDeSerializer implements Serializer, Deserializer {
 
@@ -52,8 +53,7 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
      */
     public JsonDeSerializer(final Charset encoding) {
         super();
-        this.mimeType = EnhancedMimeType
-                .create("application", "json", encoding);
+        this.mimeType = EnhancedMimeType.create("application", "json", encoding);
     }
 
     @Override
@@ -64,13 +64,11 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
     @Override
     public final byte[] marshal(final Object obj) {
         if (!(obj instanceof JsonStructure)) {
-            throw new IllegalArgumentException(
-                    "Can only handle instances of type 'JsonStructure', but not: "
-                            + obj.getClass());
+            throw new IllegalArgumentException("Can only handle instances of type 'JsonStructure', but not: "
+                    + obj.getClass());
         }
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-        final Writer writer = new OutputStreamWriter(bos,
-                mimeType.getEncoding());
+        final Writer writer = new OutputStreamWriter(bos, mimeType.getEncoding());
         final JsonWriter jsonWriter = Json.createWriter(writer);
         try {
             jsonWriter.write((JsonStructure) obj);
@@ -82,16 +80,25 @@ public final class JsonDeSerializer implements Serializer, Deserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final byte[] data,
-            final EnhancedMimeType mimeType) {
-        final Reader reader = new InputStreamReader(new ByteArrayInputStream(
-                data), mimeType.getEncoding());
-        final JsonReader jsonReader = Json.createReader(reader);
-        try {
-            return (T) jsonReader.read();
-        } finally {
-            jsonReader.close();
+    public final <T> T unmarshal(final Object data, final EnhancedMimeType mimeType) {
+
+        if (data instanceof byte[]) {
+            final Reader reader = new InputStreamReader(new ByteArrayInputStream((byte[]) data),
+                    mimeType.getEncoding());
+            final JsonReader jsonReader = Json.createReader(reader);
+            try {
+                return (T) jsonReader.read();
+            } finally {
+                jsonReader.close();
+            }
         }
+        if (data instanceof JsonStructure) {
+            // Simply return it
+            return (T) data;
+        }
+        throw new IllegalArgumentException("This deserializer only supports input of type '"
+                + JsonStructure.class.getName() + "' and 'byte[]', but was: " + data);
+
     }
 
 }

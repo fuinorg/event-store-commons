@@ -34,15 +34,16 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
 
 /**
- * Serializes and deserializes an object from/to XML. The content type for
- * serialization is always "application/xml".
+ * Serializes and deserializes an object from/to XML using JAXB. The content type for serialization is always
+ * "application/xml". This implementation supports {@link Node} and
+ * <code>byte[]</data> for unmarshalling content.
  */
 public final class XmlDeSerializer implements SerDeserializer {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(XmlDeSerializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XmlDeSerializer.class);
 
     private final EnhancedMimeType mimeType;
 
@@ -51,8 +52,7 @@ public final class XmlDeSerializer implements SerDeserializer {
     private final Unmarshaller unmarshaller;
 
     /**
-     * Constructor that creates a JAXB context internally and uses UTF-8
-     * encoding.
+     * Constructor that creates a JAXB context internally and uses UTF-8 encoding.
      * 
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
@@ -62,16 +62,14 @@ public final class XmlDeSerializer implements SerDeserializer {
     }
 
     /**
-     * Constructor that creates a JAXB context internally and uses UTF-8
-     * encoding.
+     * Constructor that creates a JAXB context internally and uses UTF-8 encoding.
      * 
      * @param jaxbFragment
      *            Generate the XML fragment or not.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
-    public XmlDeSerializer(final boolean jaxbFragment,
-            final Class<?>... classesToBeBound) {
+    public XmlDeSerializer(final boolean jaxbFragment, final Class<?>... classesToBeBound) {
         this(Charset.forName("utf-8"), jaxbFragment, classesToBeBound);
     }
 
@@ -83,8 +81,7 @@ public final class XmlDeSerializer implements SerDeserializer {
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
-    public XmlDeSerializer(final Charset encoding,
-            final Class<?>... classesToBeBound) {
+    public XmlDeSerializer(final Charset encoding, final Class<?>... classesToBeBound) {
         this(encoding, null, true, classesToBeBound);
     }
 
@@ -107,16 +104,14 @@ public final class XmlDeSerializer implements SerDeserializer {
      * @param encoding
      *            Encoding to use.
      * @param adapters
-     *            Adapters to associate with the JAXB context or
-     *            <code>null</code>.
+     *            Adapters to associate with the JAXB context or <code>null</code>.
      * @param jaxbFragment
      *            Generate the XML fragment or not.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
-    public XmlDeSerializer(final Charset encoding,
-            final XmlAdapter<?, ?>[] adapters, final boolean jaxbFragment,
-            final Class<?>... classesToBeBound) {
+    public XmlDeSerializer(final Charset encoding, final XmlAdapter<?, ?>[] adapters,
+            final boolean jaxbFragment, final Class<?>... classesToBeBound) {
         super();
         this.mimeType = EnhancedMimeType.create("application", "xml", encoding);
         try {
@@ -138,20 +133,15 @@ public final class XmlDeSerializer implements SerDeserializer {
                 public boolean handleEvent(final ValidationEvent event) {
                     if (event.getSeverity() > 0) {
                         if (event.getLinkedException() == null) {
-                            throw new RuntimeException(
-                                    "Error unmarshalling the data: "
-                                            + event.getMessage());
+                            throw new RuntimeException("Error unmarshalling the data: " + event.getMessage());
                         }
-                        throw new RuntimeException(
-                                "Error unmarshalling the data", event
-                                        .getLinkedException());
+                        throw new RuntimeException("Error unmarshalling the data", event.getLinkedException());
                     }
                     return true;
                 }
             });
         } catch (final JAXBException ex) {
-            throw new RuntimeException(
-                    "Error initializing JAXB helper classes", ex);
+            throw new RuntimeException("Error initializing JAXB helper classes", ex);
         }
     }
 
@@ -164,8 +154,7 @@ public final class XmlDeSerializer implements SerDeserializer {
     public final byte[] marshal(final Object obj) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
-            final Writer writer = new OutputStreamWriter(bos,
-                    mimeType.getEncoding());
+            final Writer writer = new OutputStreamWriter(bos, mimeType.getEncoding());
             marshaller.marshal(obj, writer);
             return bos.toByteArray();
         } catch (final JAXBException ex) {
@@ -175,12 +164,20 @@ public final class XmlDeSerializer implements SerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final byte[] data,
-            final EnhancedMimeType mimeType) {
+    public final <T> T unmarshal(final Object data, final EnhancedMimeType mimeType) {
         try {
-            final Reader reader = new InputStreamReader(
-                    new ByteArrayInputStream(data), mimeType.getEncoding());
-            return (T) unmarshaller.unmarshal(reader);
+
+            if (data instanceof byte[]) {
+                final Reader reader = new InputStreamReader(new ByteArrayInputStream((byte[]) data),
+                        mimeType.getEncoding());
+                return (T) unmarshaller.unmarshal(reader);
+            }
+            if (data instanceof Node) {
+                return (T) unmarshaller.unmarshal((Node) data);
+            }
+            throw new IllegalArgumentException("This deserializer only supports input of type '"
+                    + Node.class.getName() + "' and 'byte[]', but was: " + data);
+
         } catch (final JAXBException ex) {
             throw new RuntimeException("Error de-serializing data", ex);
         }

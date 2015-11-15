@@ -27,9 +27,8 @@ import javax.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * Enhances the {@link javax.activation.MimeType} class with convenience methods
- * for accessing version and encoding parameters. Equals and hash code are base
- * on the {@link #toString()} method.
+ * Enhances the {@link javax.activation.MimeType} class with convenience methods for accessing version and
+ * encoding parameters. Equals and hash code are base on the {@link #toString()} method.
  */
 public final class EnhancedMimeType extends javax.activation.MimeType {
 
@@ -55,8 +54,7 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the string is not valid.
      */
-    public EnhancedMimeType(@NotNull final String str)
-            throws MimeTypeParseException {
+    public EnhancedMimeType(@NotNull final String str) throws MimeTypeParseException {
         super(str);
     }
 
@@ -71,8 +69,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary,
-            @NotNull final String sub) throws MimeTypeParseException {
+    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub)
+            throws MimeTypeParseException {
         super(primary, sub);
     }
 
@@ -89,9 +87,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary,
-            @NotNull final String sub, @Nullable final Charset encoding)
-            throws MimeTypeParseException {
+    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+            @Nullable final Charset encoding) throws MimeTypeParseException {
         super(primary, sub);
         if (encoding != null) {
             super.setParameter(ENCODING, encoding.name());
@@ -113,9 +110,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary,
-            @NotNull final String sub, @Nullable final Charset encoding,
-            @Nullable final String version) throws MimeTypeParseException {
+    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+            @Nullable final Charset encoding, @Nullable final String version) throws MimeTypeParseException {
         this(primary, sub, encoding, version, null);
     }
 
@@ -136,11 +132,9 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or sub type is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary,
-            @NotNull final String sub, @Nullable final Charset encoding,
-            @Nullable final String version,
-            @Nullable final Map<String, String> params)
-            throws MimeTypeParseException {
+    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+            @Nullable final Charset encoding, @Nullable final String version,
+            @Nullable final Map<String, String> params) throws MimeTypeParseException {
         super(primary, sub);
         if (encoding != null) {
             super.setParameter(ENCODING, encoding.name());
@@ -159,9 +153,8 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
                                     + "Use the 'encoding' argument instead.");
                 }
                 if (key.equals(VERSION)) {
-                    throw new IllegalArgumentException(
-                            "Setting version with the parameters is not allowed. "
-                                    + "Use the 'version' argument instead.");
+                    throw new IllegalArgumentException("Setting version with the parameters is not allowed. "
+                            + "Use the 'version' argument instead.");
                 }
                 super.setParameter(key, value);
             }
@@ -211,27 +204,28 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
     }
 
     /**
-     * Creates an instance with all data. Exceptions are wrapped to runtime
-     * exceptions.
+     * Creates an instance with all data. Exceptions are wrapped to runtime exceptions.
      * 
      * @param str
      *            Contains base type, sub type, version and parameters.
      * 
      * @return New instance.
      */
-    @NotNull
-    public static EnhancedMimeType create(@NotNull final String str) {
+    @Nullable
+    public static EnhancedMimeType create(@Nullable final String str) {
+        if (str == null) {
+            return null;
+        }
         try {
             return new EnhancedMimeType(str);
         } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException("Failed to create versioned mime type: "
-                    + str, ex);
+            throw new RuntimeException("Failed to create versioned mime type: " + str, ex);
         }
     }
 
     /**
-     * Creates an instance with primary and sub type (no version, no
-     * parameters). Exceptions are wrapped to runtime exceptions.
+     * Creates an instance with primary and sub type (no version, no parameters). Exceptions are wrapped to
+     * runtime exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -241,14 +235,13 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary,
-            @NotNull final String sub) {
+    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub) {
         return create(primary, sub, null, null, null);
     }
 
     /**
-     * Creates an instance with primary, sub type and encoding (no version).
-     * Exceptions are wrapped to runtime exceptions.
+     * Creates an instance with primary, sub type and encoding (no version). Exceptions are wrapped to runtime
+     * exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -260,14 +253,14 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary,
-            @NotNull final String sub, final Charset encoding) {
+    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
+            final Charset encoding) {
         return create(primary, sub, encoding, null, null);
     }
 
     /**
-     * Creates an instance with primary, sub type, encoding and version.
-     * Exceptions are wrapped to runtime exceptions.
+     * Creates an instance with primary, sub type, encoding and version. Exceptions are wrapped to runtime
+     * exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -281,16 +274,13 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary,
-            @NotNull final String sub, final Charset encoding,
-            final String version) {
-        return create(primary, sub, encoding, version,
-                new HashMap<String, String>());
+    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
+            final Charset encoding, final String version) {
+        return create(primary, sub, encoding, version, new HashMap<String, String>());
     }
 
     /**
-     * Creates an instance with all data and exceptions wrapped to runtime
-     * exceptions.
+     * Creates an instance with all data and exceptions wrapped to runtime exceptions.
      * 
      * @param primary
      *            Primary type.
@@ -306,15 +296,12 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary,
-            @NotNull final String sub, final Charset encoding,
-            final String version, final Map<String, String> parameters) {
+    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
+            final Charset encoding, final String version, final Map<String, String> parameters) {
         try {
-            return new EnhancedMimeType(primary, sub, encoding, version,
-                    parameters);
+            return new EnhancedMimeType(primary, sub, encoding, version, parameters);
         } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException("Failed to create versioned mime type: "
-                    + primary + "/" + sub, ex);
+            throw new RuntimeException("Failed to create versioned mime type: " + primary + "/" + sub, ex);
         }
     }
 

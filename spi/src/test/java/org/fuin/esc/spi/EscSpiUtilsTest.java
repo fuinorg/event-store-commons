@@ -199,8 +199,11 @@ public class EscSpiUtilsTest {
         return new Deserializer() {
             @SuppressWarnings("unchecked")
             @Override
-            public <T> T unmarshal(byte[] data, EnhancedMimeType mimeType) {
-                return (T) new String(data);
+            public <T> T unmarshal(Object data, EnhancedMimeType mimeType) {
+                if (data instanceof byte[]) {
+                    return (T) new String((byte[]) data);
+                }
+                throw new IllegalArgumentException("Unknown input type: " + data);
             }
         };
     }

@@ -25,7 +25,9 @@ public interface Deserializer {
      * Converts the given data into an object.
      * 
      * @param data
-     *            Serialized object.
+     *            Serialized object. Can have different types like <code>byte[]</code>, <code>Node</code>
+     *            (XML), <code>JsonArray</code> or <code>JsonObject</code>. The possible input depends on the
+     *            implementation.
      * @param mimeType
      *            Type of the data in the byte array.
      * 
@@ -34,6 +36,6 @@ public interface Deserializer {
      * @param <T>
      *            Type the data is converted into.
      */
-    public <T> T unmarshal(byte[] data, EnhancedMimeType mimeType);
+    public <T> T unmarshal(Object data, EnhancedMimeType mimeType);
 
 }
