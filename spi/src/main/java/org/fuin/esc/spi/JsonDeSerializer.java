@@ -34,7 +34,7 @@ import javax.json.JsonWriter;
  * This implementation supports {@link JsonStructure} and
  * <code>byte[]</data> for unmarshalling content. Type {@link JsonStructure} will simply return the input without any change.
  */
-public final class JsonDeSerializer implements Serializer, Deserializer {
+public final class JsonDeSerializer implements SerDeserializer {
 
     private final EnhancedMimeType mimeType;
 
