@@ -20,13 +20,20 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
+import org.fuin.esc.spi.JsonDeSerializer;
+import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.spi.XmlDeSerializer;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -42,14 +49,34 @@ public class BasicFeature {
     private EventStoreSync eventStore;
 
     @Before
-    public void beforeFeature() {
+    public void beforeFeature() throws MalformedURLException {
         // Use the property to select the correct implementation:
-        // System.getProperty(EscCucumber.SYSTEM_PROPERTY)
-        eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
+        final String type = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
+        if (type.equals("mem")) {
+            eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
+        } else if (type.equals("eshttp")) {
+            /*
+            final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+            final URL url = new URL("http://127.0.0.1:2113/");
+            final SerializedDataType serMetaType = new SerializedDataType("MyMeta");
+            final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
+            final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
+            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+            registry.add(new SerializedDataType("BookAddedEvent"), "application/xml", xmlDeSer);
+            registry.add(new SerializedDataType("MyMeta"), "application/json", jsonDeSer);
+            eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML, registry,
+                    registry);
+             */
+            throw new IllegalStateException("Unknown type: " + type);
+        } else {
+            throw new IllegalStateException("Unknown type: " + type);
+        }
+        eventStore.open();
     }
 
     @After
     public void afterFeature() {
+        eventStore.close();
         eventStore = null;
     }
 

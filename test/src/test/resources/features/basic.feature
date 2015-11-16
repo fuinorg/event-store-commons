@@ -6,7 +6,7 @@ Scenario: Create a stream
        """
         <events>
             <event id="f6a8d009-5613-4e4d-9e46-15a30daa2d28">
-                <data type="MyEvent" mime-type="application/xml; encoding=utf-8">
+                <data type="BookAddedEvent" mime-type="application/xml; encoding=utf-8">
                     <![CDATA[<book-added-event name="Shining" author="Stephen King"/>]]>
                 </data>
                 <meta type="MyMeta" mime-type="application/json; encoding=utf-8">
@@ -20,7 +20,7 @@ Scenario: Create a stream
         <slices>
             <slice from-stream-no="0" next-stream-no="1" end-of-stream="true">
                 <event id="f6a8d009-5613-4e4d-9e46-15a30daa2d28">
-                    <data type="MyEvent" mime-type="application/xml; encoding=utf-8">
+                    <data type="BookAddedEvent" mime-type="application/xml; encoding=utf-8">
                         <![CDATA[<book-added-event name="Shining" author="Stephen King"/>]]>
                     </data>
                     <meta type="MyMeta" mime-type="application/json; encoding=utf-8">
