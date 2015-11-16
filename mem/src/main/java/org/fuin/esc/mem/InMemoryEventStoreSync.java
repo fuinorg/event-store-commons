@@ -158,10 +158,14 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expected) {
+    public final void deleteStream(final StreamId streamId, final int expected,
+            boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, 0);
+        
+        // TODO Handle hard delete
+        
         if (streamId == StreamId.ALL) {
             throw new IllegalArgumentException(
                     "It's not possible to delete the 'all' stream");
@@ -174,10 +178,13 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId) {
+    public final void deleteStream(final StreamId streamId,
+            boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
 
+        // TODO Handle hard delete
+        
         final List<CommonEvent> events = getStream(streamId);
         deletedStreams.put(streamId, events);
         streams.remove(streamId);

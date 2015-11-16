@@ -57,7 +57,7 @@ public class BasicFeature {
     public void assertThatStreamDoesNotExist(String streamName)
             throws Throwable {
         try {
-            eventStore.deleteStream(new SimpleStreamId(streamName));
+            eventStore.deleteStream(new SimpleStreamId(streamName), true);
             fail("The stream should not exist: " + streamName);
         } catch (final StreamNotFoundException ex) {
             // OK

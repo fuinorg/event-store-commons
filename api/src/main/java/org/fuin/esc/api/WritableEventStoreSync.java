@@ -146,6 +146,11 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *            The unique identifier of the stream to be deleted
      * @param expectedVersion
      *            The version the stream should have when being deleted.
+     * @param hardDelete
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the
@@ -156,9 +161,9 @@ public interface WritableEventStoreSync extends AutoCloseable {
      * @throws StreamVersionConflictException
      *             The expected version didn't match the actual version.
      */
-    public void deleteStream(@NotNull StreamId streamId, int expectedVersion)
-            throws StreamNotFoundException, StreamDeletedException,
-            StreamVersionConflictException;
+    public void deleteStream(@NotNull StreamId streamId, int expectedVersion,
+            boolean hardDelete) throws StreamNotFoundException,
+            StreamDeletedException, StreamVersionConflictException;
 
     /**
      * Deletes a stream from the event store not matter what the current version
@@ -166,6 +171,11 @@ public interface WritableEventStoreSync extends AutoCloseable {
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
+     * @param hardDelete
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the
@@ -174,7 +184,8 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *             A stream with the given name previously existed but was
      *             deleted.
      */
-    public void deleteStream(@NotNull StreamId streamId)
+    public void deleteStream(@NotNull StreamId streamId,
+            boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException;
 
 }

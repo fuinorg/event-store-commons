@@ -150,6 +150,11 @@ public interface WritableEventStoreAsync {
      *            The unique identifier of the stream to be deleted
      * @param expectedVersion
      *            The version the stream should have when being deleted.
+     * @param hardDelete
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @return Nothing.
      * 
@@ -164,7 +169,7 @@ public interface WritableEventStoreAsync {
      */
     @NotNull
     public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId,
-            int expectedVersion);
+            int expectedVersion, boolean hardDelete);
 
     /**
      * Deletes a stream from the event store not matter what the current version
@@ -172,6 +177,11 @@ public interface WritableEventStoreAsync {
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
+     * @param hardDelete
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @return Nothing.
      * 
@@ -183,6 +193,7 @@ public interface WritableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId);
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId,
+            boolean hardDelete);
 
 }

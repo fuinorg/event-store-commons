@@ -107,24 +107,25 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public final CompletableFuture<Void> deleteStream(final StreamId streamId,
-            final int expected) {
+            final int expected, boolean hardDelete) {
 
         return CompletableFuture.runAsync(new Runnable() {
             @Override
             public void run() {
-                delegate.deleteStream(streamId, expected);
+                delegate.deleteStream(streamId, expected, hardDelete);
             }
         }, executor);
 
     }
 
     @Override
-    public final CompletableFuture<Void> deleteStream(final StreamId streamId) {
+    public final CompletableFuture<Void> deleteStream(final StreamId streamId,
+            boolean hardDelete) {
 
         return CompletableFuture.runAsync(new Runnable() {
             @Override
             public void run() {
-                delegate.deleteStream(streamId);
+                delegate.deleteStream(streamId, hardDelete);
             }
         }, executor);
 
