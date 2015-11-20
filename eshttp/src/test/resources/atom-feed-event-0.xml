@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<atom:entry xmlns:atom="http://www.w3.org/2005/Atom">
+    <atom:title>0@MyStreamA</atom:title>
+    <atom:id>classpath://atom-feed-event-0.xml</atom:id>
+    <atom:updated>2015-11-14T10:35:35.753523Z</atom:updated>
+    <atom:author>
+        <atom:name>EventStore</atom:name>
+    </atom:author>
+    <atom:summary>MyEvent</atom:summary>
+    <atom:link href="classpath://atom-feed-event-0.xml" rel="edit" />
+    <atom:link href="classpath://atom-feed-event-0.xml" rel="alternate" />
+    <atom:content type="application/xml">
+        <eventStreamId>MyStreamA</eventStreamId>
+        <eventNumber>0</eventNumber>
+        <eventType>MyEvent</eventType>
+        <eventId>8faef866-b80f-4952-9124-62819a6517aa</eventId>
+        <data>
+            <my-event id="8faef866-b80f-4952-9124-62819a6517aa" description="One" />
+        </data>
+        <metadata>
+            <EscUserMeta>
+                <my-meta>
+                    <user>john.doe</user>
+                </my-meta>
+            </EscUserMeta>
+            <EscSysMeta>
+                <data-content-type>application/xml; encoding=UTF-8</data-content-type>
+                <meta-content-type>application/xml; encoding=UTF-8</meta-content-type>
+            </EscSysMeta>
+        </metadata>
+    </atom:content>
+</atom:entry>

@@ -1,0 +1,42 @@
+{
+    "title": "0@MyStreamA",
+    "id": "classpath://atom-feed-event-0.xml",
+    "updated": "2015-11-14T10:35:35.753523Z",
+    "author": {
+        "name": "EventStore"
+    },
+    "summary": "MyEvent",
+    "content": {
+        "eventStreamId": "MyStreamA",
+        "eventNumber": 0,
+        "eventType": "MyEvent",
+        "eventId": "8faef866-b80f-4952-9124-62819a6517aa",
+        "data": {
+            "my-event": {
+                "@id": "8faef866-b80f-4952-9124-62819a6517aa",
+                "@description": "One"
+            }
+        },
+        "metadata": {
+            "EscUserMeta": {
+                "my-meta": {
+                    "user": "john.doe"
+                }
+            },
+            "EscSysMeta": {
+                "data-content-type": "application/xml; encoding=UTF-8",
+                "meta-content-type": "application/xml; encoding=UTF-8"
+            }
+        }
+    },
+    "links": [
+        {
+            "uri": "classpath://atom-feed-event-0.xml",
+            "relation": "edit"
+        },
+        {
+            "uri": "classpath://atom-feed-event-0.xml",
+            "relation": "alternate"
+        }
+    ]
+}

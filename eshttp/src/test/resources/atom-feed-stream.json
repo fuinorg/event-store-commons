@@ -1,0 +1,58 @@
+{
+    "title": "Event stream 'MyStreamA'",
+    "id": "classpath://atom-feed-stream.json",
+    "updated": "2015-11-14T10:35:35.753539Z",
+    "streamId": "MyStreamA",
+    "author": {
+        "name": "EventStore"
+    },
+    "headOfStream": true,
+    "selfUrl": "classpath://atom-feed-stream.json",
+    "eTag": "1;248368668",
+    "links": [
+        {
+            "uri": "classpath://atom-feed-stream.json",
+            "relation": "self"
+        }
+    ],
+    "entries": [
+        {
+            "title": "1@MyStreamA",
+            "id": "classpath://atom-feed-event-1.json",
+            "updated": "2015-11-14T10:35:35.753539Z",
+            "author": {
+                "name": "EventStore"
+            },
+            "summary": "MyEvent",
+            "links": [
+                {
+                    "uri": "classpath://atom-feed-event-1.json",
+                    "relation": "edit"
+                },
+                {
+                    "uri": "classpath://atom-feed-event-1.json",
+                    "relation": "alternate"
+                }
+            ]
+        },
+        {
+            "title": "0@MyStreamA",
+            "id": "classpath://atom-feed-event-0.json",
+            "updated": "2015-11-14T10:35:35.753523Z",
+            "author": {
+                "name": "EventStore"
+            },
+            "summary": "MyEvent",
+            "links": [
+                {
+                    "uri": "classpath://atom-feed-event-0.json",
+                    "relation": "edit"
+                },
+                {
+                    "uri": "classpath://atom-feed-event-0.json",
+                    "relation": "alternate"
+                }
+            ]
+        }
+    ]
+}
