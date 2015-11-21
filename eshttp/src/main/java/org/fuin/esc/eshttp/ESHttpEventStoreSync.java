@@ -36,7 +36,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -50,6 +49,7 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
+import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -338,6 +338,40 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             throw new RuntimeException(msg, ex);
         }
 
+    }
+
+    @Override
+    public final StreamState streamState(final StreamId streamId) {
+        Contract.requireArgNotNull("streamId", streamId);
+
+        final String msg = "streamState(" + streamId + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
+            LOG.info(uri.toString());
+            final HttpGet get = new HttpGet(uri);
+            final Future<HttpResponse> future = httpclient.execute(get, null);
+            final HttpResponse response = future.get();
+            final StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() == 200) {
+                LOG.debug(msg + " RESPONSE: {}", response);
+                return StreamState.ACTIVE;
+            }
+            if (status.getStatusCode() == 404) {
+                // May have never existed or was soft deleted...
+                // TODO Maybe the event store can send something to distinguish this?
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new StreamNotFoundException(streamId);
+            }
+            if (status.getStatusCode() == 410) {
+                // 410 GONE - Stream was hard deleted
+                LOG.debug(msg + " RESPONSE: {}", response);
+                return StreamState.HARD_DELETED;
+            }
+            LOG.debug(msg + " RESPONSE: {}", response);
+            throw new RuntimeException(msg + " [Status=" + status.getStatusCode() + "]");
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(msg, ex);
+        }
     }
 
     private StreamEventsSlice readEvents(final boolean forward, final URI uri, final int start,

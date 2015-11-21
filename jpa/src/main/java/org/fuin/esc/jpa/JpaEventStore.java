@@ -130,8 +130,6 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     public final void deleteStream(final StreamId streamId, final int expectedVersion,
             final boolean hardDelete) {
 
-        // TODO Handle hard delete
-
         final JpaStream stream = getEm().find(JpaStream.class, streamId.getName(),
                 LockModeType.PESSIMISTIC_WRITE);
         if (stream == null) {
@@ -143,7 +141,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         if (stream.getVersion() != expectedVersion) {
             throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
         }
-        stream.delete();
+        stream.delete(hardDelete);
 
     }
 

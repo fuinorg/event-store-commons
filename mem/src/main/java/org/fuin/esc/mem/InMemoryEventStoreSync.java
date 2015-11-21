@@ -18,6 +18,7 @@ package org.fuin.esc.mem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.esc.api.SubscribableEventStoreSync;
 import org.fuin.esc.api.Subscription;
@@ -49,9 +51,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
     private List<CommonEvent> all;
 
-    private Map<StreamId, List<CommonEvent>> streams;
-
-    private Map<StreamId, List<CommonEvent>> deletedStreams;
+    private Map<StreamId, InternalStream> streams;
 
     private Map<StreamId, List<InternalSubscription>> subscriptions;
 
@@ -68,7 +68,6 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         this.executor = executor;
         all = new ArrayList<CommonEvent>();
         streams = new HashMap<>();
-        deletedStreams = new HashMap<>();
         subscriptions = new HashMap<>();
     }
 
@@ -97,7 +96,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
 
-        final List<CommonEvent> events = getStream(streamId);
+        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         if (events.size() - 1 < eventNumber) {
             throw new EventNotFoundException(streamId, eventNumber);
         }
@@ -116,7 +115,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         if (streamId == StreamId.ALL) {
             events = all;
         } else {
-            events = getStream(streamId);
+            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
@@ -143,7 +142,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         if (streamId == StreamId.ALL) {
             events = all;
         } else {
-            events = getStream(streamId);
+            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
@@ -165,15 +164,18 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
         Contract.requireArgNotNull("streamId", streamId);
 
-        // TODO Handle hard delete
-
         if (streamId == StreamId.ALL) {
             throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
 
-        final List<CommonEvent> events = getStream(streamId, expected);
-        deletedStreams.put(streamId, events);
-        streams.remove(streamId);
+        try {
+            final InternalStream stream = getStream(streamId, expected);
+            stream.delete(hardDelete);
+        } catch (final StreamNotFoundException ex) {
+            if (expected != ExpectedVersion.EMPTY_STREAM.getNo()) {
+                throw ex;
+            }
+        }
 
     }
 
@@ -191,13 +193,13 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
-        final List<CommonEvent> events = createIfNotExists(streamId, expectedVersion);
+        final InternalStream stream = createIfNotExists(streamId, expectedVersion);
         all.addAll(toAppend);
-        events.addAll(toAppend);
+        stream.addAll(toAppend);
 
         notifyListeners(streamId, toAppend, 0);
 
-        return events.size();
+        return stream.getVersion();
 
     }
 
@@ -217,13 +219,13 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
-        final List<CommonEvent> events = createIfNotExists(streamId);
+        final InternalStream stream = createIfNotExists(streamId, ExpectedVersion.ANY.getNo());
         all.addAll(toAppend);
-        events.addAll(toAppend);
+        stream.addAll(toAppend);
 
         notifyListeners(streamId, toAppend, 0);
 
-        return events.size();
+        return stream.getVersion();
 
     }
 
@@ -245,7 +247,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         Contract.requireArgNotNull("onEvent", onEvent);
         Contract.requireArgNotNull("onDrop", onDrop);
 
-        final List<CommonEvent> events = getStream(streamId);
+        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         final Integer lastEventNumber = events.size();
         final int subscriberId = subscriptions.size();
 
@@ -285,6 +287,15 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
     }
 
+    @Override
+    public final StreamState streamState(final StreamId streamId) {
+        final InternalStream stream = streams.get(streamId);
+        if (stream == null) {
+            throw new StreamNotFoundException(streamId);
+        }
+        return stream.getState();
+    }
+
     private void notifyListeners(final StreamId streamId, final List<CommonEvent> events, final int idx) {
 
         if ((idx > -1) && (idx < events.size())) {
@@ -317,57 +328,119 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         return list.indexOf(new InternalSubscription(inMemSubscription));
     }
 
-    private List<CommonEvent> getStream(final StreamId streamId) {
-        return getStream(streamId, false);
+    private InternalStream getStream(final StreamId streamId, final int expected) {
+        final InternalStream stream = streams.get(streamId);
+        if (stream == null) {
+            throw new StreamNotFoundException(streamId);
+        }
+        if (stream.getState() == StreamState.HARD_DELETED || stream.getState() == StreamState.SOFT_DELETED) {
+            throw new StreamDeletedException(streamId);
+        }
+        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
+            throw new StreamVersionConflictException(streamId, expected, stream.getVersion());
+        }
+        return stream;
     }
 
-    private List<CommonEvent> getStream(final StreamId streamId, final boolean suppressNotFound) {
-        final List<CommonEvent> events = streams.get(streamId);
-        if (events == null) {
-            if (deletedStreams.containsKey(streamId)) {
-                throw new StreamDeletedException(streamId);
+    private InternalStream createIfNotExists(final StreamId streamId, final int expected) {
+        InternalStream stream = streams.get(streamId);
+        if (stream == null) {
+            stream = new InternalStream();
+            streams.put(streamId, stream);
+        }
+        if (stream.getState() == StreamState.HARD_DELETED) {
+            throw new StreamDeletedException(streamId);
+        }
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            stream.undelete();
+        }
+        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
+            throw new StreamVersionConflictException(streamId, expected, stream.getVersion());
+        }
+        return stream;
+    }
+
+    /**
+     * A stream.
+     */
+    private static final class InternalStream {
+
+        private StreamState state;
+
+        private int version;
+
+        private final List<CommonEvent> events;
+
+        /**
+         * Deafult constructor.
+         */
+        public InternalStream() {
+            super();
+            state = StreamState.ACTIVE;
+            version = 0;
+            events = new ArrayList<>();
+        }
+
+        /**
+         * Adds a number of events to the stream.
+         * 
+         * @param events
+         *            Events to add.
+         */
+        public final void addAll(final List<CommonEvent> events) {
+            this.events.addAll(events);
+            version = version + events.size();
+        }
+
+        /**
+         * Returns the state of the stream.
+         * 
+         * @return TRUE if it was a hard delete.
+         */
+        public final StreamState getState() {
+            return state;
+        }
+
+        /**
+         * Current version of the stream.
+         * 
+         * @return Version.
+         */
+        public final int getVersion() {
+            return version;
+        }
+
+        /**
+         * Returns the event list.
+         * 
+         * @return Events before deletion.
+         */
+        public final List<CommonEvent> getEvents() {
+            return Collections.unmodifiableList(events);
+        }
+
+        /**
+         * Hard deletes the stream.
+         */
+        public final void delete(final boolean hardDelete) {
+            if (hardDelete) {
+                this.state = StreamState.HARD_DELETED;
+            } else {
+                this.state = StreamState.SOFT_DELETED;
             }
-            if (suppressNotFound) {
-                return new ArrayList<>();
+            events.clear();
+        }
+
+        /**
+         * Reverts the deletion of the stream.
+         */
+        public final void undelete() {
+            if (state != StreamState.SOFT_DELETED) {
+                throw new IllegalStateException("Undelete impossible, state was: " + state);
             }
-            throw new StreamNotFoundException(streamId);            
+            this.state = StreamState.ACTIVE;
         }
-        return events;
-    }
 
-    private List<CommonEvent> getStream(final StreamId streamId, final int expected) {
-        final List<CommonEvent> events = getStream(streamId,
-                (expected == ExpectedVersion.EMPTY_STREAM.getNo()));
-        final int actual = events.size() - 1;
-        if ((actual == -1) && (expected == ExpectedVersion.EMPTY_STREAM.getNo())) {
-            return events;
-        }
-        if (expected != ExpectedVersion.ANY.getNo() && expected != actual) {
-            throw new StreamVersionConflictException(streamId, expected, actual);
-        }
-        return events;
-    }
-
-    private List<CommonEvent> createIfNotExists(final StreamId streamId) {
-
-        try {
-            return getStream(streamId);
-        } catch (final StreamNotFoundException ex) {
-            final List<CommonEvent> events = new ArrayList<CommonEvent>();
-            streams.put(streamId, events);
-            return events;
-        }
-    }
-
-    private List<CommonEvent> createIfNotExists(final StreamId streamId, final int expected) {
-
-        try {
-            return getStream(streamId, expected);
-        } catch (final StreamNotFoundException ex) {
-            final List<CommonEvent> events = new ArrayList<CommonEvent>();
-            streams.put(streamId, events);
-            return events;
-        }
     }
 
     /**
@@ -375,19 +448,18 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
      */
     private static final class InternalSubscription {
 
-        private InMemorySubscription subscription;
+        private final InMemorySubscription subscription;
 
-        private BiConsumer<Subscription, CommonEvent> eventListener;
+        private final BiConsumer<Subscription, CommonEvent> eventListener;
 
         /**
-         * Constructor for find operations.
+         * Constructor for find operations. NEVER USE for
          * 
          * @param subscription
          *            The subscription.
          */
         public InternalSubscription(final InMemorySubscription subscription) {
-            super();
-            this.subscription = subscription;
+            this(subscription, null);
         }
 
         /**

@@ -111,4 +111,25 @@ public interface ReadableEventStoreAsync {
     public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId,
             int eventNumber);
 
+    /**
+     * Determines if a stream exists.
+     * 
+     * @param streamId Unique identifier of the stream.
+     * 
+     * @return TRUE if the stream exists, else FALSE.
+     */
+    public CompletableFuture<Boolean> streamExists(@NotNull StreamId streamId);
+    
+    /**
+     * Returns the state of the stream.
+     * 
+     * @param streamId Unique identifier of the stream.
+     * 
+     * @return State.
+     * 
+     * @throws StreamNotFoundException
+     *             A stream with the given name does not exist in the repository.
+     */
+    public CompletableFuture<StreamState> streamState(@NotNull StreamId streamId);
+    
 }

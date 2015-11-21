@@ -104,4 +104,16 @@ public interface ReadableEventStoreSync extends AutoCloseable {
      */
     public boolean streamExists(@NotNull StreamId streamId);
     
+    /**
+     * Returns the state of the stream.
+     * 
+     * @param streamId Unique identifier of the stream.
+     * 
+     * @return State.
+     * 
+     * @throws StreamNotFoundException
+     *             A stream with the given name does not exist in the repository.
+     */
+    public StreamState streamState(@NotNull StreamId streamId);
+    
 }

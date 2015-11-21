@@ -30,6 +30,7 @@ import org.fuin.esc.api.ReadableEventStoreSync;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamState;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
@@ -193,6 +194,15 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
         return (stream != null);
 
+    }
+    
+    @Override
+    public final StreamState streamState(final StreamId streamId) {
+        final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
+        if (stream == null) {
+            throw new StreamNotFoundException(streamId);
+        }
+        return stream.getState();
     }
 
     /**

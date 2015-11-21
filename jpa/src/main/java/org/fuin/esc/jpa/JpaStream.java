@@ -20,32 +20,50 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.StreamState;
+
 /**
  * Base class for all concrete streams.
  */
 @MappedSuperclass
 public abstract class JpaStream {
 
-    @Column(name = "DELETED", nullable = false)
-    private boolean deleted = false;
+    @Column(name = "STATE", nullable = false)
+    private int state = StreamState.ACTIVE.dbValue();
 
     @Column(name = "VERSION", nullable = false)
     private int version = 0;
 
     /**
+     * Returns the state of the stream.
+     * 
+     * @return State.
+     */
+    public final StreamState getState() {
+        return StreamState.fromDbValue(state);
+    }
+
+    /**
      * Returns the information if the stream was deleted.
      * 
-     * @return TRUE if the stream was deleted.
+     * @return TRUE if soft or hard deleted.
      */
     public final boolean isDeleted() {
-        return deleted;
+        return (state == StreamState.SOFT_DELETED.dbValue() || state == StreamState.HARD_DELETED.dbValue());
     }
 
     /**
      * Marks the stream as deleted.
+     * 
+     * @param hardDelete
+     *            Hard or soft deletion.
      */
-    public final void delete() {
-        this.deleted = true;
+    public final void delete(final boolean hardDelete) {
+        if (hardDelete) {
+            this.state = StreamState.HARD_DELETED.dbValue();
+        } else {
+            this.state = StreamState.SOFT_DELETED.dbValue();
+        }
     }
 
     /**
