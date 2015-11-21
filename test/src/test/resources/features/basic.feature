@@ -1,7 +1,7 @@
 Feature: Append to a stream 
 
 Scenario: Create a stream  
-   Given The stream "Abc" does not exist
+   Given the stream "Abc" does not exist
    When I write the following events to stream "Abc"
        """
         <events>

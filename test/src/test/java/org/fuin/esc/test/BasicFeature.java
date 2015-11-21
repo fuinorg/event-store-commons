@@ -26,9 +26,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamVersionConflictException;
+import org.fuin.esc.eshttp.ESEnvelopeType;
+import org.fuin.esc.eshttp.ESHttpEventStoreSync;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
@@ -55,7 +60,6 @@ public class BasicFeature {
         if (type.equals("mem")) {
             eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
         } else if (type.equals("eshttp")) {
-            /*
             final ThreadFactory threadFactory = Executors.defaultThreadFactory();
             final URL url = new URL("http://127.0.0.1:2113/");
             final SerializedDataType serMetaType = new SerializedDataType("MyMeta");
@@ -64,10 +68,8 @@ public class BasicFeature {
             final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
             registry.add(new SerializedDataType("BookAddedEvent"), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType("MyMeta"), "application/json", jsonDeSer);
-            eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML, registry,
-                    registry);
-             */
-            throw new IllegalStateException("Unknown type: " + type);
+            eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML,
+                    registry, registry);
         } else {
             throw new IllegalStateException("Unknown type: " + type);
         }
@@ -80,40 +82,43 @@ public class BasicFeature {
         eventStore = null;
     }
 
-    @Given("^The stream \"([^\"]*)\" does not exist$")
-    public void assertThatStreamDoesNotExist(String streamName)
-            throws Throwable {
-        try {
-            eventStore.deleteStream(new SimpleStreamId(streamName), true);
+    @Given("^the stream \"([^\"]*)\" does not exist$")
+    public void assertThatStreamDoesNotExist(String streamName) throws Throwable {
+        if (eventStore.streamExists(new SimpleStreamId(streamName, false))) {
             fail("The stream should not exist: " + streamName);
-        } catch (final StreamNotFoundException ex) {
-            // OK
         }
     }
 
+    @When("^the stream \"(.*?)\" is hard deleted using expected version \"(.*?)\"$")
+    public void hardDelete(String streamName, String version) throws StreamNotFoundException,
+            StreamDeletedException, StreamVersionConflictException {
+        eventStore.deleteStream(new SimpleStreamId(streamName, false), ExpectedVersion.no(version), true);
+    }
+
     @When("^I write the following events to stream \"([^\"]*)\"$")
-    public void appendEventsTo(String streamName, String eventsXml)
-            throws Throwable {
+    public void appendEventsTo(String streamName, String eventsXml) throws Throwable {
         final Events toAppend = unmarshal(eventsXml, Events.class);
-        eventStore.appendToStream(new SimpleStreamId(streamName),
+        eventStore.appendToStream(new SimpleStreamId(streamName, false),
                 toAppend.asCommonEvents(BookAddedEvent.class));
     }
 
     @Then("^reading all events from stream \"([^\"]*)\" should return the following slices$")
-    public void assertReadingAllEvents(String streamName, String slicesXml)
-            throws Throwable {
+    public void assertReadingAllEvents(String streamName, String slicesXml) throws Throwable {
         final Slices expected = unmarshal(slicesXml, Slices.class);
         final Slices actual = new Slices();
-        StreamEventsSlice slice = eventStore.readEventsForward(
-                new SimpleStreamId(streamName), 0, MAX_EVENTS);
+        StreamEventsSlice slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false), 0, MAX_EVENTS);
         while (!slice.isEndOfStream()) {
             actual.append(Slice.valueOf(slice));
-            slice = eventStore.readEventsForward(
-                    new SimpleStreamId(streamName), slice.getNextEventNumber(),
+            slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false), slice.getNextEventNumber(),
                     MAX_EVENTS);
         }
         actual.append(Slice.valueOf(slice));
         assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
+    }
+    
+    @Then("^this should be successful$")
+    public void success() {
+        // Just to allow the phrase
     }
 
 }
