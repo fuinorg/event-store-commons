@@ -107,7 +107,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public final CompletableFuture<Void> deleteStream(final StreamId streamId,
-            final int expected, boolean hardDelete) {
+            final int expected, final boolean hardDelete) {
 
         return CompletableFuture.runAsync(new Runnable() {
             @Override
@@ -120,7 +120,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public final CompletableFuture<Void> deleteStream(final StreamId streamId,
-            boolean hardDelete) {
+            final boolean hardDelete) {
 
         return CompletableFuture.runAsync(new Runnable() {
             @Override
