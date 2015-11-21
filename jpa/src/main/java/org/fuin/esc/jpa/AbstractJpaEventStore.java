@@ -185,6 +185,16 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
     }
 
+    @Override
+    public final boolean streamExists(final StreamId streamId) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+
+        final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
+        return (stream != null);
+
+    }
+
     /**
      * Tries to find a serializer for the given type of object and converts it into a storable data block.
      * 

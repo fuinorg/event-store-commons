@@ -36,6 +36,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -60,13 +61,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation that connects to the http://www.geteventstore.com via HTTP
- * API.
+ * Implementation that connects to the http://www.geteventstore.com via HTTP API.
  */
 public final class ESHttpEventStoreSync implements EventStoreSync {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ESHttpEventStoreSync.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ESHttpEventStoreSync.class);
 
     private final ThreadFactory threadFactory;
 
@@ -98,12 +97,9 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
      * @param desRegistry
      *            Registry used to locate deserializers.
      */
-    public ESHttpEventStoreSync(@NotNull final ThreadFactory threadFactory,
-            @NotNull final URL url,
-            @NotNull final SerializedDataType serMetaType,
-            @NotNull final ESEnvelopeType envelopeType,
-            @NotNull final SerializerRegistry serRegistry,
-            @NotNull final DeserializerRegistry desRegistry) {
+    public ESHttpEventStoreSync(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
+            @NotNull final SerializedDataType serMetaType, @NotNull final ESEnvelopeType envelopeType,
+            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("threadFactory", threadFactory);
         Contract.requireArgNotNull("url", url);
@@ -121,16 +117,14 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     @Override
     public void open() {
-        httpclient = HttpAsyncClients.custom().setThreadFactory(threadFactory)
-                .build();
+        httpclient = HttpAsyncClients.custom().setThreadFactory(threadFactory).build();
         httpclient.start();
     }
 
     @Override
     public void close() {
         if (httpclient == null) {
-            throw new IllegalStateException(
-                    "The 'open()' method was never called!");
+            throw new IllegalStateException("The 'open()' method was never called!");
         }
         try {
             httpclient.close();
@@ -140,71 +134,62 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, -2, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) {
         return appendToStream(streamId, expectedVersion, Arrays.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final List<CommonEvent> events) {        
+    public final int appendToStream(final StreamId streamId, final List<CommonEvent> events) {
         return appendToStream(streamId, -2, events);
     }
 
     @Override
-    public int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> commonEvents)
-            throws StreamDeletedException, StreamVersionConflictException,
-            StreamReadOnlyException {
+    public int appendToStream(final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> commonEvents) throws StreamDeletedException,
+            StreamVersionConflictException, StreamReadOnlyException {
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
 
         final ESHttpMarshaller marshaller = envelopeType.getMarshaller();
-        final EnhancedMimeType mimeType = EscSpiUtils.mimeType(serRegistry,
-                commonEvents);
+        final EnhancedMimeType mimeType = EscSpiUtils.mimeType(serRegistry, commonEvents);
         // TODO Get next expected version from event store!
         int nextExpectedVersion = 0;
         if (mimeType == null) {
             // Not all events have same type
             for (final CommonEvent commonEvent : commonEvents) {
-                final String content = marshaller.marshal(serRegistry,
-                        serMetaType, commonEvent);
+                final String content = marshaller.marshal(serRegistry, serMetaType, commonEvent);
                 appendToStream(streamId, expectedVersion, mimeType, content, 1);
             }
         } else {
             // All events are of same type
-            final String content = marshaller.marshal(serRegistry, serMetaType,
-                    commonEvents);
-            appendToStream(streamId, expectedVersion, mimeType, content,
-                    commonEvents.size());
+            final String content = marshaller.marshal(serRegistry, serMetaType, commonEvents);
+            appendToStream(streamId, expectedVersion, mimeType, content, commonEvents.size());
         }
 
         return nextExpectedVersion;
     }
 
-    private void appendToStream(final StreamId streamId,
-            final int expectedVersion, final EnhancedMimeType mimeType,
-            String content, int count) throws StreamDeletedException,
+    private void appendToStream(final StreamId streamId, final int expectedVersion,
+            final EnhancedMimeType mimeType, String content, int count) throws StreamDeletedException,
             StreamVersionConflictException {
 
-        final String msg = "appendToStream(" + streamId + ", "
-                + expectedVersion + ", " + mimeType + ", " + count + ")";
+        final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", "
+                + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamId).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
             final HttpPost post = new HttpPost(uri);
             post.setHeader("Content-Type", envelopeType.getWriteContentType());
             post.setHeader("ES-ExpectedVersion", "" + expectedVersion);
-            post.setEntity(new StringEntity(content, ContentType.create(
-                    mimeType.getBaseType(), mimeType.getEncoding())));
+            post.setEntity(new StringEntity(content, ContentType.create(mimeType.getBaseType(),
+                    mimeType.getEncoding())));
             LOG.debug(msg + " POST: {}", post);
 
             final Future<HttpResponse> future = httpclient.execute(post, null);
@@ -225,8 +210,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 // TODO Add expected version instead of any version if ES
                 // returns this in header
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamVersionConflictException(streamId,
-                        expectedVersion, null);
+                throw new StreamVersionConflictException(streamId, expectedVersion, null);
             }
             if (statusLine.getStatusCode() == 410) {
                 // Stream was hard deleted
@@ -235,27 +219,21 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             }
 
             LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status="
-                    + statusLine.getStatusCode() + "]");
+            throw new RuntimeException(msg + " [Status=" + statusLine.getStatusCode() + "]");
 
-        } catch (final URISyntaxException | InterruptedException
-                | ExecutionException ex) {
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
     }
 
     @Override
-    public void deleteStream(final StreamId streamId,
-            final int expectedVersion, final boolean hardDelete)
-            throws StreamNotFoundException, StreamDeletedException,
-            StreamVersionConflictException {
+    public void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
+            throws StreamNotFoundException, StreamDeletedException, StreamVersionConflictException {
 
-        final String msg = "deleteStream(" + streamId + ", " + expectedVersion
-                + ", " + expectedVersion + ")";
+        final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + expectedVersion + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamId).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
             final HttpPost post = new HttpPost(uri);
             post.setHeader("ES-HardDelete", "" + hardDelete);
             LOG.debug(msg + " POST: {}", post);
@@ -272,8 +250,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 // TODO Add expected version instead of any version if ES
                 // returns this in header
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamVersionConflictException(streamId,
-                        expectedVersion, null);
+                throw new StreamVersionConflictException(streamId, expectedVersion, null);
             }
             if (statusLine.getStatusCode() == 404) {
                 // 404 Not Found
@@ -286,8 +263,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 throw new StreamDeletedException(streamId);
             }
 
-        } catch (final URISyntaxException | ExecutionException
-                | InterruptedException ex) {
+        } catch (final URISyntaxException | ExecutionException | InterruptedException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -300,35 +276,27 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     }
 
     @Override
-    public StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+    public StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
-        final String msg = "readEventsForward(" + streamId + ", " + start
-                + ", " + count + ")";
+        final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + start
-                            + "/forward/" + count).build();
+                    "/streams/" + streamName(streamId) + "/" + start + "/forward/" + count).build();
             return readEvents(true, uri, start, count, msg);
-        } catch (final IOException | URISyntaxException | InterruptedException
-                | ExecutionException ex) {
+        } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
     }
 
     @Override
-    public StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
-        final String msg = "readEventsBackward(" + streamId + ", " + start
-                + ", " + count + ")";
+    public StreamEventsSlice readEventsBackward(final StreamId streamId, final int start, final int count) {
+        final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + start
-                            + "/backward/" + count).build();
+                    "/streams/" + streamName(streamId) + "/" + start + "/backward/" + count).build();
             return readEvents(false, uri, start, count, msg);
-        } catch (final IOException | URISyntaxException | InterruptedException
-                | ExecutionException ex) {
+        } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
     }
@@ -338,17 +306,42 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + eventNumber)
-                    .build();
+                    "/streams/" + streamName(streamId) + "/" + eventNumber).build();
             return readEvent(uri);
         } catch (final URISyntaxException ex) {
             throw new RuntimeException(msg, ex);
         }
     }
 
-    private StreamEventsSlice readEvents(final boolean forward, final URI uri,
-            final int start, final int count, final String msg)
-            throws InterruptedException, ExecutionException, IOException {
+    @Override
+    public final boolean streamExists(final StreamId streamId) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+
+        final String msg = "streamExists(" + streamId + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
+            LOG.info(uri.toString());
+            final HttpGet get = new HttpGet(uri);
+            final Future<HttpResponse> future = httpclient.execute(get, null);
+            final HttpResponse response = future.get();
+            final StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() == 404) {
+                return false;
+            }
+            if (status.getStatusCode() == 200) {
+                return true;
+            }
+            LOG.debug(msg + " RESPONSE: {}", response);
+            throw new RuntimeException(msg + " [Status=" + status.getStatusCode() + "]");
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(msg, ex);
+        }
+
+    }
+
+    private StreamEventsSlice readEvents(final boolean forward, final URI uri, final int start,
+            final int count, final String msg) throws InterruptedException, ExecutionException, IOException {
         LOG.info(uri.toString());
         final HttpGet get = createHttpGet(uri);
         final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -358,8 +351,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             final HttpEntity entity = response.getEntity();
             final InputStream in = entity.getContent();
             try {
-                final AtomFeedReader atomFeedReader = envelopeType
-                        .getAtomFeedReader();
+                final AtomFeedReader atomFeedReader = envelopeType.getAtomFeedReader();
                 final List<URI> uris = atomFeedReader.readAtomFeed(in);
                 return readEvents(forward, start, count, uris);
             } finally {
@@ -369,8 +361,8 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         throw new RuntimeException(msg + " [Status=" + status + "]");
     }
 
-    private StreamEventsSlice readEvents(final boolean forward,
-            final int fromEventNumber, final int count, final List<URI> uris) {
+    private StreamEventsSlice readEvents(final boolean forward, final int fromEventNumber, final int count,
+            final List<URI> uris) {
         final List<CommonEvent> events = new ArrayList<>();
         for (int i = uris.size() - 1; i >= 0; i--) {
             final URI uri = uris.get(i);
@@ -382,12 +374,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             nextEventNumber = fromEventNumber + events.size();
             endOfStream = count > events.size();
         } else {
-            nextEventNumber = ((fromEventNumber - count < 0)) ? 0
-                    : fromEventNumber - count;
+            nextEventNumber = ((fromEventNumber - count < 0)) ? 0 : fromEventNumber - count;
             endOfStream = (fromEventNumber - count < 0);
         }
-        return new StreamEventsSlice(fromEventNumber, events, nextEventNumber,
-                endOfStream);
+        return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
     }
 
     private CommonEvent readEvent(final URI uri) {
@@ -400,17 +390,16 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 final HttpEntity entity = response.getEntity();
                 final InputStream in = entity.getContent();
                 try {
-                    return envelopeType.getAtomFeedReader().readEvent(
-                            desRegistry, serMetaType, in);
+                    return envelopeType.getAtomFeedReader().readEvent(desRegistry, serMetaType, in);
                 } finally {
                     in.close();
                 }
             } else {
-                throw new RuntimeException("Failed to read " + uri
-                        + " [Status=" + status.getStatusCode() + "]");
+                throw new RuntimeException("Failed to read " + uri + " [Status=" + status.getStatusCode()
+                        + "]");
             }
-        } catch (final InterruptedException | ExecutionException
-                | UnsupportedOperationException | IOException ex) {
+        } catch (final InterruptedException | ExecutionException | UnsupportedOperationException
+                | IOException ex) {
             throw new RuntimeException("Failed to read " + uri, ex);
         }
     }

@@ -122,17 +122,16 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId,
-            boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final boolean hardDelete) {
         deleteStream(streamId, ANY_VERSION, hardDelete);
     }
 
     @Override
     public final void deleteStream(final StreamId streamId, final int expectedVersion,
-            boolean hardDelete) {
+            final boolean hardDelete) {
 
         // TODO Handle hard delete
-        
+
         final JpaStream stream = getEm().find(JpaStream.class, streamId.getName(),
                 LockModeType.PESSIMISTIC_WRITE);
         if (stream == null) {

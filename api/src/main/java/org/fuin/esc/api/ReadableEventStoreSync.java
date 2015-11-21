@@ -95,4 +95,13 @@ public interface ReadableEventStoreSync extends AutoCloseable {
     @NotNull
     public CommonEvent readEvent(@NotNull StreamId streamId, int eventNumber);
 
+    /**
+     * Determines if a stream exists.
+     * 
+     * @param streamId Unique identifier of the stream.
+     * 
+     * @return TRUE if the stream exists, else FALSE.
+     */
+    public boolean streamExists(@NotNull StreamId streamId);
+    
 }

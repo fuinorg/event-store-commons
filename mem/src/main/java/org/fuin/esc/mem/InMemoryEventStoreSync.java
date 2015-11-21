@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -40,11 +41,9 @@ import org.fuin.esc.api.Subscription;
 import org.fuin.objects4j.common.Contract;
 
 /**
- * In-memory implementation for unit testing. This implementation is **NOT**
- * thread-safe.
+ * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
  */
-public final class InMemoryEventStoreSync implements EventStoreSync,
-        SubscribableEventStoreSync {
+public final class InMemoryEventStoreSync implements EventStoreSync, SubscribableEventStoreSync {
 
     private Executor executor;
 
@@ -60,8 +59,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
      * Constructor with all mandatory data.
      * 
      * @param executor
-     *            Executor used to create the necessary threads for event
-     *            notifications.
+     *            Executor used to create the necessary threads for event notifications.
      */
     public InMemoryEventStoreSync(@NotNull final Executor executor) {
         super();
@@ -85,8 +83,16 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) {
+    public final boolean streamExists(final StreamId streamId) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+
+        return (streams.get(streamId) != null);
+
+    }
+
+    @Override
+    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
@@ -100,8 +106,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -122,19 +127,18 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         final int nextEventNumber = (start + result.size());
         final boolean endOfStream = (result.size() < count);
 
-        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
-                endOfStream);
+        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);
 
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
+            final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        
+
         final List<CommonEvent> events;
         if (streamId == StreamId.ALL) {
             events = all;
@@ -153,22 +157,18 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         final int nextEventNumber = start - result.size();
         final boolean endOfStream = (start - count) < 0;
 
-        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
-                endOfStream);
+        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expected,
-            boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final int expected, final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("expected", expected, 0);
-        
+
         // TODO Handle hard delete
-        
+
         if (streamId == StreamId.ALL) {
-            throw new IllegalArgumentException(
-                    "It's not possible to delete the 'all' stream");
+            throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
 
         final List<CommonEvent> events = getStream(streamId, expected);
@@ -178,29 +178,20 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId,
-            boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final boolean hardDelete) {
 
-        Contract.requireArgNotNull("streamId", streamId);
-
-        // TODO Handle hard delete
-        
-        final List<CommonEvent> events = getStream(streamId);
-        deletedStreams.put(streamId, events);
-        streams.remove(streamId);
+        deleteStream(streamId, ExpectedVersion.ANY.getNo(), hardDelete);
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("expectedVersion", expectedVersion, 0);
         Contract.requireArgNotNull("toAppend", toAppend);
 
-        final List<CommonEvent> events = createIfNotExists(streamId,
-                expectedVersion);
+        final List<CommonEvent> events = createIfNotExists(streamId, expectedVersion);
         all.addAll(toAppend);
         events.addAll(toAppend);
 
@@ -211,8 +202,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
 
@@ -221,8 +212,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId, final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -238,8 +228,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
 
@@ -248,8 +237,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
     }
 
     @Override
-    public final Subscription subscribeToStream(final StreamId streamId,
-            final int eventNumber,
+    public final Subscription subscribeToStream(final StreamId streamId, final int eventNumber,
             final BiConsumer<Subscription, CommonEvent> onEvent,
             final BiConsumer<Subscription, Exception> onDrop) {
 
@@ -261,8 +249,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         final Integer lastEventNumber = events.size();
         final int subscriberId = subscriptions.size();
 
-        final InMemorySubscription subscription = new InMemorySubscription(
-                subscriberId, streamId, lastEventNumber);
+        final InMemorySubscription subscription = new InMemorySubscription(subscriberId, streamId,
+                lastEventNumber);
 
         List<InternalSubscription> list = subscriptions.get(streamId);
         if (list == null) {
@@ -282,15 +270,12 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
 
         Contract.requireArgNotNull("subscription", subscription);
         if (!(subscription instanceof InMemorySubscription)) {
-            throw new IllegalArgumentException(
-                    "Can only handle subscriptions of type "
-                            + InMemorySubscription.class.getSimpleName()
-                            + ", not: ");
+            throw new IllegalArgumentException("Can only handle subscriptions of type "
+                    + InMemorySubscription.class.getSimpleName() + ", not: ");
         }
         final InMemorySubscription inMemSubscription = (InMemorySubscription) subscription;
 
-        final List<InternalSubscription> list = subscriptions.get(subscription
-                .getStreamId());
+        final List<InternalSubscription> list = subscriptions.get(subscription.getStreamId());
         if (list != null) {
             final int idx = indexOf(list, inMemSubscription);
             if (idx > -1) {
@@ -300,22 +285,18 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
 
     }
 
-    private void notifyListeners(final StreamId streamId,
-            final List<CommonEvent> events, final int idx) {
+    private void notifyListeners(final StreamId streamId, final List<CommonEvent> events, final int idx) {
 
         if ((idx > -1) && (idx < events.size())) {
 
-            final List<InternalSubscription> internalSubscriptions = subscriptions
-                    .get(streamId);
+            final List<InternalSubscription> internalSubscriptions = subscriptions.get(streamId);
             if (internalSubscriptions != null) {
-                final Iterator<InternalSubscription> it = internalSubscriptions
-                        .iterator();
+                final Iterator<InternalSubscription> it = internalSubscriptions.iterator();
                 while (it.hasNext()) {
                     final InternalSubscription internalSubscription = it.next();
                     final BiConsumer<Subscription, CommonEvent> eventListener = internalSubscription
                             .getEventListener();
-                    final InMemorySubscription subscription = internalSubscription
-                            .getSubscription();
+                    final InMemorySubscription subscription = internalSubscription.getSubscription();
                     final List<CommonEvent> copy = new ArrayList<>(events);
                     executor.execute(new Runnable() {
                         @Override
@@ -332,27 +313,36 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
 
     }
 
-    private int indexOf(final List<InternalSubscription> list,
-            final InMemorySubscription inMemSubscription) {
+    private int indexOf(final List<InternalSubscription> list, final InMemorySubscription inMemSubscription) {
         return list.indexOf(new InternalSubscription(inMemSubscription));
     }
 
     private List<CommonEvent> getStream(final StreamId streamId) {
+        return getStream(streamId, false);
+    }
+
+    private List<CommonEvent> getStream(final StreamId streamId, final boolean suppressNotFound) {
         final List<CommonEvent> events = streams.get(streamId);
         if (events == null) {
             if (deletedStreams.containsKey(streamId)) {
                 throw new StreamDeletedException(streamId);
             }
-            throw new StreamNotFoundException(streamId);
+            if (suppressNotFound) {
+                return new ArrayList<>();
+            }
+            throw new StreamNotFoundException(streamId);            
         }
         return events;
     }
 
-    private List<CommonEvent> getStream(final StreamId streamId,
-            final int expected) {
-        final List<CommonEvent> events = getStream(streamId);
+    private List<CommonEvent> getStream(final StreamId streamId, final int expected) {
+        final List<CommonEvent> events = getStream(streamId,
+                (expected == ExpectedVersion.EMPTY_STREAM.getNo()));
         final int actual = events.size() - 1;
-        if (expected != actual) {
+        if ((actual == -1) && (expected == ExpectedVersion.EMPTY_STREAM.getNo())) {
+            return events;
+        }
+        if (expected != ExpectedVersion.ANY.getNo() && expected != actual) {
             throw new StreamVersionConflictException(streamId, expected, actual);
         }
         return events;
@@ -369,8 +359,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync,
         }
     }
 
-    private List<CommonEvent> createIfNotExists(final StreamId streamId,
-            final int expected) {
+    private List<CommonEvent> createIfNotExists(final StreamId streamId, final int expected) {
 
         try {
             return getStream(streamId, expected);
