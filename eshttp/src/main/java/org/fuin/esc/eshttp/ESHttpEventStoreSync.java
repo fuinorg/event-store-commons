@@ -35,6 +35,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -231,14 +232,15 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     public void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException, StreamVersionConflictException {
 
-        final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + expectedVersion + ")";
+        final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
-            final HttpPost post = new HttpPost(uri);
-            post.setHeader("ES-HardDelete", "" + hardDelete);
-            LOG.debug(msg + " POST: {}", post);
+            final HttpDelete delete = new HttpDelete(uri);
+            delete.setHeader("ES-HardDelete", "" + hardDelete);
+            delete.setHeader("ES-ExpectedVersion", "" + expectedVersion);
+            LOG.debug(msg + " DELETE: {}", delete);
 
-            final Future<HttpResponse> future = httpclient.execute(post, null);
+            final Future<HttpResponse> future = httpclient.execute(delete, null);
             final HttpResponse response = future.get();
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == 204) {
@@ -262,6 +264,9 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 LOG.debug(msg + " RESPONSE: {}", response);
                 throw new StreamDeletedException(streamId);
             }
+
+            LOG.debug(msg + " RESPONSE: {}", response);
+            throw new RuntimeException(msg + " [Status=" + statusLine.getStatusCode() + "]");
 
         } catch (final URISyntaxException | ExecutionException | InterruptedException ex) {
             throw new RuntimeException(msg, ex);
