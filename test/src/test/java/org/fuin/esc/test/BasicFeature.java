@@ -20,20 +20,16 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamVersionConflictException;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStoreSync;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
@@ -42,6 +38,7 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -153,5 +150,121 @@ public class BasicFeature {
                 .isInstanceOf(clasz);
     }
 
+    @When("^the following deletes are executed$")
+    public void the_following_deletes_are_executed(final List<DeleteOperation> deleteOperations)
+            throws Throwable {
+
+        for (final DeleteOperation op : deleteOperations) {
+            op.init();
+            try {
+                eventStore.deleteStream(new SimpleStreamId(op.getStreamName(), false),
+                        op.getExpectedVersion(), op.isHardDelete());
+            } catch (Exception ex) {
+                op.setException(ex);
+            }
+        }
+        
+        final StringBuffer sb = new StringBuffer();
+        for (DeleteOperation op : deleteOperations) {
+            if (!op.isResultAsExpected()) {
+                sb.append(op.toResult());
+                sb.append("\n");
+            }
+        }
+        if (sb.length() > 0) {
+            caughtException = new RuntimeException("Some delete results are not as expected:\n" + sb);
+        }
+
+    }
+
+    public static class DeleteOperation {
+
+        private String streamName;
+        private boolean hardDelete;
+        private String expectedVersion;
+        private String expectedException;
+        private Exception exception;
+
+        public void init() {
+            streamName = emptyAsNull(streamName);
+            expectedVersion = emptyAsNull(expectedVersion);
+            expectedException = emptyAsNull(expectedException);
+        }
+        
+        public String getStreamName() {
+            return streamName;
+        }
+
+        public boolean isHardDelete() {
+            return hardDelete;
+        }
+
+        public int getExpectedVersion() {
+            return ExpectedVersion.no(expectedVersion);
+        }
+
+        public Exception getException() {
+            return exception;
+        }
+
+        public void setException(Exception ex) {
+            this.exception = ex;
+        }
+        
+        public boolean isResultAsExpected() {
+            if (expectedException == null) {
+                if (exception == null) {
+                    return true;
+                }
+                return false;
+            }
+            if (exception == null) {
+                return false;
+            }
+            final Class<? extends Exception> ex = forName(expectedException);
+            if (exception.getClass() == ex) {
+                return true;
+            }
+            return false;
+        }
+        
+        public String toResult() {
+            return streamName + " expected: " + expectedException + ", but was: " + exception;
+        }
+
+        
+        @Override
+        public String toString() {
+            return "DeleteOperation [streamName=" + streamName + ", expectedVersion=" + expectedVersion
+                    + ", hardDelete=" + hardDelete + ", exception=" + exception + "]";
+        }
+
+        @SuppressWarnings("unchecked")
+        private Class<? extends Exception> forName(final String expectedException) {
+            final String name = emptyAsNull(expectedException);
+            if (expectedException == null) {
+                return null;
+            }
+            try {
+                return (Class<? extends Exception>) Class.forName("org.fuin.esc.api." + name);
+            } catch (final ClassNotFoundException ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+        }
+
+    }
+
+    private static String emptyAsNull(String str) {
+        if (str == null) {
+            return null;
+        }
+        final String name = str.trim();
+        if (name.length() == 0 || name.equals("-")) {
+            return null;
+        }
+        return str;
+    }
+
+    
 }
 // CHECKSTYLE:ON
