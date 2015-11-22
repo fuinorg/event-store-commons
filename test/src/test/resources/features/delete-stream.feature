@@ -2,7 +2,7 @@ Feature: Delete a stream
 
 Scenario: Non existing
     When the following deletes are executed
-    | stream name                  | hard delete | expected version | expected exception             | 
+    | STREAM NAME                  | HARD DELETE | EXPECTED VERSION | EXPECTED EXCEPTION             | 
     | non_existing_delete_stream_1 | true        | ANY              | -                              |
     | non_existing_delete_stream_2 | true        | NO_STREAM        | -                              |
     | non_existing_delete_stream_3 | false       | ANY              | -                              |
