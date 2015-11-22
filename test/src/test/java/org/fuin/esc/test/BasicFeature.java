@@ -20,6 +20,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.fuin.units4j.Units4JUtils.unmarshal;
 import static org.junit.Assert.fail;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Executors;
@@ -53,6 +55,8 @@ public class BasicFeature {
 
     private EventStoreSync eventStore;
 
+    private Exception caughtException;
+
     @Before
     public void beforeFeature() throws MalformedURLException {
         // Use the property to select the correct implementation:
@@ -80,45 +84,73 @@ public class BasicFeature {
     public void afterFeature() {
         eventStore.close();
         eventStore = null;
+        caughtException = null;
     }
 
     @Given("^the stream \"([^\"]*)\" does not exist$")
-    public void assertThatStreamDoesNotExist(String streamName) throws Throwable {
-        if (eventStore.streamExists(new SimpleStreamId(streamName, false))) {
-            fail("The stream should not exist: " + streamName);
+    public void assertThatStreamDoesNotExist(String streamName) {
+        try {
+            if (eventStore.streamExists(new SimpleStreamId(streamName, false))) {
+                fail("The stream should not exist: " + streamName);
+            }
+        } catch (Exception ex) {
+            caughtException = ex;
         }
     }
 
     @When("^the stream \"(.*?)\" is hard deleted using expected version \"(.*?)\"$")
-    public void hardDelete(String streamName, String version) throws StreamNotFoundException,
-            StreamDeletedException, StreamVersionConflictException {
-        eventStore.deleteStream(new SimpleStreamId(streamName, false), ExpectedVersion.no(version), true);
+    public void hardDelete(String streamName, String version) {
+        try {
+            eventStore.deleteStream(new SimpleStreamId(streamName, false), ExpectedVersion.no(version), true);
+        } catch (Exception ex) {
+            caughtException = ex;
+        }
     }
 
     @When("^I write the following events to stream \"([^\"]*)\"$")
-    public void appendEventsTo(String streamName, String eventsXml) throws Throwable {
-        final Events toAppend = unmarshal(eventsXml, Events.class);
-        eventStore.appendToStream(new SimpleStreamId(streamName, false),
-                toAppend.asCommonEvents(BookAddedEvent.class));
+    public void appendEventsTo(String streamName, String eventsXml) {
+        try {
+            final Events toAppend = unmarshal(eventsXml, Events.class);
+            eventStore.appendToStream(new SimpleStreamId(streamName, false),
+                    toAppend.asCommonEvents(BookAddedEvent.class));
+        } catch (Exception ex) {
+            caughtException = ex;
+        }
     }
 
     @Then("^reading all events from stream \"([^\"]*)\" should return the following slices$")
-    public void assertReadingAllEvents(String streamName, String slicesXml) throws Throwable {
-        final Slices expected = unmarshal(slicesXml, Slices.class);
-        final Slices actual = new Slices();
-        StreamEventsSlice slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false), 0, MAX_EVENTS);
-        while (!slice.isEndOfStream()) {
-            actual.append(Slice.valueOf(slice));
-            slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false), slice.getNextEventNumber(),
+    public void assertReadingAllEvents(String streamName, String slicesXml) {
+        try {
+            final Slices expected = unmarshal(slicesXml, Slices.class);
+            final Slices actual = new Slices();
+            StreamEventsSlice slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false), 0,
                     MAX_EVENTS);
+            while (!slice.isEndOfStream()) {
+                actual.append(Slice.valueOf(slice));
+                slice = eventStore.readEventsForward(new SimpleStreamId(streamName, false),
+                        slice.getNextEventNumber(), MAX_EVENTS);
+            }
+            actual.append(Slice.valueOf(slice));
+            assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
+        } catch (Exception ex) {
+            caughtException = ex;
         }
-        actual.append(Slice.valueOf(slice));
-        assertThat(actual.getSlices()).isEqualTo(expected.getSlices());
     }
-    
+
     @Then("^this should be successful$")
     public void success() {
-        // Just to allow the phrase
+        assertThat(caughtException).isNull();
+    }
+
+    @Then("^this should fail with API \"(.*?)\"$")
+    public void failsWithApiException(String exceptionClass) throws ClassNotFoundException {
+        @SuppressWarnings("unchecked")
+        final Class<? extends Throwable> clasz = (Class<? extends Throwable>) Class
+                .forName("org.fuin.esc.api." + exceptionClass);
+        assertThat(caughtException).as(
+                "Expected an exception of type " + clasz.getName() + ", but was: "
+                        + caughtException.getClass().getName() + ": " + caughtException.getMessage())
+                .isInstanceOf(clasz);
     }
 
 }
