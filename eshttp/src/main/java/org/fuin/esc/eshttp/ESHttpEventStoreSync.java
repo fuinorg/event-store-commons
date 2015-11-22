@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import static org.fuin.esc.api.EscApiUtils.ANY_VERSION;
+import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -277,7 +277,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     @Override
     public void deleteStream(final StreamId streamId, final boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException {
-        deleteStream(streamId, ANY_VERSION, hardDelete);
+        deleteStream(streamId, ANY.getNo(), hardDelete);
     }
 
     @Override

@@ -21,10 +21,9 @@ package org.fuin.esc.api;
  */
 public final class EscApiUtils {
 
-    /** Version does not matter. */
-    public static final int ANY_VERSION = -1;
-
     /**
+     * TODO Replace this with an enum.
+     * 
      * Only events will be seen that are added after subscription was
      * established.
      */

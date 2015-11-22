@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.fuin.esc.api.EscApiUtils.ANY_VERSION;
+import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +75,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
-        return appendToStream(streamId, ANY_VERSION, Arrays.asList(events));
+        return appendToStream(streamId, ANY.getNo(), Arrays.asList(events));
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public final int appendToStream(final StreamId streamId, final List<CommonEvent> events) {
-        return appendToStream(streamId, ANY_VERSION, events);
+        return appendToStream(streamId, ANY.getNo(), events);
     }
 
     @Override
@@ -107,7 +107,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
             if (stream.isDeleted()) {
                 throw new StreamDeletedException(streamId);
             }
-            if ((expectedVersion != ANY_VERSION) && (stream.getVersion() != expectedVersion)) {
+            if ((expectedVersion != ANY.getNo()) && (stream.getVersion() != expectedVersion)) {
                 throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
             }
         }
@@ -123,7 +123,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public final void deleteStream(final StreamId streamId, final boolean hardDelete) {
-        deleteStream(streamId, ANY_VERSION, hardDelete);
+        deleteStream(streamId, ANY.getNo(), hardDelete);
     }
 
     @Override

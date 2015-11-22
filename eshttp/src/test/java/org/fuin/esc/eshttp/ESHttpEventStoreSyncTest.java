@@ -16,7 +16,6 @@
  */
 package org.fuin.esc.eshttp;
 
-import static org.fuin.esc.api.EscApiUtils.ANY_VERSION;
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.net.MalformedURLException;
