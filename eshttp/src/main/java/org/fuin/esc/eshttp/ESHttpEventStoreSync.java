@@ -340,6 +340,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             if (status.getStatusCode() == 404) {
                 return false;
             }
+            if (status.getStatusCode() == 410) {
+                // Stream was hard deleted
+                return false;
+            }
             if (status.getStatusCode() == 200) {
                 return true;
             }

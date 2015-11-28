@@ -92,7 +92,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
         Contract.requireArgNotNull("streamId", streamId);
 
-        return (streams.get(streamId) != null);
+        final InternalStream internalStream = streams.get(streamId);
+        return (internalStream != null && internalStream.getState() == StreamState.ACTIVE);
 
     }
 
