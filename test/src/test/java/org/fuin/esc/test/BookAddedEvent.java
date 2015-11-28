@@ -25,6 +25,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "book-added-event")
 public class BookAddedEvent {
 
+    /** Never changing unique event type name. */
+    public static final String TYPE = "BookAddedEvent";
+    
     @XmlAttribute
     private String name;
 

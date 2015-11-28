@@ -26,10 +26,14 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.api.StreamId;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStoreSync;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
@@ -38,7 +42,6 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -67,7 +70,7 @@ public class BasicFeature {
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
             final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.add(new SerializedDataType("BookAddedEvent"), "application/xml", xmlDeSer);
+            registry.add(new SerializedDataType(BookAddedEvent.TYPE), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType("MyMeta"), "application/json", jsonDeSer);
             eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML,
                     registry, registry);
@@ -163,7 +166,7 @@ public class BasicFeature {
                 op.setException(ex);
             }
         }
-        
+
         final StringBuffer sb = new StringBuffer();
         for (DeleteOperation op : deleteOperations) {
             if (!op.isResultAsExpected()) {
@@ -175,6 +178,16 @@ public class BasicFeature {
             caughtException = new RuntimeException("Some delete results are not as expected:\n" + sb);
         }
 
+    }
+
+    @Given("^the following streams are created and a single event is appended$")
+    public void createStreamAndAppendSomeEvent(final List<String> streams) throws Throwable {
+        for (final String stream : streams) {
+            final StreamId streamId = new SimpleStreamId(stream, false);
+            eventStore.createStream(streamId);
+            eventStore.appendToStream(streamId, new CommonEvent(new EventId(), new EventType(
+                    BookAddedEvent.TYPE), new BookAddedEvent("Unknown", "John Doe")));
+        }
     }
 
     public static class DeleteOperation {
@@ -190,7 +203,7 @@ public class BasicFeature {
             expectedVersion = emptyAsNull(expectedVersion);
             expectedException = emptyAsNull(expectedException);
         }
-        
+
         public String getStreamName() {
             return streamName;
         }
@@ -210,7 +223,7 @@ public class BasicFeature {
         public void setException(Exception ex) {
             this.exception = ex;
         }
-        
+
         public boolean isResultAsExpected() {
             if (expectedException == null) {
                 if (exception == null) {
@@ -227,12 +240,11 @@ public class BasicFeature {
             }
             return false;
         }
-        
+
         public String toResult() {
             return streamName + " expected: " + expectedException + ", but was: " + exception;
         }
 
-        
         @Override
         public String toString() {
             return "DeleteOperation [streamName=" + streamName + ", expectedVersion=" + expectedVersion
@@ -265,6 +277,5 @@ public class BasicFeature {
         return str;
     }
 
-    
 }
 // CHECKSTYLE:ON

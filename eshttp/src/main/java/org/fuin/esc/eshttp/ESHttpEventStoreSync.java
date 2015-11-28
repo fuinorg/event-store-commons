@@ -45,6 +45,7 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -132,6 +133,11 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         } catch (final IOException ex) {
             throw new RuntimeException("Cannot close http client", ex);
         }
+    }
+    
+    @Override
+    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+        // Do nothing as the operation is not supported        
     }
 
     @Override

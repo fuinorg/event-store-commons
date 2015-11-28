@@ -32,6 +32,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -78,6 +79,11 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
     @Override
     public final void close() {
+        // Do nothing
+    }
+
+    @Override
+    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
         // Do nothing
     }
 
@@ -383,7 +389,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         public InternalStream() {
             super();
             state = StreamState.ACTIVE;
-            version = 0;
+            version = -1;
             events = new ArrayList<>();
         }
 

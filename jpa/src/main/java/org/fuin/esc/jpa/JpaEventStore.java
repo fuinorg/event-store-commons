@@ -29,6 +29,7 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
@@ -73,6 +74,11 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         this.serMetaType = serMetaType;
     }
 
+    @Override
+    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+        // Do nothing as the operation is not supported        
+    }
+    
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, ANY.getNo(), Arrays.asList(events));
