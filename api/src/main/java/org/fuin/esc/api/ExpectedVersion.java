@@ -25,14 +25,9 @@ public enum ExpectedVersion {
     /** This disables the optimistic concurrency check. */
     ANY(-2),
 
-    /** This specifies the expectation that target stream does not yet exist. */
-    NO_STREAM(-1),
+    /** This specifies the expectation that target stream does not yet exist or is empty. */
+    NO_OR_EMPTY_STREAM(-1);
 
-    /**
-     * this specifies the expectation that the target stream has been explicitly created, but does not yet
-     * have any user events written in it.
-     */
-    EMPTY_STREAM(0);
 
     private int no;
 
