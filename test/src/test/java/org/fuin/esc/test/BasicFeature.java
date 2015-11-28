@@ -202,7 +202,7 @@ public class BasicFeature {
     }
 
     @Then("^reading forward from the following streams should have the following result$")
-    public void readForward(final List<ReadForwardOperation> readOperations) {
+    public void readForward(final List<ReadForwardOperation> readOperations) throws Exception {
 
         for (final ReadForwardOperation op : readOperations) {
             op.init();
@@ -214,7 +214,7 @@ public class BasicFeature {
                 op.setException(ex);
             }
         }
-        caughtException = verifyOperations(readOperations);
+        assertThat(verifyOperations(readOperations)).isNull();
 
     }
 
@@ -226,7 +226,7 @@ public class BasicFeature {
 
     }
 
-    public static class DeleteOperation implements Operation {
+    private static class DeleteOperation implements Operation {
 
         private String streamName;
         private boolean hardDelete;
@@ -250,10 +250,6 @@ public class BasicFeature {
 
         public int getExpectedVersion() {
             return ExpectedVersion.no(expectedVersion);
-        }
-
-        public Exception getException() {
-            return exception;
         }
 
         public void setException(Exception ex) {
@@ -312,10 +308,6 @@ public class BasicFeature {
 
         public int getCount() {
             return count;
-        }
-
-        public Exception getException() {
-            return exception;
         }
 
         public void setException(Exception ex) {

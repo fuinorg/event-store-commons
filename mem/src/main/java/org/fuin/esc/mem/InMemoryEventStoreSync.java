@@ -346,7 +346,10 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
-        if (stream.getState() == StreamState.HARD_DELETED || stream.getState() == StreamState.SOFT_DELETED) {
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            throw new StreamNotFoundException(streamId);
+        }
+        if (stream.getState() == StreamState.HARD_DELETED) {
             throw new StreamDeletedException(streamId);
         }
         if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {

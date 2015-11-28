@@ -293,7 +293,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
                     "/streams/" + streamName(streamId) + "/" + start + "/forward/" + count).build();
-            return readEvents(true, uri, start, count, msg);
+            return readEvents(streamId, true, uri, start, count, msg);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -306,7 +306,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
                     "/streams/" + streamName(streamId) + "/" + start + "/backward/" + count).build();
-            return readEvents(false, uri, start, count, msg);
+            return readEvents(streamId, false, uri, start, count, msg);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -389,14 +389,14 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         }
     }
 
-    private StreamEventsSlice readEvents(final boolean forward, final URI uri, final int start,
+    private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri, final int start,
             final int count, final String msg) throws InterruptedException, ExecutionException, IOException {
         LOG.info(uri.toString());
         final HttpGet get = createHttpGet(uri);
         final Future<HttpResponse> future = httpclient.execute(get, null);
         final HttpResponse response = future.get();
-        final StatusLine status = response.getStatusLine();
-        if (status.getStatusCode() == 200) {
+        final StatusLine statusLine = response.getStatusLine();
+        if (statusLine.getStatusCode() == 200) {
             final HttpEntity entity = response.getEntity();
             final InputStream in = entity.getContent();
             try {
@@ -407,7 +407,17 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 in.close();
             }
         }
-        throw new RuntimeException(msg + " [Status=" + status + "]");
+        if (statusLine.getStatusCode() == 404) {
+            // 404 Not Found
+            LOG.debug(msg + " RESPONSE: {}", response);
+            throw new StreamNotFoundException(streamId);
+        }
+        if (statusLine.getStatusCode() == 410) {
+            // Stream was hard deleted
+            LOG.debug(msg + " RESPONSE: {}", response);
+            throw new StreamDeletedException(streamId);
+        }
+        throw new RuntimeException(msg + " [Status=" + statusLine + "]");
     }
 
     private StreamEventsSlice readEvents(final boolean forward, final int fromEventNumber, final int count,
