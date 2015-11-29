@@ -1,6 +1,14 @@
 Feature: Delete a stream
 
 Scenario: Non existing
+    Given the following streams don't exist
+    | Stream Name                   |
+    | delete_non_existing_stream_1  |
+    | delete_non_existing_stream_2  |
+    | delete_non_existing_stream_3  |
+    | delete_non_existing_stream_4  |
+    | delete_non_existing_stream_5  |
+    | delete_non_existing_stream_6  |
     When the following deletes are executed
     | Stream Name                  | Hard Delete | Expected Version   | Expected Exception             | 
     | delete_non_existing_stream_1 | true        | ANY                | -                              |
@@ -9,7 +17,7 @@ Scenario: Non existing
     | delete_non_existing_stream_4 | false       | NO_OR_EMPTY_STREAM | -                              |
     | delete_non_existing_stream_5 | true        | 1                  | StreamVersionConflictException |
     | delete_non_existing_stream_6 | false       | 1                  | StreamVersionConflictException |
-    Then this should be successful
+    Then this should give the expected results
 
 Scenario: Already existing
     Given the following streams are created and a single event is appended to each
@@ -32,14 +40,14 @@ Scenario: Already existing
     | delete_existing_stream_6 | false       | 0                  | -                              |
     | delete_existing_stream_7 | true        | 1                  | StreamVersionConflictException |
     | delete_existing_stream_8 | false       | 1                  | StreamVersionConflictException |
-    Then this should be successful
+    Then this should give the expected results
 
 Scenario: Read after delete
     Given the following streams are created and a single event is appended to each 
     | Stream Name            |
     | read_after_hard_delete |
     | read_after_soft_delete |
-    And the following deletes are executed
+    When the following deletes are executed
     | Stream Name            | Hard Delete | Expected Version | Expected Exception | 
     | read_after_hard_delete | true        | ANY              | -                  |
     | read_after_soft_delete | false       | ANY              | -                  |

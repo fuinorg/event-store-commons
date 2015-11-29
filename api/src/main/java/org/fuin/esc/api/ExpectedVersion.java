@@ -16,6 +16,8 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.Nullable;
+
 /**
  * Stream version numbers that have a special meaning. This is used for an optimistic concurrency check on the
  * version of the stream to which events are to be written.
@@ -27,7 +29,6 @@ public enum ExpectedVersion {
 
     /** This specifies the expectation that target stream does not yet exist or is empty. */
     NO_OR_EMPTY_STREAM(-1);
-
 
     private int no;
 
@@ -52,7 +53,10 @@ public enum ExpectedVersion {
      * 
      * @return TRUE if the name is valid, else FALSE.
      */
-    public static boolean valid(final String name) {
+    public static boolean valid(@Nullable final String name) {
+        if (name == null) {
+            return true;
+        }
         for (ExpectedVersion version : values()) {
             if (version.name().equals(name)) {
                 return true;
@@ -65,11 +69,15 @@ public enum ExpectedVersion {
      * Returns the value of the given constant or if it cannot be found the string converted to an int.
      * 
      * @param name
-     *            Name of a constant or a valid Integer value.
+     *            Name of a constant or a valid Integer value. If the argument is <code>null</code> the enum
+     *            {@link #ANY} will be returned.
      * 
      * @return Value.
      */
     public static int no(final String name) {
+        if (name == null) {
+            return ANY.no;
+        }
         if (valid(name)) {
             return valueOf(name).getNo();
         }
