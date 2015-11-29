@@ -12,7 +12,7 @@ Scenario: Non existing
     Then this should be successful
 
 Scenario: Already existing
-    Given the following streams are created and a single event is appended 
+    Given the following streams are created and a single event is appended to each
     | Stream Name              | 
     | delete_existing_stream_1 | 
     | delete_existing_stream_2 |
@@ -35,7 +35,7 @@ Scenario: Already existing
     Then this should be successful
 
 Scenario: Read after delete
-    Given the following streams are created and a single event is appended 
+    Given the following streams are created and a single event is appended to each 
     | Stream Name            |
     | read_after_hard_delete |
     | read_after_soft_delete |
@@ -47,9 +47,7 @@ Scenario: Read after delete
     | Stream Name            |
     | read_after_hard_delete |
     | read_after_soft_delete |
-    And reading forward from the following streams should have the following result
+    And reading forward from the following streams should have the given result
     | Stream Name            | Start | Count | Expected Exception       | 
     | read_after_hard_delete | 0     | 1     | StreamDeletedException   |
     | read_after_soft_delete | 0     | 1     | StreamNotFoundException  |
-    
-    

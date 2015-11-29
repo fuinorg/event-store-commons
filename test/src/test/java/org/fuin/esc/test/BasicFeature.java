@@ -178,7 +178,7 @@ public class BasicFeature {
 
     }
 
-    @Given("^the following streams are created and a single event is appended$")
+    @Given("^the following streams are created and a single event is appended to each$")
     public void createStreamsAndAppendSomeEvent(final List<String> streams) {
         for (int i = 1; i < streams.size(); i++) {
             final String stream = streams.get(i);
@@ -201,7 +201,7 @@ public class BasicFeature {
         }
     }
 
-    @Then("^reading forward from the following streams should have the following result$")
+    @Then("^reading forward from the following streams should have the given result$")
     public void readForward(final List<ReadForwardOperation> readOperations) throws Exception {
 
         for (final ReadForwardOperation op : readOperations) {
