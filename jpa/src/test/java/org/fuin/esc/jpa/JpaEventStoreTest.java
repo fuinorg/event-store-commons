@@ -28,7 +28,7 @@ import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamVersionConflictException;
+import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.jpa.examples.AggregateStreamId;
 import org.fuin.esc.jpa.examples.VendorCreatedEvent;
 import org.fuin.esc.jpa.examples.VendorStream;
@@ -44,7 +44,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
     @Test
     public void testAppendSingleSuccess() throws SQLException,
             StreamNotFoundException, StreamDeletedException,
-            StreamVersionConflictException {
+            WrongExpectedVersionException {
 
         // PREPARE
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();

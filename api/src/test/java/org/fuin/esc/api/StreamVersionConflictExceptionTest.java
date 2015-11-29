@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link StreamVersionConflictException} class.
+ * Tests the {@link WrongExpectedVersionException} class.
  */
 // CHECKSTYLE:OFF Test
 public class StreamVersionConflictExceptionTest {
@@ -36,11 +36,11 @@ public class StreamVersionConflictExceptionTest {
 
     private static final int ACTUAL_VERSION = 2;
 
-    private StreamVersionConflictException testee;
+    private WrongExpectedVersionException testee;
 
     @Before
     public void setup() {
-        testee = new StreamVersionConflictException(STREAM_ID,
+        testee = new WrongExpectedVersionException(STREAM_ID,
                 EXPECTED_VERSION, ACTUAL_VERSION);
     }
 
@@ -60,11 +60,11 @@ public class StreamVersionConflictExceptionTest {
     public void testSerializeDeserialize() {
 
         // PREPARE
-        final StreamVersionConflictException original = testee;
+        final WrongExpectedVersionException original = testee;
 
         // TEST
         final byte[] data = serialize(original);
-        final StreamVersionConflictException copy = deserialize(data);
+        final WrongExpectedVersionException copy = deserialize(data);
 
         // VERIFY
         assertThat(copy.getMessage()).isEqualTo(original.getMessage());

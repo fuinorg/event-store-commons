@@ -66,13 +66,13 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *             on-the-fly.
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion, @NotNull CommonEvent... events)
-            throws StreamNotFoundException, StreamDeletedException, StreamVersionConflictException,
+            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException;
 
     /**
@@ -115,14 +115,14 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *             on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
     public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull List<CommonEvent> events) throws StreamNotFoundException, StreamDeletedException,
-            StreamVersionConflictException, StreamReadOnlyException;
+            WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
      * Appends a list of events to a stream. If the stream does not exist, the implementation may create it on
@@ -162,11 +162,11 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *             A stream with the given name does not exist in the repository.
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      */
     public void deleteStream(@NotNull StreamId streamId, int expectedVersion, boolean hardDelete)
-            throws StreamNotFoundException, StreamDeletedException, StreamVersionConflictException;
+            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException;
 
     /**
      * Deletes a stream from the event store not matter what the current version is.

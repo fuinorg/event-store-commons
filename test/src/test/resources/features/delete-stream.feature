@@ -10,13 +10,13 @@ Scenario: Non existing
     | delete_non_existing_stream_5  |
     | delete_non_existing_stream_6  |
     When the following deletes are executed
-    | Stream Name                  | Hard Delete | Expected Version   | Expected Exception             | 
-    | delete_non_existing_stream_1 | true        | ANY                | -                              |
-    | delete_non_existing_stream_2 | true        | NO_OR_EMPTY_STREAM | -                              |
-    | delete_non_existing_stream_3 | false       | ANY                | -                              |
-    | delete_non_existing_stream_4 | false       | NO_OR_EMPTY_STREAM | -                              |
-    | delete_non_existing_stream_5 | true        | 1                  | StreamVersionConflictException |
-    | delete_non_existing_stream_6 | false       | 1                  | StreamVersionConflictException |
+    | Stream Name                  | Hard Delete | Expected Version   | Expected Exception            | 
+    | delete_non_existing_stream_1 | true        | ANY                | -                             |
+    | delete_non_existing_stream_2 | true        | NO_OR_EMPTY_STREAM | -                             |
+    | delete_non_existing_stream_3 | false       | ANY                | -                             |
+    | delete_non_existing_stream_4 | false       | NO_OR_EMPTY_STREAM | -                             |
+    | delete_non_existing_stream_5 | true        | 1                  | WrongExpectedVersionException |
+    | delete_non_existing_stream_6 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
 
 Scenario: Already existing
@@ -31,15 +31,15 @@ Scenario: Already existing
     | delete_existing_stream_7 |
     | delete_existing_stream_8 |
     When the following deletes are executed
-    | Stream Name              | Hard Delete | Expected Version   | Expected Exception             | 
-    | delete_existing_stream_1 | true        | ANY                | -                              |
-    | delete_existing_stream_2 | true        | NO_OR_EMPTY_STREAM | StreamVersionConflictException |
-    | delete_existing_stream_3 | false       | ANY                | -                              |
-    | delete_existing_stream_4 | false       | NO_OR_EMPTY_STREAM | StreamVersionConflictException |
-    | delete_existing_stream_5 | true        | 0                  | -                              |
-    | delete_existing_stream_6 | false       | 0                  | -                              |
-    | delete_existing_stream_7 | true        | 1                  | StreamVersionConflictException |
-    | delete_existing_stream_8 | false       | 1                  | StreamVersionConflictException |
+    | Stream Name              | Hard Delete | Expected Version   | Expected Exception            | 
+    | delete_existing_stream_1 | true        | ANY                | -                             |
+    | delete_existing_stream_2 | true        | NO_OR_EMPTY_STREAM | WrongExpectedVersionException |
+    | delete_existing_stream_3 | false       | ANY                | -                             |
+    | delete_existing_stream_4 | false       | NO_OR_EMPTY_STREAM | WrongExpectedVersionException |
+    | delete_existing_stream_5 | true        | 0                  | -                             |
+    | delete_existing_stream_6 | false       | 0                  | -                             |
+    | delete_existing_stream_7 | true        | 1                  | WrongExpectedVersionException |
+    | delete_existing_stream_8 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
 
 Scenario: Read after delete

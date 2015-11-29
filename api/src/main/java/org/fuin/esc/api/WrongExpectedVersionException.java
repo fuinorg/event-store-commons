@@ -26,7 +26,7 @@ import org.fuin.objects4j.common.Nullable;
  * Signals a conflict between an expected and an actual version.
  */
 @Immutable
-public final class StreamVersionConflictException extends RuntimeException {
+public final class WrongExpectedVersionException extends RuntimeException {
 
     private static final long serialVersionUID = 1000L;
 
@@ -46,7 +46,7 @@ public final class StreamVersionConflictException extends RuntimeException {
      * @param actual
      *            Actual version.
      */
-    public StreamVersionConflictException(@NotNull final StreamId streamId,
+    public WrongExpectedVersionException(@NotNull final StreamId streamId,
             @NotNull final Integer expected, @Nullable final Integer actual) {
         // CHECKSTYLE:OFF:AvoidInlineConditionals OK here
         super("Expected version " + expected + " for stream '" + streamId

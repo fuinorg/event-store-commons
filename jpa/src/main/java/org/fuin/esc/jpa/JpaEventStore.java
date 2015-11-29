@@ -33,7 +33,7 @@ import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamVersionConflictException;
+import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.esc.spi.SerializedDataType;
@@ -114,7 +114,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
                 throw new StreamDeletedException(streamId);
             }
             if ((expectedVersion != ANY.getNo()) && (stream.getVersion() != expectedVersion)) {
-                throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
+                throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
             }
         }
         for (int i = 0; i < events.size(); i++) {
@@ -145,7 +145,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
             throw new StreamDeletedException(streamId);
         }
         if (stream.getVersion() != expectedVersion) {
-            throw new StreamVersionConflictException(streamId, expectedVersion, stream.getVersion());
+            throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
         }
         stream.delete(hardDelete);
 

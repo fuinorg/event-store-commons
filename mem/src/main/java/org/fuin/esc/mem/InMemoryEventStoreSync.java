@@ -38,7 +38,7 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.StreamVersionConflictException;
+import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.api.SubscribableEventStoreSync;
 import org.fuin.esc.api.Subscription;
 import org.fuin.objects4j.common.Contract;
@@ -185,7 +185,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
                 return;
             }
             if (expected >= ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
-                throw new StreamVersionConflictException(streamId, expected, null);
+                throw new WrongExpectedVersionException(streamId, expected, null);
             }
             throw ex;
         }
@@ -353,7 +353,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
             throw new StreamDeletedException(streamId);
         }
         if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
-            throw new StreamVersionConflictException(streamId, expected, stream.getVersion());
+            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
         }
         return stream;
     }
@@ -371,7 +371,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
             stream.undelete();
         }
         if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
-            throw new StreamVersionConflictException(streamId, expected, stream.getVersion());
+            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
         }
         return stream;
     }

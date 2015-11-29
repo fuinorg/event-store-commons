@@ -52,7 +52,7 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.StreamVersionConflictException;
+import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
@@ -159,7 +159,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     @Override
     public int appendToStream(final StreamId streamId, final int expectedVersion,
             final List<CommonEvent> commonEvents) throws StreamDeletedException,
-            StreamVersionConflictException, StreamReadOnlyException {
+            WrongExpectedVersionException, StreamReadOnlyException {
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -186,7 +186,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     private void appendToStream(final StreamId streamId, final int expectedVersion,
             final EnhancedMimeType mimeType, String content, int count) throws StreamDeletedException,
-            StreamVersionConflictException {
+            WrongExpectedVersionException {
 
         final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", "
                 + count + ")";
@@ -217,7 +217,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 // TODO Add expected version instead of any version if ES
                 // returns this in header
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamVersionConflictException(streamId, expectedVersion, null);
+                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
             if (statusLine.getStatusCode() == 410) {
                 // Stream was hard deleted
@@ -236,7 +236,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     @Override
     public void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
-            throws StreamNotFoundException, StreamDeletedException, StreamVersionConflictException {
+            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException {
 
         final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
@@ -258,7 +258,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 // TODO Add expected version instead of any version if ES
                 // returns this in header
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamVersionConflictException(streamId, expectedVersion, null);
+                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
             if (statusLine.getStatusCode() == 404) {
                 // 404 Not Found

@@ -58,7 +58,7 @@ public interface WritableEventStoreAsync {
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was
      *             deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
@@ -110,7 +110,7 @@ public interface WritableEventStoreAsync {
      *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
@@ -164,7 +164,7 @@ public interface WritableEventStoreAsync {
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was
      *             deleted.
-     * @throws StreamVersionConflictException
+     * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      */
     @NotNull
