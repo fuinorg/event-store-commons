@@ -97,7 +97,7 @@ public final class DeleteCommand implements TestCommand {
 
         streamId = new SimpleStreamId(streamName, false);
         expectedIntVersion = ExpectedVersion.no(expectedVersion);
-        expectedExceptionClass = EscTestUtils.exceptionForSimpleName(expectedException);
+        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }
 

@@ -129,12 +129,20 @@ public class TestFeatures {
     }
 
     @Then("^reading forward from the following streams should have the given result$")
-    public void readForward(final List<ReadForwardCommand> commands) throws Exception {
+    public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
         command.execute();
         command.verify();
     }
 
+    @When("^I read forward from the following streams$")
+    public void whenReadForward(final List<ReadForwardCommand> commands) {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }    
+    
 }
 // CHECKSTYLE:ON

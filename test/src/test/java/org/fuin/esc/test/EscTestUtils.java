@@ -52,6 +52,29 @@ final class EscTestUtils {
     }
 
     /**
+     * Determines if an exception has an expected type and message.
+     * 
+     * @param expectedClass
+     *            Expected exception type.
+     * @param expectedMessage
+     *            Expected message.
+     * @param ex
+     *            Exception to test.
+     * 
+     * @return TRUE if the object is exactly of the same class and has the same message, else FALSE.
+     */
+    public static boolean isExpectedException(final Class<? extends Exception> expectedClass,
+            final String expectedMessage, final Exception ex) {
+        if (!isExpectedType(expectedClass, ex)) {
+            return false;
+        }
+        if ((expectedClass != null) && (expectedMessage != null) && (ex != null)) {
+            return Objects.equals(expectedMessage, ex.getMessage());
+        }
+        return true;
+    }
+
+    /**
      * Creates a failure message from an expected type and an exception.
      * 
      * @param streamId
@@ -65,17 +88,52 @@ final class EscTestUtils {
      */
     public static String createExceptionFailureMessage(final StreamId streamId,
             final Class<? extends Exception> expectedExceptionClass, final Exception exception) {
+        return createExceptionFailureMessage(streamId, expectedExceptionClass, null, exception);
+    }
+
+    /**
+     * Creates a failure message from an expected type, message and an exception.
+     * 
+     * @param streamId
+     *            Unique stream identifier this failure relates to.
+     * @param expectedExceptionClass
+     *            Expected exception type.
+     * @param expectedExceptionMessage
+     *            Expected exception message.
+     * @param exception
+     *            Current exception.
+     * 
+     * @return Message.
+     */
+    public static String createExceptionFailureMessage(final StreamId streamId,
+            final Class<? extends Exception> expectedExceptionClass, final String expectedExceptionMessage,
+            final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
                 return "[" + streamId + "] OK";
             }
-            return "[" + streamId + "] expected no exception, but was: " + exception;
+            return "[" + streamId + "] expected no exception, but was: " + nameAndMessage(exception);
         }
         if (exception == null) {
-            return "[" + streamId + "] expected " + expectedExceptionClass.getName()
+            return "[" + streamId + "] expected "
+                    + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
                     + ", but no exception was thrown";
         }
-        return "[" + streamId + "] expected " + expectedExceptionClass.getName() + ", but was: " + exception;
+        return "[" + streamId + "] expected "
+                + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
+                + nameAndMessage(exception);
+    }
+
+    private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass,
+            final String expectedExceptionMessage) {
+        if (expectedExceptionMessage == null) {
+            return expectedExceptionClass.getName();
+        }
+        return expectedExceptionClass.getName() + "('" + expectedExceptionMessage + "')";
+    }
+
+    private static String nameAndMessage(final Exception ex) {
+        return ex.getClass().getName() + "('" + ex.getMessage() + "')";
     }
 
     /**
@@ -98,22 +156,25 @@ final class EscTestUtils {
     }
 
     /**
-     * Creates an API exception class from a simple exception name.
+     * Creates an exception class from an exception name. If the name is NOT fully qualified (has no '.' in
+     * the name) it's assumed that it's an API exception from package 'org.fuin.esc.api'.
      * 
-     * @param exceptionSimpleName
-     *            Simple name of a class located in the "org.fuin.esc.api" package.
+     * @param exceptionName
+     *            Fully qualified name or a simple name of a class located in the "org.fuin.esc.api" package.
      * 
      * @return Class.
      */
     @SuppressWarnings("unchecked")
-    public static Class<? extends Exception> exceptionForSimpleName(final String exceptionSimpleName) {
-        final String name = emptyAsNull(exceptionSimpleName);
-        if (exceptionSimpleName == null) {
+    public static Class<? extends Exception> exceptionForName(final String exceptionName) {
+        String name = emptyAsNull(exceptionName);
+        if (exceptionName == null) {
             return null;
         }
+        if (name.indexOf('.') == -1) {
+            name = EscApiUtils.class.getPackage().getName() + "." + name;
+        }
         try {
-            return (Class<? extends Exception>) Class.forName(EscApiUtils.class.getPackage().getName() + "."
-                    + name);
+            return (Class<? extends Exception>) Class.forName(name);
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }

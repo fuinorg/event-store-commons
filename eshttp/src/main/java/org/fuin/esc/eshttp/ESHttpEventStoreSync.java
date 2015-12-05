@@ -289,6 +289,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     @Override
     public StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 1);
+        Contract.requireArgMin("count", count, 1);
+        
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(

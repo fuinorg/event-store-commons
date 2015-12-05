@@ -27,7 +27,7 @@ import org.fuin.esc.api.StreamId;
  */
 public final class ReadForwardCommand implements TestCommand {
 
-    // Creation
+    // Creation - DO NOT CHANGE NAMES OR ORDER! It's used by cucumber.
 
     private String streamName;
 
@@ -36,6 +36,8 @@ public final class ReadForwardCommand implements TestCommand {
     private int count;
 
     private String expectedException;
+
+    private String expectedMessage;
 
     // Initialization
 
@@ -67,14 +69,17 @@ public final class ReadForwardCommand implements TestCommand {
      *            The count of items to read.
      * @param expectedException
      *            The exception that is expected, an empty string or "-".
+     * @param expectedMessage
+     *            The exception message that is expected, an empty string or "-".
      */
     public ReadForwardCommand(@NotNull final String streamName, final int start, final int count,
-            final String expectedException) {
+            final String expectedException, final String expectedMessage) {
         super();
         this.streamName = streamName;
         this.start = start;
         this.count = count;
         this.expectedException = expectedException;
+        this.expectedMessage = expectedMessage;
     }
 
     /**
@@ -88,9 +93,10 @@ public final class ReadForwardCommand implements TestCommand {
 
         streamName = EscTestUtils.emptyAsNull(streamName);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
+        expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
 
         streamId = new SimpleStreamId(streamName, true);
-        expectedExceptionClass = EscTestUtils.exceptionForSimpleName(expectedException);
+        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }
 
@@ -105,12 +111,13 @@ public final class ReadForwardCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedType(expectedExceptionClass, actualException);
+        return EscTestUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
     }
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, actualException);
+        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, expectedMessage,
+                actualException);
     }
 
     @Override
@@ -119,12 +126,11 @@ public final class ReadForwardCommand implements TestCommand {
             throw new RuntimeException(getFailureDescription());
         }
     }
-    
+
     @Override
     public final String toString() {
         return "ReadForwardCommand [streamName=" + streamName + ", start=" + start + ", count=" + count
-                + ", expectedException=" + expectedException + ", actualException="
-                + actualException + "]";
+                + ", expectedException=" + expectedException + ", actualException=" + actualException + "]";
     }
 
 }
