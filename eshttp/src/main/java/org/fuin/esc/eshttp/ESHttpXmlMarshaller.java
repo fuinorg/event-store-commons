@@ -68,7 +68,7 @@ public final class ESHttpXmlMarshaller implements ESHttpMarshaller {
     }
 
     /**
-     * Creates a single "application/vnd.eventstore.events(+json/+xml)" entry.
+     * Creates a single "application/vnd.eventstore.events+xml" entry.
      * 
      * @param registry
      *            Registry with known serializers.
@@ -77,7 +77,7 @@ public final class ESHttpXmlMarshaller implements ESHttpMarshaller {
      * @param commonEvent
      *            Event to marshal.
      * 
-     * @return Single event that has to be surrounded by "[]" (JSON) or "&lt;Events&gt;&lt;/Events&gt;" (XML).
+     * @return Single event that has to be surrounded by "&lt;Events&gt;&lt;/Events&gt;".
      */
     protected final String marshalIntern(final SerializerRegistry registry, final SerializedDataType serMetaType,
             final CommonEvent commonEvent) {
