@@ -55,7 +55,7 @@ Scenario: Read after delete
     | Stream Name            |
     | read_after_hard_delete |
     | read_after_soft_delete |
-    And reading forward from the following streams should have the given result
+    And reading forward from the following streams should raise the given exceptions
     | Stream Name            | Start | Count | Expected Exception       | 
     | read_after_hard_delete | 1     | 1     | StreamDeletedException   |
     | read_after_soft_delete | 1     | 1     | StreamNotFoundException  |

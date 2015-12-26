@@ -290,7 +290,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     public StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("start", start, 1);
+        Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
         
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";

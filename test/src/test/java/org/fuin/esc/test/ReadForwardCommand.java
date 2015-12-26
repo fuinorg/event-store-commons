@@ -16,18 +16,27 @@
  */
 package org.fuin.esc.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Reads a stream forward.
  */
 public final class ReadForwardCommand implements TestCommand {
 
-    // Creation - DO NOT CHANGE NAMES OR ORDER! It's used by cucumber.
+    // Creation (Initialized by Cucumber)
+    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -35,9 +44,29 @@ public final class ReadForwardCommand implements TestCommand {
 
     private int count;
 
-    private String expectedException;
+    private int resultFrom;
 
-    private String expectedMessage;
+    private int resultNext;
+
+    private boolean endOfStream;
+
+    private String resultEventId1;
+
+    private String resultEventId2;
+
+    private String resultEventId3;
+
+    private String resultEventId4;
+
+    private String resultEventId5;
+
+    private String resultEventId6;
+
+    private String resultEventId7;
+
+    private String resultEventId8;
+
+    private String resultEventId9;
 
     // Initialization
 
@@ -45,11 +74,13 @@ public final class ReadForwardCommand implements TestCommand {
 
     private EventStoreSync es;
 
-    private Class<? extends Exception> expectedExceptionClass;
+    private StreamEventsSlice expectedSlice;
 
     // Execution
 
     private Exception actualException;
+
+    private StreamEventsSlice actualSlice;
 
     /**
      * Default constructor used by Cucumber.
@@ -67,19 +98,33 @@ public final class ReadForwardCommand implements TestCommand {
      *            The starting point to read from.
      * @param count
      *            The count of items to read.
-     * @param expectedException
-     *            The exception that is expected, an empty string or "-".
-     * @param expectedMessage
-     *            The exception message that is expected, an empty string or "-".
+     * @param fromEventNumber
+     *            The starting point (represented as a sequence number) of the read.
+     * @param nextEventNumber
+     *            The next event number that can be read.
+     * @param endOfStream
+     *            Determines whether or not this is the end of the stream.
+     * @param events
+     *            Expected events.
      */
     public ReadForwardCommand(@NotNull final String streamName, final int start, final int count,
-            final String expectedException, final String expectedMessage) {
+            final int fromEventNumber, final int nextEventNumber, final boolean endOfStream,
+            @Nullable final String... events) {
         super();
         this.streamName = streamName;
         this.start = start;
         this.count = count;
-        this.expectedException = expectedException;
-        this.expectedMessage = expectedMessage;
+        this.resultFrom = fromEventNumber;
+        this.resultNext = nextEventNumber;
+        this.endOfStream = endOfStream;
+        final List<CommonEvent> expectedEvents = new ArrayList<>();
+        if (events != null) {
+            for (final String event : events) {
+                addEvent(expectedEvents, event);
+            }
+        }
+        this.expectedSlice = new StreamEventsSlice(fromEventNumber, expectedEvents, nextEventNumber,
+                endOfStream);
     }
 
     /**
@@ -92,18 +137,43 @@ public final class ReadForwardCommand implements TestCommand {
         this.es = eventstore;
 
         streamName = EscTestUtils.emptyAsNull(streamName);
-        expectedException = EscTestUtils.emptyAsNull(expectedException);
-        expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
+        resultEventId1 = EscTestUtils.emptyAsNull(resultEventId1);
+        resultEventId2 = EscTestUtils.emptyAsNull(resultEventId2);
+        resultEventId3 = EscTestUtils.emptyAsNull(resultEventId3);
+        resultEventId4 = EscTestUtils.emptyAsNull(resultEventId4);
+        resultEventId5 = EscTestUtils.emptyAsNull(resultEventId5);
+        resultEventId6 = EscTestUtils.emptyAsNull(resultEventId6);
+        resultEventId7 = EscTestUtils.emptyAsNull(resultEventId7);
+        resultEventId8 = EscTestUtils.emptyAsNull(resultEventId8);
+        resultEventId9 = EscTestUtils.emptyAsNull(resultEventId9);
 
         streamId = new SimpleStreamId(streamName, true);
-        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
+        final List<CommonEvent> expectedEvents = new ArrayList<>();
+        addEvent(expectedEvents, resultEventId1);
+        addEvent(expectedEvents, resultEventId2);
+        addEvent(expectedEvents, resultEventId3);
+        addEvent(expectedEvents, resultEventId4);
+        addEvent(expectedEvents, resultEventId5);
+        addEvent(expectedEvents, resultEventId6);
+        addEvent(expectedEvents, resultEventId7);
+        addEvent(expectedEvents, resultEventId8);
+        addEvent(expectedEvents, resultEventId9);
+        expectedSlice = new StreamEventsSlice(resultFrom, expectedEvents, resultNext, endOfStream);
 
+    }
+
+    private static void addEvent(final List<CommonEvent> events, final String eventId) {
+        if (eventId != null) {
+            final CommonEvent ce = new CommonEvent(new EventId(eventId), new EventType(BookAddedEvent.TYPE),
+                    new BookAddedEvent("Any", "John Doe"));
+            events.add(ce);
+        }
     }
 
     @Override
     public final void execute() {
         try {
-            es.readEventsForward(streamId, start, count);
+            actualSlice = es.readEventsForward(streamId, start, count);
         } catch (final Exception ex) {
             this.actualException = ex;
         }
@@ -111,13 +181,19 @@ public final class ReadForwardCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
+        if (actualException != null) {
+            return false;
+        }
+        return expectedSlice.equals(actualSlice);
     }
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, expectedMessage,
-                actualException);
+        if (actualException != null) {
+            return EscTestUtils.createExceptionFailureMessage(streamId, actualException);
+        }
+        return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: "
+                + actualSlice.toDebugString();
     }
 
     @Override
@@ -130,7 +206,7 @@ public final class ReadForwardCommand implements TestCommand {
     @Override
     public final String toString() {
         return "ReadForwardCommand [streamName=" + streamName + ", start=" + start + ", count=" + count
-                + ", expectedException=" + expectedException + ", actualException=" + actualException + "]";
+                + ", expectedSlice=" + expectedSlice + ", actualSlice=" + actualSlice + "]";
     }
 
 }

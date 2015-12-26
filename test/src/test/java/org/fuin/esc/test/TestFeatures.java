@@ -45,6 +45,8 @@ import cucumber.api.java.en.When;
 public class TestFeatures {
 
     private EventStoreSync eventStore;
+    
+    private TestCommand lastCommand;
 
     @Before
     public void beforeFeature() throws MalformedURLException {
@@ -67,17 +69,22 @@ public class TestFeatures {
             throw new IllegalStateException("Unknown type: " + type);
         }
         eventStore.open();
+        lastCommand = null;
     }
 
     @After
     public void afterFeature() {
         eventStore.close();
         eventStore = null;
+        lastCommand = null;
     }
 
     @Then("^this should give the expected results$")
     public void success() {
-        // Do nothing - Just to please the "then" phrase
+        if (lastCommand == null) {
+            throw new IllegalStateException("Last command was not set in the 'when' condition");
+        }
+        lastCommand.verify();
     }
 
     @When("^the following deletes are executed$")
@@ -85,7 +92,7 @@ public class TestFeatures {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
         command.execute();
-        command.verify();
+        lastCommand = command;
     }
 
     @Given("^the following streams are created and a single event is appended to each$")
@@ -128,8 +135,8 @@ public class TestFeatures {
         command.verify();
     }
 
-    @Then("^reading forward from the following streams should have the given result$")
-    public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
+    @Then("^reading forward from the following streams should raise the given exceptions$")
+    public void thenReadForwardException(final List<ReadForwardExceptionCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
         command.execute();
@@ -137,12 +144,39 @@ public class TestFeatures {
     }
 
     @When("^I read forward from the following streams$")
-    public void whenReadForward(final List<ReadForwardCommand> commands) {
+    public void whenReadForwardException(final List<ReadForwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        lastCommand = command;
+    }    
+    
+    @Given("^the stream \"(.*?)\" does not exist$")
+    public void givenStreamDoesNotExist(final String streamName) {
+        final TestCommand command = new StreamExistsCommand(streamName, false);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
+    
+    @When("^I append the following events in the given order$")
+    public void whenAppendEvents(final List<AppendToStreamCommand> commands){
+        final MultipleCommands command = new MultipleCommands();
+        for (final AppendToStreamCommand cmd : commands) {
+            command.add(cmd);
+        }
         command.init(eventStore);
         command.execute();
         command.verify();
     }    
+
+    @Then("^reading forward from stream should have the following results$")
+    public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
     
 }
 // CHECKSTYLE:ON

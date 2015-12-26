@@ -28,6 +28,7 @@ import org.fuin.esc.api.StreamId;
 public final class StreamExistsCommand implements TestCommand {
 
     // Creation
+    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 

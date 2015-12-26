@@ -19,33 +19,32 @@ package org.fuin.esc.test;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 
 /**
- * Deletes a stream.
+ * Reads a stream forward and expects and exception.
  */
-public final class DeleteCommand implements TestCommand {
+public final class ReadForwardExceptionCommand implements TestCommand {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
-    private boolean hardDelete;
+    private int start;
 
-    private String expectedVersion;
+    private int count;
 
     private String expectedException;
 
-    // Initialization
+    private String expectedMessage;
 
-    private EventStoreSync es;
+    // Initialization
 
     private StreamId streamId;
 
-    private int expectedIntVersion;
+    private EventStoreSync es;
 
     private Class<? extends Exception> expectedExceptionClass;
 
@@ -56,7 +55,7 @@ public final class DeleteCommand implements TestCommand {
     /**
      * Default constructor used by Cucumber.
      */
-    public DeleteCommand() {
+    public ReadForwardExceptionCommand() {
         super();
     }
 
@@ -65,22 +64,23 @@ public final class DeleteCommand implements TestCommand {
      * 
      * @param streamName
      *            Uniquely identifies the stream to create.
-     * @param hardDelete
-     *            TRUE if it should be impossible to recreate the stream. FALSE (soft delete) if appending to
-     *            it will recreate it. Please note that in this case the version numbers do not start at zero
-     *            but at where you previously soft deleted the stream from.
-     * @param expectedVersion
-     *            The version the stream should have when being deleted.
+     * @param start
+     *            The starting point to read from.
+     * @param count
+     *            The count of items to read.
      * @param expectedException
      *            The exception that is expected, an empty string or "-".
+     * @param expectedMessage
+     *            The exception message that is expected, an empty string or "-".
      */
-    public DeleteCommand(@NotNull final String streamName, final boolean hardDelete,
-            final String expectedVersion, final String expectedException) {
+    public ReadForwardExceptionCommand(@NotNull final String streamName, final int start, final int count,
+            final String expectedException, final String expectedMessage) {
         super();
         this.streamName = streamName;
-        this.hardDelete = hardDelete;
-        this.expectedVersion = expectedVersion;
+        this.start = start;
+        this.count = count;
         this.expectedException = expectedException;
+        this.expectedMessage = expectedMessage;
     }
 
     /**
@@ -89,36 +89,36 @@ public final class DeleteCommand implements TestCommand {
      * @param eventstore
      *            Event store to use.
      */
-    public void init(@NotNull final EventStoreSync eventstore) {
+    public final void init(@NotNull final EventStoreSync eventstore) {
         this.es = eventstore;
 
         streamName = EscTestUtils.emptyAsNull(streamName);
-        expectedVersion = EscTestUtils.emptyAsNull(expectedVersion);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
+        expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
 
-        streamId = new SimpleStreamId(streamName, false);
-        expectedIntVersion = ExpectedVersion.no(expectedVersion);
+        streamId = new SimpleStreamId(streamName, true);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }
 
     @Override
-    public void execute() {
+    public final void execute() {
         try {
-            es.deleteStream(streamId, expectedIntVersion, hardDelete);
+            es.readEventsForward(streamId, start, count);
         } catch (final Exception ex) {
-            actualException = ex;
+            this.actualException = ex;
         }
     }
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedType(expectedExceptionClass, actualException);
+        return EscTestUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
     }
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, actualException);
+        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, expectedMessage,
+                actualException);
     }
 
     @Override
@@ -130,9 +130,8 @@ public final class DeleteCommand implements TestCommand {
 
     @Override
     public final String toString() {
-        return "DeleteCommand [streamName=" + streamName + ", hardDelete=" + hardDelete
-                + ", expectedVersion=" + expectedVersion + ", expectedException="
-                + expectedException + ", actualException=" + actualException + "]";
+        return "ReadForwardCommand [streamName=" + streamName + ", start=" + start + ", count=" + count
+                + ", expectedException=" + expectedException + ", actualException=" + actualException + "]";
     }
 
 }

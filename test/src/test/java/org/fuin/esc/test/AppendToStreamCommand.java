@@ -16,13 +16,16 @@
  */
 package org.fuin.esc.test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
@@ -34,13 +37,16 @@ import org.fuin.objects4j.common.Nullable;
 public final class AppendToStreamCommand implements TestCommand {
 
     // Creation (Initialized by Cucumber)
+    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
     private String expectedVersion;
 
-    private String expectedException;
+    private String eventId;
 
+    private String expectedException;
+    
     // Initialization
 
     private EventStoreSync es;
@@ -99,10 +105,21 @@ public final class AppendToStreamCommand implements TestCommand {
         streamName = EscTestUtils.emptyAsNull(streamName);
         expectedVersion = EscTestUtils.emptyAsNull(expectedVersion);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
+        eventId = EscTestUtils.emptyAsNull(eventId);
 
         streamId = new SimpleStreamId(streamName, false);
         expectedIntVersion = ExpectedVersion.no(expectedVersion);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
+        if (eventId == null) {
+            if ((events == null) || (events.size() == 0)) {
+                throw new IllegalStateException("No events set to append!");
+            }
+        } else {
+            events = new ArrayList<>();
+            final CommonEvent ce = new CommonEvent(new EventId(eventId), new EventType(BookAddedEvent.TYPE),
+                    new BookAddedEvent("Any", "John Doe"));
+            events.add(ce);
+        }
 
     }
 

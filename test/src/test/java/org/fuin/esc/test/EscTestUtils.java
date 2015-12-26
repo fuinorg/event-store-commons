@@ -75,6 +75,20 @@ final class EscTestUtils {
     }
 
     /**
+     * Creates a failure message from an exception.
+     * 
+     * @param streamId
+     *            Unique stream identifier this failure relates to.
+     * @param exception
+     *            Current exception.
+     * 
+     * @return Message.
+     */
+    public static String createExceptionFailureMessage(final StreamId streamId, final Exception exception) {
+        return createExceptionFailureMessage(streamId, null, null, exception);
+    }
+
+    /**
      * Creates a failure message from an expected type and an exception.
      * 
      * @param streamId

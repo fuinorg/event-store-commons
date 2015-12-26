@@ -153,8 +153,21 @@ public final class StreamEventsSlice {
 
     // CHECKSTYLE:ON
 
+    /**
+     * Returns a debug string representation with all data.
+     * 
+     * @return Includes list content.
+     */
+    public final String toDebugString() {
+        return new ToStringBuilder(this)
+                .append("fromEventNumber", fromEventNumber)
+                .append("nextEventNumber", nextEventNumber)
+                .append("endOfStream", endOfStream)
+                .append("events", events).toString();
+    }
+    
     @Override
-    public String toString() {
+    public final String toString() {
         return new ToStringBuilder(this)
                 .append("fromEventNumber", fromEventNumber)
                 .append("nextEventNumber", nextEventNumber)
