@@ -16,6 +16,7 @@
  */
 package org.fuin.esc.spi;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -140,7 +141,7 @@ public final class EscSpiUtils {
         if (array == null) {
             return null;
         }
-        return EscSpiUtils.asList(array);
+        return Arrays.asList(array);
     }
 
 }
