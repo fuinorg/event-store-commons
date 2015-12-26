@@ -147,7 +147,10 @@ public interface WritableEventStoreSync extends AutoCloseable {
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
-     * Deletes a stream from the event store if it has a given version.
+     * Deletes a stream from the event store if it has a given version. Deleting a previously soft-deleted
+     * stream again does NOT throw an exception. Deleting a non-existing stream with an expected version of
+     * {@link ExpectedVersion#ANY} or {@link ExpectedVersion#NO_OR_EMPTY_STREAM} does also NOT throw an
+     * exception.
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
@@ -158,15 +161,13 @@ public interface WritableEventStoreSync extends AutoCloseable {
      *            it will recreate it. Please note that in this case the version numbers do not start at zero
      *            but at where you previously soft deleted the stream from.
      * 
-     * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was hard deleted.
      * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      */
     public void deleteStream(@NotNull StreamId streamId, int expectedVersion, boolean hardDelete)
-            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException;
+            throws StreamDeletedException, WrongExpectedVersionException;
 
     /**
      * Deletes a stream from the event store not matter what the current version is.
