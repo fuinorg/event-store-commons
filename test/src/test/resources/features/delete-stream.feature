@@ -59,3 +59,36 @@ Scenario: Read after delete
     | Stream Name            | Start | Count | Expected Exception       | 
     | read_after_hard_delete | 1     | 1     | StreamDeletedException   |
     | read_after_soft_delete | 1     | 1     | StreamNotFoundException  |
+
+Scenario: Delete after delete
+    Given the following streams are created and a single event is appended to each 
+    | Stream Name                |
+    | delete_after_hard_delete_1 |
+    | delete_after_hard_delete_2 |
+    | delete_after_hard_delete_3 |
+    | delete_after_hard_delete_4 |
+    | delete_after_soft_delete_1 |
+    | delete_after_soft_delete_2 |
+    | delete_after_soft_delete_3 |
+    | delete_after_soft_delete_4 |
+    When the following deletes are executed
+    | Stream Name                | Hard Delete | Expected Version | Expected Exception | 
+    | delete_after_hard_delete_1 | true        | ANY              | -                  |
+    | delete_after_hard_delete_2 | true        | ANY              | -                  |
+    | delete_after_hard_delete_3 | true        | ANY              | -                  |
+    | delete_after_hard_delete_4 | true        | ANY              | -                  |
+    | delete_after_soft_delete_1 | false       | ANY              | -                  |
+    | delete_after_soft_delete_2 | false       | ANY              | -                  |
+    | delete_after_soft_delete_3 | false       | ANY              | -                  |
+    | delete_after_soft_delete_4 | false       | ANY              | -                  |
+    Then executing the following deletes should have the given result
+    | Stream Name                | Hard Delete | Expected Version | Expected Exception      | 
+    | delete_after_hard_delete_1 | true        | ANY              | StreamDeletedException  |
+    | delete_after_hard_delete_2 | false       | ANY              | StreamDeletedException  |
+    | delete_after_hard_delete_3 | true        | 0                | StreamDeletedException  |
+    | delete_after_hard_delete_4 | false       | 0                | StreamDeletedException  |
+    | delete_after_soft_delete_1 | true        | ANY              | -                       |
+    | delete_after_soft_delete_2 | false       | ANY              | -                       |
+    | delete_after_soft_delete_3 | true        | 0                | -                       |
+    | delete_after_soft_delete_4 | false       | 0                | -                       |
+    
