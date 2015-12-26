@@ -75,13 +75,11 @@ public final class Data implements ValueObject, Serializable {
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
-     *            Internet Media Type with encoding and version that classifies
-     *            the data.
+     *            Internet Media Type with encoding and version that classifies the data.
      * @param content
      *            Content.
      */
-    public Data(@NotNull final String type,
-            @NotNull final EnhancedMimeType mimeType,
+    public Data(@NotNull final String type, @NotNull final EnhancedMimeType mimeType,
             @NotNull final String content) {
         super();
 
@@ -144,12 +142,21 @@ public final class Data implements ValueObject, Serializable {
     }
 
     /**
-     * Unmarshals the content into an object. Content is required to be
-     * "application/xml" or "application/json".
+     * Returns the information if the content is TEXT.
+     * 
+     * @return TRUE if the mime type is 'text/plain' else FALSE.
+     */
+    public final boolean isText() {
+        return getMimeType().getBaseType().equals("text/plain");
+    }
+
+    /**
+     * Unmarshals the content into an object. Content is required to be "application/xml", "application/json"
+     * or "text/plain".
      * 
      * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass
-     *            the classes for the content here.
+     *            In case the XML JAXB unmarshalling is used, you have to pass the classes for the content
+     *            here.
      * 
      * @return Object created from content.
      * 
@@ -159,25 +166,26 @@ public final class Data implements ValueObject, Serializable {
     @SuppressWarnings("unchecked")
     public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {
 
-        if (!(isJson() || isXml())) {
-            throw new IllegalStateException(
-                    "Can only unmarshal JSON or XML content, not: " + mimeType);
+        if (!(isJson() || isXml() || isText())) {
+            throw new IllegalStateException("Can only unmarshal JSON, XML or TEXT content, not: " + mimeType);
         }
 
         // We can only handle JSON...
         if (isJson()) {
-            return (T) Json.createReader(new StringReader(content))
-                    .readObject();
+            return (T) Json.createReader(new StringReader(content)).readObject();
         }
         // ...or XML
-        return unmarshal(content, classesToBeBound);
+        if (isXml()) {
+            return unmarshal(content, classesToBeBound);
+        }
+        // ...or TEXT
+        return (T) content;
     }
 
     @Override
     public final String toString() {
-        return new ToStringBuilder(this).append("type", type)
-                .append("mimeType", mimeType).append("content", content)
-                .toString();
+        return new ToStringBuilder(this).append("type", type).append("mimeType", mimeType)
+                .append("content", content).toString();
     }
 
     /**

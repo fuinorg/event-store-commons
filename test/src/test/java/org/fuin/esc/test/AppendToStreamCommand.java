@@ -46,7 +46,7 @@ public final class AppendToStreamCommand implements TestCommand {
     private String eventId;
 
     private String expectedException;
-    
+
     // Initialization
 
     private EventStoreSync es;
@@ -85,12 +85,30 @@ public final class AppendToStreamCommand implements TestCommand {
     public AppendToStreamCommand(@NotNull final String streamName, @Nullable final int expectedVersion,
             @Nullable final Class<? extends Exception> expectedExceptionClass,
             @NotNull final CommonEvent... events) {
+        this(streamName, expectedVersion, expectedExceptionClass, Arrays.asList(events));
+    }
+
+    /**
+     * Constructor for manual creation.
+     * 
+     * @param streamName
+     *            Uniquely identifies the stream to create.
+     * @param expectedVersion
+     *            The version the stream should have when being deleted.
+     * @param expectedExceptionClass
+     *            The exception type that is expected.
+     * @param events
+     *            Events to add.
+     */
+    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final int expectedVersion,
+            @Nullable final Class<? extends Exception> expectedExceptionClass,
+            @NotNull final List<CommonEvent> events) {
         super();
         this.streamName = streamName;
         this.expectedVersion = "" + expectedVersion;
         this.expectedException = (expectedExceptionClass == null ? null : expectedExceptionClass
                 .getSimpleName());
-        this.events = Arrays.asList(events);
+        this.events = events;
     }
 
     /**

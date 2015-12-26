@@ -18,14 +18,19 @@ package org.fuin.esc.test;
 
 import java.util.Objects;
 
+import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for the package.
  */
 final class EscTestUtils {
+
+    private static Logger LOG = LoggerFactory.getLogger(EscTestUtils.class);
 
     private EscTestUtils() {
         throw new UnsupportedOperationException();
@@ -126,16 +131,21 @@ final class EscTestUtils {
             if (exception == null) {
                 return "[" + streamId + "] OK";
             }
-            return "[" + streamId + "] expected no exception, but was: " + nameAndMessage(exception);
+            final String msg = "[" + streamId + "] expected no exception, but was: "
+                    + nameAndMessage(exception);
+            LOG.error(msg, exception);
+            return msg;
         }
         if (exception == null) {
             return "[" + streamId + "] expected "
                     + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
                     + ", but no exception was thrown";
         }
-        return "[" + streamId + "] expected "
+        final String msg = "[" + streamId + "] expected "
                 + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
                 + nameAndMessage(exception);
+        LOG.error(msg, exception);
+        return msg;
     }
 
     private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass,
@@ -192,6 +202,113 @@ final class EscTestUtils {
         } catch (final ClassNotFoundException ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
+    }
+
+    /**
+     * Compares the two events based on their content.
+     * 
+     * @param eventA
+     *            First event.
+     * @param eventB
+     *            Second event.
+     * 
+     * @return TRUE id the events have the same content.
+     */
+    public static boolean sameContent(@Nullable final CommonEvent eventA, @Nullable final CommonEvent eventB) {
+        if (eventA == null) {
+            if (eventB == null) {
+                return true;
+            }
+            return false;
+        }
+        if (eventB == null) {
+            return false;
+        }
+
+        if (eventA.getId() == null) {
+            if (eventB.getId() != null) {
+                return false;
+            }
+        } else if (!eventA.getId().equals(eventB.getId())) {
+            return false;
+        }
+
+        if (eventA.getData() == null) {
+            if (eventB.getData() != null) {
+                return false;
+            }
+        } else if (!eventA.getData().equals(eventB.getData())) {
+            return false;
+        }
+
+        if (eventA.getMeta() == null) {
+            if (eventB.getMeta() != null) {
+                return false;
+            }
+        } else if (!eventA.getMeta().equals(eventB.getMeta())) {
+            return false;
+        }
+
+        if (eventA.getType() == null) {
+            if (eventB.getType() != null) {
+                return false;
+            }
+        } else if (!eventA.getType().equals(eventB.getType())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static String createExceptionFailureMessage(final StreamId streamId,
+            final CommonEvent expectedEvent, final CommonEvent actualEvent) {
+        if (expectedEvent == null) {
+            if (actualEvent == null) {
+                return "[" + streamId + "] OK";
+            }
+            return "[" + streamId + "] Expected no event, but got: " + actualEvent;
+        }
+        if (actualEvent == null) {
+            return "[" + streamId + "] Got no event, but expected one: " + expectedEvent;
+        }
+
+        if (expectedEvent.getId() == null) {
+            if (actualEvent.getId() != null) {
+                return "[" + streamId + "] Expected no event id, but was: " + actualEvent.getId();
+            }
+        } else if (!expectedEvent.getId().equals(actualEvent.getId())) {
+            return "[" + streamId + "] Expected event id '" + expectedEvent.getId() + "', but was: "
+                    + actualEvent.getId();
+        }
+
+        if (expectedEvent.getData() == null) {
+            if (actualEvent.getData() != null) {
+                return "[" + streamId + "] Expected no event data, but was: " + actualEvent.getData();
+            }
+        } else if (!expectedEvent.getData().equals(actualEvent.getData())) {
+            return "[" + streamId + "] Expected event data '" + expectedEvent.getData() + "', but was: "
+                    + actualEvent.getData();
+        }
+
+        if (expectedEvent.getMeta() == null) {
+            if (actualEvent.getMeta() != null) {
+                return "[" + streamId + "] Expected no event meta, but was: " + actualEvent.getMeta();
+            }
+        } else if (!expectedEvent.getMeta().equals(actualEvent.getMeta())) {
+            return "[" + streamId + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: "
+                    + actualEvent.getMeta();
+        }
+
+        if (expectedEvent.getType() == null) {
+            if (actualEvent.getType() != null) {
+                return "[" + streamId + "] Expected no event type, but was: " + actualEvent.getType();
+            }
+        } else if (!expectedEvent.getType().equals(actualEvent.getType())) {
+            return "[" + streamId + "] Expected event type '" + expectedEvent.getType() + "', but was: "
+                    + actualEvent.getType();
+        }
+
+        return "[" + streamId + "] OK";
     }
 
 }

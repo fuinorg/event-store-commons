@@ -33,7 +33,9 @@ import org.fuin.esc.mem.InMemoryEventStoreSync;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.spi.XmlDeSerializer;
+import org.fuin.units4j.Units4JUtils;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -45,6 +47,8 @@ import cucumber.api.java.en.When;
 public class TestFeatures {
 
     private EventStoreSync eventStore;
+
+    private SimpleSerializerDeserializerRegistry registry;
     
     private TestCommand lastCommand;
 
@@ -60,9 +64,11 @@ public class TestFeatures {
             final SerializedDataType serMetaType = new SerializedDataType("MyMeta");
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+            final TextDeSerializer textDeSer = new TextDeSerializer();
+            registry = new SimpleSerializerDeserializerRegistry();
             registry.add(new SerializedDataType(BookAddedEvent.TYPE), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType("MyMeta"), "application/json", jsonDeSer);
+            registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
             eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML,
                     registry, registry);
         } else {
@@ -184,6 +190,29 @@ public class TestFeatures {
         command.init(eventStore);
         command.execute();
         command.verify();
+    }
+    
+    @When("^I append the following events to stream \"(.*?)\"$")
+    public void appendXmlEvents(final String streamName, final String eventsXml) {
+        
+        final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
+        final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
+
+        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, commonEvents);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+                
+    }
+
+    @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
+    public void readXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
+        
+        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml, null);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+        
     }
     
 }

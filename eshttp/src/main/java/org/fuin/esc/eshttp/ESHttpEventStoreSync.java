@@ -439,6 +439,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     }
 
     private CommonEvent readEvent(final URI uri) {
+        LOG.info(uri.toString());
         try {
             final HttpGet get = createHttpGet(uri);
             final Future<HttpResponse> future = httpclient.execute(get, null);

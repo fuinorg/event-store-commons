@@ -24,6 +24,9 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 
+/**
+ * Utilities to ease the implementation of service provider implementations.
+ */
 public final class EscSpiUtils {
 
     /**
@@ -100,7 +103,7 @@ public final class EscSpiUtils {
      */
     public static EnhancedMimeType mimeType(@NotNull final SerializerRegistry registry,
             @NotNull final List<CommonEvent> commonEvents) {
-        
+
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("commonEvents", commonEvents);
 
@@ -108,6 +111,10 @@ public final class EscSpiUtils {
         for (final CommonEvent commonEvent : commonEvents) {
             final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent.getType()
                     .asBaseType()));
+            if (serializer == null) {
+                throw new IllegalStateException("Could not find a serializer for event type '"
+                        + commonEvent.getType() + "': " + commonEvent);
+            }
             if (mimeType == null) {
                 mimeType = serializer.getMimeType();
             } else {
