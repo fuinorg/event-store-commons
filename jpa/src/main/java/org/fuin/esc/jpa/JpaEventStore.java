@@ -18,7 +18,6 @@ package org.fuin.esc.jpa;
 
 import static org.fuin.esc.api.ExpectedVersion.ANY;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -35,6 +34,7 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
@@ -81,13 +81,13 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
-        return appendToStream(streamId, ANY.getNo(), Arrays.asList(events));
+        return appendToStream(streamId, ANY.getNo(), EscSpiUtils.asList(events));
     }
 
     @Override
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
             final CommonEvent... events) {
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
     @Override

@@ -17,12 +17,13 @@
 package org.fuin.esc.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.objects4j.common.Contract;
 
 /**
  * Combines multiple commands into one.
@@ -46,7 +47,7 @@ public final class MultipleCommands implements TestCommand {
      *            Commands.
      */
     public MultipleCommands(@NotNull final TestCommand... commands) {
-        this(Arrays.asList(commands));
+        this(EscSpiUtils.asList(commands));
     }
 
     /**
@@ -57,6 +58,7 @@ public final class MultipleCommands implements TestCommand {
      */
     public MultipleCommands(@NotNull final List<? extends TestCommand> commands) {
         super();
+        Contract.requireArgNotNull("commands", commands);
         this.commands = new ArrayList<>();
         this.commands.addAll(commands);
     }

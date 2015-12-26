@@ -17,7 +17,6 @@
 package org.fuin.esc.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -29,6 +28,7 @@ import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -85,7 +85,7 @@ public final class AppendToStreamCommand implements TestCommand {
     public AppendToStreamCommand(@NotNull final String streamName, @Nullable final int expectedVersion,
             @Nullable final Class<? extends Exception> expectedExceptionClass,
             @NotNull final CommonEvent... events) {
-        this(streamName, expectedVersion, expectedExceptionClass, Arrays.asList(events));
+        this(streamName, expectedVersion, expectedExceptionClass, EscSpiUtils.asList(events));
     }
 
     /**

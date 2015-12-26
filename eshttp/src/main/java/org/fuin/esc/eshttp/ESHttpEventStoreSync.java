@@ -24,7 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -142,13 +141,13 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
-        return appendToStream(streamId, -2, Arrays.asList(events));
+        return appendToStream(streamId, -2, EscSpiUtils.asList(events));
     }
 
     @Override
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
             final CommonEvent... events) {
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
     @Override

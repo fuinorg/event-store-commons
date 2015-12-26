@@ -3,9 +3,9 @@ package org.fuin.esc.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.fuin.esc.spi.EscSpiUtils;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.ParentRunner;
@@ -68,7 +68,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         if (args == null) {
             argList.add("NONE");
         } else {
-            argList.addAll(Arrays.asList(args.value()));
+            argList.addAll(EscSpiUtils.asList(args.value()));
         }
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(

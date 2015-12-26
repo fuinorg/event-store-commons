@@ -126,4 +126,21 @@ public final class EscSpiUtils {
         return mimeType;
     }
 
+    /**
+     * Returns the array as a list in a null-safe way.
+     * 
+     * @param array
+     *            Array to convert into a list.
+     * 
+     * @return Array list.
+     * 
+     * @param <T> Type of the array and list.
+     */
+    public static <T> List<T> asList(final T[] array) {
+        if (array == null) {
+            return null;
+        }
+        return EscSpiUtils.asList(array);
+    }
+
 }

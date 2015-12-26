@@ -18,7 +18,6 @@ package org.fuin.esc.test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,6 +26,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fuin.esc.spi.EscSpiUtils;
 
 /**
  * Multiple slice of data from a stream.
@@ -78,7 +78,7 @@ public final class Slices implements Serializable {
      */
     public void append(final Slice... slices) {
         if (slices != null && slices.length > 0) {
-            this.slices.addAll(Arrays.asList(slices));
+            this.slices.addAll(EscSpiUtils.asList(slices));
         }
     }
 

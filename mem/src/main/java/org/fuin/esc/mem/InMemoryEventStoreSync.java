@@ -17,7 +17,6 @@
 package org.fuin.esc.mem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,6 +40,7 @@ import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.SubscribableEventStoreSync;
 import org.fuin.esc.api.Subscription;
 import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
 
 /**
@@ -228,25 +228,14 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
             final CommonEvent... events) {
 
-        Contract.requireArgNotNull("events", events);
-
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
 
     }
 
     @Override
     public final int appendToStream(final StreamId streamId, final List<CommonEvent> toAppend) {
 
-        Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgNotNull("toAppend", toAppend);
-
-        final InternalStream stream = createIfNotExists(streamId, ExpectedVersion.ANY.getNo());
-        all.addAll(toAppend);
-        stream.addAll(toAppend);
-
-        notifyListeners(streamId, toAppend, 0);
-
-        return stream.getVersion();
+        return appendToStream(streamId, ExpectedVersion.ANY.getNo(), toAppend);
 
     }
 
@@ -255,7 +244,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, Arrays.asList(events));
+        return appendToStream(streamId, EscSpiUtils.asList(events));
 
     }
 

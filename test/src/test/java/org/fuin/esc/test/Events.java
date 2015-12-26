@@ -18,7 +18,6 @@ package org.fuin.esc.test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.spi.EscSpiUtils;
 
 /**
  * Multiple events.
@@ -79,7 +79,7 @@ public final class Events implements Serializable {
      */
     public void append(final Event... events) {
         if (events != null && events.length > 0) {
-            this.events.addAll(Arrays.asList(events));
+            this.events.addAll(EscSpiUtils.asList(events));
         }
     }
 

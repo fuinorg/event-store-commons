@@ -211,7 +211,7 @@ public final class EsjEventStore implements EventStoreSync {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, expectedVersion, Arrays.asList(events));
+        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
 
     }
 
@@ -251,7 +251,7 @@ public final class EsjEventStore implements EventStoreSync {
     public final int appendToStream(final StreamId streamId,
             final CommonEvent... events) throws StreamNotFoundException,
             StreamDeletedException, StreamReadOnlyException {
-        return appendToStream(streamId, Arrays.asList(events));
+        return appendToStream(streamId, EscSpiUtils.asList(events));
     }
 
 }

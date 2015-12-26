@@ -17,7 +17,6 @@
 package org.fuin.esc.eshttp;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +26,7 @@ import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.ContractViolationException;
 import org.fuin.objects4j.common.Nullable;
 
@@ -74,8 +74,8 @@ public final class NamespaceContextMap implements NamespaceContext {
 
         // Values that can never be overwritten
         uriMap.put(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
-                Arrays.asList(new String[] { XMLConstants.XMLNS_ATTRIBUTE }));
-        uriMap.put(XMLConstants.XML_NS_URI, Arrays.asList(new String[] { XMLConstants.XML_NS_PREFIX }));
+                EscSpiUtils.asList(new String[] { XMLConstants.XMLNS_ATTRIBUTE }));
+        uriMap.put(XMLConstants.XML_NS_URI, EscSpiUtils.asList(new String[] { XMLConstants.XML_NS_PREFIX }));
         prefixMap.put(XMLConstants.XMLNS_ATTRIBUTE, XMLConstants.XMLNS_ATTRIBUTE_NS_URI);
         prefixMap.put(XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
     }
