@@ -28,10 +28,13 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
+import javax.json.JsonValue;
 
 import net.minidev.json.JSONArray;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.EventType;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
@@ -71,9 +74,19 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
     @Override
     public final CommonEvent readEvent(final DeserializerRegistry desRegistry,
             final SerializedDataType serMetaType, final InputStream in) {
-        final AtomEntry<JsonObject> entry = readAtomEntry(in);
+ 
+        final AtomEntry<JsonValue> entry = readAtomEntry(in);
 
-        return null;
+        final ESHttpJsonUnmarshaller unmarshaller = new ESHttpJsonUnmarshaller();
+
+        final Object data = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getEventType()),
+                entry.getDataContentType(), entry.getData());
+        final Object meta = unmarshaller.unmarshal(desRegistry, serMetaType, entry.getMetaContentType(),
+                entry.getMeta());
+
+        return new CommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()), data,
+                meta);
+        
     }
 
     /**
@@ -84,7 +97,7 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
      * 
      * @return Entry.
      */
-    public final AtomEntry<JsonObject> readAtomEntry(final InputStream in) {
+    public final AtomEntry<JsonValue> readAtomEntry(final InputStream in) {
 
         final JsonReader jsonReader = Json.createReader(new InputStreamReader(in));
         final JsonObject jsonObj = jsonReader.readObject();
@@ -100,10 +113,10 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
         final String metaContentTypeStr = ((JsonString) JsonPath.read(jsonObj,
                 "$.content.metadata.EscSysMeta.meta-content-type")).getString();
         final EnhancedMimeType metaContentType = EnhancedMimeType.create(metaContentTypeStr);
-        final JsonObject data = JsonPath.read(jsonObj, "$.content.data");
-        final JsonObject meta = JsonPath.read(jsonObj, "$.content.metadata.EscUserMeta");
+        final JsonValue data = JsonPath.read(jsonObj, "$.content.data");
+        final JsonValue meta = JsonPath.read(jsonObj, "$.content.metadata.EscUserMeta");
 
-        return new AtomEntry<JsonObject>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
+        return new AtomEntry<JsonValue>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
                 metaContentType, data, meta);
 
     }
