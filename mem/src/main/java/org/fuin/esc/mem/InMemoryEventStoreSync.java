@@ -38,9 +38,9 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.api.SubscribableEventStoreSync;
 import org.fuin.esc.api.Subscription;
+import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.objects4j.common.Contract;
 
 /**
@@ -175,20 +175,28 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
             throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
 
-        try {
-            final InternalStream stream = getStream(streamId, expected);
-            stream.delete(hardDelete);
-        } catch (final StreamNotFoundException ex) {
+        final InternalStream stream = streams.get(streamId);
+        if (stream == null) {
+            // Stream never existed
             if (expected == ExpectedVersion.ANY.getNo()
                     || expected == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
                 // Ignore
                 return;
             }
-            if (expected >= ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
-                throw new WrongExpectedVersionException(streamId, expected, null);
-            }
-            throw ex;
+            throw new WrongExpectedVersionException(streamId, expected, null);
         }
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            // Ignore
+            return;
+        }
+        if (stream.getState() == StreamState.HARD_DELETED) {
+            throw new StreamDeletedException(streamId);
+        }
+        // StreamState.ACTIVE
+        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
+            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
+        }
+        stream.delete(hardDelete);
 
     }
 
