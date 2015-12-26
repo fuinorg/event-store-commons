@@ -8,7 +8,7 @@ Defines a common event store Java interface and provides some adapters (like for
 |--------|-------------|--------|---------|
 | [esc-api](api) | Defines the event store commons API. | OK | Test coverage ~48% |
 | [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| OK | Test coverage ~55% |
-| [esc-esj](esj) | Adapter for [lt.emasina:esj-client](https://github.com/valdasraps/esj) | Compile Errors  | Will be dropped soon because 'esj' is incomplete |
+| [esc-esj](esj) | Adapter for [lt.emasina:esj-client](https://github.com/valdasraps/esj) | Compile Errors  | Will be dropped soon because 'esj' is incomplete and there is no more development |
 | [esc-jpa](jpa) | JPA adapter | Development paused | Will be continued after 'esc-test' is more complete |
 | [esc-mem](mem) | In-memory implementation | OK | Test coverage ~45% |
 | [esc-spi](spi) | Helper classes for adapters and implementations | OK | Test coverage ~65% |
