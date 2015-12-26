@@ -88,13 +88,21 @@ public class TestFeatures {
     }
 
     @When("^the following deletes are executed$")
-    public void executeDeletes(final List<DeleteCommand> commands) {
+    public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
         command.execute();
         lastCommand = command;
     }
 
+    @Then("^executing the following deletes should have the given result$")
+    public void thenExecuteDeletes(final List<DeleteCommand> commands) {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
+    
     @Given("^the following streams are created and a single event is appended to each$")
     public void createStreamsAndAppendSomeEvent(final List<String> streams) {
 
