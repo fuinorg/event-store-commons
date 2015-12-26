@@ -260,11 +260,6 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 LOG.debug(msg + " RESPONSE: {}", response);
                 throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
-            if (statusLine.getStatusCode() == 404) {
-                // 404 Not Found
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamNotFoundException(streamId);
-            }
             if (statusLine.getStatusCode() == 410) {
                 // 410 GONE - Stream was hard deleted
                 LOG.debug(msg + " RESPONSE: {}", response);
