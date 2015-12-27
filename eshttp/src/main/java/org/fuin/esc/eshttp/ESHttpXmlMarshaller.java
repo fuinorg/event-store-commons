@@ -144,7 +144,7 @@ public final class ESHttpXmlMarshaller implements ESHttpMarshaller {
         if (sd.getMimeType().getBaseType().equals("application/xml")) {
             return new String(sd.getRaw(), sd.getMimeType().getEncoding());
         }
-        return Base64.encodeBase64String(sd.getRaw());
+        return "<Base64>" + Base64.encodeBase64String(sd.getRaw()) + "</Base64>";
     }
 
     private static String convertToStr(final EnhancedMimeType mimeType) {

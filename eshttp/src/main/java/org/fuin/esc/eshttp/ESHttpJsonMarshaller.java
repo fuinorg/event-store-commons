@@ -143,7 +143,7 @@ public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
         if (sd.getMimeType().getBaseType().equals("application/json")) {
             return new String(sd.getRaw(), sd.getMimeType().getEncoding());
         }
-        return "\"" + Base64.encodeBase64String(sd.getRaw()) + "\"";
+        return "{ \"Base64\": \"" + Base64.encodeBase64String(sd.getRaw()) + "\" }";
     }
 
     private String convertToStr(final EnhancedMimeType mimeType) {

@@ -1,7 +1,9 @@
 <Event>
 	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
 	<EventType>MyEvent</EventType>
-	<Data>eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9</Data>
+	<Data>
+	   <Base64>eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9</Base64>
+	</Data>
 	<MetaData>
 		<EscUserMeta>
 			<my-meta>

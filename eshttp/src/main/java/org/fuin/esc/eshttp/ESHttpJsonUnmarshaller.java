@@ -16,7 +16,9 @@
  */
 package org.fuin.esc.eshttp;
 
+import javax.json.JsonObject;
 import javax.json.JsonString;
+import javax.json.JsonStructure;
 import javax.json.JsonValue;
 
 import org.apache.commons.codec.binary.Base64;
@@ -37,23 +39,23 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         if (data == null) {
             return null;
         }
-        if (!(data instanceof JsonValue)) {
-            throw new IllegalArgumentException("Can only unmarshal JsonValue, but was: " + data);
+        if (!(data instanceof JsonStructure)) {
+            throw new IllegalArgumentException("Can only unmarshal JsonStructure, but was: " + data);
         }
-        final JsonValue jsonValue = (JsonValue) data;
+        final JsonStructure jsonStruct = (JsonStructure) data;
 
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
             // JSON Object or Array
             final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
-            return deSer.unmarshal(jsonValue, mimeType);
+            return deSer.unmarshal(jsonStruct, mimeType);
         }        
-        if (jsonValue.getValueType() != JsonValue.ValueType.STRING) {
+        if (jsonStruct.getValueType() != JsonValue.ValueType.OBJECT) {
             throw new IllegalStateException("Got transferEncodingData='" + transferEncodingData
-                    + "' and expected JSON String, but was: " + jsonValue);
+                    + "' and expected JSON Object, but was: " + jsonStruct);
         }
-        final JsonString jsonStr = (JsonString) jsonValue;
-        final String base64str = jsonStr.getString();
+        final JsonObject jsonObj = (JsonObject) jsonStruct;
+        final String base64str = jsonObj.getString("Base64");
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);
