@@ -133,10 +133,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             throw new RuntimeException("Cannot close http client", ex);
         }
     }
-    
+
     @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
-        // Do nothing as the operation is not supported        
+        // Do nothing as the operation is not supported
     }
 
     @Override
@@ -191,11 +191,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
-            final HttpPost post = new HttpPost(uri);
-            post.setHeader("Content-Type", envelopeType.getWriteContentType());
-            post.setHeader("ES-ExpectedVersion", "" + expectedVersion);
-            post.setEntity(new StringEntity(content, ContentType.create(mimeType.getBaseType(),
-                    mimeType.getEncoding())));
+            final HttpPost post = createPost(uri, expectedVersion, content);
             LOG.debug(msg + " POST: {}", post);
 
             final Future<HttpResponse> future = httpclient.execute(post, null);
@@ -286,7 +282,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        
+
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
@@ -387,8 +383,9 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         }
     }
 
-    private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri, final int start,
-            final int count, final String msg) throws InterruptedException, ExecutionException, IOException {
+    private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri,
+            final int start, final int count, final String msg) throws InterruptedException,
+            ExecutionException, IOException {
         LOG.info(uri.toString());
         final HttpGet get = createHttpGet(uri);
         final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -473,6 +470,17 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         final HttpGet request = new HttpGet(uri);
         request.setHeader("Accept", envelopeType.getReadContentType());
         return request;
+    }
+
+    private HttpPost createPost(final URI uri, final int expectedVersion, final String content) {
+        final HttpPost post = new HttpPost(uri);
+        post.setHeader("Content-Type",
+                envelopeType.getWriteContentType() + "; charset=" + envelopeType.getMetaCharset());
+        post.setHeader("ES-ExpectedVersion", "" + expectedVersion);
+        final ContentType contentType = ContentType.create(envelopeType.getMetaType(),
+                envelopeType.getMetaCharset());
+        post.setEntity(new StringEntity(content, contentType));
+        return post;
     }
 
 }

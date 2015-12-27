@@ -16,20 +16,24 @@
  */
 package org.fuin.esc.eshttp;
 
+import java.nio.charset.Charset;
+
 /**
  * Type of data sent to and received from the event store.
  */
 public enum ESEnvelopeType {
 
     /** XML envelope. */
-    XML("application/xml", "application/atom+xml", "application/vnd.eventstore.events+xml",
+    XML("application/xml", "utf-8", "application/atom+xml", "application/vnd.eventstore.events+xml",
             new ESHttpXmlMarshaller(), new AtomFeedXmlReader()),
 
     /** JSON enevlope. */
-    JSON("application/json", "application/vnd.eventstore.atom+json",
+    JSON("application/json", "utf-8", "application/vnd.eventstore.atom+json",
             "application/vnd.eventstore.events+json", new ESHttpJsonMarshaller(), new AtomFeedJsonReader());
 
     private final String metaType;
+
+    private final Charset metaCharset;
 
     private final String readContentType;
 
@@ -39,10 +43,11 @@ public enum ESEnvelopeType {
 
     private final AtomFeedReader atomFeedReader;
 
-    private ESEnvelopeType(final String metaType, final String readContentType,
+    private ESEnvelopeType(final String metaType, final String metaCharset, final String readContentType,
             final String writeContentType, final ESHttpMarshaller marshaller,
             final AtomFeedReader atomFeedReader) {
         this.metaType = metaType;
+        this.metaCharset = Charset.forName(metaCharset);
         this.readContentType = readContentType;
         this.writeContentType = writeContentType;
         this.marshaller = marshaller;
@@ -56,6 +61,15 @@ public enum ESEnvelopeType {
      */
     public final String getMetaType() {
         return metaType;
+    }
+
+    /**
+     * Charset used for meta data.
+     * 
+     * @return Charset.
+     */
+    public final Charset getMetaCharset() {
+        return metaCharset;
     }
 
     /**
