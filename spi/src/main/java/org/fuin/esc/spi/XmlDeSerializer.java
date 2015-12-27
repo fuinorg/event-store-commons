@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 /**
  * Serializes and deserializes an object from/to XML using JAXB. The content type for serialization is always
  * "application/xml". This implementation supports {@link Node} and
- * <code>byte[]</data> for unmarshalling content.
+ * <code>byte[]</code> for unmarshalling content.
  */
 public final class XmlDeSerializer implements SerDeserializer {
 
