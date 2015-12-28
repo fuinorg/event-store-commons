@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -42,52 +43,42 @@ import org.junit.Test;
 public final class JpaEventStoreTest extends AbstractPersistenceTest {
 
     @Test
-    public void testAppendSingleSuccess() throws SQLException,
-            StreamNotFoundException, StreamDeletedException,
-            WrongExpectedVersionException {
+    public void testAppendSingleSuccess() throws SQLException, StreamNotFoundException,
+            StreamDeletedException, WrongExpectedVersionException {
 
         // PREPARE
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
-        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(
-                VendorCreatedEvent.class);
-        registry.addSerializer(new SerializedDataType(VendorCreatedEvent.TYPE),
-                xmlDeSer);
-        registry.addDeserializer(
-                new SerializedDataType(VendorCreatedEvent.TYPE), xmlDeSer
-                        .getMimeType().getBaseType(), xmlDeSer);
-
-        final SerializedDataType serMetaType = new SerializedDataType(
-                "META_DATA");
-        registry.addSerializer(serMetaType, xmlDeSer);
-        registry.addDeserializer(serMetaType, xmlDeSer.getMimeType()
+        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(VendorCreatedEvent.class);
+        registry.addSerializer(new SerializedDataType(VendorCreatedEvent.TYPE), xmlDeSer);
+        registry.addDeserializer(new SerializedDataType(VendorCreatedEvent.TYPE), xmlDeSer.getMimeType()
                 .getBaseType(), xmlDeSer);
 
-        final JpaEventStore testee = new JpaEventStore(getEm(),
-                new JpaIdStreamFactory() {
-                    @Override
-                    public JpaStream createStream(final StreamId streamId) {
-                        final String vendorId = streamId.getSingleParamValue();
-                        return new VendorStream(vendorId);
-                    }
+        final SerializedDataType serMetaType = new SerializedDataType("META_DATA");
+        registry.addSerializer(serMetaType, xmlDeSer);
+        registry.addDeserializer(serMetaType, xmlDeSer.getMimeType().getBaseType(), xmlDeSer);
 
-                    @Override
-                    public boolean containsType(StreamId streamId) {
-                        return true;
-                    }
-                }, registry, registry, serMetaType);
+        final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
+            @Override
+            public JpaStream createStream(final StreamId streamId) {
+                final String vendorId = streamId.getSingleParamValue();
+                return new VendorStream(vendorId);
+            }
+
+            @Override
+            public boolean containsType(StreamId streamId) {
+                return true;
+            }
+        }, registry, registry, serMetaType);
         testee.open();
         try {
             final String vendorId = UUID.randomUUID().toString();
-            final VendorCreatedEvent vendorCreatedEvent = new VendorCreatedEvent(
-                    vendorId);
-            final AggregateStreamId streamId = new AggregateStreamId("Vendor",
-                    "vendorId", vendorId);
+            final VendorCreatedEvent vendorCreatedEvent = new VendorCreatedEvent(vendorId);
+            final AggregateStreamId streamId = new AggregateStreamId("Vendor", "vendorId", vendorId);
             final EventId eventId = new EventId();
             final EventType eventType = new EventType("VendorCreatedEvent");
             final Object meta = null;
-            final CommonEvent eventData = new CommonEvent(eventId, eventType,
-                    vendorCreatedEvent, meta);
+            final CommonEvent eventData = new SimpleCommonEvent(eventId, eventType, vendorCreatedEvent, meta);
 
             // TEST
             beginTransaction();
@@ -97,8 +88,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             // VERIFY
             assertThat(version).isEqualTo(1);
             beginTransaction();
-            final StreamEventsSlice slice = testee.readEventsForward(streamId,
-                    1, 2);
+            final StreamEventsSlice slice = testee.readEventsForward(streamId, 1, 2);
             commitTransaction();
             assertThat(slice.getFromEventNumber()).isEqualTo(1);
             assertThat(slice.getNextEventNumber()).isEqualTo(2);

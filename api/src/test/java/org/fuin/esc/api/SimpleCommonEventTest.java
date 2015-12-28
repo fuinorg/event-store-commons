@@ -28,10 +28,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link CommonEvent} class.
+ * Tests the {@link SimpleCommonEvent} class.
  */
 // CHECKSTYLE:OFF Test
-public class CommonEventTest {
+public class SimpleCommonEventTest {
 
     private static final EventId ID = new EventId();
 
@@ -42,11 +42,11 @@ public class CommonEventTest {
     private static JsonObject META = Json.createObjectBuilder()
             .add("ip", "127.0.0.1").build();
 
-    private CommonEvent testee;
+    private SimpleCommonEvent testee;
 
     @Before
     public void setup() {
-        testee = new CommonEvent(ID, TYPE, DATA, META);
+        testee = new SimpleCommonEvent(ID, TYPE, DATA, META);
     }
 
     @After
@@ -56,7 +56,7 @@ public class CommonEventTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(CommonEvent.class).verify();
+        EqualsVerifier.forClass(SimpleCommonEvent.class).verify();
     }
 
     @Test

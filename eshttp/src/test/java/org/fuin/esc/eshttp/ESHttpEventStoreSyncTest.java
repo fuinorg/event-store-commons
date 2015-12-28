@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadFactory;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -74,11 +75,11 @@ public class ESHttpEventStoreSyncTest {
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamA", false);
         final MyEvent one = new MyEvent("One");
-        final CommonEvent eventOne = new CommonEvent(new EventId(one.getId()), new EventType("MyEvent"), one,
-                meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()),
+                new EventType("MyEvent"), one, meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new CommonEvent(new EventId(two.getId()), new EventType("MyEvent"), two,
-                meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()),
+                new EventType("MyEvent"), two, meta);
 
         // TEST
         testee.appendToStream(streamId, eventOne, eventTwo);
@@ -98,20 +99,20 @@ public class ESHttpEventStoreSyncTest {
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamB", false);
         final MyEvent one = new MyEvent("One");
-        final CommonEvent eventOne = new CommonEvent(new EventId(one.getId()), new EventType("MyEvent"), one,
-                meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()),
+                new EventType("MyEvent"), one, meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new CommonEvent(new EventId(two.getId()), new EventType("MyEvent"), two,
-                meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()),
+                new EventType("MyEvent"), two, meta);
         final MyEvent three = new MyEvent("Three");
-        final CommonEvent eventThree = new CommonEvent(new EventId(three.getId()), new EventType("MyEvent"),
-                three, meta);
+        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), new EventType(
+                "MyEvent"), three, meta);
         final MyEvent four = new MyEvent("Four");
-        final CommonEvent eventFour = new CommonEvent(new EventId(four.getId()), new EventType("MyEvent"),
-                four, meta);
+        final CommonEvent eventFour = new SimpleCommonEvent(new EventId(four.getId()), new EventType(
+                "MyEvent"), four, meta);
         final MyEvent five = new MyEvent("Five");
-        final CommonEvent eventFive = new CommonEvent(new EventId(five.getId()), new EventType("MyEvent"),
-                five, meta);
+        final CommonEvent eventFive = new SimpleCommonEvent(new EventId(five.getId()), new EventType(
+                "MyEvent"), five, meta);
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree, eventFour, eventFive);
 
         // TEST Slice 1
@@ -150,14 +151,14 @@ public class ESHttpEventStoreSyncTest {
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamC", false);
         final MyEvent one = new MyEvent("One");
-        final CommonEvent eventOne = new CommonEvent(new EventId(one.getId()), new EventType("MyEvent"), one,
-                meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()),
+                new EventType("MyEvent"), one, meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new CommonEvent(new EventId(two.getId()), new EventType("MyEvent"), two,
-                meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()),
+                new EventType("MyEvent"), two, meta);
         final MyEvent three = new MyEvent("Three");
-        final CommonEvent eventThree = new CommonEvent(new EventId(three.getId()), new EventType("MyEvent"),
-                three);
+        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), new EventType(
+                "MyEvent"), three);
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree);
 
         // TEST Slice 1

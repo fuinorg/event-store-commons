@@ -20,104 +20,23 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
- * Event that is uniquely identified by a UUID. It's equals and hash code
- * methods are defined on the <code>id</code>.
+ * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
+ * <code>id</code>.
  */
-@Immutable
-public final class CommonEvent implements Serializable, ValueObject {
-
-    private static final long serialVersionUID = 1000L;
-
-    /** The ID of the event, used as part of the idempotent write check. */
-    @NotNull
-    private EventId id;
-
-    /** Never changing unique event type name. */
-    @NotNull
-    private EventType type;
-
-    /** The event data. */
-    @NotNull
-    private Object data;
-
-    /** The meta data. */
-    private Object meta;
+public interface CommonEvent extends Serializable, ValueObject {
 
     /**
-     * Protected constructor for deserialization.
-     */
-    protected CommonEvent() {
-        super();
-    }
-
-    /**
-     * Constructor without meta data.
-     * 
-     * @param id
-     *            The ID of the event, used as part of the idempotent write
-     *            check. This is type string to allow different UUID
-     *            implementations. It has to be a valid UUID string
-     *            representation.
-     * @param type
-     *            Unique name of the type of data.
-     * @param data
-     *            Event data.
-     * 
-     */
-    public CommonEvent(@NotNull final EventId id,
-            @NotNull final EventType type, @NotNull final Object data) {
-        this(id, type, data, null);
-    }
-
-    /**
-     * Constructor with meta data.
-     * 
-     * @param id
-     *            The ID of the event, used as part of the idempotent write
-     *            check. This is type string to allow different UUID
-     *            implementations. It has to be a valid UUID string
-     *            representation.
-     * @param type
-     *            Unique name of the type of data.
-     * @param data
-     *            Event data.
-     * @param meta
-     *            Meta data.
-     * 
-     */
-    public CommonEvent(@NotNull final EventId id,
-            @NotNull final EventType type, @NotNull final Object data,
-            @Nullable final Object meta) {
-        super();
-
-        Contract.requireArgNotNull("id", id);
-        Contract.requireArgNotNull("type", type);
-        Contract.requireArgNotNull("data", data);
-
-        this.id = id;
-        this.type = type;
-        this.data = data;
-        this.meta = meta;
-
-    }
-
-    /**
-     * Returns the ID of the event, used as part of the idempotent write check.
-     * This is type string to allow different UUID implementations. It has to be
-     * a valid UUID string representation.
+     * Returns the ID of the event, used as part of the idempotent write check. This is type string to allow
+     * different UUID implementations. It has to be a valid UUID string representation.
      * 
      * @return Unique event identifier.
      */
     @NotNull
-    public final EventId getId() {
-        return id;
-    }
+    public EventId getId();
 
     /**
      * Returns the event type.
@@ -125,9 +44,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * @return Never changing unique event type name.
      */
     @NotNull
-    public final EventType getType() {
-        return type;
-    }
+    public EventType getType();
 
     /**
      * Returns the event data.
@@ -135,9 +52,7 @@ public final class CommonEvent implements Serializable, ValueObject {
      * @return Event data.
      */
     @NotNull
-    public final Object getData() {
-        return data;
-    }
+    public Object getData();
 
     /**
      * Returns the meta data.
@@ -145,42 +60,6 @@ public final class CommonEvent implements Serializable, ValueObject {
      * @return Meta data.
      */
     @Nullable
-    public final Object getMeta() {
-        return meta;
-    }
-
-    // CHECKSTYLE:OFF Generated code
-
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof CommonEvent))
-            return false;
-        CommonEvent other = (CommonEvent) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
-    }
-
-    // CHECKSTYLE:ON
-
-    @Override
-    public String toString() {
-        return type + " " + id;
-    }
+    public Object getMeta();
 
 }

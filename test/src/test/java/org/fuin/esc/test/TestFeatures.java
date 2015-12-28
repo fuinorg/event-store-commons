@@ -27,6 +27,7 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStoreSync;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
@@ -49,7 +50,7 @@ public class TestFeatures {
     private EventStoreSync eventStore;
 
     private SimpleSerializerDeserializerRegistry registry;
-    
+
     private TestCommand lastCommand;
 
     @Before
@@ -108,7 +109,7 @@ public class TestFeatures {
         command.execute();
         command.verify();
     }
-    
+
     @Given("^the following streams are created and a single event is appended to each$")
     public void createStreamsAndAppendSomeEvent(final List<String> streams) {
 
@@ -117,8 +118,8 @@ public class TestFeatures {
         for (int i = 1; i < streams.size(); i++) {
             final String streamName = streams.get(i);
             command.add(new CreateStreamCommand(streamName));
-            final CommonEvent event = new CommonEvent(new EventId(), new EventType(BookAddedEvent.TYPE),
-                    new BookAddedEvent("Unknown", "John Doe"));
+            final CommonEvent event = new SimpleCommonEvent(new EventId(),
+                    new EventType(BookAddedEvent.TYPE), new BookAddedEvent("Unknown", "John Doe"));
             command.add(new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, event));
         }
 
@@ -163,8 +164,8 @@ public class TestFeatures {
         command.init(eventStore);
         command.execute();
         lastCommand = command;
-    }    
-    
+    }
+
     @Given("^the stream \"(.*?)\" does not exist$")
     public void givenStreamDoesNotExist(final String streamName) {
         final TestCommand command = new StreamExistsCommand(streamName, false);
@@ -172,9 +173,9 @@ public class TestFeatures {
         command.execute();
         command.verify();
     }
-    
+
     @When("^I append the following events in the given order$")
-    public void whenAppendEvents(final List<AppendToStreamCommand> commands){
+    public void whenAppendEvents(final List<AppendToStreamCommand> commands) {
         final MultipleCommands command = new MultipleCommands();
         for (final AppendToStreamCommand cmd : commands) {
             command.add(cmd);
@@ -182,7 +183,7 @@ public class TestFeatures {
         command.init(eventStore);
         command.execute();
         command.verify();
-    }    
+    }
 
     @Then("^reading forward from stream should have the following results$")
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
@@ -191,29 +192,30 @@ public class TestFeatures {
         command.execute();
         command.verify();
     }
-    
+
     @When("^I append the following events to stream \"(.*?)\"$")
     public void appendXmlEvents(final String streamName, final String eventsXml) {
-        
+
         final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
-        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, commonEvents);
+        final AppendToStreamCommand command = new AppendToStreamCommand(streamName,
+                ExpectedVersion.ANY.getNo(), null, commonEvents);
         command.init(eventStore);
         command.execute();
         command.verify();
-                
+
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
     public void readXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
-        
+
         final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml, null);
         command.init(eventStore);
         command.execute();
         command.verify();
-        
+
     }
-    
+
 }
 // CHECKSTYLE:ON

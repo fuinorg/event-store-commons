@@ -35,6 +35,7 @@ import net.minidev.json.JSONArray;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
@@ -84,7 +85,7 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
         final Object meta = unmarshaller.unmarshal(desRegistry, serMetaType, entry.getMetaContentType(),
                 entry.getMeta());
 
-        return new CommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()), data,
+        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()), data,
                 meta);
         
     }

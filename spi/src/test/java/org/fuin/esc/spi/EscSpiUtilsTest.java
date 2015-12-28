@@ -26,6 +26,7 @@ import javax.activation.MimeTypeParseException;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.junit.Test;
 
 /**
@@ -131,7 +132,7 @@ public class EscSpiUtilsTest {
         final EventType eventType = new EventType(type);
         registry.addSerializer(serType, dummySerializer("text/plain"));
         final List<CommonEvent> events = new ArrayList<>();
-        events.add(new CommonEvent(new EventId(), eventType, "One"));
+        events.add(new SimpleCommonEvent(new EventId(), eventType, "One"));
 
         // TEST
         final EnhancedMimeType mimeType = EscSpiUtils.mimeType(registry, events);
@@ -158,8 +159,8 @@ public class EscSpiUtilsTest {
         registry.addSerializer(serTypeB, dummySerializer("application/xml"));
 
         final List<CommonEvent> events = new ArrayList<>();
-        events.add(new CommonEvent(new EventId(), eventTypeA, "One"));
-        events.add(new CommonEvent(new EventId(), eventTypeB, "<Other/>"));
+        events.add(new SimpleCommonEvent(new EventId(), eventTypeA, "One"));
+        events.add(new SimpleCommonEvent(new EventId(), eventTypeB, "<Other/>"));
 
         // TEST
         // TEST

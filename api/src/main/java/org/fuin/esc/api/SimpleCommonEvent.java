@@ -14,82 +14,94 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.test;
-
-import java.io.Serializable;
+package org.fuin.esc.api;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
-import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.objects4j.vo.ValueObject;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
  * <code>id</code>.
  */
 @Immutable
-@XmlRootElement(name = "event")
-public final class Event implements Serializable, ValueObject {
+public final class SimpleCommonEvent implements CommonEvent {
 
     private static final long serialVersionUID = 1000L;
 
     /** The ID of the event, used as part of the idempotent write check. */
     @NotNull
-    @XmlAttribute(name = "id")
     private EventId id;
+
+    /** Never changing unique event type name. */
+    @NotNull
+    private EventType type;
 
     /** The event data. */
     @NotNull
-    @XmlElement(name = "data")
-    private Data data;
+    private Object data;
 
     /** The meta data. */
-    @NotNull
-    @XmlElement(name = "meta")
-    private Data meta;
+    private Object meta;
 
     /**
      * Protected constructor for deserialization.
      */
-    protected Event() {
+    protected SimpleCommonEvent() {
         super();
     }
 
     /**
-     * Constructor with XML meta data.
+     * Constructor without meta data.
      * 
      * @param id
-     *            The ID of the event, used as part of the idempotent write check.
+     *            The ID of the event, used as part of the idempotent write check. This is type string to
+     *            allow different UUID implementations. It has to be a valid UUID string representation.
+     * @param type
+     *            Unique name of the type of data.
+     * @param data
+     *            Event data.
+     * 
+     */
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType type,
+            @NotNull final Object data) {
+        this(id, type, data, null);
+    }
+
+    /**
+     * Constructor with meta data.
+     * 
+     * @param id
+     *            The ID of the event, used as part of the idempotent write check. This is type string to
+     *            allow different UUID implementations. It has to be a valid UUID string representation.
+     * @param type
+     *            Unique name of the type of data.
      * @param data
      *            Event data.
      * @param meta
      *            Meta data.
      * 
      */
-    public Event(@NotNull final EventId id, @NotNull final Data data, @Nullable final Data meta) {
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType type,
+            @NotNull final Object data, @Nullable final Object meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
+        Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("data", data);
 
         this.id = id;
+        this.type = type;
         this.data = data;
         this.meta = meta;
 
     }
 
     /**
-     * Returns the ID of the event, used as part of the idempotent write check.
+     * Returns the ID of the event, used as part of the idempotent write check. This is type string to allow
+     * different UUID implementations. It has to be a valid UUID string representation.
      * 
      * @return Unique event identifier.
      */
@@ -99,12 +111,22 @@ public final class Event implements Serializable, ValueObject {
     }
 
     /**
+     * Returns the event type.
+     * 
+     * @return Never changing unique event type name.
+     */
+    @NotNull
+    public final EventType getType() {
+        return type;
+    }
+
+    /**
      * Returns the event data.
      * 
      * @return Event data.
      */
     @NotNull
-    public final Data getData() {
+    public final Object getData() {
         return data;
     }
 
@@ -113,24 +135,9 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @return Meta data.
      */
-    @NotNull
-    public final Data getMeta() {
+    @Nullable
+    public final Object getMeta() {
         return meta;
-    }
-
-    /**
-     * Returns this object as a common event object.
-     * 
-     * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass the classes for the content
-     *            here.
-     * 
-     * @return Converted object.
-     */
-    public final CommonEvent asCommonEvent(final Class<?>... classesToBeBound) {
-        final Object m = getMeta().unmarshalContent(classesToBeBound);
-        final Object d = getData().unmarshalContent(classesToBeBound);
-        return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d, m);
     }
 
     // CHECKSTYLE:OFF Generated code
@@ -149,9 +156,9 @@ public final class Event implements Serializable, ValueObject {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof Event))
+        if (!(obj instanceof SimpleCommonEvent))
             return false;
-        Event other = (Event) obj;
+        SimpleCommonEvent other = (SimpleCommonEvent) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
@@ -164,22 +171,7 @@ public final class Event implements Serializable, ValueObject {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("id", id).append("data", data).append("meta", meta)
-                .toString();
-    }
-
-    /**
-     * Creates an event using a common event.
-     * 
-     * @param selEvent
-     *            Event to copy.
-     * 
-     * @return New instance.
-     */
-    public static Event valueOf(final CommonEvent selEvent) {
-        final Data data = Data.valueOf(selEvent.getType().asBaseType(), selEvent.getData());
-        final Data meta = Data.valueOf("meta", selEvent.getMeta());
-        return new Event(selEvent.getId(), data, meta);
+        return type + " " + id;
     }
 
 }

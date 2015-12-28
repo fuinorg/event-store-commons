@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.ReadableEventStoreSync;
+import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
@@ -291,7 +292,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     private CommonEvent asCommonEvent(final JpaEvent jpaEvent) {
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
-        return new CommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, meta);
+        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, meta);
     }
 
     private Object deserialize(final JpaData data) {
