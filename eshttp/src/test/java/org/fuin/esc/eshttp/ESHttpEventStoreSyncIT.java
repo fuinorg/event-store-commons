@@ -42,7 +42,7 @@ import org.junit.Test;
  * Tests the {@link ESHttpEventStoreSync} class.
  */
 // CHECKSTYLE:OFF Test
-public class ESHttpEventStoreSyncTest {
+public class ESHttpEventStoreSyncIT {
 
     private ESHttpEventStoreSync testee;
 

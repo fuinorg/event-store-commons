@@ -31,7 +31,7 @@ import cucumber.api.CucumberOptions;
         "pretty", "html:target/cucumber-html-report",
         "junit:target/cucumber-junit-report/allcukes.xml" })
 // @formatter:on
-public class CucumberTests {
+public class CucumberIT {
 
 }
 // CHECKSTYLE:ON

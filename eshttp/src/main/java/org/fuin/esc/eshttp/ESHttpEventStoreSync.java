@@ -327,7 +327,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
             LOG.info(uri.toString());
-            final HttpGet get = new HttpGet(uri);
+            final HttpGet get = createHttpGet(uri);
             final Future<HttpResponse> future = httpclient.execute(get, null);
             final HttpResponse response = future.get();
             final StatusLine status = response.getStatusLine();

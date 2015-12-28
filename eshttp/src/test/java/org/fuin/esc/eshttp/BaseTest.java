@@ -38,6 +38,10 @@ public class BaseTest {
                     // Just copied code, not worth to test
                     return false;
                 }
+                if (clasz == ESHttpEventStoreSync.class) {
+                    // Integration Test
+                    return false;
+                }
                 return true;
             }
         });
