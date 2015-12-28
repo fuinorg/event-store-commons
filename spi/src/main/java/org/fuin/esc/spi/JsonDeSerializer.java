@@ -31,8 +31,8 @@ import javax.json.JsonWriter;
 
 /**
  * Serializes and deserializes a JSON object. The content type for serialization is always "application/json".
- * This implementation supports {@link JsonStructure} and
- * <code>byte[]</data> for unmarshalling content. Type {@link JsonStructure} will simply return the input without any change.
+ * This implementation supports {@link JsonStructure} and <code>byte[]</code> for unmarshalling content. Type
+ * {@link JsonStructure} will simply return the input without any change.
  */
 public final class JsonDeSerializer implements SerDeserializer {
 
