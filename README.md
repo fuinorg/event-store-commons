@@ -1,6 +1,11 @@
 # event-store-commons
 Defines a common event store Java interface and provides some adapters (like for Greg Young's [event store](https://www.geteventstore.com/)) and implementations (like in-memory or file-based).
 
+[![Build Status](https://fuin-org.ci.cloudbees.com/job/event-store-commons/badge/icon)](https://fuin-org.ci.cloudbees.com/job/event-store-commons/)
+[![Coverage Status](https://coveralls.io/repos/fuinorg/event-store-commons/badge.svg)](https://coveralls.io/r/fuinorg/event-store-commons)
+[![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
+[![Java Development Kit 1.8](https://img.shields.io/badge/JDK-1.8-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
 # Status
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in progress** - *Don't expect the interfaces to be stable or the code to be well tested yet...* ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
