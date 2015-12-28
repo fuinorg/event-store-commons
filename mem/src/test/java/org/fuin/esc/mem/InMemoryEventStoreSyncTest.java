@@ -26,6 +26,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -59,17 +60,14 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("One"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Two"));
+        final CommonEvent eventOne = event("One");
+        final CommonEvent eventTwo = event("Two");
 
         // TEST
-        testee.appendToStream(streamId, 0, eventOne, eventTwo);
+        testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo);
 
         // VERIFY
-        final StreamEventsSlice slice = testee.readEventsForward(StreamId.ALL,
-                0, 2);
+        final StreamEventsSlice slice = testee.readEventsForward(StreamId.ALL, 0, 2);
         assertThat(slice.getEvents()).contains(eventOne, eventTwo);
         assertThat(slice.getFromEventNumber()).isEqualTo(0);
         assertThat(slice.getNextEventNumber()).isEqualTo(2);
@@ -81,23 +79,16 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("One"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Two"));
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Three"));
-        final CommonEvent eventFour = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Four"));
-        final CommonEvent eventFive = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Five"));
-        final int nextVersion = testee.appendToStream(streamId, 0, eventOne,
-                eventTwo, eventThree, eventFour, eventFive);
-        final int version = nextVersion - 1;
+        final CommonEvent eventOne = event("5874a43c-3404-42a1-a07e-64e22209963b", "One");
+        final CommonEvent eventTwo = event("32383ba2-d524-4466-9ad2-f06a3fe1958f", "Two");
+        final CommonEvent eventThree = event("8885c8c1-6148-4709-b816-018f72111559", "Three");
+        final CommonEvent eventFour = event("4028e009-74eb-4a31-905a-3bdffb1046c0", "Four");
+        final CommonEvent eventFive = event("9bfb6129-f503-49a7-b2d1-7a2edcefae9c", "Five");
+        final int version = testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
+                eventOne, eventTwo, eventThree, eventFour, eventFive);
 
         // TEST Slice 1
-        final StreamEventsSlice slice1 = testee.readEventsBackward(
-                StreamId.ALL, version, 2);
+        final StreamEventsSlice slice1 = testee.readEventsBackward(StreamId.ALL, version, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventFive, eventFour);
@@ -106,8 +97,8 @@ public class InMemoryEventStoreSyncTest {
         assertThat(slice1.isEndOfStream()).isFalse();
 
         // TEST Slice 2
-        final StreamEventsSlice slice2 = testee.readEventsBackward(
-                StreamId.ALL, slice1.getNextEventNumber(), 2);
+        final StreamEventsSlice slice2 = testee.readEventsBackward(StreamId.ALL, slice1.getNextEventNumber(),
+                2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree, eventTwo);
@@ -116,8 +107,8 @@ public class InMemoryEventStoreSyncTest {
         assertThat(slice2.isEndOfStream()).isFalse();
 
         // TEST Slice 3
-        final StreamEventsSlice slice3 = testee.readEventsBackward(
-                StreamId.ALL, slice2.getNextEventNumber(), 2);
+        final StreamEventsSlice slice3 = testee.readEventsBackward(StreamId.ALL, slice2.getNextEventNumber(),
+                2);
 
         // VERIFY Slice 3
         assertThat(slice3.getEvents()).containsExactly(eventOne);
@@ -132,17 +123,14 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("One"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Two"));
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Three"));
-        testee.appendToStream(streamId, 0, eventOne, eventTwo, eventThree);
+        final CommonEvent eventOne = event("One");
+        final CommonEvent eventTwo = event("Two");
+        final CommonEvent eventThree = event("Three");
+        testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo,
+                eventThree);
 
         // TEST Slice 1
-        final StreamEventsSlice slice1 = testee.readEventsForward(StreamId.ALL,
-                0, 2);
+        final StreamEventsSlice slice1 = testee.readEventsForward(StreamId.ALL, 0, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventOne, eventTwo);
@@ -151,8 +139,8 @@ public class InMemoryEventStoreSyncTest {
         assertThat(slice1.isEndOfStream()).isFalse();
 
         // TEST Slice 2
-        final StreamEventsSlice slice2 = testee.readEventsForward(StreamId.ALL,
-                slice1.getNextEventNumber(), 2);
+        final StreamEventsSlice slice2 = testee.readEventsForward(StreamId.ALL, slice1.getNextEventNumber(),
+                2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree);
@@ -167,21 +155,17 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("One"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Two"));
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Three"));
+        final CommonEvent eventOne = event("One");
+        final CommonEvent eventTwo = event("Two");
+        final CommonEvent eventThree = event("Three");
         testee.appendToStream(streamId, eventOne);
         final List<CommonEvent> result = new CopyOnWriteArrayList<>();
 
         // TEST
-        testee.subscribeToStream(streamId, EscApiUtils.SUBSCRIBE_TO_NEW_EVENTS,
-                (subscription, event) -> {
-                    result.add(event);
-                }, (subscription, exception) -> {
-                    // Not used
+        testee.subscribeToStream(streamId, EscApiUtils.SUBSCRIBE_TO_NEW_EVENTS, (subscription, event) -> {
+            result.add(event);
+        }, (subscription, exception) -> {
+            // Not used
             });
         testee.appendToStream(streamId, eventTwo, eventThree);
         waitForResult(result, 1);
@@ -196,12 +180,9 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Eins"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Zwei"));
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Drei"));
+        final CommonEvent eventOne = event("Eins");
+        final CommonEvent eventTwo = event("Zwei");
+        final CommonEvent eventThree = event("Drei");
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree);
         final List<CommonEvent> result = new CopyOnWriteArrayList<>();
 
@@ -223,12 +204,9 @@ public class InMemoryEventStoreSyncTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Eins"));
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Zwei"));
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(),
-                new EventType("MyEvent"), new MyEvent("Drei"));
+        final CommonEvent eventOne = event("Eins");
+        final CommonEvent eventTwo = event("Zwei");
+        final CommonEvent eventThree = event("Drei");
         testee.appendToStream(streamId, eventOne, eventTwo);
         final List<CommonEvent> result = new CopyOnWriteArrayList<>();
 
@@ -254,8 +232,7 @@ public class InMemoryEventStoreSyncTest {
         }
     }
 
-    private void waitForResult(final List<CommonEvent> result,
-            final int expected) {
+    private void waitForResult(final List<CommonEvent> result, final int expected) {
         int count = 0;
         while (result.size() != expected && (count < 10)) {
             try {
@@ -266,6 +243,18 @@ public class InMemoryEventStoreSyncTest {
             count++;
         }
 
+    }
+
+    private static CommonEvent event(final String name) {
+        return event(new EventId(), name);
+    }
+
+    private static CommonEvent event(final String uuid, final String name) {
+        return event(new EventId(uuid), name);
+    }
+
+    private static CommonEvent event(final EventId id, final String name) {
+        return new SimpleCommonEvent(id, new EventType("MyEvent"), new MyEvent(name));
     }
 
 }

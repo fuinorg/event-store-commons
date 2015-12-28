@@ -112,7 +112,8 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, 
+            final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
