@@ -87,7 +87,7 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
     }
 
     /**
-     * Parses the atom data without creating the event itself from data & meta data.
+     * Parses the atom data without creating the event itself from data &amp; meta data.
      * 
      * @param in
      *            Input stream to read.
