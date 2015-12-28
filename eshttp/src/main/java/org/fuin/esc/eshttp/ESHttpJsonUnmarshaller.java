@@ -17,7 +17,6 @@
 package org.fuin.esc.eshttp;
 
 import javax.json.JsonObject;
-import javax.json.JsonString;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 
@@ -49,7 +48,7 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
             // JSON Object or Array
             final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
             return deSer.unmarshal(jsonStruct, mimeType);
-        }        
+        }
         if (jsonStruct.getValueType() != JsonValue.ValueType.OBJECT) {
             throw new IllegalStateException("Got transferEncodingData='" + transferEncodingData
                     + "' and expected JSON Object, but was: " + jsonStruct);
