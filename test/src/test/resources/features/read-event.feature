@@ -15,7 +15,8 @@ Scenario: Same type append and read
         </event>
     </events>
     """
-    Then reading event 0 from stream "append_same_and_read_stream" should return the following event
+    Then this should raise no exception
+    And reading event 0 from stream "append_same_and_read_stream" should return the following event
     """
     <event id="73d2ac98-04cf-4531-bd88-0da46e394a02">
         <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>

@@ -83,7 +83,9 @@ public class TestFeatures {
     public void afterFeature() {
         eventStore.close();
         eventStore = null;
-        lastCommand = null;
+        if (lastCommand != null) {
+            throw new IllegalStateException("Last command was set, but not verified!");
+        }
     }
 
     @Then("^this should give the expected results$")
@@ -92,6 +94,7 @@ public class TestFeatures {
             throw new IllegalStateException("Last command was not set in the 'when' condition");
         }
         lastCommand.verify();
+        lastCommand = null;
     }
 
     @Then("^this should raise no exception$")

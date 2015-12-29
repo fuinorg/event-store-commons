@@ -51,7 +51,8 @@ Scenario: Read after delete
     | Stream Name            | Hard Delete | Expected Version | Expected Exception | 
     | read_after_hard_delete | true        | ANY              | -                  |
     | read_after_soft_delete | false       | ANY              | -                  |
-    Then following streams should not exist
+    Then this should give the expected results
+    And following streams should not exist
     | Stream Name            |
     | read_after_hard_delete |
     | read_after_soft_delete |
@@ -81,7 +82,8 @@ Scenario: Delete after delete
     | delete_after_soft_delete_2 | false       | ANY              | -                  |
     | delete_after_soft_delete_3 | false       | ANY              | -                  |
     | delete_after_soft_delete_4 | false       | ANY              | -                  |
-    Then executing the following deletes should have the given result
+    Then this should give the expected results
+    And executing the following deletes should have the given result
     | Stream Name                | Hard Delete | Expected Version | Expected Exception      | 
     | delete_after_hard_delete_1 | true        | ANY              | StreamDeletedException  |
     | delete_after_hard_delete_2 | false       | ANY              | StreamDeletedException  |
