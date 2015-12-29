@@ -16,18 +16,15 @@
  */
 package org.fuin.esc.api;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Nullable;
-import org.fuin.objects4j.vo.ValueObject;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
  * <code>id</code>.
  */
-public interface CommonEvent extends Serializable, ValueObject {
+public interface CommonEvent {
 
     /**
      * Returns the ID of the event, used as part of the idempotent write check. This is type string to allow
