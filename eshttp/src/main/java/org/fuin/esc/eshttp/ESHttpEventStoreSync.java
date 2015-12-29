@@ -43,8 +43,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -460,12 +462,13 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     private CommonEvent readEvent(final URI uri) {
         LOG.info(uri.toString());
+        final String msg = "readEvent(" + uri + ")";
         try {
             final HttpGet get = createHttpGet(uri);
             final Future<HttpResponse> future = httpclient.execute(get, null);
             final HttpResponse response = future.get();
-            final StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
+            final StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() == 200) {
                 final HttpEntity entity = response.getEntity();
                 final InputStream in = entity.getContent();
                 try {
@@ -473,16 +476,47 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 } finally {
                     in.close();
                 }
-            } else {
-                throw new RuntimeException("Failed to read " + uri + " [Status=" + status.getStatusCode()
-                        + "]");
             }
+            if (statusLine.getStatusCode() == 404) {
+                // 404 Not Found
+                LOG.debug(msg + " RESPONSE: {}", response);
+                final StreamId streamId = streamId(uri);
+                final int eventNumber = eventNumber(uri);
+                throw new EventNotFoundException(streamId, eventNumber);
+            }
+            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
         } catch (final InterruptedException | ExecutionException | UnsupportedOperationException
                 | IOException ex) {
             throw new RuntimeException("Failed to read " + uri, ex);
         }
     }
 
+    private StreamId streamId(final URI uri) {
+        // http://127.0.0.1:2113/streams/append_diff_and_read_stream/2
+        final String url = uri.toString();
+        final int p1 = url.indexOf("/streams/");
+        if (p1 == -1) {
+            throw new IllegalStateException("Failed to extract '/streams/': " + uri);
+        }
+        final int p2 = url.lastIndexOf('/');
+        if (p2 == -1) {
+            throw new IllegalStateException("Failed to extract last '/': " + uri);
+        }
+        final String str = url.substring(p1 + 9, p2);
+        return new SimpleStreamId(str);
+    }
+
+    private int eventNumber(final URI uri) {
+        // http://127.0.0.1:2113/streams/append_diff_and_read_stream/2
+        final String url = uri.toString();
+        final int p = url.lastIndexOf('/');
+        if (p == -1) {
+            throw new IllegalStateException("Failed to extract event number: " + uri);
+        }
+        final String str = url.substring(p + 1);
+        return Integer.valueOf(str);
+    }
+    
     private String streamName(StreamId streamId) {
         if (streamId.equals(StreamId.ALL)) {
             return "$all";
