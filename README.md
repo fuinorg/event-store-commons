@@ -9,8 +9,8 @@ Defines a common event store Java interface and provides some adapters (like for
 # Status
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
-| Module | Description | Status | Comment |
-|--------|-------------|--------|---------|
+| :Module | :Description | Status | :Comment |
+|---------|--------------|--------|----------|
 | [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~58% |
 | [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
 | [esc-jpa](jpa) | JPA adapter | ![PAUSED](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/sleeping.png) | Development paused - Will be continued after 'esc-test' is more complete |
@@ -23,7 +23,7 @@ Defines a common event store Java interface and provides some adapters (like for
 See [ES.JVM](https://github.com/EventStore/EventStore.JVM) / [ES.Java](https://github.com/jen20/EventStore.Java)
 
 # Examples
-| Name | Description |
-|------|-------------|
-| [In-memory example](blob/master/test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java) | A very simple in-memory example |
+| :Name | :Description |
+|-------|--------------|
+| [In-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java) | A very simple in-memory example |
  
