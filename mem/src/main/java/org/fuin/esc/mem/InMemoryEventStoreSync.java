@@ -161,7 +161,10 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         }
 
         final int fromEventNumber = start;
-        final int nextEventNumber = start - result.size();
+        int nextEventNumber = start - result.size();
+        if (nextEventNumber < 0) {
+            nextEventNumber = 0;
+        }
         final boolean endOfStream = (start - count) < 0;
 
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);

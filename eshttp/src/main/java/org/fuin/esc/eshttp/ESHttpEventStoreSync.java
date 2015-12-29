@@ -44,6 +44,7 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -160,6 +161,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             final List<CommonEvent> commonEvents) throws StreamDeletedException,
             WrongExpectedVersionException, StreamReadOnlyException {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        Contract.requireArgNotNull("commonEvents", commonEvents);
+
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
@@ -233,6 +238,9 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     public void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+
         final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
@@ -287,7 +295,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
                     "/streams/" + streamName(streamId) + "/" + start + "/forward/" + count).build();
-            return readEvents(streamId, true, uri, start, count, msg);
+            return readEvents(streamId, true, uri, start, count, msg, false);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -296,11 +304,16 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     @Override
     public StreamEventsSlice readEventsBackward(final StreamId streamId, final int start, final int count) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 0);
+        Contract.requireArgMin("count", count, 1);
+
         final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
                     "/streams/" + streamName(streamId) + "/" + start + "/backward/" + count).build();
-            return readEvents(streamId, false, uri, start, count, msg);
+            return readEvents(streamId, false, uri, start, count, msg, true);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -308,6 +321,10 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     @Override
     public CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("eventNumber", eventNumber, 0);
+
         final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath(
@@ -384,8 +401,8 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     }
 
     private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri,
-            final int start, final int count, final String msg) throws InterruptedException,
-            ExecutionException, IOException {
+            final int start, final int count, final String msg, final boolean reverseOrder)
+            throws InterruptedException, ExecutionException, IOException {
         LOG.info(uri.toString());
         final HttpGet get = createHttpGet(uri);
         final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -397,7 +414,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             try {
                 final AtomFeedReader atomFeedReader = envelopeType.getAtomFeedReader();
                 final List<URI> uris = atomFeedReader.readAtomFeed(in);
-                return readEvents(forward, start, count, uris);
+                return readEvents(forward, start, count, uris, reverseOrder);
             } finally {
                 in.close();
             }
@@ -416,11 +433,18 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
     }
 
     private StreamEventsSlice readEvents(final boolean forward, final int fromEventNumber, final int count,
-            final List<URI> uris) {
+            final List<URI> uris, final boolean reverseOrder) {
         final List<CommonEvent> events = new ArrayList<>();
-        for (int i = uris.size() - 1; i >= 0; i--) {
-            final URI uri = uris.get(i);
-            events.add(readEvent(uri));
+        if (reverseOrder) {
+            for (int i = 0; i < uris.size(); i++) {
+                final URI uri = uris.get(i);
+                events.add(readEvent(uri));
+            }
+        } else {
+            for (int i = uris.size() - 1; i >= 0; i--) {
+                final URI uri = uris.get(i);
+                events.add(readEvent(uri));
+            }
         }
         final int nextEventNumber;
         final boolean endOfStream;
