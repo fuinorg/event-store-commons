@@ -234,12 +234,20 @@ public class TestFeatures {
     }
     
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
-    public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) throws Throwable {
+    public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) {
         final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null, expectedException);
         command.init(eventStore);
         command.execute();
         command.verify();
     }    
 
+    @When("^the following state queries are executed$")
+    public void whenStateQueriesAreExecuted(final List<StreamStateCommand> commands) {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
+    
 }
 // CHECKSTYLE:ON
