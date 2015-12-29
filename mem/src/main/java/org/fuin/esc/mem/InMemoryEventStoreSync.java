@@ -217,7 +217,25 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
-        final InternalStream stream = createIfNotExists(streamId, expectedVersion);
+        InternalStream stream = streams.get(streamId);
+        if (stream == null) {
+            stream = new InternalStream();
+            streams.put(streamId, stream);
+        }
+        if (stream.getState() == StreamState.HARD_DELETED) {
+            throw new StreamDeletedException(streamId);
+        }
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            stream.undelete();
+        }
+        if (expectedVersion != ExpectedVersion.ANY.getNo() && expectedVersion != stream.getVersion()) {
+            final List<CommonEvent> events = stream.getEvents();
+            if (lastEventsEqual(events, toAppend)) {
+                return stream.getVersion();
+            }
+            throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
+        }
+
         all.addAll(toAppend);
         stream.addAll(toAppend);
 
@@ -225,6 +243,24 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
         return stream.getVersion();
 
+    }
+
+    private boolean lastEventsEqual(final List<CommonEvent> events, final List<CommonEvent> toAppend) {
+        if (events.size() < toAppend.size()) {
+            return false;
+        }
+        int currentIdx = events.size() - 1;
+        int appendIdx = toAppend.size() - 1;
+        while (appendIdx > 0) {
+            final CommonEvent current = events.get(currentIdx);
+            final CommonEvent append = events.get(appendIdx);
+            if (!current.getId().equals(append.getId())) {
+                return false;
+            }
+            currentIdx--;
+            appendIdx--;
+        }
+        return true;
     }
 
     @Override
@@ -357,24 +393,6 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         }
         if (stream.getState() == StreamState.HARD_DELETED) {
             throw new StreamDeletedException(streamId);
-        }
-        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
-            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
-        }
-        return stream;
-    }
-
-    private InternalStream createIfNotExists(final StreamId streamId, final int expected) {
-        InternalStream stream = streams.get(streamId);
-        if (stream == null) {
-            stream = new InternalStream();
-            streams.put(streamId, stream);
-        }
-        if (stream.getState() == StreamState.HARD_DELETED) {
-            throw new StreamDeletedException(streamId);
-        }
-        if (stream.getState() == StreamState.SOFT_DELETED) {
-            stream.undelete();
         }
         if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
             throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
