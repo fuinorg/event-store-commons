@@ -111,7 +111,7 @@ public class TestFeatures {
     }
 
     @Given("^the following streams are created and a single event is appended to each$")
-    public void createStreamsAndAppendSomeEvent(final List<String> streams) {
+    public void givenCreateStreamsAndAppendSomeEvent(final List<String> streams) {
 
         final MultipleCommands command = new MultipleCommands();
 
@@ -210,7 +210,7 @@ public class TestFeatures {
     }
 
     @When("^I append the following events to stream \"(.*?)\"$")
-    public void appendXmlEvents(final String streamName, final String eventsXml) {
+    public void whenAppendXmlEvents(final String streamName, final String eventsXml) {
 
         final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
@@ -224,7 +224,7 @@ public class TestFeatures {
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
-    public void readXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
+    public void thenReadXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
 
         final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml, null);
         command.init(eventStore);
@@ -232,6 +232,14 @@ public class TestFeatures {
         command.verify();
 
     }
+    
+    @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
+    public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) throws Throwable {
+        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null, expectedException);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }    
 
 }
 // CHECKSTYLE:ON

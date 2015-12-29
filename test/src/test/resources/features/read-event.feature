@@ -59,4 +59,5 @@ Scenario: Same type append and read
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
     </event>
     """
+    And reading event 2 from stream "append_diff_and_read_stream" should throw a "EventNotFoundException"
  
