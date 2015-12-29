@@ -112,8 +112,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, 
-            final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -307,7 +306,13 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
-        return stream.getState();
+        final StreamState state = stream.getState();
+        if (state == StreamState.SOFT_DELETED) {
+            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
+            // streams
+            throw new StreamNotFoundException(streamId);
+        }
+        return state;
     }
 
     private void notifyListeners(final StreamId streamId, final List<CommonEvent> events, final int idx) {
