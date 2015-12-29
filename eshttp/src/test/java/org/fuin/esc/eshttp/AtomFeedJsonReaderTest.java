@@ -65,7 +65,7 @@ public class AtomFeedJsonReaderTest {
         try {
 
             // TEST
-            final AtomEntry entry = testee.readAtomEntry(in);
+            final AtomEntry<?> entry = testee.readAtomEntry(in);
 
             // VERIFY
             assertThat(entry.getEventStreamId()).isEqualTo("MyStreamA");
