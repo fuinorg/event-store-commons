@@ -208,18 +208,20 @@ public class TestFeatures {
 
     @When("^I append the following events to stream \"(.*?)\"$")
     public void whenAppendXmlEvents(final String streamName, final String eventsXml) {
+        appendXmlEvents(streamName, ExpectedVersion.ANY.getNo(), eventsXml);
+    }
 
+    private void appendXmlEvents(final String streamName, final int version, final String eventsXml) {
         final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
         final AppendToStreamCommand command = new AppendToStreamCommand(streamName,
-                ExpectedVersion.ANY.getNo(), null, commonEvents);
+                version, null, commonEvents);
         command.init(eventStore);
         command.execute();
         command.verify();
-
     }
-
+    
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
     public void thenReadXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
 
