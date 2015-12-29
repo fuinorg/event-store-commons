@@ -128,7 +128,12 @@ public final class Event implements Serializable, ValueObject {
      * @return Converted object.
      */
     public final CommonEvent asCommonEvent(final Class<?>... classesToBeBound) {
-        final Object m = getMeta().unmarshalContent(classesToBeBound);
+        final Object m;
+        if (getMeta() == null) {
+            m = null;
+        } else {
+            m = getMeta().unmarshalContent(classesToBeBound);
+        }
         final Object d = getData().unmarshalContent(classesToBeBound);
         return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d, m);
     }
