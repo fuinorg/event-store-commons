@@ -94,6 +94,11 @@ public class TestFeatures {
         lastCommand.verify();
     }
 
+    @Then("^this should raise no exception$")
+    public void thenNoException() {
+        // Do nothing, just to create a nice 'then' text
+    }
+    
     @When("^the following deletes are executed$")
     public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
