@@ -21,3 +21,9 @@ Defines a common event store Java interface and provides some adapters (like for
 # Architecture
 ![Layers](https://raw.github.com/fuinorg/event-store-commons/master/doc/event-store-commons.png)
 See [ES.JVM](https://github.com/EventStore/EventStore.JVM) / [ES.Java](https://github.com/jen20/EventStore.Java)
+
+# Examples
+| Name | Description |
+|------|-------------|
+| [In-memory example](blob/master/test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java) | A very simple in-memory example |
+ 

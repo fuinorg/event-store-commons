@@ -36,6 +36,7 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.spi.XmlDeSerializer;
+import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.units4j.Units4JUtils;
 
 import cucumber.api.java.After;

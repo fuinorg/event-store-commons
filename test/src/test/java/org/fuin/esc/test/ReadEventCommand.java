@@ -22,6 +22,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.units4j.Units4JUtils;
 
 /**

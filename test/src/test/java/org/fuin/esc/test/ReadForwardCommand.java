@@ -29,6 +29,7 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.objects4j.common.Nullable;
 
 /**
