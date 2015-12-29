@@ -98,9 +98,15 @@ public final class ReadEventCommand implements TestCommand {
         expectedEventXml = EscTestUtils.emptyAsNull(expectedEventXml);
 
         streamId = new SimpleStreamId(streamName, false);
-        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
-        final Event event = Units4JUtils.unmarshal(expectedEventXml, Event.class);
-        expectedEvent = event.asCommonEvent(BookAddedEvent.class);
+        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);        
+        final Event event;
+        if (expectedEventXml == null) {
+            event = null;
+            expectedEvent = null;
+        } else {
+            event = Units4JUtils.unmarshal(expectedEventXml, Event.class);
+            expectedEvent = event.asCommonEvent(BookAddedEvent.class);
+        }
 
     }
 
