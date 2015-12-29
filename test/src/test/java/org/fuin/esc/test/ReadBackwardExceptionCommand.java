@@ -23,9 +23,9 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 
 /**
- * Reads a stream forward and expects and exception.
+ * Reads a stream backward and expects and exception.
  */
-public final class ReadForwardExceptionCommand implements TestCommand {
+public final class ReadBackwardExceptionCommand implements TestCommand {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -55,7 +55,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
     /**
      * Default constructor used by Cucumber.
      */
-    public ReadForwardExceptionCommand() {
+    public ReadBackwardExceptionCommand() {
         super();
     }
 
@@ -73,7 +73,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
      * @param expectedMessage
      *            The exception message that is expected, an empty string or "-".
      */
-    public ReadForwardExceptionCommand(@NotNull final String streamName, final int start, final int count,
+    public ReadBackwardExceptionCommand(@NotNull final String streamName, final int start, final int count,
             final String expectedException, final String expectedMessage) {
         super();
         this.streamName = streamName;
@@ -104,7 +104,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
     @Override
     public final void execute() {
         try {
-            es.readEventsForward(streamId, start, count);
+            es.readEventsBackward(streamId, start, count);
         } catch (final Exception ex) {
             this.actualException = ex;
         }
@@ -130,7 +130,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
 
     @Override
     public final String toString() {
-        return "ReadForwardExceptionCommand [streamName=" + streamName + ", start=" + start + ", count="
+        return "ReadBackwardExceptionCommand [streamName=" + streamName + ", start=" + start + ", count="
                 + count + ", expectedException=" + expectedException + ", actualException=" + actualException
                 + "]";
     }

@@ -166,6 +166,14 @@ public class TestFeatures {
         lastCommand = command;
     }
 
+    @When("^I read backward from the following streams$")
+    public void whenReadBackwardException(final List<ReadBackwardExceptionCommand> commands) {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        lastCommand = command;
+    }
+
     @Given("^the stream \"(.*?)\" does not exist$")
     public void givenStreamDoesNotExist(final String streamName) {
         final TestCommand command = new StreamExistsCommand(streamName, false);
@@ -187,6 +195,14 @@ public class TestFeatures {
 
     @Then("^reading forward from stream should have the following results$")
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
+        final TestCommand command = new MultipleCommands(commands);
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
+
+    @Then("^reading backward from stream should have the following results$")
+    public void thenReadBackward(final List<ReadBackwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
         command.execute();
