@@ -23,7 +23,5 @@ Defines a common event store Java interface and provides some adapters (like for
 See [ES.JVM](https://github.com/EventStore/EventStore.JVM) / [ES.Java](https://github.com/jen20/EventStore.Java)
 
 # Examples
-| Name | Description |
-|:-----|:------------|
-| [In-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java) | A very simple in-memory example |
- 
+-[Simple in-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java)
+-[Simple event store example using HTTP interface and XML](test/src/test/java/org/fuin/esc/test/examples/EsHttpExample.java)
