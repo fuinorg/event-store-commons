@@ -198,10 +198,19 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.18.1</version>
+				<configuration>
+					<argLine>${failsafe.argLine}</argLine>
+				</configuration>
 				<executions>
 					<execution>
+						<id>integration-test</id>
 						<goals>
 							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
 							<goal>verify</goal>
 						</goals>
 					</execution>
@@ -221,10 +230,10 @@
 						</goals>
 					</execution>
 				</executions>
-                <configuration>
-                    <archive-name>EventStore-OSS-Ubuntu-14.04</archive-name>
-                    <archive-version>3.4.0</archive-version>
-                </configuration>
+				<configuration>
+					<archive-name>EventStore-OSS-Ubuntu-14.04</archive-name>
+					<archive-version>3.4.0</archive-version>
+				</configuration>
 			</plugin>
 
 		</plugins>
