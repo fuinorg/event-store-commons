@@ -131,23 +131,12 @@ public class TestFeatures {
 
     @Given("^the following streams don't exist$")
     public void givenStreamsDontExist(final List<String> streams) {
-        streamsShouldNotExist(streams);
+        streamsExists(streams, false);
     }
 
     @Then("^following streams should not exist$")
     public void thenStreamsShouldNotExist(final List<String> streams) {
-        streamsShouldNotExist(streams);
-    }
-
-    private void streamsShouldNotExist(final List<String> streams) {
-        final MultipleCommands command = new MultipleCommands();
-        for (int i = 1; i < streams.size(); i++) {
-            final String streamName = streams.get(i);
-            command.add(new StreamExistsCommand(streamName, false));
-        }
-        command.init(eventStore);
-        command.execute();
-        command.verify();
+        streamsExists(streams, false);
     }
 
     @Then("^reading forward from the following streams should raise the given exceptions$")
@@ -232,14 +221,15 @@ public class TestFeatures {
         command.verify();
 
     }
-    
+
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
     public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) {
-        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null, expectedException);
+        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null,
+                expectedException);
         command.init(eventStore);
         command.execute();
         command.verify();
-    }    
+    }
 
     @When("^the following state queries are executed$")
     public void whenStateQueriesAreExecuted(final List<StreamStateCommand> commands) {
@@ -248,6 +238,27 @@ public class TestFeatures {
         command.execute();
         command.verify();
     }
-    
+
+    @Given("^the following streams exist$")
+    public void givenStreamsExist(final List<String> streams) {
+        streamsExists(streams, true);
+    }
+
+    @Then("^following streams should exist$")
+    public void thenStreamsShouldExist(final List<String> streams) {
+        streamsExists(streams, true);
+    }
+
+    private void streamsExists(final List<String> streams, final boolean exist) {
+        final MultipleCommands command = new MultipleCommands();
+        for (int i = 1; i < streams.size(); i++) {
+            final String streamName = streams.get(i);
+            command.add(new StreamExistsCommand(streamName, exist));
+        }
+        command.init(eventStore);
+        command.execute();
+        command.verify();
+    }
+
 }
 // CHECKSTYLE:ON

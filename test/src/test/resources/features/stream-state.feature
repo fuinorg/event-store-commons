@@ -18,5 +18,12 @@ Scenario: All states
     | state_hard_deleted_stream | HARD_DELETED   | -                       |
     | state_soft_deleted_stream | -              | StreamNotFoundException |
     Then this should give the expected results
-
+    And following streams should exist
+    | Stream Name           |
+    | state_existing_stream |
+    And following streams should not exist
+    | Stream Name               |
+    | name_does_not_matter      |
+    | state_hard_deleted_stream |
+    | state_soft_deleted_stream |
     
