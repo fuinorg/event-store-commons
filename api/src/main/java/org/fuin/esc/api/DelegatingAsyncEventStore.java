@@ -42,7 +42,8 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
      * @param delegate
      *            Delegate to forward all method calls to.
      */
-    public DelegatingAsyncEventStore(@NotNull final Executor executor, @NotNull final EventStoreSync delegate) {
+    public DelegatingAsyncEventStore(@NotNull final Executor executor, 
+            @NotNull final EventStoreSync delegate) {
         super();
         Contract.requireArgNotNull("executor", executor);
         Contract.requireArgNotNull("delegate", delegate);

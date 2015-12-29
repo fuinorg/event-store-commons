@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 final class EscTestUtils {
 
-    private static Logger LOG = LoggerFactory.getLogger(EscTestUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EscTestUtils.class);
 
     private EscTestUtils() {
         throw new UnsupportedOperationException();
@@ -214,7 +214,8 @@ final class EscTestUtils {
      * 
      * @return TRUE id the events have the same content.
      */
-    public static boolean sameContent(@Nullable final CommonEvent eventA, @Nullable final CommonEvent eventB) {
+    public static boolean sameContent(@Nullable final CommonEvent eventA, 
+            @Nullable final CommonEvent eventB) {
         if (eventA == null) {
             if (eventB == null) {
                 return true;
@@ -260,6 +261,15 @@ final class EscTestUtils {
         return true;
     }
 
+    /**
+     * Creates an exception message by pointing out the differences between two events.
+     * 
+     * @param streamId Unique stream indentifier.
+     * @param expectedEvent First event.
+     * @param actualEvent Second event.
+     * 
+     * @return Exception message.
+     */
     public static String createExceptionFailureMessage(final StreamId streamId,
             final CommonEvent expectedEvent, final CommonEvent actualEvent) {
         if (expectedEvent == null) {

@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface EscCucumberArgs {
 
-    /** Arguments to execute the test with. */
+    /** @return Arguments to execute the test with. */
     String[] value();
 
 }

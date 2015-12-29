@@ -107,8 +107,11 @@ public final class AppendToStreamCommand implements TestCommand {
         super();
         this.streamName = streamName;
         this.expectedVersion = "" + expectedVersion;
-        this.expectedException = (expectedExceptionClass == null ? null : expectedExceptionClass
-                .getSimpleName());
+        if (expectedExceptionClass == null) {
+            this.expectedException = null;
+        } else {
+            this.expectedException = expectedExceptionClass.getSimpleName();
+        }
         this.events = events;
     }
 

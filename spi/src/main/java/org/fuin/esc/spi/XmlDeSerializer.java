@@ -38,8 +38,8 @@ import org.w3c.dom.Node;
 
 /**
  * Serializes and deserializes an object from/to XML using JAXB. The content type for serialization is always
- * "application/xml". This implementation supports {@link Node} and
- * <code>byte[]</code> for unmarshalling content.
+ * "application/xml". This implementation supports {@link Node} and <code>byte[]</code> for unmarshalling
+ * content.
  */
 public final class XmlDeSerializer implements SerDeserializer {
 
@@ -90,6 +90,8 @@ public final class XmlDeSerializer implements SerDeserializer {
      * 
      * @param encoding
      *            Encoding to use.
+     * @param jaxbFragment
+     *            Generate the XML fragment or not.
      * @param classesToBeBound
      *            Classes to use for the JAXB context.
      */
@@ -135,7 +137,8 @@ public final class XmlDeSerializer implements SerDeserializer {
                         if (event.getLinkedException() == null) {
                             throw new RuntimeException("Error unmarshalling the data: " + event.getMessage());
                         }
-                        throw new RuntimeException("Error unmarshalling the data", event.getLinkedException());
+                        throw new RuntimeException("Error unmarshalling " + "the data", event
+                                .getLinkedException());
                     }
                     return true;
                 }
