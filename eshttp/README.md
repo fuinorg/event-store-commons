@@ -3,7 +3,7 @@ Event store commons HTTP adapter for Greg Young's [Event Store](https://www.gete
 
 ## ESC Meta Data Structure
 The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. 
-To allow storing different types and versions of data and meta data, the common event store interface introduces 
+To allow having multiple types and versions of data and meta data, the common event store interface introduces 
 a separate meta data structure. It contains information about content-types, encoding, version, meta type and 
 the meta information provided by the user.
 
