@@ -32,7 +32,7 @@
 		<module>api</module>
 		<module>spi</module>
 		<module>mem</module>
-		<!-- Disabled until 'test' is more complete <module>jpa</module> -->
+		<module>jpa</module>
 		<module>eshttp</module>
 		<module>test</module>
 	</modules>
