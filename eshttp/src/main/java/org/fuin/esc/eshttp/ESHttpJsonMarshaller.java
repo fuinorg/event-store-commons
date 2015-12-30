@@ -34,9 +34,9 @@ import org.fuin.objects4j.common.Contract;
  */
 public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
 
-    private static final String CLOSE_TAG = "[";
+    private static final String OPEN_TAG = "[";
 
-    private static final String OPEN_TAG = "]";
+    private static final String CLOSE_TAG = "]";
 
     @Override
     public final String marshal(final SerializerRegistry registry, final SerializedDataType serMetaType,
