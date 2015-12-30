@@ -23,13 +23,21 @@ Here is how the data structure looks like that is sent using the [Event Store Ev
             },
             "EscSysMeta":{
                 "data-content-type":"application/json; encoding=UTF-8",
-                "meta-content-type":"application/json; encoding=UTF-8",
+                "meta-content-type":"application/json; encoding=UTF-8; version=3",
                 "meta-type":"MyMeta"
             }
         }
     }
 ]
 ```
+Some things to note:
+- "Data" contains the user's data (event)
+- "EscUserMeta" contains the user's meta data
+- "EscSysMeta" has type informations about "Data" and "EscUserMeta"
+- "*-content-type" contains the mime-type, encoding and and an optional version of the data structure
+- "meta-type" is the unique type name of the meta data (equivalent to "EventType" for data)
+
+
 Here is another example of event (XML) and mime type (TEXT) with a different format than the surrounding JSON envelope:
 ```json
 [
@@ -45,7 +53,7 @@ Here is another example of event (XML) and mime type (TEXT) with a different for
             },
             "EscSysMeta": {
                 "data-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
-                "meta-content-type": "text/plain; encoding=UTF-8; transfer-encoding=base64",
+                "meta-content-type": "text/plain; encoding=UTF-8; transfer-encoding=base64; version=2",
                 "meta-type":"AnyMeta"
             }
         }
