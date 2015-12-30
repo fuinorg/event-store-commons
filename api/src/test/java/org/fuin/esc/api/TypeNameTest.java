@@ -24,7 +24,7 @@ import org.fuin.objects4j.common.ContractViolationException;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
-public final class EventTypeTest {
+public final class TypeNameTest {
 
     @Test
     public final void testSerialize() {
