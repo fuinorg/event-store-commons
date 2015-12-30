@@ -48,8 +48,6 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     private JpaIdStreamFactory streamFactory;
 
-    private SerializedDataType serMetaType;
-
     /**
      * Constructor with all mandatory data.
      * 
@@ -61,24 +59,19 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
      *            Registry used to locate serializers.
      * @param desRegistry
      *            Registry used to locate deserializers.
-     * @param serMetaType
-     *            Type used to persist the meta data.
      */
     public JpaEventStore(@NotNull final EntityManager em, @NotNull final JpaIdStreamFactory streamFactory,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
-            @NotNull final SerializedDataType serMetaType) {
+            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
         Contract.requireArgNotNull("streamFactory", streamFactory);
-        Contract.requireArgNotNull("serMetaType", serMetaType);
         this.streamFactory = streamFactory;
-        this.serMetaType = serMetaType;
     }
 
     @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
-        // Do nothing as the operation is not supported        
+        // Do nothing as the operation is not supported
     }
-    
+
     @Override
     public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, ANY.getNo(), EscSpiUtils.asList(events));
@@ -188,10 +181,11 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         }
 
         // Serialize data
-        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getType().asBaseType());
+        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
         final SerializedData serData = serialize(serDataType, commonEvent.getData());
 
         // Serialize meta data
+        final SerializedDataType serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
         final SerializedData serMeta = serialize(serMetaType, commonEvent.getMeta());
 
         // Create the JPA event to store

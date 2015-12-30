@@ -24,7 +24,6 @@ import java.util.concurrent.ThreadFactory;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -70,9 +69,7 @@ public final class EsHttpMixedExample {
         registry.add(serMetaType, "application/xml", xmlDeSer);
 
         // Create an event store instance and open it
-        EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, // Unique type
-                                                                                              // name for the
-                                                                                              // meta data
+        EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, 
                 ESEnvelopeType.JSON, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer
                 registry // Registry used to find a de-serializer
@@ -83,15 +80,11 @@ public final class EsHttpMixedExample {
             // Prepare
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
-            EventType eventType = new EventType("BookAddedEvent");// Define unique event type (name of the
-                                                                  // event)
 
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
             MyMeta meta = new MyMeta("michael"); // Your meta information
 
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event, meta); // Combines user
-                                                                                              // and general
-                                                                                              // data
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, BookAddedEvent.TYPE, event, MyMeta.TYPE, meta); // Combines user and general data
 
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);

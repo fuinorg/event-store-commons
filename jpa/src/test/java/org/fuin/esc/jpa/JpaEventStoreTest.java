@@ -50,13 +50,9 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
         final XmlDeSerializer xmlDeSer = new XmlDeSerializer(VendorCreatedEvent.class);
-        registry.addSerializer(new SerializedDataType(VendorCreatedEvent.TYPE), xmlDeSer);
-        registry.addDeserializer(new SerializedDataType(VendorCreatedEvent.TYPE), xmlDeSer.getMimeType()
-                .getBaseType(), xmlDeSer);
-
-        final SerializedDataType serMetaType = new SerializedDataType("META_DATA");
-        registry.addSerializer(serMetaType, xmlDeSer);
-        registry.addDeserializer(serMetaType, xmlDeSer.getMimeType().getBaseType(), xmlDeSer);
+        final SerializedDataType serDataType = new SerializedDataType(VendorCreatedEvent.TYPE);
+        registry.addSerializer(serDataType, xmlDeSer);
+        registry.addDeserializer(serDataType, xmlDeSer.getMimeType().getBaseType(), xmlDeSer);
 
         final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
             @Override
@@ -69,16 +65,15 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             public boolean containsType(StreamId streamId) {
                 return true;
             }
-        }, registry, registry, serMetaType);
+        }, registry, registry);
         testee.open();
         try {
             final String vendorId = UUID.randomUUID().toString();
             final VendorCreatedEvent vendorCreatedEvent = new VendorCreatedEvent(vendorId);
             final AggregateStreamId streamId = new AggregateStreamId("Vendor", "vendorId", vendorId);
             final EventId eventId = new EventId();
-            final EventType eventType = new EventType("VendorCreatedEvent");
-            final Object meta = null;
-            final CommonEvent eventData = new SimpleCommonEvent(eventId, eventType, vendorCreatedEvent, meta);
+            final EventType dataType = new EventType(VendorCreatedEvent.TYPE);
+            final CommonEvent eventData = new SimpleCommonEvent(eventId, dataType, vendorCreatedEvent);
 
             // TEST
             beginTransaction();

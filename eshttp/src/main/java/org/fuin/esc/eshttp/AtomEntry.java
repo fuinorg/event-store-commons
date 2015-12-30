@@ -32,6 +32,7 @@ public class AtomEntry<TYPE> {
     private final String eventId;
     private final EnhancedMimeType dataContentType;
     private final EnhancedMimeType metaContentType;
+    private final String metaType;
     private final TYPE data;
     private final TYPE meta;
 
@@ -44,11 +45,12 @@ public class AtomEntry<TYPE> {
      * @param eventId
      * @param dataContentType
      * @param metaContentType
+     * @param metaType
      * @param data
      * @param meta
      */
     public AtomEntry(String eventStreamId, int eventNumber, String eventType, String eventId,
-            EnhancedMimeType dataContentType, EnhancedMimeType metaContentType, TYPE data, TYPE meta) {
+            EnhancedMimeType dataContentType, EnhancedMimeType metaContentType, String metaType, TYPE data, TYPE meta) {
         super();
         this.eventStreamId = eventStreamId;
         this.eventNumber = eventNumber;
@@ -56,6 +58,7 @@ public class AtomEntry<TYPE> {
         this.eventId = eventId;
         this.dataContentType = dataContentType;
         this.metaContentType = metaContentType;
+        this.metaType = metaType;
         this.data = data;
         this.meta = meta;
     }
@@ -82,6 +85,10 @@ public class AtomEntry<TYPE> {
 
     public EnhancedMimeType getMetaContentType() {
         return metaContentType;
+    }
+
+    public String getMetaType() {
+        return metaType;
     }
 
     public TYPE getData() {

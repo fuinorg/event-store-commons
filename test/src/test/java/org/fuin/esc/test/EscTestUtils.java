@@ -250,11 +250,11 @@ final class EscTestUtils {
             return false;
         }
 
-        if (eventA.getType() == null) {
-            if (eventB.getType() != null) {
+        if (eventA.getDataType() == null) {
+            if (eventB.getDataType() != null) {
                 return false;
             }
-        } else if (!eventA.getType().equals(eventB.getType())) {
+        } else if (!eventA.getDataType().equals(eventB.getDataType())) {
             return false;
         }
 
@@ -309,13 +309,13 @@ final class EscTestUtils {
                     + actualEvent.getMeta();
         }
 
-        if (expectedEvent.getType() == null) {
-            if (actualEvent.getType() != null) {
-                return "[" + streamId + "] Expected no event type, but was: " + actualEvent.getType();
+        if (expectedEvent.getDataType() == null) {
+            if (actualEvent.getDataType() != null) {
+                return "[" + streamId + "] Expected no event type, but was: " + actualEvent.getDataType();
             }
-        } else if (!expectedEvent.getType().equals(actualEvent.getType())) {
-            return "[" + streamId + "] Expected event type '" + expectedEvent.getType() + "', but was: "
-                    + actualEvent.getType();
+        } else if (!expectedEvent.getDataType().equals(actualEvent.getDataType())) {
+            return "[" + streamId + "] Expected event type '" + expectedEvent.getDataType() + "', but was: "
+                    + actualEvent.getDataType();
         }
 
         return "[" + streamId + "] OK";

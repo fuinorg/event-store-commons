@@ -113,7 +113,7 @@ public class InMemoryEventStoreSyncTest {
         // VERIFY Slice 3
         assertThat(slice3.getEvents()).containsExactly(eventOne);
         assertThat(slice3.getFromEventNumber()).isEqualTo(version - 4);
-        assertThat(slice3.getNextEventNumber()).isEqualTo(version - 5);
+        assertThat(slice3.getNextEventNumber()).isEqualTo(version - 4);
         assertThat(slice3.isEndOfStream()).isTrue();
 
     }

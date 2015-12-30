@@ -135,7 +135,11 @@ public final class Event implements Serializable, ValueObject {
             m = getMeta().unmarshalContent(classesToBeBound);
         }
         final Object d = getData().unmarshalContent(classesToBeBound);
-        return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d, m);
+        if (getMeta() == null) {
+            return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d);
+        }
+        return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d, new EventType(getMeta()
+                .getType()), m);
     }
 
     // CHECKSTYLE:OFF Generated code
@@ -182,7 +186,7 @@ public final class Event implements Serializable, ValueObject {
      * @return New instance.
      */
     public static Event valueOf(final CommonEvent selEvent) {
-        final Data data = Data.valueOf(selEvent.getType().asBaseType(), selEvent.getData());
+        final Data data = Data.valueOf(selEvent.getDataType().asBaseType(), selEvent.getData());
         final Data meta = Data.valueOf("meta", selEvent.getMeta());
         return new Event(selEvent.getId(), data, meta);
     }

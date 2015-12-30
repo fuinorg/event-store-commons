@@ -42,12 +42,12 @@ public class ESHttpJsonMarshallerTest extends AbstractESHttpMarshallerTest {
         final UUID uuid = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
         final SerializedData serData = asJson(MyEvent.TYPE.asBaseType(),
                 "application/json; encoding=utf-8; version=1", createMyEventJson(uuid, "Hello, JSON!"));
-        final SerializedData serMeta = asJson(MyMeta.TYPE, "application/json; version=1; encoding=utf-8",
-                createMyMetaJson());
+        final SerializedData serMeta = asJson(MyMeta.TYPE.asBaseType(),
+                "application/json; version=1; encoding=utf-8", createMyMetaJson());
 
         // TEST
-        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE,
+                serData, MyMeta.TYPE, serMeta);
 
         // VERIFY
         assertThatJson(json).isEqualTo(expectedJson);
@@ -62,12 +62,12 @@ public class ESHttpJsonMarshallerTest extends AbstractESHttpMarshallerTest {
 
         final SerializedData serData = asXml(MyEvent.TYPE.asBaseType(),
                 "application/xml; version=1; encoding=utf-8", createMyEventXml(uuid, "Hello, XML!"));
-        final SerializedData serMeta = asJson(MyMeta.TYPE, "application/json; version=1; encoding=utf-8",
-                createMyMetaJson());
+        final SerializedData serMeta = asJson(MyMeta.TYPE.asBaseType(),
+                "application/json; version=1; encoding=utf-8", createMyMetaJson());
 
         // TEST
-        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE,
+                serData, MyMeta.TYPE, serMeta);
 
         // VERIFY
         assertThatJson(json).isEqualTo(expectedJson);
@@ -82,12 +82,12 @@ public class ESHttpJsonMarshallerTest extends AbstractESHttpMarshallerTest {
         final UUID uuid = UUID.fromString("bf01c02f-5699-4e0f-8a9c-96343546d306");
         final SerializedData serData = asXml(MyEvent.TYPE.asBaseType(),
                 "application/xml; version=1; encoding=utf-8", createMyEventJson(uuid, "Hello, JSON!"));
-        final SerializedData serMeta = asXml(MyMeta.TYPE, "application/xml; version=1; encoding=utf-8",
-                createMyMetaXml());
+        final SerializedData serMeta = asXml(MyMeta.TYPE.asBaseType(),
+                "application/xml; version=1; encoding=utf-8", createMyMetaXml());
 
         // TEST
-        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+        final String json = new ESHttpJsonMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE,
+                serData, MyMeta.TYPE, serMeta);
 
         // VERIFY
         assertThatJson(json).isEqualTo(expectedJson);

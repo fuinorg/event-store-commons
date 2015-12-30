@@ -35,18 +35,19 @@ public class SimpleCommonEventTest {
 
     private static final EventId ID = new EventId();
 
-    private static final EventType TYPE = new EventType("MyEvent");
+    private static final EventType DATA_TYPE = new EventType("MyEvent");
 
     private static MyEvent DATA = new MyEvent("Peter");
 
-    private static JsonObject META = Json.createObjectBuilder()
-            .add("ip", "127.0.0.1").build();
+    private static final EventType META_TYPE = new EventType("MyMeta");
+
+    private static JsonObject META = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
 
     private SimpleCommonEvent testee;
 
     @Before
     public void setup() {
-        testee = new SimpleCommonEvent(ID, TYPE, DATA, META);
+        testee = new SimpleCommonEvent(ID, DATA_TYPE, DATA, META_TYPE, META);
     }
 
     @After

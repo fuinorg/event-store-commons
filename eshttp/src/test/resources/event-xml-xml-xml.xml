@@ -12,10 +12,9 @@
 			</my-meta>
 		</EscUserMeta>
 		<EscSysMeta>
-			<data-content-type>application/xml; version=1; encoding=utf-8
-			</data-content-type>
-			<meta-content-type>application/xml; version=1; encoding=utf-8
-			</meta-content-type>
+			<data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
+			<meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+            <meta-type>MyMeta</meta-type>
 		</EscSysMeta>
 	</MetaData>
 </Event>

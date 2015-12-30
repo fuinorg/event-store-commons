@@ -24,7 +24,6 @@ import java.util.concurrent.ThreadFactory;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -71,7 +70,6 @@ public final class EsHttpXmlExample {
 
         // Create an event store instance and open it
         EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, 
-                serMetaType, // Unique type name for the meta data
                 ESEnvelopeType.XML, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer 
                 registry  // Registry used to find a de-serializer
@@ -82,9 +80,8 @@ public final class EsHttpXmlExample {
             // Prepare
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
-            EventType eventType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event); // Combines user and general data
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, BookAddedEvent.TYPE, event); // Combines user and general data
             
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);

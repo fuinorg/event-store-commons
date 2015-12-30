@@ -73,21 +73,25 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
     }
 
     @Override
-    public final CommonEvent readEvent(final DeserializerRegistry desRegistry,
-            final SerializedDataType serMetaType, final InputStream in) {
- 
+    public final CommonEvent readEvent(final DeserializerRegistry desRegistry, final InputStream in) {
+
         final AtomEntry<JsonValue> entry = readAtomEntry(in);
 
         final ESHttpJsonUnmarshaller unmarshaller = new ESHttpJsonUnmarshaller();
 
         final Object data = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getEventType()),
                 entry.getDataContentType(), entry.getData());
-        final Object meta = unmarshaller.unmarshal(desRegistry, serMetaType, entry.getMetaContentType(),
-                entry.getMeta());
+        final Object meta;
+        if (entry.getMetaType() == null) {
+            meta = null;
+        } else {
+            meta = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getMetaType()),
+                    entry.getMetaContentType(), entry.getMeta());
+        }
 
-        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()), data,
-                meta);
-        
+        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()),
+                data, new EventType(entry.getMetaType()), meta);
+
     }
 
     /**
@@ -114,11 +118,13 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
         final String metaContentTypeStr = ((JsonString) JsonPath.read(jsonObj,
                 "$.content.metadata.EscSysMeta.meta-content-type")).getString();
         final EnhancedMimeType metaContentType = EnhancedMimeType.create(metaContentTypeStr);
+        final String metaTypeStr = ((JsonString) JsonPath.read(jsonObj,
+                "$.content.metadata.EscSysMeta.meta-type")).getString();
         final JsonValue data = JsonPath.read(jsonObj, "$.content.data");
         final JsonValue meta = JsonPath.read(jsonObj, "$.content.metadata.EscUserMeta");
 
         return new AtomEntry<JsonValue>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
-                metaContentType, data, meta);
+                metaContentType, metaTypeStr, data, meta);
 
     }
 

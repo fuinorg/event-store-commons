@@ -25,7 +25,6 @@ import java.util.concurrent.ThreadFactory;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
@@ -37,6 +36,7 @@ import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.spi.XmlDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
+import org.fuin.esc.test.examples.MyMeta;
 import org.fuin.units4j.Units4JUtils;
 
 import cucumber.api.java.After;
@@ -63,16 +63,15 @@ public class TestFeatures {
         } else if (type.equals("eshttp")) {
             final ThreadFactory threadFactory = Executors.defaultThreadFactory();
             final URL url = new URL("http://127.0.0.1:2113/");
-            final SerializedDataType serMetaType = new SerializedDataType("MyMeta");
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
             final TextDeSerializer textDeSer = new TextDeSerializer();
             registry = new SimpleSerializerDeserializerRegistry();
-            registry.add(new SerializedDataType(BookAddedEvent.TYPE), "application/xml", xmlDeSer);
-            registry.add(new SerializedDataType("MyMeta"), "application/json", jsonDeSer);
+            registry.add(new SerializedDataType(BookAddedEvent.TYPE.asBaseType()), "application/xml",
+                    xmlDeSer);
+            registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonDeSer);
             registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
-            eventStore = new ESHttpEventStoreSync(threadFactory, url, serMetaType, ESEnvelopeType.XML,
-                    registry, registry);
+            eventStore = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.XML, registry, registry);
         } else {
             throw new IllegalStateException("Unknown type: " + type);
         }
@@ -102,7 +101,7 @@ public class TestFeatures {
     public void thenNoException() {
         // Do nothing, just to create a nice 'then' text
     }
-    
+
     @When("^the following deletes are executed$")
     public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
@@ -127,8 +126,8 @@ public class TestFeatures {
         for (int i = 1; i < streams.size(); i++) {
             final String streamName = streams.get(i);
             command.add(new CreateStreamCommand(streamName));
-            final CommonEvent event = new SimpleCommonEvent(new EventId(),
-                    new EventType(BookAddedEvent.TYPE), new BookAddedEvent("Unknown", "John Doe"));
+            final CommonEvent event = new SimpleCommonEvent(new EventId(), BookAddedEvent.TYPE,
+                    new BookAddedEvent("Unknown", "John Doe"));
             command.add(new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, event));
         }
 
@@ -216,13 +215,13 @@ public class TestFeatures {
         final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
-        final AppendToStreamCommand command = new AppendToStreamCommand(streamName,
-                version, null, commonEvents);
+        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null,
+                commonEvents);
         command.init(eventStore);
         command.execute();
         command.verify();
     }
-    
+
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
     public void thenReadXmlEvent(final int eventNumber, final String streamName, final String expectedEventXml) {
 

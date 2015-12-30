@@ -10,7 +10,8 @@
 		},
 		"EscSysMeta":{
 			"data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-			"meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64"
+			"meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+            "meta-type": "MyMeta"
 		}
 		
 	}

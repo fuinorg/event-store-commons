@@ -52,11 +52,14 @@ public final class EscSpiUtils {
     @Nullable
     public static SerializedData serialize(@NotNull final SerializerRegistry registry,
             @NotNull final SerializedDataType type, @Nullable final Object data) {
-        Contract.requireArgNotNull("registry", registry);
-        Contract.requireArgNotNull("type", type);
+
         if (data == null) {
             return null;
         }
+        
+        Contract.requireArgNotNull("registry", registry);
+        Contract.requireArgNotNull("type", type);
+        
         final Serializer serializer = registry.getSerializer(type);
         if (serializer == null) {
             throw new IllegalStateException("Couldn't get a serializer for: " + type);
@@ -110,11 +113,11 @@ public final class EscSpiUtils {
 
         EnhancedMimeType mimeType = null;
         for (final CommonEvent commonEvent : commonEvents) {
-            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent.getType()
+            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent.getDataType()
                     .asBaseType()));
             if (serializer == null) {
                 throw new IllegalStateException("Could not find a serializer for event type '"
-                        + commonEvent.getType() + "': " + commonEvent);
+                        + commonEvent.getDataType() + "': " + commonEvent);
             }
             if (mimeType == null) {
                 mimeType = serializer.getMimeType();

@@ -24,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -166,8 +165,8 @@ public final class ReadForwardCommand implements TestCommand {
 
     private static void addEvent(final List<CommonEvent> events, final String eventId) {
         if (eventId != null) {
-            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), new EventType(
-                    BookAddedEvent.TYPE), new BookAddedEvent("Any", "John Doe"));
+            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
+                    new BookAddedEvent("Any", "John Doe"));
             events.add(ce);
         }
     }

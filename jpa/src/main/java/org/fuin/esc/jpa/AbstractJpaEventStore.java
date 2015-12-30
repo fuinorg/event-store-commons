@@ -138,8 +138,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, 
-            final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         return readStreamEvents(streamId, start, count, true);
 
@@ -197,7 +196,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         return (stream != null);
 
     }
-    
+
     @Override
     public final StreamState streamState(final StreamId streamId) {
         final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
@@ -293,7 +292,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     private CommonEvent asCommonEvent(final JpaEvent jpaEvent) {
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
-        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, meta);
+        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, jpaEvent
+                .getMeta().getType(), meta);
     }
 
     private Object deserialize(final JpaData data) {

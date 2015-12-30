@@ -15,7 +15,8 @@
 		},
 		"EscSysMeta":{
 			"data-content-type":"application/json; version=1; encoding=utf-8",
-			"meta-content-type":"application/json; version=1; encoding=utf-8"
+			"meta-content-type":"application/json; version=1; encoding=utf-8",
+            "meta-type": "MyMeta"
 		}
 		
 	}

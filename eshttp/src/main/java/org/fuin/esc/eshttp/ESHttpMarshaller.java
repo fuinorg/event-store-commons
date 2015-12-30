@@ -21,7 +21,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Nullable;
 
@@ -36,15 +35,12 @@ public interface ESHttpMarshaller {
      * 
      * @param registry
      *            Registry with known serializers.
-     * @param serMetaType
-     *            Unique name of the meta data type.
      * @param commonEvents
      *            Events to marshal.
      * 
      * @return Single event body.
      */
-    public String marshal(@NotNull SerializerRegistry registry, @NotNull SerializedDataType serMetaType,
-            @NotNull List<CommonEvent> commonEvents);
+    public String marshal(@NotNull SerializerRegistry registry, @NotNull List<CommonEvent> commonEvents);
 
     /**
      * Creates a single "application/vnd.eventstore.events(+json/+xml)" entry surrounded by "[]" (JSON) or
@@ -52,14 +48,11 @@ public interface ESHttpMarshaller {
      * 
      * @param registry
      *            Registry with known serializers.
-     * @param serMetaType
-     *            Unique name of the meta data type.
      * @param commonEvent
      *            Event to marshal.
      * 
      * @return Single event body.
      */
-    public String marshal(@NotNull SerializerRegistry registry, @NotNull SerializedDataType serMetaType,
-            @Nullable CommonEvent commonEvent);
+    public String marshal(@NotNull SerializerRegistry registry, @Nullable CommonEvent commonEvent);
 
 }

@@ -41,7 +41,7 @@ public interface CommonEvent {
      * @return Never changing unique event type name.
      */
     @NotNull
-    public EventType getType();
+    public EventType getDataType();
 
     /**
      * Returns the event data.
@@ -51,6 +51,14 @@ public interface CommonEvent {
     @NotNull
     public Object getData();
 
+    /**
+     * Returns the meta data type.
+     * 
+     * @return Never changing unique event meta data type name.
+     */
+    @NotNull
+    public EventType getMetaType();
+    
     /**
      * Returns the meta data.
      * 

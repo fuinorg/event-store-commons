@@ -37,22 +37,23 @@ public class AtomEntryTest {
         // PREPARE
         String eventStreamId = "MyStreamA"; 
         int eventNumber = 1; 
-        String eventType = "MyEvent"; 
+        String dataType = "MyEvent"; 
         String eventId = "8faef866-b80f-4952-9124-62819a6517aa";
         EnhancedMimeType dataContentType = new EnhancedMimeType("application/xml; encoding=UTF-8");
         EnhancedMimeType metaContentType = new EnhancedMimeType("application/xml; encoding=ISO8859-1");
+        String metaType = "MyMeta"; 
         String data = "<data/>"; 
         String meta = "<meta/>";
         
         // TEST
-        final AtomEntry<String> testee = new AtomEntry<String>(eventStreamId, eventNumber, eventType, eventId,
-                dataContentType, metaContentType, data, meta);
+        final AtomEntry<String> testee = new AtomEntry<String>(eventStreamId, eventNumber, dataType, eventId,
+                dataContentType, metaContentType, metaType, data, meta);
 
 
         // VERIFY
         assertThat(testee.getEventStreamId()).isEqualTo(eventStreamId);
         assertThat(testee.getEventNumber()).isEqualTo(eventNumber);
-        assertThat(testee.getEventType()).isEqualTo(eventType);
+        assertThat(testee.getEventType()).isEqualTo(dataType);
         assertThat(testee.getEventId()).isEqualTo(eventId);
         assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
         assertThat(testee.getDataContentType().getEncoding()).isEqualTo(Charset.forName("UTF-8"));

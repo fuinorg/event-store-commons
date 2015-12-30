@@ -39,30 +39,26 @@ public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
     private static final String CLOSE_TAG = "]";
 
     @Override
-    public final String marshal(final SerializerRegistry registry, final SerializedDataType serMetaType,
-            final List<CommonEvent> commonEvents) {
+    public final String marshal(final SerializerRegistry registry, final List<CommonEvent> commonEvents) {
 
         Contract.requireArgNotNull("registry", registry);
-        Contract.requireArgNotNull("serMetaType", serMetaType);
         Contract.requireArgNotNull("commonEvents", commonEvents);
 
         final StringBuffer sb = new StringBuffer(OPEN_TAG);
         for (final CommonEvent commonEvent : commonEvents) {
-            sb.append(marshalIntern(registry, serMetaType, commonEvent));
+            sb.append(marshalIntern(registry, commonEvent));
         }
         sb.append(CLOSE_TAG);
         return sb.toString();
     }
 
     @Override
-    public final String marshal(final SerializerRegistry registry, final SerializedDataType serMetaType,
-            final CommonEvent commonEvent) {
-        
+    public final String marshal(final SerializerRegistry registry, final CommonEvent commonEvent) {
+
         Contract.requireArgNotNull("registry", registry);
-        Contract.requireArgNotNull("serMetaType", serMetaType);
-        
+
         final StringBuffer sb = new StringBuffer(OPEN_TAG);
-        sb.append(marshalIntern(registry, serMetaType, commonEvent));
+        sb.append(marshalIntern(registry, commonEvent));
         sb.append(CLOSE_TAG);
         return sb.toString();
     }
@@ -72,32 +68,35 @@ public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
      * 
      * @param registry
      *            Registry with known serializers.
-     * @param serMetaType
-     *            Unique name of the meta data type.
      * @param commonEvent
      *            Event to marshal.
      * 
      * @return Single event that has to be surrounded by "[]".
      */
-    protected final String marshalIntern(final SerializerRegistry registry, final SerializedDataType serMetaType,
-            final CommonEvent commonEvent) {
-        
+    protected final String marshalIntern(final SerializerRegistry registry, final CommonEvent commonEvent) {
+
         Contract.requireArgNotNull("registry", registry);
-        Contract.requireArgNotNull("serMetaType", serMetaType);
-        
+
         if (commonEvent == null) {
             return null;
         }
 
         // Serialize data
-        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getType().asBaseType());
+        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
         final SerializedData serData = EscSpiUtils.serialize(registry, serDataType, commonEvent.getData());
 
         // Serialize meta data
+        final SerializedDataType serMetaType;
+        if (commonEvent.getMetaType() == null) {
+            serMetaType = null;
+        } else {
+            serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+        }
         final SerializedData serMeta = EscSpiUtils.serialize(registry, serMetaType, commonEvent.getMeta());
 
         // Convert into string
-        return marshalIntern(commonEvent.getId(), commonEvent.getType(), serData, serMeta);
+        return marshalIntern(commonEvent.getId(), commonEvent.getDataType(), serData,
+                commonEvent.getMetaType(), serMeta);
 
     }
 
@@ -107,29 +106,32 @@ public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
      * 
      * @param id
      *            Unique event identifier.
-     * @param type
+     * @param dataType
      *            Unique event type.
      * @param serData
      *            Serialized event data.
+     * @param metaType
+     *            Unique event type.
      * @param serMeta
      *            Serialized meta data.
      * 
      * @return String with single event.
      */
-    protected final String marshalIntern(final EventId id, final EventType type, final SerializedData serData,
-            final SerializedData serMeta) {
-        
+    protected final String marshalIntern(final EventId id, final EventType dataType,
+            final SerializedData serData, final EventType metaType, final SerializedData serMeta) {
+
         Contract.requireArgNotNull("id", id);
-        Contract.requireArgNotNull("type", type);
+        Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("serData", serData);
 
         final String metaContentType;
         if (serMeta == null) {
             metaContentType = "";
         } else {
-            metaContentType = ",\"meta-content-type\": \"" + convertToStr(serMeta.getMimeType()) + "\"";
+            metaContentType = ",\"meta-content-type\": \"" + convertToStr(serMeta.getMimeType()) + "\""
+                    + ",\"meta-type\": \"" + metaType + "\"";
         }
-        return "{" + "\"EventId\": \"" + id + "\"," + "\"EventType\": \"" + type + "\"," + "\"Data\": "
+        return "{" + "\"EventId\": \"" + id + "\"," + "\"EventType\": \"" + dataType + "\"," + "\"Data\": "
                 + convertToStr(serData) + "," + "\"MetaData\": {" + "\"EscUserMeta\": "
                 + convertToStr(serMeta) + "," + "\"EscSysMeta\": { " + "\"data-content-type\": \""
                 + convertToStr(serData.getMimeType()) + "\"" + metaContentType + "}" + "}" + "}";

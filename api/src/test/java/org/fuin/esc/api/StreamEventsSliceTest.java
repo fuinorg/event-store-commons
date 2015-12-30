@@ -54,9 +54,9 @@ public class StreamEventsSliceTest {
                 .add("ip", "127.0.0.1").build();
         events = new ArrayList<CommonEvent>();
         events.add(new SimpleCommonEvent(new EventId(), new EventType("MyEvent"),
-                new MyEvent("Peter"), meta));
+                new MyEvent("Peter"), new EventType("MyMeta"), meta));
         events.add(new SimpleCommonEvent(new EventId(), new EventType("MyEvent"),
-                new MyEvent("Mary Jane"), meta));
+                new MyEvent("Mary Jane"), new EventType("MyMeta"), meta));
     }
 
     @Before

@@ -45,12 +45,12 @@ public class ESHttpXmlMarshallerTest extends AbstractESHttpMarshallerTest {
         final UUID uuid = UUID.fromString("68616d90-cf72-4c2a-b913-32bf6e6506ed");
         final SerializedData serData = asXml(MyEvent.TYPE.asBaseType(),
                 "application/xml; version=1; encoding=utf-8", createMyEventXml(uuid, "Hello, XML!"));
-        final SerializedData serMeta = asXml(MyMeta.TYPE, "application/xml; version=1; encoding=utf-8",
-                createMyMetaXml());
+        final SerializedData serMeta = asXml(MyMeta.TYPE.asBaseType(),
+                "application/xml; version=1; encoding=utf-8", createMyMetaXml());
 
         // TEST
         final String xml = new ESHttpXmlMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+                MyMeta.TYPE, serMeta);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
@@ -68,12 +68,12 @@ public class ESHttpXmlMarshallerTest extends AbstractESHttpMarshallerTest {
         final UUID uuid = UUID.fromString("68616d90-cf72-4c2a-b913-32bf6e6506ed");
         final SerializedData serData = asJson(MyEvent.TYPE.asBaseType(),
                 "application/json; encoding=utf-8; version=1", createMyEventJson(uuid, "Hello, JSON!"));
-        final SerializedData serMeta = asXml(MyMeta.TYPE, "application/xml; version=1; encoding=utf-8",
-                createMyMetaXml());
+        final SerializedData serMeta = asXml(MyMeta.TYPE.asBaseType(),
+                "application/xml; version=1; encoding=utf-8", createMyMetaXml());
 
         // TEST
         final String xml = new ESHttpXmlMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+                MyMeta.TYPE, serMeta);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
@@ -91,12 +91,12 @@ public class ESHttpXmlMarshallerTest extends AbstractESHttpMarshallerTest {
         final UUID uuid = UUID.fromString("48ff75a0-d573-44eb-ad89-45b99757ddfc");
         final SerializedData serData = asJson(MyEvent.TYPE.asBaseType(),
                 "application/json; encoding=utf-8; version=1", createMyEventJson(uuid, "Hello, JSON!"));
-        final SerializedData serMeta = asJson(MyMeta.TYPE, "application/json; version=1; encoding=utf-8",
-                createMyMetaJson());
+        final SerializedData serMeta = asJson(MyMeta.TYPE.asBaseType(),
+                "application/json; version=1; encoding=utf-8", createMyMetaJson());
 
         // TEST
         final String xml = new ESHttpXmlMarshaller().marshalIntern(new EventId(uuid), MyEvent.TYPE, serData,
-                serMeta);
+                MyMeta.TYPE, serMeta);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);

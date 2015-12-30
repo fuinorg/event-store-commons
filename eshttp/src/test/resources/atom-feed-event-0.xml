@@ -26,6 +26,7 @@
             <EscSysMeta>
                 <data-content-type>application/xml; encoding=UTF-8</data-content-type>
                 <meta-content-type>application/xml; encoding=UTF-8</meta-content-type>
+                <meta-type>MyMeta</meta-type>
             </EscSysMeta>
         </metadata>
     </atom:content>

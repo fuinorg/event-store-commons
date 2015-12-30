@@ -166,8 +166,8 @@ public final class ReadBackwardCommand implements TestCommand {
 
     private static void addEvent(final List<CommonEvent> events, final String eventId) {
         if (eventId != null) {
-            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), new EventType(
-                    BookAddedEvent.TYPE), new BookAddedEvent("Any", "John Doe"));
+            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
+                    new BookAddedEvent("Any", "John Doe"));
             events.add(ce);
         }
     }

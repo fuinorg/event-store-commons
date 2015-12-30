@@ -58,7 +58,6 @@ import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
@@ -75,8 +74,6 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
 
     private final URL url;
 
-    private final SerializedDataType serMetaType;
-
     private final ESEnvelopeType envelopeType;
 
     private final SerializerRegistry serRegistry;
@@ -92,8 +89,6 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
      *            Factory used to create the necessary internal threads.
      * @param url
      *            Event store base URL like "http://127.0.0.1:2113/".
-     * @param serMetaType
-     *            Unique type name for the meta data.
      * @param envelopeType
      *            Envelope type for reading/writing events.
      * @param serRegistry
@@ -102,18 +97,16 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
      *            Registry used to locate deserializers.
      */
     public ESHttpEventStoreSync(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
-            @NotNull final SerializedDataType serMetaType, @NotNull final ESEnvelopeType envelopeType,
+            @NotNull final ESEnvelopeType envelopeType,
             @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("threadFactory", threadFactory);
         Contract.requireArgNotNull("url", url);
-        Contract.requireArgNotNull("serMetaType", serMetaType);
         Contract.requireArgNotNull("envelopeType", envelopeType);
         Contract.requireArgNotNull("serRegistry", serRegistry);
         Contract.requireArgNotNull("desRegistry", desRegistry);
         this.threadFactory = threadFactory;
         this.url = url;
-        this.serMetaType = serMetaType;
         this.envelopeType = envelopeType;
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
@@ -178,12 +171,12 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         if (mimeType == null) {
             // Not all events have same type
             for (final CommonEvent commonEvent : commonEvents) {
-                final String content = marshaller.marshal(serRegistry, serMetaType, commonEvent);
+                final String content = marshaller.marshal(serRegistry, commonEvent);
                 appendToStream(streamId, expectedVersion, mimeType, content, 1);
             }
         } else {
             // All events are of same type
-            final String content = marshaller.marshal(serRegistry, serMetaType, commonEvents);
+            final String content = marshaller.marshal(serRegistry, commonEvents);
             appendToStream(streamId, expectedVersion, mimeType, content, commonEvents.size());
         }
 
@@ -473,7 +466,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 final HttpEntity entity = response.getEntity();
                 final InputStream in = entity.getContent();
                 try {
-                    return envelopeType.getAtomFeedReader().readEvent(desRegistry, serMetaType, in);
+                    return envelopeType.getAtomFeedReader().readEvent(desRegistry, in);
                 } finally {
                     in.close();
                 }

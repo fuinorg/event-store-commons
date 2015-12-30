@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.SerializedDataType;
 
 /**
  * Reads and an Atom feed.
@@ -28,14 +27,11 @@ public interface AtomFeedReader {
      * 
      * @param desRegistry
      *            Registry with known deserializers.
-     * @param serMetaType
-     *            Unique name of the meta data type.
      * @param in
      *            Input stream to read.
      * 
      * @return Event.
      */
-    public CommonEvent readEvent(DeserializerRegistry desRegistry, SerializedDataType serMetaType, InputStream in);
-
+    public CommonEvent readEvent(DeserializerRegistry desRegistry, InputStream in);
 
 }

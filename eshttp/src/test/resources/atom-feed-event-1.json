@@ -25,7 +25,8 @@
             },
             "EscSysMeta": {
                 "data-content-type": "application/xml; encoding=UTF-8",
-                "meta-content-type": "application/xml; encoding=UTF-8"
+                "meta-content-type": "application/xml; encoding=UTF-8",
+                "meta-type": "MyMeta"
             }
         }
     },

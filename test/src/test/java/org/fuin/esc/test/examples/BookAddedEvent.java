@@ -19,6 +19,8 @@ package org.fuin.esc.test.examples;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fuin.esc.api.EventType;
+
 /**
  * Example event.
  */
@@ -26,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BookAddedEvent {
 
     /** Never changing unique event type name. */
-    public static final String TYPE = "BookAddedEvent";
+    public static final EventType TYPE = new EventType("BookAddedEvent");
 
     @XmlAttribute
     private String name;

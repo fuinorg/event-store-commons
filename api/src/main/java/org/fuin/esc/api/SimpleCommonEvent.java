@@ -29,19 +29,20 @@ import org.fuin.objects4j.common.Nullable;
 @Immutable
 public final class SimpleCommonEvent implements CommonEvent {
 
-    private static final long serialVersionUID = 1000L;
-
     /** The ID of the event, used as part of the idempotent write check. */
     @NotNull
     private EventId id;
 
     /** Never changing unique event type name. */
     @NotNull
-    private EventType type;
+    private EventType dataType;
 
     /** The event data. */
     @NotNull
     private Object data;
+
+    /** Never changing unique meta type name. */
+    private EventType metaType;
 
     /** The meta data. */
     private Object meta;
@@ -59,15 +60,15 @@ public final class SimpleCommonEvent implements CommonEvent {
      * @param id
      *            The ID of the event, used as part of the idempotent write check. This is type string to
      *            allow different UUID implementations. It has to be a valid UUID string representation.
-     * @param type
+     * @param dataType
      *            Unique name of the type of data.
      * @param data
      *            Event data.
      * 
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType type,
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType dataType,
             @NotNull final Object data) {
-        this(id, type, data, null);
+        this(id, dataType, data, null, null);
     }
 
     /**
@@ -76,66 +77,53 @@ public final class SimpleCommonEvent implements CommonEvent {
      * @param id
      *            The ID of the event, used as part of the idempotent write check. This is type string to
      *            allow different UUID implementations. It has to be a valid UUID string representation.
-     * @param type
+     * @param dataType
      *            Unique name of the type of data.
      * @param data
      *            Event data.
+     * @param metaType
+     *            Unique name of the type of meta data.
      * @param meta
      *            Meta data.
      * 
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType type,
-            @NotNull final Object data, @Nullable final Object meta) {
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType dataType,
+            @NotNull final Object data, @Nullable final EventType metaType, @Nullable final Object meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
-        Contract.requireArgNotNull("type", type);
+        Contract.requireArgNotNull("type", dataType);
         Contract.requireArgNotNull("data", data);
 
         this.id = id;
-        this.type = type;
+        this.dataType = dataType;
         this.data = data;
+        this.metaType = metaType;
         this.meta = meta;
 
     }
 
-    /**
-     * Returns the ID of the event, used as part of the idempotent write check. This is type string to allow
-     * different UUID implementations. It has to be a valid UUID string representation.
-     * 
-     * @return Unique event identifier.
-     */
-    @NotNull
+    @Override
     public final EventId getId() {
         return id;
     }
 
-    /**
-     * Returns the event type.
-     * 
-     * @return Never changing unique event type name.
-     */
-    @NotNull
-    public final EventType getType() {
-        return type;
+    @Override
+    public final EventType getDataType() {
+        return dataType;
     }
 
-    /**
-     * Returns the event data.
-     * 
-     * @return Event data.
-     */
-    @NotNull
+    @Override
     public final Object getData() {
         return data;
     }
 
-    /**
-     * Returns the meta data.
-     * 
-     * @return Meta data.
-     */
-    @Nullable
+    @Override
+    public final EventType getMetaType() {
+        return metaType;
+    }
+
+    @Override
     public final Object getMeta() {
         return meta;
     }
@@ -171,7 +159,7 @@ public final class SimpleCommonEvent implements CommonEvent {
 
     @Override
     public String toString() {
-        return type + " " + id;
+        return dataType + " " + id;
     }
 
 }

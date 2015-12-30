@@ -70,19 +70,26 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
     }
 
     @Override
-    public final CommonEvent readEvent(final DeserializerRegistry desRegistry,
-            final SerializedDataType serMetaType, final InputStream in) {
+    public final CommonEvent readEvent(final DeserializerRegistry desRegistry, final InputStream in) {
         final AtomEntry<Node> entry = readAtomEntry(in);
 
         final ESHttpXmlUnmarshaller unmarshaller = new ESHttpXmlUnmarshaller();
 
         final Object data = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getEventType()),
                 entry.getDataContentType(), entry.getData());
-        final Object meta = unmarshaller.unmarshal(desRegistry, serMetaType, entry.getMetaContentType(),
-                entry.getMeta());
-
-        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()), data,
-                meta);
+        final Object meta;
+        if (entry.getMetaType() == null) {
+            meta = null;
+        } else {
+            meta = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getMetaType()),
+                    entry.getMetaContentType(), entry.getMeta());
+        }
+        if (meta == null) {
+            return new SimpleCommonEvent(new EventId(entry.getEventId()),
+                    new EventType(entry.getEventType()), data);
+        }
+        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()),
+                data, new EventType(entry.getMetaType()), meta);
 
     }
 
@@ -109,14 +116,16 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
         final String metaContentTypeStr = findContentText(doc, xPath,
                 "/atom:entry/atom:content/metadata/EscSysMeta/meta-content-type");
         final EnhancedMimeType metaContentType = EnhancedMimeType.create(metaContentTypeStr);
+        final String metaTypeStr = findContentText(doc, xPath,
+                "/atom:entry/atom:content/metadata/EscSysMeta/meta-type");
         final Node data = child(findNode(doc, xPath, "/atom:entry/atom:content/data"));
         final Node meta = child(findNode(doc, xPath, "/atom:entry/atom:content/metadata/EscUserMeta"));
 
         return new AtomEntry<Node>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
-                metaContentType, data, meta);
+                metaContentType, metaTypeStr, data, meta);
 
     }
-    
+
     private Node child(final Node node) {
         if (node == null) {
             return null;

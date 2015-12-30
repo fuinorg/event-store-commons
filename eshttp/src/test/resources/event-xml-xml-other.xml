@@ -13,6 +13,7 @@
 		<EscSysMeta>
 			<data-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</data-content-type>
 			<meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+            <meta-type>MyMeta</meta-type>
 		</EscSysMeta>
 	</MetaData>
 </Event>

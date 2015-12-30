@@ -24,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -139,8 +138,8 @@ public final class AppendToStreamCommand implements TestCommand {
             }
         } else {
             events = new ArrayList<>();
-            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), new EventType(
-                    BookAddedEvent.TYPE), new BookAddedEvent("Any", "John Doe"));
+            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
+                    new BookAddedEvent("Any", "John Doe"));
             events.add(ce);
         }
 

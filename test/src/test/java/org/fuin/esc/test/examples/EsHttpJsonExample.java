@@ -74,7 +74,6 @@ public final class EsHttpJsonExample {
 
         // Create an event store instance and open it
         EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, 
-                serMetaType, // Unique type name for the meta data
                 ESEnvelopeType.JSON, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer 
                 registry  // Registry used to find a de-serializer
@@ -85,12 +84,13 @@ public final class EsHttpJsonExample {
             // Prepare
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
-            EventType eventType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
+            EventType dataType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
+            EventType metaType = new EventType("MyMeta");// Define unique meta type (name of the meta data)
             
             JsonObject event = Json.createObjectBuilder().add("name", "Shining").add("author", "Stephen King").build();
             JsonObject meta = Json.createObjectBuilder().add("user", "michael").build();
             
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event, meta); // Combines user and general data
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, dataType, event, metaType, meta); // Combines user and general data
             
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);
