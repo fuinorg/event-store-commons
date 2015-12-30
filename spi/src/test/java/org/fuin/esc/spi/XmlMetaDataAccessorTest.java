@@ -60,17 +60,31 @@ public class XmlMetaDataAccessorTest {
     @Test
     public void testGetString() {
         assertThat(testee.getString("a")).isEqualTo("whatever");
+        assertThat(testee.getString("unknown")).isNull();
     }
 
     @Test
     public void testGetInteger() {
         assertThat(testee.getInteger("b")).isEqualTo(1);
+        assertThat(testee.getInteger("unknown")).isNull();
     }
 
     @Test
     public void testGetBoolean() {
         assertThat(testee.getBoolean("c")).isTrue();
+        assertThat(testee.getBoolean("unknown")).isNull();;
     }
 
+    @Test
+    public void testNullDocument() {
+        
+        final XmlMetaDataAccessor testee = new XmlMetaDataAccessor();
+        testee.init(null);
+        assertThat(testee.getString("unknown")).isNull();
+        assertThat(testee.getInteger("unknown")).isNull();
+        assertThat(testee.getBoolean("unknown")).isNull();;
+        
+    }
+    
 }
 // CHECKSTYLE:ON

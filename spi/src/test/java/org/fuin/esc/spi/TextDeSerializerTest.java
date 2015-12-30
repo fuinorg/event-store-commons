@@ -32,7 +32,7 @@ import org.junit.Test;
 // CHECKSTYLE:OFF Test
 public class TextDeSerializerTest {
 
-    private static final Charset CHARSET = Charset.forName("utf-8");
+    private static final Charset CHARSET = Charset.forName("iso-8859-1");
 
     private TextDeSerializer testee;
 
@@ -59,6 +59,31 @@ public class TextDeSerializerTest {
 
         // VERIFY
         assertThat(copy).isEqualTo(original);
+
+    }
+
+    @Test
+    public void testUnmarshalString() {
+
+        // PREPARE
+        final String original = "Whatever";
+
+        // TEST
+        final String copy = testee.unmarshal(original,
+                EnhancedMimeType.create("text/plain; encoding=" + CHARSET));
+
+        // VERIFY
+        assertThat(copy).isEqualTo(original);
+
+    }
+
+    @Test
+    public void testGetMimeType() {
+
+        // TEST & VERIFY
+        assertThat(testee.getMimeType()).isEqualTo(EnhancedMimeType.create("text", "plain", CHARSET));
+        assertThat(new TextDeSerializer().getMimeType()).isEqualTo(
+                EnhancedMimeType.create("text", "plain", Charset.forName("utf-8")));
 
     }
 
