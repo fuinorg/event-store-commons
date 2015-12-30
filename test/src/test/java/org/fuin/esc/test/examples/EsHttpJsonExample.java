@@ -27,7 +27,7 @@ import javax.json.JsonObject;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -84,8 +84,8 @@ public final class EsHttpJsonExample {
             // Prepare
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
-            EventType dataType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
-            EventType metaType = new EventType("MyMeta");// Define unique meta type (name of the meta data)
+            TypeName dataType = new TypeName("BookAddedEvent");// Define unique event type (name of the event)
+            TypeName metaType = new TypeName("MyMeta");// Define unique meta type (name of the meta data)
             
             JsonObject event = Json.createObjectBuilder().add("name", "Shining").add("author", "Stephen King").build();
             JsonObject meta = Json.createObjectBuilder().add("user", "michael").build();

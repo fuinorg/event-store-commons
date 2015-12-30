@@ -34,7 +34,7 @@ import javax.xml.xpath.XPath;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -86,10 +86,10 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
         }
         if (meta == null) {
             return new SimpleCommonEvent(new EventId(entry.getEventId()),
-                    new EventType(entry.getEventType()), data);
+                    new TypeName(entry.getEventType()), data);
         }
-        return new SimpleCommonEvent(new EventId(entry.getEventId()), new EventType(entry.getEventType()),
-                data, new EventType(entry.getMetaType()), meta);
+        return new SimpleCommonEvent(new EventId(entry.getEventId()), new TypeName(entry.getEventType()),
+                data, new TypeName(entry.getMetaType()), meta);
 
     }
 

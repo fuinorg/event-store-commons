@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
@@ -136,9 +136,9 @@ public final class Event implements Serializable, ValueObject {
         }
         final Object d = getData().unmarshalContent(classesToBeBound);
         if (getMeta() == null) {
-            return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d);
+            return new SimpleCommonEvent(getId(), new TypeName(getData().getType()), d);
         }
-        return new SimpleCommonEvent(getId(), new EventType(getData().getType()), d, new EventType(getMeta()
+        return new SimpleCommonEvent(getId(), new TypeName(getData().getType()), d, new TypeName(getMeta()
                 .getType()), m);
     }
 

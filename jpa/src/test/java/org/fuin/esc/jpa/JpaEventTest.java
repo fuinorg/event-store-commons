@@ -24,7 +24,7 @@ import java.util.HashMap;
 import javax.persistence.TypedQuery;
 
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.units4j.AbstractPersistenceTest;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public final class JpaEventTest extends AbstractPersistenceTest {
 
         // PREPARE
         final EventId eventId = new EventId();
-        final EventType type = new EventType("HelloWorld");
+        final TypeName type = new TypeName("HelloWorld");
         final int version = 1;
         final String xml = "<hello name=\"world\" />";
         final JpaEvent testee = create(eventId, type, version, xml);
@@ -72,7 +72,7 @@ public final class JpaEventTest extends AbstractPersistenceTest {
 
     }
 
-    private JpaEvent create(final EventId eventId, final EventType type,
+    private JpaEvent create(final EventId eventId, final TypeName type,
             final int version, final String xml) {
         final Charset encoding = Charset.forName("utf-8");
         final EnhancedMimeType mimeType = EnhancedMimeType.create(

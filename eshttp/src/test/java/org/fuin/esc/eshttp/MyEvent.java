@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotEmpty;
 
@@ -36,7 +36,7 @@ public final class MyEvent implements Serializable {
     private static final long serialVersionUID = 100L;
 
     /** Unique name of the event. */
-    public static EventType TYPE = new EventType("MyEvent");
+    public static TypeName TYPE = new TypeName("MyEvent");
 
     @XmlAttribute(name = "id")
     private String id;

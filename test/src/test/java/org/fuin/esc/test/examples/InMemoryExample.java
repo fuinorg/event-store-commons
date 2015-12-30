@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -55,7 +55,7 @@ public final class InMemoryExample {
             // Prepare
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
-            EventType eventType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
+            TypeName eventType = new TypeName("BookAddedEvent");// Define unique event type (name of the event)
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
             CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event); // Combines user and general data
             

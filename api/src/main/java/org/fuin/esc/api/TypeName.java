@@ -24,10 +24,10 @@ import org.fuin.objects4j.common.NotEmpty;
 import org.fuin.objects4j.vo.AbstractStringValueObject;
 
 /**
- * Uniquely identifies a type of event.
+ * Name that uniquely identifies a type of data.
  */
 @Immutable
-public final class EventType extends AbstractStringValueObject {
+public final class TypeName extends AbstractStringValueObject {
 
     private static final long serialVersionUID = 811127657088134517L;
 
@@ -37,7 +37,7 @@ public final class EventType extends AbstractStringValueObject {
     /**
      * Protected default constructor for deserialization.
      */
-    protected EventType() {
+    protected TypeName() {
         super();
     }
 
@@ -47,7 +47,7 @@ public final class EventType extends AbstractStringValueObject {
      * @param value
      *            Type name.
      */
-    public EventType(@NotEmpty final String value) {
+    public TypeName(@NotEmpty final String value) {
         super();
         Contract.requireArgNotEmpty("value", value);
         this.value = value;

@@ -25,7 +25,7 @@ import javax.activation.MimeTypeParseException;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.junit.Test;
 
@@ -129,7 +129,7 @@ public class EscSpiUtilsTest {
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         final String type = "TypeX";
         final SerializedDataType serType = new SerializedDataType(type);
-        final EventType eventType = new EventType(type);
+        final TypeName eventType = new TypeName(type);
         registry.addSerializer(serType, dummySerializer("text/plain"));
         final List<CommonEvent> events = new ArrayList<>();
         events.add(new SimpleCommonEvent(new EventId(), eventType, "One"));
@@ -150,12 +150,12 @@ public class EscSpiUtilsTest {
 
         final String typeA = "TypeA";
         final SerializedDataType serTypeA = new SerializedDataType(typeA);
-        final EventType eventTypeA = new EventType(typeA);
+        final TypeName eventTypeA = new TypeName(typeA);
         registry.addSerializer(serTypeA, dummySerializer("text/plain"));
 
         final String typeB = "TypeB";
         final SerializedDataType serTypeB = new SerializedDataType(typeB);
-        final EventType eventTypeB = new EventType(typeB);
+        final TypeName eventTypeB = new TypeName(typeB);
         registry.addSerializer(serTypeB, dummySerializer("application/xml"));
 
         final List<CommonEvent> events = new ArrayList<>();

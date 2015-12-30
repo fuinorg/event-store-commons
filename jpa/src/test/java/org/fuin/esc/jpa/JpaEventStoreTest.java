@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -72,7 +72,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             final VendorCreatedEvent vendorCreatedEvent = new VendorCreatedEvent(vendorId);
             final AggregateStreamId streamId = new AggregateStreamId("Vendor", "vendorId", vendorId);
             final EventId eventId = new EventId();
-            final EventType dataType = new EventType(VendorCreatedEvent.TYPE);
+            final TypeName dataType = new TypeName(VendorCreatedEvent.TYPE);
             final CommonEvent eventData = new SimpleCommonEvent(eventId, dataType, vendorCreatedEvent);
 
             // TEST

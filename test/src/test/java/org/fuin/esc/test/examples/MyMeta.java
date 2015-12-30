@@ -21,7 +21,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -33,7 +33,7 @@ public final class MyMeta implements Serializable {
     private static final long serialVersionUID = 100L;
 
     /** Unique name of the event. */
-    public static final EventType TYPE = new EventType("MyMeta");
+    public static final TypeName TYPE = new TypeName("MyMeta");
 
     @XmlElement(name = "user")
     private String user;

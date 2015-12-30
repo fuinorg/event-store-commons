@@ -35,14 +35,14 @@ public final class SimpleCommonEvent implements CommonEvent {
 
     /** Never changing unique event type name. */
     @NotNull
-    private EventType dataType;
+    private TypeName dataType;
 
     /** The event data. */
     @NotNull
     private Object data;
 
     /** Never changing unique meta type name. */
-    private EventType metaType;
+    private TypeName metaType;
 
     /** The meta data. */
     private Object meta;
@@ -66,7 +66,7 @@ public final class SimpleCommonEvent implements CommonEvent {
      *            Event data.
      * 
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType dataType,
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final TypeName dataType,
             @NotNull final Object data) {
         this(id, dataType, data, null, null);
     }
@@ -87,8 +87,8 @@ public final class SimpleCommonEvent implements CommonEvent {
      *            Meta data.
      * 
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final EventType dataType,
-            @NotNull final Object data, @Nullable final EventType metaType, @Nullable final Object meta) {
+    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final TypeName dataType,
+            @NotNull final Object data, @Nullable final TypeName metaType, @Nullable final Object meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
@@ -109,7 +109,7 @@ public final class SimpleCommonEvent implements CommonEvent {
     }
 
     @Override
-    public final EventType getDataType() {
+    public final TypeName getDataType() {
         return dataType;
     }
 
@@ -119,7 +119,7 @@ public final class SimpleCommonEvent implements CommonEvent {
     }
 
     @Override
-    public final EventType getMetaType() {
+    public final TypeName getMetaType() {
         return metaType;
     }
 

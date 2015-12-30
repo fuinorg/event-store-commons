@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -254,7 +254,7 @@ public class InMemoryEventStoreSyncTest {
     }
 
     private static CommonEvent event(final EventId id, final String name) {
-        return new SimpleCommonEvent(id, new EventType("MyEvent"), new MyEvent(name));
+        return new SimpleCommonEvent(id, new TypeName("MyEvent"), new MyEvent(name));
     }
 
 }

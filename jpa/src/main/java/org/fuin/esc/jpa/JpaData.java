@@ -25,7 +25,7 @@ import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlInlineBinaryData;
 
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
@@ -75,7 +75,7 @@ public class JpaData implements ValueObject, Serializable {
      * @param raw
      *            Raw data block.
      */
-    public JpaData(@NotNull final EventType type,
+    public JpaData(@NotNull final TypeName type,
             @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
@@ -110,8 +110,8 @@ public class JpaData implements ValueObject, Serializable {
      * @return Unique and never changing type name.
      */
     @NeverNull
-    public final EventType getType() {
-        return new EventType(type);
+    public final TypeName getType() {
+        return new TypeName(type);
     }
 
     /**

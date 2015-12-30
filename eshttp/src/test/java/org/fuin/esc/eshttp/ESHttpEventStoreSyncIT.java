@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -73,8 +73,8 @@ public class ESHttpEventStoreSyncIT {
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamA", false);
         final MyEvent one = new MyEvent("One");
-        final EventType dataType = new EventType("MyEvent");
-        final EventType metaType = new EventType("MyMeta");
+        final TypeName dataType = new TypeName("MyEvent");
+        final TypeName metaType = new TypeName("MyMeta");
         final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
                 meta);
         final MyEvent two = new MyEvent("Two");
@@ -98,8 +98,8 @@ public class ESHttpEventStoreSyncIT {
         // PREPARE
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamB", false);
-        final EventType dataType = new EventType("MyEvent");
-        final EventType metaType = new EventType("MyMeta");
+        final TypeName dataType = new TypeName("MyEvent");
+        final TypeName metaType = new TypeName("MyMeta");
         final MyEvent one = new MyEvent("One");
         final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
         final MyEvent two = new MyEvent("Two");
@@ -148,8 +148,8 @@ public class ESHttpEventStoreSyncIT {
         final MyMeta meta = new MyMeta("john.doe");
         final StreamId streamId = new SimpleStreamId("MyStreamC", false);
         final MyEvent one = new MyEvent("One");
-        final EventType dataType = new EventType("MyEvent");
-        final EventType metaType = new EventType("MyMeta");
+        final TypeName dataType = new TypeName("MyEvent");
+        final TypeName metaType = new TypeName("MyMeta");
         final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
                 meta);
         final MyEvent two = new MyEvent("Two");

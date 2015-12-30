@@ -29,26 +29,26 @@ public final class EventTypeTest {
     @Test
     public final void testSerialize() {
         final String name = "MyUniqueTypeName";
-        final EventType original = new EventType(name);
-        final EventType copy = deserialize(serialize(original));
+        final TypeName original = new TypeName(name);
+        final TypeName copy = deserialize(serialize(original));
         assertThat(original).isEqualTo(copy);
     }
 
     @Test
     public final void testConstructValid() {
         final String name = "MyType";
-        assertThat(new EventType(name).toString()).isEqualTo(name);
-        assertThat(new EventType(name).length()).isEqualTo(name.length());
+        assertThat(new TypeName(name).toString()).isEqualTo(name);
+        assertThat(new TypeName(name).length()).isEqualTo(name.length());
     }
 
     @Test(expected = ContractViolationException.class)
     public final void testConstructNullString() {
-        new EventType(null);
+        new TypeName(null);
     }
 
     @Test(expected = ContractViolationException.class)
     public final void testConstructEmpty() {
-        new EventType("");
+        new TypeName("");
     }
 
 }

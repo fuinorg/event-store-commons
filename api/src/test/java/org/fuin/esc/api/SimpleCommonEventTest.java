@@ -35,11 +35,11 @@ public class SimpleCommonEventTest {
 
     private static final EventId ID = new EventId();
 
-    private static final EventType DATA_TYPE = new EventType("MyEvent");
+    private static final TypeName DATA_TYPE = new TypeName("MyEvent");
 
     private static MyEvent DATA = new MyEvent("Peter");
 
-    private static final EventType META_TYPE = new EventType("MyMeta");
+    private static final TypeName META_TYPE = new TypeName("MyMeta");
 
     private static JsonObject META = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
 

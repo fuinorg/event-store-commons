@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
@@ -115,8 +115,8 @@ public final class ESHttpXmlMarshaller implements ESHttpMarshaller {
      * 
      * @return String with single event.
      */
-    protected final String marshalIntern(final EventId id, final EventType dataType,
-            final SerializedData serData, final EventType metaType, final SerializedData serMeta) {
+    protected final String marshalIntern(final EventId id, final TypeName dataType,
+            final SerializedData serData, final TypeName metaType, final SerializedData serMeta) {
 
         Contract.requireArgNotNull("id", id);
         Contract.requireArgNotNull("type", dataType);

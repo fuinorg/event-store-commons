@@ -50,13 +50,12 @@ public class StreamEventsSliceTest {
 
     @BeforeClass
     public static void beforeClass() throws MimeTypeParseException {
-        final JsonObject meta = Json.createObjectBuilder()
-                .add("ip", "127.0.0.1").build();
+        final TypeName dataType = new TypeName("MyEvent");
+        final TypeName metaType = new TypeName("MyMeta");
+        final JsonObject meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
         events = new ArrayList<CommonEvent>();
-        events.add(new SimpleCommonEvent(new EventId(), new EventType("MyEvent"),
-                new MyEvent("Peter"), new EventType("MyMeta"), meta));
-        events.add(new SimpleCommonEvent(new EventId(), new EventType("MyEvent"),
-                new MyEvent("Mary Jane"), new EventType("MyMeta"), meta));
+        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Peter"), metaType, meta));
+        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Mary Jane"), metaType, meta));
     }
 
     @Before
