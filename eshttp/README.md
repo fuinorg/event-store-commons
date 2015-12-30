@@ -1,39 +1,55 @@
 # esc-eshttp
-Event store commons HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/).
+Event store commons HTTP adapter for Greg Young's [Event Store](https://www.geteventstore.com/).
 
 ## ESC Meta Data Structure
-The common event store interface uses a special meta data structure for the [Event Store](https://geteventstore.com/).
-This allows storing the content type, encoding and version of the user's data and meta data.  
+The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. 
+To allow storing different types and versions of data and meta data, the common event store interface introduces 
+a separate meta data structure. It contains information about content-types, encoding, version, meta type and 
+the meta information provided by the user.
+
+Here is how the data structure looks like that is sent using the [Event Store Events Media Type](http://docs.geteventstore.com/http-api/3.4.0/writing-to-a-stream/):
 ```json
-{
-  "EscUserMeta": {
-    "user": "michael"
-  },
-  "EscSysMeta": {
-    "data-content-type": "application/json; encoding=UTF-8",
-    "meta-content-type": "application/json; encoding=UTF-8",
-    "meta-type":"MyMeta"
-  }
-}
+[
+    {
+        "EventId":"b3074933-c3ac-44c1-8854-04a21d560999",
+        "EventType":"BookAddedEvent",
+        "Data":{
+            "name":"Shining",
+            "author":"Stephen King"
+        },
+        "MetaData":{
+            "EscUserMeta":{
+                "user":"michael"
+            },
+            "EscSysMeta":{
+                "data-content-type":"application/json; encoding=UTF-8",
+                "meta-content-type":"application/json; encoding=UTF-8",
+                "meta-type":"MyMeta"
+            }
+        }
+    }
+]
 ```
-Here is an example of XML content stored in a JSON format:
-### Data
+Here is another example of event (XML) and mime type (TEXT) with a different format than the surrounding JSON envelope:
 ```json
-{
-  "Base64": "PGJvb2stYWRkZWQtZXZlbnQgbmFtZT0iU2hpbmluZyIgYXV0aG9yPSJTdGVwaGVuIEtpbmciLz4="
-}
-```
-### Meta Data
-```json
-{
-  "EscUserMeta": {
-    "Base64": "PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+"
-  },
-  "EscSysMeta": {
-    "data-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
-    "meta-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
-    "meta-type":"MyMeta"
-  }
-}
+[
+    {
+        "EventId":"b3074933-c3ac-44c1-8854-04a21d560999",
+        "EventType":"BookAddedEvent",
+        "Data":{
+            "Base64": "PGJvb2stYWRkZWQtZXZlbnQgbmFtZT0iU2hpbmluZyIgYXV0aG9yPSJTdGVwaGVuIEtpbmciLz4="
+        },
+        "MetaData":{
+            "EscUserMeta": {
+                "Base64": "QW55dGhpbmcgZ29lcw=="
+            },
+            "EscSysMeta": {
+                "data-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
+                "meta-content-type": "text/plain; encoding=UTF-8; transfer-encoding=base64",
+                "meta-type":"AnyMeta"
+            }
+        }
+    }
+]
 ```
 The actual data and meta data is base64 encoded. This way you can use any data format you like for storing your content.
