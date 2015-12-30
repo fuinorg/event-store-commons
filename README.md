@@ -6,7 +6,7 @@ Defines a common event store Java interface and provides some adapters (like for
 [![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
 [![Java Development Kit 1.8](https://img.shields.io/badge/JDK-1.8-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
-# Status
+## Status
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
 | Module | Description | Status | Comment |
@@ -18,11 +18,11 @@ Defines a common event store Java interface and provides some adapters (like for
 | [esc-spi](spi) | Helper classes for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~68% |
 | [esc-test](test) | Cucumber tests for adapters and implementations | ![Work in progress](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/work-in-progress.png) | Currently in work |
 
-# Architecture
+## Architecture
 ![Layers](https://raw.github.com/fuinorg/event-store-commons/master/doc/event-store-commons.png)
 See [ES.JVM](https://github.com/EventStore/EventStore.JVM) / [ES.Java](https://github.com/jen20/EventStore.Java)
 
-# Examples
+## Examples
 - [Simple in-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java)
 - [Event store with HTTP interface and XML](test/src/test/java/org/fuin/esc/test/examples/EsHttpXmlExample.java)
 - [Event store with HTTP interface and JSON](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonExample.java)
