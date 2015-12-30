@@ -215,7 +215,8 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 LOG.debug(msg + " RESPONSE: {}", response);
                 return;
             }
-            if (statusLine.getStatusCode() == 400) {
+            if ((statusLine.getStatusCode() == 400)
+                    && !statusLine.getReasonPhrase().contains("request body invalid")) {
                 // TODO Add expected version instead of any version if ES
                 // returns this in header
                 LOG.debug(msg + " RESPONSE: {}", response);
@@ -228,7 +229,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             }
 
             LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + statusLine.getStatusCode() + "]");
+            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
 
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
@@ -272,7 +273,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             }
 
             LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + statusLine.getStatusCode() + "]");
+            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
 
         } catch (final URISyntaxException | ExecutionException | InterruptedException ex) {
             throw new RuntimeException(msg, ex);
@@ -361,7 +362,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 return true;
             }
             LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + status.getStatusCode() + "]");
+            throw new RuntimeException(msg + " [Status=" + status + "]");
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -396,7 +397,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
                 return StreamState.HARD_DELETED;
             }
             LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + status.getStatusCode() + "]");
+            throw new RuntimeException(msg + " [Status=" + status + "]");
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -516,7 +517,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         final String str = url.substring(p + 1);
         return Integer.valueOf(str);
     }
-    
+
     private String streamName(StreamId streamId) {
         if (streamId.equals(StreamId.ALL)) {
             return "$all";
