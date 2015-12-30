@@ -11,7 +11,8 @@ This allows storing the content type, encoding and version of the user's data an
   },
   "EscSysMeta": {
     "data-content-type": "application/json; encoding=UTF-8",
-    "meta-content-type": "application/json; encoding=UTF-8"
+    "meta-content-type": "application/json; encoding=UTF-8",
+    "meta-type":"MyMeta"
   }
 }
 ```
@@ -30,7 +31,8 @@ Here is an example of XML content stored in a JSON format:
   },
   "EscSysMeta": {
     "data-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
-    "meta-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64"
+    "meta-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
+    "meta-type":"MyMeta"
   }
 }
 ```
