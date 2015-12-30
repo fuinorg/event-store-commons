@@ -19,7 +19,7 @@ Defines a common event store Java interface and provides some adapters (like for
 | [esc-jpa](jpa) | JPA adapter | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~56% |
 | [esc-mem](mem) | In-memory implementation | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60% |
 | [esc-spi](spi) | Helper classes for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~67% |
-| [esc-test](test) | Cucumber tests for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) |  |
+| [esc-test](test) | Cucumber tests for adapters and implementations | ![Work in progress](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/work-in-progress.png) | Subscriptions + JPA not tested yet |
 
 ## Architecture
 ![Layers](https://raw.github.com/fuinorg/event-store-commons/master/doc/event-store-commons.png)
