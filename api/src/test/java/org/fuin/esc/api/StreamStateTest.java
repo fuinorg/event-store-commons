@@ -21,30 +21,15 @@ import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
-public final class EventIdConverterTest {
-
-    private static final String UUID = "f73422c8-2ed9-4613-865d-fa82adf43767";
+public final class StreamStateTest {
 
     @Test
-    public final void testMarshalNull() throws Exception {
-        assertThat(new EventIdConverter().marshal(null)).isNull();
-    }
+    public final void testFromDbValue() {
 
-    @Test
-    public final void testMarshal() throws Exception {
-        final EventId eventId = new EventId(UUID);
-        assertThat(new EventIdConverter().marshal(eventId)).isEqualTo(UUID);
-    }
+        // TEST + VERIFY
+        assertThat(StreamState.fromDbValue(StreamState.HARD_DELETED.dbValue())).isEqualTo(
+                StreamState.HARD_DELETED);
 
-    @Test
-    public final void testUnmarshalNull() throws Exception {
-        assertThat(new EventIdConverter().unmarshal(null)).isNull();
-    }
-
-    @Test
-    public final void testUnmarshal() throws Exception {
-        final EventId eventId = new EventId(UUID);
-        assertThat(new EventIdConverter().unmarshal(UUID)).isEqualTo(eventId);
     }
 
 }

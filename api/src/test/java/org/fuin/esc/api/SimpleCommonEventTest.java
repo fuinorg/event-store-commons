@@ -63,7 +63,9 @@ public class SimpleCommonEventTest {
     @Test
     public void testGetter() {
         assertThat(testee.getId()).isEqualTo(ID);
+        assertThat(testee.getDataType()).isEqualTo(DATA_TYPE);
         assertThat(testee.getData()).isEqualTo(DATA);
+        assertThat(testee.getMetaType()).isEqualTo(META_TYPE);
         assertThat(testee.getMeta()).isEqualTo(META);
     }
 

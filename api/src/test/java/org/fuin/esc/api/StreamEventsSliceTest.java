@@ -69,6 +69,11 @@ public class StreamEventsSliceTest {
     }
 
     @Test
+    public void testNullList() {
+        assertThat(new StreamEventsSlice(FROM, null, NEXT, EOS).getEvents()).isEmpty();
+    }
+    
+    @Test
     public void testEqualsHashCode() {
         EqualsVerifier.forClass(StreamEventsSlice.class).verify();
     }

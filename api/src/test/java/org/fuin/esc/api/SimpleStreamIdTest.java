@@ -51,7 +51,20 @@ public class SimpleStreamIdTest {
     @Test
     public void testGetter() {
         assertThat(testee.getName()).isEqualTo(NAME);
+        assertThat(testee.asString()).isEqualTo(NAME);
+        assertThat(testee.isProjection()).isTrue();    
+        assertThat(testee.getParameters()).isEmpty();
     }
 
+    @Test
+    public void testConstruction() {
+        assertThat(new SimpleStreamId(NAME, false).isProjection()).isFalse();
+        assertThat(new SimpleStreamId(NAME, true).isProjection()).isTrue();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testGetSingleParamValue() {
+        testee.getSingleParamValue();
+    }    
 }
 // CHECKSTYLE:ON

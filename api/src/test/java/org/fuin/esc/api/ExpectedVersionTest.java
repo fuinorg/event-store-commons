@@ -21,30 +21,26 @@ import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
-public final class EventIdConverterTest {
-
-    private static final String UUID = "f73422c8-2ed9-4613-865d-fa82adf43767";
+public final class ExpectedVersionTest {
 
     @Test
-    public final void testMarshalNull() throws Exception {
-        assertThat(new EventIdConverter().marshal(null)).isNull();
+    public final void testValid() {
+
+        // TEST + VERIFY
+        assertThat(ExpectedVersion.valid("DOES_NOT_EXIST")).isFalse();
+        assertThat(ExpectedVersion.valid(ExpectedVersion.ANY.name())).isTrue();
+
     }
 
     @Test
-    public final void testMarshal() throws Exception {
-        final EventId eventId = new EventId(UUID);
-        assertThat(new EventIdConverter().marshal(eventId)).isEqualTo(UUID);
-    }
+    public final void testNo() {
 
-    @Test
-    public final void testUnmarshalNull() throws Exception {
-        assertThat(new EventIdConverter().unmarshal(null)).isNull();
-    }
+        // TEST + VERIFY
+        assertThat(ExpectedVersion.no(null)).isEqualTo(ExpectedVersion.ANY.getNo());
+        assertThat(ExpectedVersion.no(ExpectedVersion.NO_OR_EMPTY_STREAM.name())).isEqualTo(
+                ExpectedVersion.NO_OR_EMPTY_STREAM.getNo());
+        assertThat(ExpectedVersion.no("123")).isEqualTo(123);
 
-    @Test
-    public final void testUnmarshal() throws Exception {
-        final EventId eventId = new EventId(UUID);
-        assertThat(new EventIdConverter().unmarshal(UUID)).isEqualTo(eventId);
     }
 
 }
