@@ -292,6 +292,9 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     private CommonEvent asCommonEvent(final JpaEvent jpaEvent) {
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
+        if (meta == null) {
+            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data);
+        }
         return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, jpaEvent
                 .getMeta().getType(), meta);
     }

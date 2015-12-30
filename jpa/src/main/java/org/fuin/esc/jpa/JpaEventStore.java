@@ -185,7 +185,12 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         final SerializedData serData = serialize(serDataType, commonEvent.getData());
 
         // Serialize meta data
-        final SerializedDataType serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+        final SerializedDataType serMetaType;
+        if (commonEvent.getMetaType() == null) {
+            serMetaType = null;
+        } else {
+            serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+        }
         final SerializedData serMeta = serialize(serMetaType, commonEvent.getMeta());
 
         // Create the JPA event to store
