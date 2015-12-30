@@ -14,7 +14,7 @@ Defines a common event store Java interface and provides some adapters (like for
 
 | Module | Description | Status | Comment |
 |:-------|:------------|--------|:--------|
-| [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~58% |
+| [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~93% |
 | [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
 | [esc-jpa](jpa) | JPA adapter | ![PAUSED](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/sleeping.png) | Development paused - Will be continued after 'esc-test' is more complete |
 | [esc-mem](mem) | In-memory implementation | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60% |
