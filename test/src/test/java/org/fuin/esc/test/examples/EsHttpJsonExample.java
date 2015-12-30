@@ -21,6 +21,10 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStoreSync;
@@ -31,17 +35,17 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStoreSync;
+import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
-import org.fuin.esc.spi.XmlDeSerializer;
 
 /**
- * Event Store (https://geteventstore.com/) HTTP example.
+ * Event Store (https://geteventstore.com/) HTTP JSON example.
  */
 // CHECKSTYLE:OFF Shorter example code
-public final class EsHttpExample {
+public final class EsHttpJsonExample {
 
-    private EsHttpExample() {
+    private EsHttpJsonExample() {
         super();
     }
 
@@ -61,18 +65,18 @@ public final class EsHttpExample {
         SerializedDataType serMetaType = new SerializedDataType("MyMeta");
         SerializedDataType serDataType = new SerializedDataType("BookAddedEvent");
         
-        // Handles XML serialization and de-serialization
-        XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, BookAddedEvent.class);
+        // Handles JSON serialization and de-serialization
+        JsonDeSerializer jsonDeSer = new JsonDeSerializer();
         
         // Registry connects the type with the appropriate serializer and de-serializer
         SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.add(serDataType, "application/xml", xmlDeSer);
-        registry.add(serMetaType, "application/xml", xmlDeSer);
+        registry.add(serDataType, "application/json", jsonDeSer);
+        registry.add(serMetaType, "application/json", jsonDeSer);
 
         // Create an event store instance and open it
         EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, 
                 serMetaType, // Unique type name for the meta data
-                ESEnvelopeType.XML, // This format will be used to communicate with the event store
+                ESEnvelopeType.JSON, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer 
                 registry  // Registry used to find a de-serializer
                 );
@@ -83,8 +87,11 @@ public final class EsHttpExample {
             StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
             EventType eventType = new EventType("BookAddedEvent");// Define unique event type (name of the event)
-            BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event); // Combines user and general data
+            
+            JsonObject event = Json.createObjectBuilder().add("name", "Shining").add("author", "Stephen King").build();
+            JsonObject meta = Json.createObjectBuilder().add("user", "michael").build();
+            
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event, meta); // Combines user and general data
             
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);

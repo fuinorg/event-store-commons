@@ -24,4 +24,5 @@ See [ES.JVM](https://github.com/EventStore/EventStore.JVM) / [ES.Java](https://g
 
 # Examples
 - [Simple in-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java)
-- [Simple event store example using HTTP interface and XML](test/src/test/java/org/fuin/esc/test/examples/EsHttpExample.java)
+- [Event store with HTTP interface and XML](test/src/test/java/org/fuin/esc/test/examples/EsHttpXmlExample.java)
+- [Event store with HTTP interface and JSON](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonExample.java)
