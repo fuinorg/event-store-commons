@@ -61,4 +61,5 @@ Here is another example of event (XML) and mime type (TEXT) with a different for
 ]
 ```
 The actual data and meta data is base64 encoded. This way you can use any data format you like for storing your content.
-If you decode the base 64 data, it's ```<book-added-event name="Shining" author="Stephen King"/>``` (Data) and ```Anything goes``` (Meta).
+If you decode the base 64 data, it's "```<book-added-event name="Shining" author="Stephen King"/>```" (Data) and 
+"```Anything goes```" (EscUserMeta).
