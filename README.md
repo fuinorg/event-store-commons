@@ -6,7 +6,7 @@ Defines a common event store Java interface and provides some adapters (like for
 [![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
 [![Java Development Kit 1.8](https://img.shields.io/badge/JDK-1.8-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
-*Caution*: The code coverage value is not correct (it's actually higher than above value) as the 'test' module is not considered correctly (See #4)
+*Caution*: The code coverage value is not correct (it's actually higher than above value) as the 'test' module is not considered correctly (See [Issue #4](#4))
 
 
 ## Status
