@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
