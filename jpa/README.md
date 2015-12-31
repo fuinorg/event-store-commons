@@ -30,7 +30,7 @@ Class name is the same as the stream identifier plus 'Event' (Not there is no 's
 public class YourSelectedNameEvent extends JpaStreamEvent { 
     // ... 
 }
-```java
+```
 
 ####Stream entity 
 Table name is the same as the stream identifier plus '_STREAMS' and uses an 'underscore' for replacing camel case parts.   
@@ -40,4 +40,5 @@ Class name is the same as the stream identifier plus 'Stream' (Not there is no '
 @Entity
 public class YourSelectedNameStream extends JpaStream { 
     // ... 
-}```
+}
+```
