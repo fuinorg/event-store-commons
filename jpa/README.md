@@ -23,7 +23,7 @@ StreamId streamId = new SimpleStreamId("YourSelectedName")
 
 ####Event entity
 Table name is the same as the stream identifier plus '_EVENTS' and uses an 'underscore' for replacing camel case parts.
-Class name is the same as the stream identifier plus 'Event' (Not there is no 's' at the end!).
+Class name is the same as the stream identifier plus 'Event' (Note that there is no 's' at the end!).
 ```java
 @Table(name = "YOUR_SELECTED_NAME_EVENTS")
 @Entity
@@ -34,7 +34,7 @@ public class YourSelectedNameEvent extends JpaStreamEvent {
 
 ####Stream entity 
 Table name is the same as the stream identifier plus '_STREAMS' and uses an 'underscore' for replacing camel case parts.   
-Class name is the same as the stream identifier plus 'Stream' (Not there is no 's' at the end!).
+Class name is the same as the stream identifier plus 'Stream' (Note that there is no 's' at the end!).
 ```java
 @Table(name = "APPEND_MULTIPLE_AGAIN_STREAMS")
 @Entity
