@@ -3,8 +3,9 @@ Java Persistence API (JPA) based implementation of the event store commons api.
 
 Naming conventions
 ------------------
-The JPA implementation requires a strict naming convention. 
-You have to name your tables and identifiers accordingly **otherwise it will not work**.
+The JPA implementation requires a strict naming convention.
+ 
+*You have to name your tables and identifiers accordingly* **otherwise it will not work**.
 
 ####StreamId
 Use a camel case stream identifier name that ends *not* on 'Stream', 'Streams', 'Event' or 'Events'.
