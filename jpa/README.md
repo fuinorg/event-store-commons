@@ -8,3 +8,27 @@ A [VendorStream](src/test/java/org/fuin/esc/jpa/examples/VendorStream.java) has 
 and [VendorEvent](src/test/java/org/fuin/esc/jpa/examples/VendorEvent.java) has a reference to the event table. 
 The [JpaEvent](src/main/java/org/fuin/esc/jpa/JpaEvent.java) table contains the real event data.    
 ![JPA Entities](https://raw.github.com/fuinorg/event-store-commons/master/jpa/src/main/doc/esc-jpa-example.png)
+
+Naming conventions
+------------------
+The JPA implementation requires a strict naming convention. You have to name your tables and identifiers accordingly.
+
+###Example
+- StreamId
+  ```StreamId streamId = new SimpleStreamId("YourSelectedName")```
+- Event entity
+  Table name is the same as the stream identifier plus '_EVENTS' and uses 'underscore' for replacing camel case.
+  Class name is the same as the stream identifier plus 'Event' (Not there is no 's' at the end!).
+  ```@Table(name = "YOUR_SELECTED_NAME_EVENTS")
+     @Entity
+     public class YourSelectedNameEvent extends JpaStreamEvent { 
+         // ... 
+     }```
+- Stream entity 
+  Table name is the same as the stream identifier plus '_STREAMS' and uses 'underscore' for replacing camel case.   
+  Class name is the same as the stream identifier plus 'Stream' (Not there is no 's' at the end!).
+  ```@Table(name = "APPEND_MULTIPLE_AGAIN_STREAMS")
+     @Entity
+     public class YourSelectedNameStream extends JpaStream { 
+         // ... 
+     }```
