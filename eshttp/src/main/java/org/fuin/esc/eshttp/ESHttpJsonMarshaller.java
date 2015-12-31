@@ -45,7 +45,13 @@ public final class ESHttpJsonMarshaller implements ESHttpMarshaller {
         Contract.requireArgNotNull("commonEvents", commonEvents);
 
         final StringBuffer sb = new StringBuffer(OPEN_TAG);
+        boolean first = true;
         for (final CommonEvent commonEvent : commonEvents) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(",");
+            }
             sb.append(marshalIntern(registry, commonEvent));
         }
         sb.append(CLOSE_TAG);
