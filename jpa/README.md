@@ -5,7 +5,7 @@ Naming conventions
 ------------------
 The JPA implementation requires a strict naming convention.
  
-*You have to name your tables and identifiers accordingly* **otherwise it will not work**.
+**You have to name your tables and identifiers exactly as described below otherwise it will not work**.
 
 ####StreamId
 Use a camel case stream identifier name that ends *not* on 'Stream', 'Streams', 'Event' or 'Events'.
