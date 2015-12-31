@@ -230,7 +230,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
         }
         if (expectedVersion != ExpectedVersion.ANY.getNo() && expectedVersion != stream.getVersion()) {
             final List<CommonEvent> events = stream.getEvents();
-            if (lastEventsEqual(events, toAppend)) {
+            if (EscSpiUtils.eventsEqual(events, toAppend)) {
                 return stream.getVersion();
             }
             throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
@@ -243,24 +243,6 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
 
         return stream.getVersion();
 
-    }
-
-    private boolean lastEventsEqual(final List<CommonEvent> events, final List<CommonEvent> toAppend) {
-        if (events.size() < toAppend.size()) {
-            return false;
-        }
-        int currentIdx = events.size() - 1;
-        int appendIdx = toAppend.size() - 1;
-        while (appendIdx > 0) {
-            final CommonEvent current = events.get(currentIdx);
-            final CommonEvent append = events.get(appendIdx);
-            if (!current.getId().equals(append.getId())) {
-                return false;
-            }
-            currentIdx--;
-            appendIdx--;
-        }
-        return true;
     }
 
     @Override

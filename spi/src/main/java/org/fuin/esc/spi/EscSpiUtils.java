@@ -56,10 +56,10 @@ public final class EscSpiUtils {
         if (data == null) {
             return null;
         }
-        
+
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("type", type);
-        
+
         final Serializer serializer = registry.getSerializer(type);
         if (serializer == null) {
             throw new IllegalStateException("Couldn't get a serializer for: " + type);
@@ -113,8 +113,8 @@ public final class EscSpiUtils {
 
         EnhancedMimeType mimeType = null;
         for (final CommonEvent commonEvent : commonEvents) {
-            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent.getDataType()
-                    .asBaseType()));
+            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent
+                    .getDataType().asBaseType()));
             if (serializer == null) {
                 throw new IllegalStateException("Could not find a serializer for event type '"
                         + commonEvent.getDataType() + "': " + commonEvent);
@@ -138,13 +138,42 @@ public final class EscSpiUtils {
      * 
      * @return Array list.
      * 
-     * @param <T> Type of the array and list.
+     * @param <T>
+     *            Type of the array and list.
      */
     public static <T> List<T> asList(final T[] array) {
         if (array == null) {
             return null;
         }
         return Arrays.asList(array);
+    }
+
+    /**
+     * Tests if both lists contain the same events.
+     * 
+     * @param eventsA
+     *            First event list.
+     * @param eventsB
+     *            Second event list.
+     * 
+     * @return TRUE if both lists have the same size and all event identifiers are equal.
+     */
+    public static boolean eventsEqual(final List<CommonEvent> eventsA, final List<CommonEvent> eventsB) {
+        if (eventsA.size() < eventsB.size()) {
+            return false;
+        }
+        int currentIdx = eventsA.size() - 1;
+        int appendIdx = eventsB.size() - 1;
+        while (appendIdx > 0) {
+            final CommonEvent current = eventsA.get(currentIdx);
+            final CommonEvent append = eventsA.get(appendIdx);
+            if (!current.getId().equals(append.getId())) {
+                return false;
+            }
+            currentIdx--;
+            appendIdx--;
+        }
+        return true;
     }
 
 }
