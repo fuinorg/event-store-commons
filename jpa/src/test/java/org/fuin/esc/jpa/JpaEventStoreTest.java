@@ -23,12 +23,13 @@ import java.util.UUID;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamState;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.jpa.examples.AggregateStreamId;
 import org.fuin.esc.jpa.examples.VendorCreatedEvent;
@@ -83,14 +84,20 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             // VERIFY
             assertThat(version).isEqualTo(1);
             beginTransaction();
+            final boolean exists = testee.streamExists(streamId);
+            final StreamState state = testee.streamState(streamId);
             final StreamEventsSlice slice = testee.readEventsForward(streamId, 1, 2);
             commitTransaction();
+
+            assertThat(exists).isTrue();
+            assertThat(state).isEqualTo(StreamState.ACTIVE);
             assertThat(slice.getFromEventNumber()).isEqualTo(1);
             assertThat(slice.getNextEventNumber()).isEqualTo(2);
             assertThat(slice.isEndOfStream()).isTrue();
             assertThat(slice.getEvents()).hasSize(1);
             final CommonEvent ed = slice.getEvents().get(0);
             assertThat(ed.getId()).isEqualTo(eventId);
+            
 
         } finally {
             testee.close();

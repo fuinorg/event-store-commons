@@ -144,27 +144,6 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     }
 
-    private String createStreamSelect(final StreamId streamId) {
-
-        if (streamId.isProjection()) {
-            throw new IllegalArgumentException("Projections do not have a stream table : " + streamId);
-        }
-
-        final List<KeyValue> params = streamId.getParameters();
-        final StringBuilder sb = new StringBuilder("SELECT t FROM " + streamId.getName() + "Stream t");
-        if (params.size() > 0) {
-            sb.append(" WHERE ");
-            for (int i = 0; i < params.size(); i++) {
-                final KeyValue param = params.get(i);
-                if (i > 0) {
-                    sb.append(" AND ");
-                }
-                sb.append("t." + param.getKey() + "=:" + param.getKey());
-            }
-        }
-        return sb.toString();
-    }
-
     private void setParameters(final Query query, final StreamId streamId) {
         final List<KeyValue> params = streamId.getParameters();
         if (params.size() > 0) {

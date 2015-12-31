@@ -22,6 +22,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -192,18 +193,27 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
 
         Contract.requireArgNotNull("streamId", streamId);
 
-        final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
-        return (stream != null);
+        final String sql = createStreamSelect(streamId);
+        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        setParameters(query, streamId);
+        final List<JpaStream> streams = query.getResultList();
+        return streams.size() > 0;
 
     }
 
     @Override
     public final StreamState streamState(final StreamId streamId) {
-        final JpaStream stream = getEm().find(JpaStream.class, streamId.getName());
-        if (stream == null) {
+        
+        final String sql = createStreamSelect(streamId);
+        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        setParameters(query, streamId);
+        final List<JpaStream> streams = query.getResultList();
+        if (streams.size() == 0) {
             throw new StreamNotFoundException(streamId);
         }
+        final JpaStream stream = streams.get(0);
         return stream.getState();
+        
     }
 
     /**
@@ -306,6 +316,36 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getType()
                 .asBaseType()), data.getMimeType(), data.getRaw());
         return EscSpiUtils.deserialize(desRegistry, serializedData);
+    }
+
+    /**
+     * Creates the JPQL to select the stream itself.
+     * 
+     * @param streamId
+     *            Unique stream name. Postfix 'Stream' will be appended to the name (e.g. stream identifier
+     *            'Whatever' will become 'WhateverStream').
+     * 
+     * @return JPQL that selects the stream with the given identifer.
+     */
+    protected final String createStreamSelect(final StreamId streamId) {
+
+        if (streamId.isProjection()) {
+            throw new IllegalArgumentException("Projections do not have a stream table : " + streamId);
+        }
+
+        final List<KeyValue> params = streamId.getParameters();
+        final StringBuilder sb = new StringBuilder("SELECT t FROM " + streamId.getName() + "Stream t");
+        if (params.size() > 0) {
+            sb.append(" WHERE ");
+            for (int i = 0; i < params.size(); i++) {
+                final KeyValue param = params.get(i);
+                if (i > 0) {
+                    sb.append(" AND ");
+                }
+                sb.append("t." + param.getKey() + "=:" + param.getKey());
+            }
+        }
+        return sb.toString();
     }
 
 }
