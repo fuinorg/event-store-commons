@@ -18,9 +18,18 @@ package org.fuin.esc.test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -29,6 +38,7 @@ import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStoreSync;
+import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
@@ -37,6 +47,7 @@ import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.spi.XmlDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.esc.test.examples.MyMeta;
+import org.fuin.esc.test.jpa.TestIdStreamFactory;
 import org.fuin.units4j.Units4JUtils;
 
 import cucumber.api.java.After;
@@ -54,15 +65,19 @@ public class TestFeatures {
 
     private TestCommand lastCommand;
 
+    private EntityManagerFactory emf;
+
+    private EntityManager em;
+
+    private Connection connection;
+
     @Before
     public void beforeFeature() throws MalformedURLException {
         // Use the property to select the correct implementation:
         final String type = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
         if (type.equals("mem")) {
             eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
-        } else if (type.equals("eshttp")) {
-            final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-            final URL url = new URL("http://127.0.0.1:2113/");
+        } else if (type.equals("eshttp") || type.equals("jpa")) {
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
             final TextDeSerializer textDeSer = new TextDeSerializer();
@@ -71,7 +86,15 @@ public class TestFeatures {
                     xmlDeSer);
             registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonDeSer);
             registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
-            eventStore = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.XML, registry, registry);
+            if (type.equals("eshttp")) {
+                final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+                final URL url = new URL("http://127.0.0.1:2113/");
+                eventStore = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.XML, registry,
+                        registry);
+            } else {
+                setupDb();
+                eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
+            }
         } else {
             throw new IllegalStateException("Unknown type: " + type);
         }
@@ -82,6 +105,7 @@ public class TestFeatures {
     @After
     public void afterFeature() {
         eventStore.close();
+        teardownDb();
         eventStore = null;
         if (lastCommand != null) {
             throw new IllegalStateException("Last command was set, but not verified!");
@@ -106,7 +130,7 @@ public class TestFeatures {
     public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         lastCommand = command;
     }
 
@@ -114,7 +138,7 @@ public class TestFeatures {
     public void thenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -132,7 +156,7 @@ public class TestFeatures {
         }
 
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
 
     }
@@ -151,7 +175,7 @@ public class TestFeatures {
     public void thenReadForwardException(final List<ReadForwardExceptionCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -159,7 +183,7 @@ public class TestFeatures {
     public void whenReadForwardException(final List<ReadForwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         lastCommand = command;
     }
 
@@ -167,7 +191,7 @@ public class TestFeatures {
     public void whenReadBackwardException(final List<ReadBackwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         lastCommand = command;
     }
 
@@ -175,7 +199,7 @@ public class TestFeatures {
     public void givenStreamDoesNotExist(final String streamName) {
         final TestCommand command = new StreamExistsCommand(streamName, false);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -186,7 +210,7 @@ public class TestFeatures {
             command.add(cmd);
         }
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -194,7 +218,7 @@ public class TestFeatures {
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -202,7 +226,7 @@ public class TestFeatures {
     public void thenReadBackward(final List<ReadBackwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -218,7 +242,7 @@ public class TestFeatures {
         final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null,
                 commonEvents);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -227,7 +251,7 @@ public class TestFeatures {
 
         final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml, null);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
 
     }
@@ -237,7 +261,7 @@ public class TestFeatures {
         final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null,
                 expectedException);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -245,7 +269,7 @@ public class TestFeatures {
     public void whenStateQueriesAreExecuted(final List<StreamStateCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
     }
 
@@ -266,8 +290,66 @@ public class TestFeatures {
             command.add(new StreamExistsCommand(streamName, exist));
         }
         command.init(eventStore);
-        command.execute();
+        execute(command);
         command.verify();
+    }
+
+    private void setupDb() {
+        try {
+            emf = Persistence.createEntityManagerFactory("testPU");
+            em = emf.createEntityManager();
+            final Map<String, Object> props = emf.getProperties();
+            final boolean shutdown = Boolean.valueOf("" + props.get("esctest.shutdown"));
+            if (shutdown) {
+                final String connUrl = "" + props.get("esctest.url");
+                final String connUsername = "" + props.get("esctest.user");
+                final String connPassword = "" + props.get("esctest.pw");
+                connection = DriverManager.getConnection(connUrl, connUsername, connPassword);
+            }
+        } catch (final SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void teardownDb() {
+        if (em != null) {
+            em.close();
+        }
+        if (emf != null) {
+            emf.close();
+        }
+        try {
+            if (connection != null) {
+                connection.createStatement().execute("SHUTDOWN");
+            }
+        } catch (final SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void execute(TestCommand command) {
+        beginTransaction();
+        command.execute();
+        endTransaction();
+    }
+    
+    private void beginTransaction() {
+        if (em != null) {
+            em.getTransaction().begin();
+        }
+    }
+
+    private void endTransaction() {
+        if (em != null) {
+            final EntityTransaction transaction = em.getTransaction();
+            if (transaction.isActive()) {
+                if (transaction.getRollbackOnly()) {
+                    transaction.rollback();
+                } else {
+                    transaction.commit();
+                }
+            }
+        }
     }
 
 }
