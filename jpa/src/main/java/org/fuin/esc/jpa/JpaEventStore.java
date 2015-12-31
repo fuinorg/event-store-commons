@@ -30,6 +30,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
+import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.WrongExpectedVersionException;
@@ -90,7 +91,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> events) {
+            final List<CommonEvent> toAppend) {
 
         final String sql = createStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
@@ -107,11 +108,18 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
                 throw new StreamDeletedException(streamId);
             }
             if ((expectedVersion != ANY.getNo()) && (stream.getVersion() != expectedVersion)) {
+                // Test for idempotency
+                final StreamEventsSlice slice = readEventsBackward(streamId, stream.getVersion(),
+                        toAppend.size());
+                final List<CommonEvent> events = slice.getEvents();
+                if (EscSpiUtils.eventsEqual(events, toAppend)) {
+                    return stream.getVersion();
+                }
                 throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
             }
         }
-        for (int i = 0; i < events.size(); i++) {
-            final JpaEvent eventEntry = asJpaEvent(events.get(i));
+        for (int i = 0; i < toAppend.size(); i++) {
+            final JpaEvent eventEntry = asJpaEvent(toAppend.get(i));
             getEm().persist(eventEntry);
             final JpaStreamEvent streamEvent = stream.createEvent(eventEntry);
             getEm().persist(streamEvent);
