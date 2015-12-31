@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+     <file>esc-test.log</file>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	  		<fileNamePattern>esc-test.%d{yyyy-MM-dd}.log</fileNamePattern>
+	    	<maxHistory>30</maxHistory>
+	    </rollingPolicy>
+     <append>true</append>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	<root level="error">
+		<appender-ref ref="FILE" />
+	</root>
+    <!--logger name="org.fuin.esc" level="info" /-->
+</configuration>
