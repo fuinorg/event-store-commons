@@ -11,4 +11,4 @@ The below results should give a rough overview about the performance of the diff
 | esc-eshttp     | Virtual Machine (2) | 4,430 events / second        | 369 events / second              |
 
 * (1) Intel Core i7-3820 @ 3.60 GHz, 16 GB RAM, Windows 7 SP 1, Crucial M4 512GB SSD
-* (2) VMWare Workstation 12 + Ubuntu 14.04 Desktop
+* (2) VMWare Workstation 12 + Ubuntu 14.04 Desktop (Same machine as (1))
