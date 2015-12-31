@@ -13,8 +13,6 @@ Naming conventions
 ------------------
 The JPA implementation requires a strict naming convention. You have to name your tables and identifiers accordingly.
 
-###Example
-
 ####StreamId
 Use a camel case stream identifier name that ends *not* on 'Stream', 'Streams', 'Event' or 'Events'.
 ```java
