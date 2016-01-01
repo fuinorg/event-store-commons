@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.test.performance;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +56,14 @@ public final class EsHttpPerformance {
      * @param args
      *            Not used.
      */
-    public static void main(final String[] args) throws MalformedURLException {
+    public static void main(final String[] args) throws IOException {
 
+        System.out.println("-------------------------");
+        System.out.println("Press <enter> to start");
+        System.in.read();
+        
+        final int max = 10000;
+        
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         final URL url = new URL("http://127.0.0.1:2113/");
 
@@ -75,36 +81,48 @@ public final class EsHttpPerformance {
         eventStore.open();
         try {
 
-            final StreamId streamId = new SimpleStreamId("books", false);
             final TypeName dataType = new TypeName("BookAddedEvent");
             final TypeName metaType = new TypeName("MyMeta");
             final JsonObject event = Json.createObjectBuilder().add("name", "Shining")
                     .add("author", "Stephen King").build();
             final JsonObject meta = Json.createObjectBuilder().add("user", "michael").build();
 
+            System.out.println("-------------------------");
+            System.out.println("Press <enter> to test 1");
+            System.in.read();
+            
+            // Append all together
+            final StreamId streamId1 = new SimpleStreamId("books1", false);
             final List<CommonEvent> togetherList = new ArrayList<>();
-            for (int i = 0; i < 100000; i++) {
+            for (int i = 0; i < max; i++) {
                 togetherList.add(new SimpleCommonEvent(new EventId(), dataType, event, metaType, meta));
             }
-
-            // Append all together
             measure("One append (" + togetherList.size() + " events)", togetherList.size(),
-                    none -> eventStore.appendToStream(streamId, ExpectedVersion.ANY.getNo(), togetherList));
+                    none -> eventStore.appendToStream(streamId1, ExpectedVersion.ANY.getNo(), togetherList));
 
+            System.out.println("-------------------------");
+            System.out.println("Press <enter> to test 2");
+            System.in.read();
+            
             // Append all separate
+            final StreamId streamId2 = new SimpleStreamId("books2", false);
             final List<CommonEvent> separateList = new ArrayList<>();
-            for (int i = 0; i < 100000; i++) {
+            for (int i = 0; i < max; i++) {
                 separateList.add(new SimpleCommonEvent(new EventId(), dataType, event, metaType, meta));
             }
             measure("Multiple appends (" + separateList.size() + " events)", separateList.size(), none -> {
                 for (final CommonEvent ce : separateList) {
-                    eventStore.appendToStream(streamId, ExpectedVersion.ANY.getNo(), ce);
+                    eventStore.appendToStream(streamId2, ExpectedVersion.ANY.getNo(), ce);
                 }
             });
 
         } finally {
             eventStore.close();
         }
+
+        System.out.println("-------------------------");
+        System.out.println("Press <enter> to end");
+        System.in.read();
 
     }
 
