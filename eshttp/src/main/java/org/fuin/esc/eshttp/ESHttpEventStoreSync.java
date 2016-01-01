@@ -42,6 +42,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.util.EntityUtils;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStoreSync;
@@ -97,8 +98,8 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
      *            Registry used to locate deserializers.
      */
     public ESHttpEventStoreSync(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
-            @NotNull final ESEnvelopeType envelopeType,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+            @NotNull final ESEnvelopeType envelopeType, @NotNull final SerializerRegistry serRegistry,
+            @NotNull final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("threadFactory", threadFactory);
         Contract.requireArgNotNull("url", url);
@@ -192,38 +193,42 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
             final HttpPost post = createPost(uri, expectedVersion, content);
-            LOG.debug(msg + " POST: {}", post);
+            try {
+                LOG.debug(msg + " POST: {}", post);
 
-            final Future<HttpResponse> future = httpclient.execute(post, null);
-            final HttpResponse response = future.get();
-            final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == 201) {
-                // CREATED - Event(s) where added
-                LOG.debug(msg + " RESPONSE: {}", response);
-                return;
-            }
-            if (statusLine.getStatusCode() == 301) {
-                // FOUND - Event(s) already existed and where not created again
-                // (Idempotency)
-                LOG.debug(msg + " RESPONSE: {}", response);
-                return;
-            }
-            if ((statusLine.getStatusCode() == 400)
-                    && !statusLine.getReasonPhrase().contains("request body invalid")) {
-                // TODO Add expected version instead of any version if ES
-                // returns this in header
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
-            }
-            if (statusLine.getStatusCode() == 410) {
-                // Stream was hard deleted
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamDeletedException(streamId);
-            }
+                final Future<HttpResponse> future = httpclient.execute(post, null);
+                final HttpResponse response = future.get();
+                final StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() == 201) {
+                    // CREATED - Event(s) where added
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    return;
+                }
+                if (statusLine.getStatusCode() == 301) {
+                    // FOUND - Event(s) already existed and where not created again
+                    // (Idempotency)
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    return;
+                }
+                if ((statusLine.getStatusCode() == 400)
+                        && !statusLine.getReasonPhrase().contains("request body invalid")) {
+                    // TODO Add expected version instead of any version if ES
+                    // returns this in header
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+                }
+                if (statusLine.getStatusCode() == 410) {
+                    // Stream was hard deleted
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    throw new StreamDeletedException(streamId);
+                }
 
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new RuntimeException(msg + " [Status=" + statusLine + "]");
 
+            } finally {
+                post.reset();
+            }
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -241,32 +246,37 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
             final HttpDelete delete = new HttpDelete(uri);
-            delete.setHeader("ES-HardDelete", "" + hardDelete);
-            delete.setHeader("ES-ExpectedVersion", "" + expectedVersion);
-            LOG.debug(msg + " DELETE: {}", delete);
+            try {
+                delete.setHeader("ES-HardDelete", "" + hardDelete);
+                delete.setHeader("ES-ExpectedVersion", "" + expectedVersion);
+                LOG.debug(msg + " DELETE: {}", delete);
 
-            final Future<HttpResponse> future = httpclient.execute(delete, null);
-            final HttpResponse response = future.get();
-            final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == 204) {
-                // Stream deleted
-                LOG.debug(msg + " RESPONSE: {}", response);
-                return;
-            }
-            if (statusLine.getStatusCode() == 400) {
-                // TODO Add expected version instead of any version if ES
-                // returns this in header
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
-            }
-            if (statusLine.getStatusCode() == 410) {
-                // 410 GONE - Stream was hard deleted
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamDeletedException(streamId);
-            }
+                final Future<HttpResponse> future = httpclient.execute(delete, null);
+                final HttpResponse response = future.get();
+                final StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() == 204) {
+                    // Stream deleted
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    return;
+                }
+                if (statusLine.getStatusCode() == 400) {
+                    // TODO Add expected version instead of any version if ES
+                    // returns this in header
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+                }
+                if (statusLine.getStatusCode() == 410) {
+                    // 410 GONE - Stream was hard deleted
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    throw new StreamDeletedException(streamId);
+                }
 
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+
+            } finally {
+                delete.reset();
+            }
 
         } catch (final URISyntaxException | ExecutionException | InterruptedException ex) {
             throw new RuntimeException(msg, ex);
@@ -341,21 +351,25 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
             LOG.info(uri.toString());
             final HttpGet get = createHttpGet(uri);
-            final Future<HttpResponse> future = httpclient.execute(get, null);
-            final HttpResponse response = future.get();
-            final StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 404) {
-                return false;
+            try {
+                final Future<HttpResponse> future = httpclient.execute(get, null);
+                final HttpResponse response = future.get();
+                final StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() == 404) {
+                    return false;
+                }
+                if (status.getStatusCode() == 410) {
+                    // Stream was hard deleted
+                    return false;
+                }
+                if (status.getStatusCode() == 200) {
+                    return true;
+                }
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new RuntimeException(msg + " [Status=" + status + "]");
+            } finally {
+                get.reset();
             }
-            if (status.getStatusCode() == 410) {
-                // Stream was hard deleted
-                return false;
-            }
-            if (status.getStatusCode() == 200) {
-                return true;
-            }
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + status + "]");
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -371,26 +385,30 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
             LOG.info(uri.toString());
             final HttpGet get = createHttpGet(uri);
-            final Future<HttpResponse> future = httpclient.execute(get, null);
-            final HttpResponse response = future.get();
-            final StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() == 200) {
+            try {
+                final Future<HttpResponse> future = httpclient.execute(get, null);
+                final HttpResponse response = future.get();
+                final StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() == 200) {
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    return StreamState.ACTIVE;
+                }
+                if (status.getStatusCode() == 404) {
+                    // May have never existed or was soft deleted...
+                    // TODO Maybe the event store can send something to distinguish this?
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    throw new StreamNotFoundException(streamId);
+                }
+                if (status.getStatusCode() == 410) {
+                    // 410 GONE - Stream was hard deleted
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    return StreamState.HARD_DELETED;
+                }
                 LOG.debug(msg + " RESPONSE: {}", response);
-                return StreamState.ACTIVE;
+                throw new RuntimeException(msg + " [Status=" + status + "]");
+            } finally {
+                get.reset();
             }
-            if (status.getStatusCode() == 404) {
-                // May have never existed or was soft deleted...
-                // TODO Maybe the event store can send something to distinguish this?
-                LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamNotFoundException(streamId);
-            }
-            if (status.getStatusCode() == 410) {
-                // 410 GONE - Stream was hard deleted
-                LOG.debug(msg + " RESPONSE: {}", response);
-                return StreamState.HARD_DELETED;
-            }
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new RuntimeException(msg + " [Status=" + status + "]");
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -401,31 +419,39 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
             throws InterruptedException, ExecutionException, IOException {
         LOG.info(uri.toString());
         final HttpGet get = createHttpGet(uri);
-        final Future<HttpResponse> future = httpclient.execute(get, null);
-        final HttpResponse response = future.get();
-        final StatusLine statusLine = response.getStatusLine();
-        if (statusLine.getStatusCode() == 200) {
-            final HttpEntity entity = response.getEntity();
-            final InputStream in = entity.getContent();
-            try {
-                final AtomFeedReader atomFeedReader = envelopeType.getAtomFeedReader();
-                final List<URI> uris = atomFeedReader.readAtomFeed(in);
-                return readEvents(forward, start, count, uris, reverseOrder);
-            } finally {
-                in.close();
+        try {
+            final Future<HttpResponse> future = httpclient.execute(get, null);
+            final HttpResponse response = future.get();
+            final StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() == 200) {
+                final HttpEntity entity = response.getEntity();
+                try {
+                    final InputStream in = entity.getContent();
+                    try {
+                        final AtomFeedReader atomFeedReader = envelopeType.getAtomFeedReader();
+                        final List<URI> uris = atomFeedReader.readAtomFeed(in);
+                        return readEvents(forward, start, count, uris, reverseOrder);
+                    } finally {
+                        in.close();
+                    }
+                } finally {
+                    EntityUtils.consume(entity);
+                }
             }
+            if (statusLine.getStatusCode() == 404) {
+                // 404 Not Found
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new StreamNotFoundException(streamId);
+            }
+            if (statusLine.getStatusCode() == 410) {
+                // Stream was hard deleted
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new StreamDeletedException(streamId);
+            }
+            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+        } finally {
+            get.reset();
         }
-        if (statusLine.getStatusCode() == 404) {
-            // 404 Not Found
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new StreamNotFoundException(streamId);
-        }
-        if (statusLine.getStatusCode() == 410) {
-            // Stream was hard deleted
-            LOG.debug(msg + " RESPONSE: {}", response);
-            throw new StreamDeletedException(streamId);
-        }
-        throw new RuntimeException(msg + " [Status=" + statusLine + "]");
     }
 
     private StreamEventsSlice readEvents(final boolean forward, final int fromEventNumber, final int count,
@@ -459,26 +485,34 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
         final String msg = "readEvent(" + uri + ")";
         try {
             final HttpGet get = createHttpGet(uri);
-            final Future<HttpResponse> future = httpclient.execute(get, null);
-            final HttpResponse response = future.get();
-            final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == 200) {
-                final HttpEntity entity = response.getEntity();
-                final InputStream in = entity.getContent();
-                try {
-                    return envelopeType.getAtomFeedReader().readEvent(desRegistry, in);
-                } finally {
-                    in.close();
+            try {
+                final Future<HttpResponse> future = httpclient.execute(get, null);
+                final HttpResponse response = future.get();
+                final StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() == 200) {
+                    final HttpEntity entity = response.getEntity();
+                    try {
+                        final InputStream in = entity.getContent();
+                        try {
+                            return envelopeType.getAtomFeedReader().readEvent(desRegistry, in);
+                        } finally {
+                            in.close();
+                        }
+                    } finally {
+                        EntityUtils.consume(entity);
+                    }
                 }
+                if (statusLine.getStatusCode() == 404) {
+                    // 404 Not Found
+                    LOG.debug(msg + " RESPONSE: {}", response);
+                    final StreamId streamId = streamId(uri);
+                    final int eventNumber = eventNumber(uri);
+                    throw new EventNotFoundException(streamId, eventNumber);
+                }
+                throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+            } finally {
+                get.reset();
             }
-            if (statusLine.getStatusCode() == 404) {
-                // 404 Not Found
-                LOG.debug(msg + " RESPONSE: {}", response);
-                final StreamId streamId = streamId(uri);
-                final int eventNumber = eventNumber(uri);
-                throw new EventNotFoundException(streamId, eventNumber);
-            }
-            throw new RuntimeException(msg + " [Status=" + statusLine + "]");
         } catch (final InterruptedException | ExecutionException | UnsupportedOperationException
                 | IOException ex) {
             throw new RuntimeException("Failed to read " + uri, ex);
