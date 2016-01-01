@@ -7,8 +7,8 @@ Provides tests for all event store commons implementations.
 
 | Implementation                                                                   | Type                | One append (100,000 at once) | Multiple appends (100,000 times) | 
 |:---------------------------------------------------------------------------------|:--------------------|:-----------------------------|:---------------------------------|
-| [esc-eshttp](src/test/java/org/fuin/esc/test/performance/EsHttpPerformance.java) | Physical PC SSD (1) | 2,704 events / second        | 100 events / second              |
-| [esc-eshttp](src/test/java/org/fuin/esc/test/performance/EsHttpPerformance.java) | Physical PC HDD (2) | 2,680 events / second        | _Event Store crashed_            |
+| [esc-eshttp](src/test/java/org/fuin/esc/test/performance/EsHttpPerformance.java) | Physical PC SSD (1) | 2,467 events / second        |  96 events / second              |
+| [esc-eshttp](src/test/java/org/fuin/esc/test/performance/EsHttpPerformance.java) | Physical PC HDD (2) | 2,426 events / second        |  15 events / second              |
 | [esc-eshttp](src/test/java/org/fuin/esc/test/performance/EsHttpPerformance.java) | Virtual Machine (3) | 4,430 events / second        | 369 events / second              |
 
 * 64 Bit Java 8 Runtime
