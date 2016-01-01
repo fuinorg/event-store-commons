@@ -58,12 +58,10 @@ public final class EsHttpPerformance {
      */
     public static void main(final String[] args) throws IOException {
 
-        System.out.println("-------------------------");
-        System.out.println("Press <enter> to start");
-        System.in.read();
-        
+        waitForInput("START");
+
         final int max = 10000;
-        
+
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         final URL url = new URL("http://127.0.0.1:2113/");
 
@@ -87,10 +85,8 @@ public final class EsHttpPerformance {
                     .add("author", "Stephen King").build();
             final JsonObject meta = Json.createObjectBuilder().add("user", "michael").build();
 
-            System.out.println("-------------------------");
-            System.out.println("Press <enter> to test 1");
-            System.in.read();
-            
+            waitForInput("TEST 1");
+
             // Append all together
             final StreamId streamId1 = new SimpleStreamId("books1", false);
             final List<CommonEvent> togetherList = new ArrayList<>();
@@ -100,10 +96,8 @@ public final class EsHttpPerformance {
             measure("One append (" + togetherList.size() + " events)", togetherList.size(),
                     none -> eventStore.appendToStream(streamId1, ExpectedVersion.ANY.getNo(), togetherList));
 
-            System.out.println("-------------------------");
-            System.out.println("Press <enter> to test 2");
-            System.in.read();
-            
+            waitForInput("TEST 2");
+
             // Append all separate
             final StreamId streamId2 = new SimpleStreamId("books2", false);
             final List<CommonEvent> separateList = new ArrayList<>();
@@ -120,9 +114,7 @@ public final class EsHttpPerformance {
             eventStore.close();
         }
 
-        System.out.println("-------------------------");
-        System.out.println("Press <enter> to end");
-        System.in.read();
+        waitForInput("END");
 
     }
 
@@ -138,6 +130,15 @@ public final class EsHttpPerformance {
         System.out.println("SEC            " + name + ": " + (long) seconds);
         final double perSec = (count / millis) * 1000.0;
         System.out.println("EVENTS PER SEC " + name + ": " + (long) perSec);
+    }
+
+    private static void waitForInput(final String message) throws IOException {
+        System.out.println("---------------------");
+        System.out.println(message);
+        System.out.println("Press 'c'<ENTER> to continue");
+        while ((char) System.in.read() != 'c') {
+            // Do it again
+        }
     }
 
 }
