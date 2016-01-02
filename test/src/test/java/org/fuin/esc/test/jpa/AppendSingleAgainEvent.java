@@ -27,7 +27,7 @@ import org.fuin.esc.jpa.JpaStreamEvent;
 import org.fuin.objects4j.common.Contract;
 
 /**
- * Database table for an "append_single_again_stream" event.
+ * Database table for events.
  */
 @Table(name = "APPEND_SINGLE_AGAIN_EVENTS")
 @Entity

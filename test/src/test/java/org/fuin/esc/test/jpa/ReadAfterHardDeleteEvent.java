@@ -29,9 +29,9 @@ import org.fuin.objects4j.common.Contract;
 /**
  * Database table for events.
  */
-@Table(name = "APPEND_MULTIPLE_AGAIN_EVENTS")
+@Table(name = "READ_AFTER_HARD_DELETE_EVENTS")
 @Entity
-public class AppendMultipleAgainEvent extends JpaStreamEvent {
+public class ReadAfterHardDeleteEvent extends JpaStreamEvent {
 
     @Id
     @NotNull
@@ -41,7 +41,7 @@ public class AppendMultipleAgainEvent extends JpaStreamEvent {
     /**
      * Protected default constructor only required for JPA.
      */
-    protected AppendMultipleAgainEvent() {
+    protected ReadAfterHardDeleteEvent() {
         super();
     }
 
@@ -53,7 +53,7 @@ public class AppendMultipleAgainEvent extends JpaStreamEvent {
      * @param eventEntry
      *            Event entry to connect.
      */
-    public AppendMultipleAgainEvent(@NotNull final Integer version, final JpaEvent eventEntry) {
+    public ReadAfterHardDeleteEvent(@NotNull final Integer version, final JpaEvent eventEntry) {
         super(eventEntry);
         Contract.requireArgNotNull("version", version);
         this.eventNumber = version;
@@ -85,7 +85,7 @@ public class AppendMultipleAgainEvent extends JpaStreamEvent {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AppendMultipleAgainEvent other = (AppendMultipleAgainEvent) obj;
+        ReadAfterHardDeleteEvent other = (ReadAfterHardDeleteEvent) obj;
         if (eventNumber == null) {
             if (other.eventNumber != null)
                 return false;

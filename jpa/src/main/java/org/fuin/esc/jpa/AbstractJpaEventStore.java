@@ -18,11 +18,13 @@ package org.fuin.esc.jpa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.metamodel.EntityType;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -119,6 +121,10 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     @Override
     public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("eventNumber", eventNumber, 0);
+        verifyStreamEntityExists(streamId);
+
         final StringBuilder sb = new StringBuilder(createEventSelect(streamId));
         if (streamId.getParameters().size() == 0) {
             sb.append(" WHERE ");
@@ -141,6 +147,11 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     @Override
     public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 0);
+        Contract.requireArgMin("count", count, 1);
+        verifyStreamEntityExists(streamId);
+
         return readStreamEvents(streamId, start, count, true);
 
     }
@@ -148,6 +159,11 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     @Override
     public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
             final int count) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 0);
+        Contract.requireArgMin("count", count, 1);
+        verifyStreamEntityExists(streamId);
 
         return readStreamEvents(streamId, start, count, false);
 
@@ -192,6 +208,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        verifyStreamEntityExists(streamId);
 
         final String sql = createStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
@@ -203,7 +220,10 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
 
     @Override
     public final StreamState streamState(final StreamId streamId) {
-        
+
+        Contract.requireArgNotNull("streamId", streamId);
+        verifyStreamEntityExists(streamId);
+
         final String sql = createStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setParameters(query, streamId);
@@ -213,7 +233,50 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         }
         final JpaStream stream = streams.get(0);
         return stream.getState();
-        
+
+    }
+
+    /**
+     * Verifies if a stream entity exists or throws an {@link StreamNotFoundException} otherwise.
+     * 
+     * @param streamId
+     *            Stream to test.
+     */
+    protected final void verifyStreamEntityExists(final StreamId streamId) {
+        if (!streamEntityExists(streamId)) {
+            throw new StreamNotFoundException(streamId);
+        }
+    }
+
+    /**
+     * Returns if a stream entity exists.
+     * 
+     * @param streamId
+     *            Stream to test.
+     * 
+     * @return TRUE if the entity is known, else FALSE.
+     */
+    protected final boolean streamEntityExists(final StreamId streamId) {
+        final String streamEntityName = streamId.getName() + "Stream";
+        return entityExists(streamEntityName);
+    }
+
+    /**
+     * Returns if an entity with agiven name exists.
+     * 
+     * @param entityName
+     *            Entity to test.
+     * 
+     * @return TRUE if the entity is known, else FALSE.
+     */
+    protected final boolean entityExists(final String entityName) {
+        final Set<EntityType<?>> entityTypes = getEm().getMetamodel().getEntities();
+        for (final EntityType<?> entityType : entityTypes) {
+            if (entityType.getName().equals(entityName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -56,7 +56,7 @@ public class AppendMultipleAgainStream extends JpaStream {
      */
     public final JpaStreamEvent createEvent(@NotNull final JpaEvent eventEntry) {
         incVersion();
-        return new AppendSingleAgainEvent(getVersion(), eventEntry);
+        return new AppendMultipleAgainEvent(getVersion(), eventEntry);
     }
 
     @Override

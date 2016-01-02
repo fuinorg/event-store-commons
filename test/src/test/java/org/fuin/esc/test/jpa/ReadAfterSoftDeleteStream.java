@@ -29,9 +29,9 @@ import org.fuin.esc.jpa.JpaStreamEvent;
 /**
  * Contains stream.
  */
-@Table(name = "APPEND_SINGLE_AGAIN_STREAMS")
+@Table(name = "READ_AFTER_SOFT_DELETE_STREAMS")
 @Entity
-public class AppendSingleAgainStream extends JpaStream {
+public class ReadAfterSoftDeleteStream extends JpaStream {
 
     @Id
     @NotNull
@@ -41,7 +41,7 @@ public class AppendSingleAgainStream extends JpaStream {
     /**
      * Protected default constructor for JPA.
      */
-    public AppendSingleAgainStream() {
+    public ReadAfterSoftDeleteStream() {
         super();
         this.id = 1;
     }
@@ -56,7 +56,7 @@ public class AppendSingleAgainStream extends JpaStream {
      */
     public final JpaStreamEvent createEvent(@NotNull final JpaEvent eventEntry) {
         incVersion();
-        return new AppendSingleAgainEvent(getVersion(), eventEntry);
+        return new ReadAfterSoftDeleteEvent(getVersion(), eventEntry);
     }
 
     @Override

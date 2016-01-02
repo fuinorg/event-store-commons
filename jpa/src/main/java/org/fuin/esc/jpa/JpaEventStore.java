@@ -28,11 +28,12 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public final class JpaEventStore extends AbstractJpaEventStore implements EventStoreSync {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);
-    
+
     private JpaIdStreamFactory streamFactory;
 
     /**
@@ -97,6 +98,10 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
             final List<CommonEvent> toAppend) {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        Contract.requireArgNotNull("toAppend", toAppend);
+
         final String sql = createStreamSelect(streamId);
         LOG.debug("{}", sql);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
@@ -141,22 +146,41 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expectedVersion,
-            final boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final int expected, final boolean hardDelete) {
 
-        final JpaStream stream = getEm().find(JpaStream.class, streamId.getName(),
-                LockModeType.PESSIMISTIC_WRITE);
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());
+
+        final JpaStream stream = findJpaStream(streamId);
         if (stream == null) {
-            throw new StreamNotFoundException(streamId);
+            // Stream never existed
+            if (expected == ExpectedVersion.ANY.getNo()
+                    || expected == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
+                // Ignore
+                return;
+            }
+            throw new WrongExpectedVersionException(streamId, expected, null);
         }
-        if (stream.isDeleted()) {
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            // Ignore
+            return;
+        }
+        if (stream.getState() == StreamState.HARD_DELETED) {
             throw new StreamDeletedException(streamId);
         }
-        if (stream.getVersion() != expectedVersion) {
-            throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
+        // StreamState.ACTIVE
+        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
+            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
         }
         stream.delete(hardDelete);
 
+    }
+
+    private JpaStream findJpaStream(final StreamId streamId) {
+        if (!streamEntityExists(streamId)) {
+            return null;
+        }
+        return getEm().find(JpaStream.class, streamId.getName(), LockModeType.PESSIMISTIC_WRITE);
     }
 
     private void setParameters(final Query query, final StreamId streamId) {
