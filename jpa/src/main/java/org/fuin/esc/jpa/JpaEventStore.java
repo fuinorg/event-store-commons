@@ -41,12 +41,16 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.vo.KeyValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JPA Implementation of the event store.
  */
 public final class JpaEventStore extends AbstractJpaEventStore implements EventStoreSync {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);
+    
     private JpaIdStreamFactory streamFactory;
 
     /**
@@ -94,15 +98,18 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
             final List<CommonEvent> toAppend) {
 
         final String sql = createStreamSelect(streamId);
+        LOG.debug("{}", sql);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setParameters(query, streamId);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         final List<JpaStream> streams = query.getResultList();
         final JpaStream stream;
         if (streams.size() == 0) {
+            LOG.debug("Stream '{}' not found, creating it", streamId);
             stream = streamFactory.createStream(streamId);
             getEm().persist(stream);
         } else {
+            LOG.debug("Stream '{}' found, reading it", streamId);
             stream = streams.get(0);
             if (stream.isDeleted()) {
                 throw new StreamDeletedException(streamId);
