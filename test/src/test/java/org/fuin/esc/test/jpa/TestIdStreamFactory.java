@@ -37,7 +37,7 @@ public final class TestIdStreamFactory implements JpaIdStreamFactory {
             return new AppendSingleAgainStream();
         }
         if (streamId.getName().equals("AppendMultipleAgain")) {
-            return new AppendSingleAgainStream();
+            return new AppendMultipleAgainStream();
         }
         throw new IllegalArgumentException("Unknown stream: " + streamId.getName());
     }
