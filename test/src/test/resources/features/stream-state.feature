@@ -1,29 +1,29 @@
 Feature: Stream state
 
 Scenario: All states
-    Given the stream "name_does_not_matter" does not exist
+    Given the stream "NameDoesNotMatter" does not exist
     And the following streams are created and a single event is appended to each
-    | Stream Name               | 
-    | state_existing_stream     | 
-    | state_hard_deleted_stream | 
-    | state_soft_deleted_stream |
+    | Stream Name      | 
+    | StateExisting    | 
+    | StateHardDeleted | 
+    | StateSoftDeleted |
     And the following deletes are executed
-    | Stream Name               | Hard Delete | Expected Version | 
-    | state_hard_deleted_stream | true        | ANY              |
-    | state_soft_deleted_stream | false       | ANY              |
+    | Stream Name      | Hard Delete | Expected Version | 
+    | StateHardDeleted | true        | ANY              |
+    | StateSoftDeleted | false       | ANY              |
     When the following state queries are executed
-    | Stream Name               | Expected State | Expected Exception      | 
-    | name_does_not_matter      | -              | StreamNotFoundException |
-    | state_existing_stream     | ACTIVE         | -                       |
-    | state_hard_deleted_stream | HARD_DELETED   | -                       |
-    | state_soft_deleted_stream | -              | StreamNotFoundException |
+    | Stream Name       | Expected State | Expected Exception      | 
+    | NameDoesNotMatter | -              | StreamNotFoundException |
+    | StateExisting     | ACTIVE         | -                       |
+    | StateHardDeleted  | HARD_DELETED   | -                       |
+    | StateSoftDeleted  | -              | StreamNotFoundException |
     Then this should give the expected results
     And following streams should exist
-    | Stream Name           |
-    | state_existing_stream |
+    | Stream Name   |
+    | StateExisting |
     And following streams should not exist
-    | Stream Name               |
-    | name_does_not_matter      |
-    | state_hard_deleted_stream |
-    | state_soft_deleted_stream |
+    | Stream Name       |
+    | NameDoesNotMatter |
+    | StateHardDeleted  |
+    | StateSoftDeleted  |
     
