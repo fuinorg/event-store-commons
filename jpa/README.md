@@ -8,7 +8,7 @@ simple ones without the need for a discriminator. An example for streams with di
 below mentioned "Vendor" aggregate. There is only one stream entity (table) and one event entity (table) for 
 **all** vendors. The vendor's ID is used as discriminator column to distinguish events for the different vendors.
 
-The discriminator is coded in the [stream identifier](). An example of an identifier with discriminator column is 
+The discriminator is coded in the [stream identifier](https://github.com/fuinorg/event-store-commons/blob/master/api/src/main/java/org/fuin/esc/api/StreamId.java). An example of an identifier with discriminator column is 
 the [AggregateStreamId](src/test/java/org/fuin/esc/jpa/examples/AggregateStreamId.java) and another one for an 
 identifier without a discriminator is the [SimpleStreamId](https://github.com/fuinorg/event-store-commons/blob/master/api/src/main/java/org/fuin/esc/api/SimpleStreamId.java).
 
