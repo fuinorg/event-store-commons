@@ -1,6 +1,23 @@
 # esc-jpa
 Java Persistence API (JPA) based implementation of the event store commons api.
 
+Entity types
+------------
+There are two different scenarios: Streams that require one or more discriminator columns and 
+simple ones without the need for a discriminator. An example for streams with discriminator columns is the 
+below mentioned "Vendor" aggregate. There is only **one** stream entity (table) and one event entity (table) for 
+**all** vendors. The vendor's ID is used as discriminator column to distinguish events for the different vendors.
+
+The discriminator is coded in the [stream identifier](). An example of an identifier with discriminator column is 
+the [AggregateStreamId](src/test/java/org/fuin/esc/jpa/examples/AggregateStreamId.java) and another one for an  
+identifier without a discriminator is the [SimpleStreamId](https://github.com/fuinorg/event-store-commons/blob/master/api/src/main/java/org/fuin/esc/api/SimpleStreamId.java).
+
+The good new is: There is no need to create any entities if you don't need a discriminator column. There are already 
+two predefined entites [NoParamsEvent](src/main/java/org/fuin/esc/jpa/NoParamsEvent.java) and 
+[NoParamsStream](src/main/java/org/fuin/esc/jpa/NoParamsStream.java) that will be used automatically in this case.
+
+For streams that require discriminator columns you have to create two entity classes ("*Event" + "*Stream") named as described below.
+
 Naming conventions
 ------------------
 The JPA implementation requires a strict naming convention.
@@ -10,7 +27,7 @@ The JPA implementation requires a strict naming convention.
 ####StreamId
 Use a camel case stream identifier name that ends *not* on 'Stream', 'Streams', 'Event' or 'Events'.
 ```java
-StreamId streamId = new SimpleStreamId("YourSelectedName")
+StreamId streamId = new AggregateStreamId("YourSelectedName", discriminatorValue);
 ```
 
 ####Event entity
