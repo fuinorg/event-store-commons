@@ -32,7 +32,7 @@ import org.fuin.objects4j.common.Contract;
  */
 @Table(name = "VENDOR_EVENTS")
 @Entity
-@IdClass(VendorEventId.class)
+@IdClass(VendorEventPrimaryKey.class)
 public class VendorEvent extends JpaStreamEvent {
 
     @Id

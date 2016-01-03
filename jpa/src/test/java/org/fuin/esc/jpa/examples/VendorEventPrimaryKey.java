@@ -24,9 +24,9 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NeverNull;
 
 /**
- * Identifies a stream event based on a string and a number.
+ * Primary key for the vendor event table.
  */
-public class VendorEventId implements Serializable {
+public class VendorEventPrimaryKey implements Serializable {
 
     private static final long serialVersionUID = 1000L;
 
@@ -38,7 +38,7 @@ public class VendorEventId implements Serializable {
      * Default constructor for JPA. <b><i>CAUTION:</i> DO NOT USE IN APPLICATION
      * CODE.</b>
      */
-    public VendorEventId() {
+    public VendorEventPrimaryKey() {
         super();
     }
 
@@ -50,7 +50,7 @@ public class VendorEventId implements Serializable {
      * @param eventNumber
      *            Number of the event within the stream.
      */
-    public VendorEventId(@NotNull final String vendorId,
+    public VendorEventPrimaryKey(@NotNull final String vendorId,
             @NotNull final Integer eventNumber) {
         super();
         Contract.requireArgNotNull("vendorId", vendorId);
@@ -99,7 +99,7 @@ public class VendorEventId implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        VendorEventId other = (VendorEventId) obj;
+        VendorEventPrimaryKey other = (VendorEventPrimaryKey) obj;
         if (vendorId == null) {
             if (other.vendorId != null)
                 return false;
