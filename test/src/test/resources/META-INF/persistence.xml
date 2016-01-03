@@ -13,46 +13,8 @@
 		<class>org.fuin.esc.jpa.JpaStream</class>
 		<class>org.fuin.esc.jpa.JpaProjection</class>
 		<class>org.fuin.esc.jpa.JpaData</class>
-		<class>org.fuin.esc.test.jpa.AppendSingleAgainStream</class>
-		<class>org.fuin.esc.test.jpa.AppendSingleAgainEvent</class>
-        <class>org.fuin.esc.test.jpa.AppendMultipleAgainStream</class>
-        <class>org.fuin.esc.test.jpa.AppendMultipleAgainEvent</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete1Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete1Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete2Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete2Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete3Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete3Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete4Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterHardDelete4Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete1Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete1Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete2Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete2Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete3Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete3Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete4Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteAfterSoftDelete4Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting1Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting1Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting2Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting2Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting3Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting3Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting4Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting4Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting5Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting5Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting6Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting6Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting7Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting7Event</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting8Stream</class>
-        <class>org.fuin.esc.test.jpa.DeleteExisting8Event</class>
-        <class>org.fuin.esc.test.jpa.ReadAfterHardDeleteStream</class>
-        <class>org.fuin.esc.test.jpa.ReadAfterHardDeleteEvent</class>
-        <class>org.fuin.esc.test.jpa.ReadAfterSoftDeleteStream</class>
-        <class>org.fuin.esc.test.jpa.ReadAfterSoftDeleteEvent</class>
+        <class>org.fuin.esc.jpa.NoParamsEvent</class>
+        <class>org.fuin.esc.jpa.NoParamsStream</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 

@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.validation.constraints.NotNull;
 
@@ -41,7 +40,6 @@ import org.fuin.esc.spi.SerializedData;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,20 +100,13 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("toAppend", toAppend);
 
-        final String sql = createStreamSelect(streamId);
-        LOG.debug("{}", sql);
-        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
-        setParameters(query, streamId);
-        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        final List<JpaStream> streams = query.getResultList();
-        final JpaStream stream;
-        if (streams.size() == 0) {
+        JpaStream stream = findAndLockJpaStream(streamId);
+        if (stream == null) {
             LOG.debug("Stream '{}' not found, creating it", streamId);
             stream = streamFactory.createStream(streamId);
             getEm().persist(stream);
         } else {
             LOG.debug("Stream '{}' found, reading it", streamId);
-            stream = streams.get(0);
             if (stream.isDeleted()) {
                 throw new StreamDeletedException(streamId);
             }
@@ -133,7 +124,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         for (int i = 0; i < toAppend.size(); i++) {
             final JpaEvent eventEntry = asJpaEvent(toAppend.get(i));
             getEm().persist(eventEntry);
-            final JpaStreamEvent streamEvent = stream.createEvent(eventEntry);
+            final JpaStreamEvent streamEvent = stream.createEvent(streamId, eventEntry);
             getEm().persist(streamEvent);
         }
         return stream.getVersion();
@@ -151,7 +142,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());
 
-        final JpaStream stream = findJpaStream(streamId);
+        final JpaStream stream = findAndLockJpaStream(streamId);
         if (stream == null) {
             // Stream never existed
             if (expected == ExpectedVersion.ANY.getNo()
@@ -176,21 +167,24 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     }
 
-    private JpaStream findJpaStream(final StreamId streamId) {
+    private JpaStream findAndLockJpaStream(final StreamId streamId) {
         if (!streamEntityExists(streamId)) {
             return null;
         }
-        return getEm().find(JpaStream.class, streamId.getName(), LockModeType.PESSIMISTIC_WRITE);
-    }
-
-    private void setParameters(final Query query, final StreamId streamId) {
-        final List<KeyValue> params = streamId.getParameters();
-        if (params.size() > 0) {
-            for (int i = 0; i < params.size(); i++) {
-                final KeyValue param = params.get(i);
-                query.setParameter(param.getKey(), param.getValue());
-            }
+        final String sql = createStreamSelect(streamId);
+        LOG.debug("{}", sql);
+        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        setParameters(query, streamId);
+        query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
+        final List<JpaStream> streams = query.getResultList();
+        if (streams.size() == 0) {
+            return null;
         }
+        if (streams.size() == 1) {
+            return streams.get(0);
+        }
+        throw new IllegalStateException("Select returned more than one stream: " + streams.size() + " ["
+                + sql + "]");
     }
 
     private JpaEvent asJpaEvent(final CommonEvent commonEvent) {

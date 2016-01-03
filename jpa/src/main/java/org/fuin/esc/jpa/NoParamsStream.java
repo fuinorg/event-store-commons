@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.test.jpa;
+package org.fuin.esc.jpa;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,46 +22,49 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.jpa.JpaEvent;
-import org.fuin.esc.jpa.JpaStream;
-import org.fuin.esc.jpa.JpaStreamEvent;
+import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.Contract;
 
 /**
  * Contains stream.
  */
-@Table(name = "DELETE_EXISTING_2_STREAMS")
+@Table(name = "NO_PARAMS_STREAMS")
 @Entity
-public class DeleteExisting2Stream extends JpaStream {
+public class NoParamsStream extends JpaStream {
 
     @Id
     @NotNull
-    @Column(name = "ID", nullable = false, updatable = false)
-    private Integer id;
+    @Column(name = "STREAM_NAME", nullable = false, updatable = false, length = 100)
+    private String streamName;
 
     /**
      * Protected default constructor for JPA.
      */
-    public DeleteExisting2Stream() {
+    protected NoParamsStream() {
         super();
-        this.id = 1;
     }
 
     /**
-     * Creates a container that stores the given event entry.
+     * Constructor with mandatory data.
      * 
-     * @param eventEntry
-     *            Event entry to convert into a JPA variant.
-     * 
-     * @return JPA entity.
+     * @param streamId
+     *            Unique stream identifier.
      */
-    public final JpaStreamEvent createEvent(@NotNull final JpaEvent eventEntry) {
+    public NoParamsStream(@NotNull final StreamId streamId) {
+        super();
+        Contract.requireArgNotNull("streamId", streamId);
+        this.streamName = streamId.getName();
+    }
+
+    @Override
+    public final JpaStreamEvent createEvent(final StreamId streamId, final JpaEvent eventEntry) {
         incVersion();
-        return new DeleteExisting2Event(getVersion(), eventEntry);
+        return new NoParamsEvent(streamId, getVersion(), eventEntry);
     }
 
     @Override
     public final String toString() {
-        return getClass().getSimpleName();
+        return streamName;
     }
 
 }

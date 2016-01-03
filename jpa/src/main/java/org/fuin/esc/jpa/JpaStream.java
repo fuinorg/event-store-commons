@@ -20,6 +20,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
 
 /**
@@ -32,7 +33,7 @@ public abstract class JpaStream {
     private int state = StreamState.ACTIVE.dbValue();
 
     @Column(name = "VERSION", nullable = false)
-    private int version = 0;
+    private int version = -1;
 
     /**
      * Returns the state of the stream.
@@ -86,12 +87,14 @@ public abstract class JpaStream {
 
     /**
      * Creates a container that stores the given event entry.
-     * 
+     *
+     * @param streamId
+     *            The unique identifier of the stream to create an event for.
      * @param eventEntry
-     *            Event entry to convert into a JPA variaant.
+     *            Event entry to convert into a JPA variant.
      * 
      * @return JPA entity.
      */
-    public abstract JpaStreamEvent createEvent(@NotNull JpaEvent eventEntry);
+    public abstract JpaStreamEvent createEvent(@NotNull StreamId streamId, @NotNull JpaEvent eventEntry);
 
 }

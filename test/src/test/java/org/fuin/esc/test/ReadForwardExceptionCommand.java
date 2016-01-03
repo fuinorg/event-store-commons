@@ -96,7 +96,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
 
-        streamId = new SimpleStreamId(streamName, true);
+        streamId = new SimpleStreamId(streamName, false);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }

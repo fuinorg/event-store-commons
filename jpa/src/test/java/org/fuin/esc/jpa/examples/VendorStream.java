@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.fuin.esc.api.StreamId;
 import org.fuin.esc.jpa.JpaEvent;
 import org.fuin.esc.jpa.JpaStream;
 import org.fuin.esc.jpa.JpaStreamEvent;
@@ -67,15 +68,8 @@ public class VendorStream extends JpaStream {
         return vendorId;
     }
 
-    /**
-     * Creates a container that stores the given event entry.
-     * 
-     * @param eventEntry
-     *            Event entry to convert into a JPA variant.
-     * 
-     * @return JPA entity.
-     */
-    public final JpaStreamEvent createEvent(@NotNull final JpaEvent eventEntry) {
+    @Override
+    public final JpaStreamEvent createEvent(final StreamId streamId, final JpaEvent eventEntry) {
         incVersion();
         return new VendorEvent(getVendorId(), getVersion(), eventEntry);
     }

@@ -125,16 +125,11 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         Contract.requireArgMin("eventNumber", eventNumber, 0);
         verifyStreamEntityExists(streamId);
 
-        final StringBuilder sb = new StringBuilder(createEventSelect(streamId));
-        if (streamId.getParameters().size() == 0) {
-            sb.append(" WHERE ");
-        } else {
-            sb.append(" AND ");
-        }
-        sb.append("s.event_number=:event_number");
+        final KeyValue eventNo = new KeyValue("eventNumber", eventNumber);
+        final StringBuilder sb = new StringBuilder(createEventSelect(streamId, eventNo));
 
         final Query query = em.createNativeQuery(sb.toString(), JpaEvent.class);
-        setParameters(query, streamId);
+        setParameters(query, streamId, eventNo);
 
         try {
             final JpaEvent result = (JpaEvent) query.getSingleResult();
@@ -189,7 +184,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
         setParameters(query, streamId);
-        query.setFirstResult(start - 1);
+        query.setFirstResult(start);
         query.setMaxResults(count);
 
         // Execute query
@@ -208,13 +203,23 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        verifyStreamEntityExists(streamId);
+        if (!streamEntityExists(streamId)) {
+            return false;
+        }
 
         final String sql = createStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setParameters(query, streamId);
         final List<JpaStream> streams = query.getResultList();
-        return streams.size() > 0;
+        if (streams.size() == 0) {
+            return false;
+        }
+        if (streams.size() == 1) {
+            final JpaStream stream = streams.get(0);
+            return (stream.getState() == StreamState.ACTIVE);
+        }
+        throw new IllegalStateException("Select returned more than one stream: " + streams.size() + " ["
+                + sql + "]");
 
     }
 
@@ -232,6 +237,11 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
             throw new StreamNotFoundException(streamId);
         }
         final JpaStream stream = streams.get(0);
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
+            // streams
+            throw new StreamNotFoundException(streamId);
+        }
         return stream.getState();
 
     }
@@ -257,8 +267,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
      * @return TRUE if the entity is known, else FALSE.
      */
     protected final boolean streamEntityExists(final StreamId streamId) {
-        final String streamEntityName = streamId.getName() + "Stream";
-        return entityExists(streamEntityName);
+        return entityExists(streamEntityName(streamId));
     }
 
     /**
@@ -308,6 +317,110 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         return EscSpiUtils.deserialize(desRegistry, data);
     }
 
+    /**
+     * Creates the JPQL to select the stream itself.
+     * 
+     * @param streamId
+     *            Unique stream name. Postfix 'Stream' will be appended to the name (e.g. stream identifier
+     *            'Whatever' will become 'WhateverStream').
+     * 
+     * @return JPQL that selects the stream with the given identifer.
+     */
+    protected final String createStreamSelect(final StreamId streamId) {
+
+        if (streamId.isProjection()) {
+            throw new IllegalArgumentException("Projections do not have a stream table : " + streamId);
+        }
+
+        final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
+        if (params.size() == 0) {
+            // NoParamsStream
+            params.add(new KeyValue("streamName", streamId.getName()));
+        }
+        final StringBuilder sb = new StringBuilder("SELECT t FROM " + streamEntityName(streamId) + " t");
+        sb.append(" WHERE ");
+        for (int i = 0; i < params.size(); i++) {
+            final KeyValue param = params.get(i);
+            if (i > 0) {
+                sb.append(" AND ");
+            }
+            sb.append("t." + param.getKey() + "=:" + param.getKey());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Returns the name of the stream entity for a given stream.
+     * 
+     * @param streamId
+     *            Identifier of the stream to return a stream entity name for.
+     * 
+     * @return Name of the entity (simple class name).
+     */
+    protected final String streamEntityName(final StreamId streamId) {
+        if (streamId.getParameters().size() == 0) {
+            return NoParamsStream.class.getSimpleName();
+        }
+        return streamId.getName() + "Stream";
+    }
+
+    /**
+     * Sets parameters in a query.
+     * 
+     * @param query
+     *            Query to set parameters for.
+     * @param streamId
+     *            Unique stream identifier that has the parameter values.
+     * @param additionalParams
+     *            Parameters to add in addition to the ones from the stream identifier.
+     */
+    protected final void setParameters(final Query query, final StreamId streamId,
+            final KeyValue... additionalParams) {
+        final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
+        if (params.size() == 0) {
+            params.add(new KeyValue("streamName", streamId.getName()));
+        }
+        if (additionalParams != null) {
+            for (final KeyValue kv : additionalParams) {
+                params.add(kv);
+            }
+        }
+        for (int i = 0; i < params.size(); i++) {
+            final KeyValue param = params.get(i);
+            query.setParameter(param.getKey(), param.getValue());
+        }
+    }
+
+    /**
+     * Creates a JPQL select using the parameters from the stream identifier and optional other arguments.
+     * 
+     * @param streamId
+     *            Unique stream identifier that has the parameter values.
+     * @param additionalParams
+     *            Parameters to add in addition to the ones from the stream identifier.
+     * 
+     * @return JPQL for selecting the events.
+     */
+    protected final String createEventSelect(final StreamId streamId, final KeyValue... additionalParams) {
+        final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
+        if (params.size() == 0) {
+            params.add(new KeyValue("streamName", streamId.getName()));
+        }
+        if (additionalParams != null) {
+            for (final KeyValue kv : additionalParams) {
+                params.add(kv);
+            }
+        }
+        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeTableName(streamId)
+                + " s WHERE ev.id=s.events_id");
+        for (int i = 0; i < params.size(); i++) {
+            final KeyValue param = params.get(i);
+            sb.append(" AND ");
+            sb.append("s." + sqlName(param.getKey()) + "=:" + param.getKey());
+        }
+        return sb.toString();
+    }
+
     private String createOrderBy(final StreamId streamId, final boolean asc) {
         final StringBuilder sb = new StringBuilder(" ORDER BY ");
         sb.append("ev.id");
@@ -319,39 +432,18 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         return sb.toString();
     }
 
-    private String createEventSelect(final StreamId streamId) {
-        final List<KeyValue> params = streamId.getParameters();
-        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeTableName(streamId)
-                + " s WHERE ev.id=s.events_id");
-        if (params.size() > 0) {
-            for (int i = 0; i < params.size(); i++) {
-                final KeyValue param = params.get(i);
-                sb.append(" AND ");
-                sb.append("s." + sqlName(param.getKey()) + "=:" + param.getKey());
-            }
-        }
-        return sb.toString();
-    }
-
     private String nativeTableName(final StreamId streamId) {
         if (streamId.isProjection()) {
             return sqlName(streamId.getName());
         }
-        return sqlName(streamId.getName()) + "_events";
+        if (streamId.getParameters().size() == 0) {
+            return NoParamsEvent.NO_PARAMS_EVENTS_TABLE;
+        }
+        return sqlName(streamId.getName()) + "_EVENTS";
     }
 
     private String sqlName(final String name) {
         return name.replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase();
-    }
-
-    private void setParameters(final Query query, final StreamId streamId) {
-        final List<KeyValue> params = streamId.getParameters();
-        if (params.size() > 0) {
-            for (int i = 0; i < params.size(); i++) {
-                final KeyValue param = params.get(i);
-                query.setParameter(param.getKey(), param.getValue());
-            }
-        }
     }
 
     private List<CommonEvent> asCommonEvents(final List<JpaEvent> eventEntries) {
@@ -379,36 +471,6 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getType()
                 .asBaseType()), data.getMimeType(), data.getRaw());
         return EscSpiUtils.deserialize(desRegistry, serializedData);
-    }
-
-    /**
-     * Creates the JPQL to select the stream itself.
-     * 
-     * @param streamId
-     *            Unique stream name. Postfix 'Stream' will be appended to the name (e.g. stream identifier
-     *            'Whatever' will become 'WhateverStream').
-     * 
-     * @return JPQL that selects the stream with the given identifer.
-     */
-    protected final String createStreamSelect(final StreamId streamId) {
-
-        if (streamId.isProjection()) {
-            throw new IllegalArgumentException("Projections do not have a stream table : " + streamId);
-        }
-
-        final List<KeyValue> params = streamId.getParameters();
-        final StringBuilder sb = new StringBuilder("SELECT t FROM " + streamId.getName() + "Stream t");
-        if (params.size() > 0) {
-            sb.append(" WHERE ");
-            for (int i = 0; i < params.size(); i++) {
-                final KeyValue param = params.get(i);
-                if (i > 0) {
-                    sb.append(" AND ");
-                }
-                sb.append("t." + param.getKey() + "=:" + param.getKey());
-            }
-        }
-        return sb.toString();
     }
 
 }

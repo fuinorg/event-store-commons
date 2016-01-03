@@ -18,22 +18,25 @@ package org.fuin.esc.jpa;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import java.sql.SQLException;
 import java.util.UUID;
+
+import javax.json.Json;
+import javax.json.JsonObject;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.StreamDeletedException;
+import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.jpa.examples.AggregateStreamId;
 import org.fuin.esc.jpa.examples.VendorCreatedEvent;
 import org.fuin.esc.jpa.examples.VendorStream;
+import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
@@ -44,16 +47,14 @@ import org.junit.Test;
 public final class JpaEventStoreTest extends AbstractPersistenceTest {
 
     @Test
-    public void testAppendSingleSuccess() throws SQLException, StreamNotFoundException,
-            StreamDeletedException, WrongExpectedVersionException {
+    public void testAppendSingleSuccess() throws Exception {
 
         // PREPARE
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
         final XmlDeSerializer xmlDeSer = new XmlDeSerializer(VendorCreatedEvent.class);
         final SerializedDataType serDataType = new SerializedDataType(VendorCreatedEvent.TYPE);
-        registry.addSerializer(serDataType, xmlDeSer);
-        registry.addDeserializer(serDataType, xmlDeSer.getMimeType().getBaseType(), xmlDeSer);
+        registry.add(serDataType, xmlDeSer.getMimeType().getBaseType(), xmlDeSer);
 
         final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
             @Override
@@ -63,7 +64,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             }
 
             @Override
-            public boolean containsType(StreamId streamId) {
+            public boolean containsType(final StreamId streamId) {
                 return true;
             }
         }, registry, registry);
@@ -77,32 +78,94 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             final CommonEvent eventData = new SimpleCommonEvent(eventId, dataType, vendorCreatedEvent);
 
             // TEST
-            beginTransaction();
-            final int version = testee.appendToStream(streamId, 0, eventData);
-            commitTransaction();
-
-            // VERIFY
-            assertThat(version).isEqualTo(1);
-            beginTransaction();
-            final boolean exists = testee.streamExists(streamId);
-            final StreamState state = testee.streamState(streamId);
-            final StreamEventsSlice slice = testee.readEventsForward(streamId, 1, 2);
-            commitTransaction();
-
-            assertThat(exists).isTrue();
-            assertThat(state).isEqualTo(StreamState.ACTIVE);
-            assertThat(slice.getFromEventNumber()).isEqualTo(1);
-            assertThat(slice.getNextEventNumber()).isEqualTo(2);
-            assertThat(slice.isEndOfStream()).isTrue();
-            assertThat(slice.getEvents()).hasSize(1);
-            final CommonEvent ed = slice.getEvents().get(0);
-            assertThat(ed.getId()).isEqualTo(eventId);
-            
+            execute(testee, streamId, eventData, eventId);
 
         } finally {
             testee.close();
         }
 
+    }
+
+    @Test
+    public void testNoParamsStreams() throws Exception {
+
+        // PREPARE
+        final String EVENT_A = "EventA";
+        final String EVENT_B = "EventB";
+
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
+
+        final SerializedDataType serDataTypeA = new SerializedDataType(EVENT_A);
+        registry.add(serDataTypeA, "application/json", jsonDeSer);
+        final JsonObject eventA = Json.createObjectBuilder().add("a", "John Doe").build();
+        final SimpleStreamId streamA = new SimpleStreamId("StreamA", false);
+        final EventId eventIdA = new EventId();
+        final TypeName typeA = new TypeName(EVENT_A);
+        final CommonEvent commonEventA = new SimpleCommonEvent(eventIdA, typeA, eventA);
+
+        final SerializedDataType serDataTypeB = new SerializedDataType(EVENT_B);
+        registry.add(serDataTypeB, "application/json", jsonDeSer);
+        final JsonObject eventB = Json.createObjectBuilder().add("b", "Jane Doe").build();
+        final SimpleStreamId streamB = new SimpleStreamId("StreamB", false);
+        final EventId eventIdB = new EventId();
+        final TypeName typeB = new TypeName(EVENT_B);
+        final CommonEvent commonEventB = new SimpleCommonEvent(eventIdB, typeB, eventB);
+
+        final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
+            @Override
+            public JpaStream createStream(final StreamId streamId) {
+                return new NoParamsStream(streamId);
+            }
+
+            @Override
+            public boolean containsType(final StreamId streamId) {
+                return true;
+            }
+        }, registry, registry);
+        testee.open();
+        try {
+
+            // TEST
+            execute(testee, streamA, commonEventA, eventIdA);
+            execute(testee, streamB, commonEventB, eventIdB);
+
+        } finally {
+            testee.close();
+        }
+
+    }
+
+    private static void execute(final EventStoreSync eventStore, final StreamId streamId,
+            final CommonEvent commonEvent, final EventId eventId) throws Exception {
+        beginTransaction();
+        try {
+
+            final int version = eventStore.appendToStream(streamId,
+                    ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);
+
+            // VERIFY
+            assertThat(version).isEqualTo(0);
+            final boolean exists = eventStore.streamExists(streamId);
+            final StreamState state = eventStore.streamState(streamId);
+            final StreamEventsSlice slice = eventStore.readEventsForward(streamId, 0, 2);
+            final CommonEvent readCommonEvent = eventStore.readEvent(streamId, 0);
+
+            assertThat(exists).isTrue();
+            assertThat(state).isEqualTo(StreamState.ACTIVE);
+            assertThat(slice.getFromEventNumber()).isEqualTo(0);
+            assertThat(slice.getNextEventNumber()).isEqualTo(1);
+            assertThat(slice.isEndOfStream()).isTrue();
+            assertThat(slice.getEvents()).hasSize(1);
+            final CommonEvent ce = slice.getEvents().get(0);
+            assertThat(ce.getId()).isEqualTo(eventId);
+            assertThat(ce.getId()).isEqualTo(readCommonEvent.getId());
+
+            commitTransaction();
+        } catch (final Exception ex) {
+            rollbackTransaction();
+            throw ex;
+        }
     }
 
 }

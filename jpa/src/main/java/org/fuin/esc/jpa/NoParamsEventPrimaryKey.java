@@ -14,56 +14,66 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.test.jpa;
+package org.fuin.esc.jpa;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.jpa.JpaEvent;
-import org.fuin.esc.jpa.JpaStreamEvent;
+import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NeverNull;
 
 /**
- * Database table for events.
+ * Identifies a stream event based on a stream name and an event number.
  */
-@Table(name = "DELETE_AFTER_HARD_DELETE_2_EVENTS")
-@Entity
-public class DeleteAfterHardDelete2Event extends JpaStreamEvent {
+public class NoParamsEventPrimaryKey implements Serializable {
 
-    @Id
-    @NotNull
-    @Column(name = "EVENT_NUMBER")
+    private static final long serialVersionUID = 1000L;
+
+    private String streamName;
+
     private Integer eventNumber;
 
     /**
-     * Protected default constructor only required for JPA.
+     * Default constructor for JPA. <b><i>CAUTION:</i> DO NOT USE IN APPLICATION CODE.</b>
      */
-    protected DeleteAfterHardDelete2Event() {
+    public NoParamsEventPrimaryKey() {
         super();
     }
 
     /**
-     * Constructor with all mandatory data.
+     * Constructor with all required data.
      * 
-     * @param version
-     *            Version.
-     * @param eventEntry
-     *            Event entry to connect.
+     * @param streamId
+     *            Unique stream identifier.
+     * @param eventNumber
+     *            Number of the event within the stream.
      */
-    public DeleteAfterHardDelete2Event(@NotNull final Integer version, final JpaEvent eventEntry) {
-        super(eventEntry);
-        Contract.requireArgNotNull("version", version);
-        this.eventNumber = version;
+    public NoParamsEventPrimaryKey(@NotNull final StreamId streamId, @NotNull final Integer eventNumber) {
+        super();
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgNotNull("eventNumber", eventNumber);
+        this.streamName = streamId.getName();
+        this.eventNumber = eventNumber;
     }
 
     /**
-     * Returns the number of the stream.
+     * Returns the name of the stream.
      * 
-     * @return Number that is unique in combination with the name.
+     * @return Unique stream identifier name.
      */
+    @NeverNull
+    public final String getStreamName() {
+        return streamName;
+    }
+
+    /**
+     * Returns the number of the event within the stream.
+     * 
+     * @return Order of the event in the stream.
+     */
+    @NeverNull
     public final Integer getEventNumber() {
         return eventNumber;
     }
@@ -73,6 +83,7 @@ public class DeleteAfterHardDelete2Event extends JpaStreamEvent {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((streamName == null) ? 0 : streamName.hashCode());
         result = prime * result + ((eventNumber == null) ? 0 : eventNumber.hashCode());
         return result;
     }
@@ -85,7 +96,12 @@ public class DeleteAfterHardDelete2Event extends JpaStreamEvent {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        DeleteAfterHardDelete2Event other = (DeleteAfterHardDelete2Event) obj;
+        NoParamsEventPrimaryKey other = (NoParamsEventPrimaryKey) obj;
+        if (streamName == null) {
+            if (other.streamName != null)
+                return false;
+        } else if (!streamName.equals(other.streamName))
+            return false;
         if (eventNumber == null) {
             if (other.eventNumber != null)
                 return false;
@@ -98,7 +114,7 @@ public class DeleteAfterHardDelete2Event extends JpaStreamEvent {
 
     @Override
     public final String toString() {
-        return "" + eventNumber;
+        return streamName + "-" + eventNumber;
     }
 
 }
