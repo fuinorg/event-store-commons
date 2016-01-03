@@ -9,7 +9,7 @@ below mentioned "Vendor" aggregate. There is only one stream entity (table) and 
 **all** vendors. The vendor's ID is used as discriminator column to distinguish events for the different vendors.
 
 The discriminator is coded in the [stream identifier](). An example of an identifier with discriminator column is 
-the [AggregateStreamId](src/test/java/org/fuin/esc/jpa/examples/AggregateStreamId.java) and another one for an  
+the [AggregateStreamId](src/test/java/org/fuin/esc/jpa/examples/AggregateStreamId.java) and another one for an 
 identifier without a discriminator is the [SimpleStreamId](https://github.com/fuinorg/event-store-commons/blob/master/api/src/main/java/org/fuin/esc/api/SimpleStreamId.java).
 
 The good new is: There is no need to create any entities if you don't need a discriminator column. There are already 
