@@ -1,6 +1,6 @@
 Feature: Delete a stream
 
-Scenario: Non existing
+Scenario: Non existing once
     Given the following streams don't exist
     | Stream Name        |
     | NameDoesNotMatter1 |
@@ -19,6 +19,18 @@ Scenario: Non existing
     | NameDoesNotMatter6 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
 
+Scenario: Hard delete non existing twice
+    Given the following streams don't exist
+    | Stream Name                |
+    | NonExistingHardDeleteTwice |
+    And the following deletes are executed
+    | Stream Name                | Hard Delete | Expected Version   | Expected Exception | 
+    | NonExistingHardDeleteTwice | true        | ANY                | -                  |
+    When the following deletes are executed
+    | Stream Name                | Hard Delete | Expected Version   | Expected Exception     | 
+    | NonExistingHardDeleteTwice | true        | ANY                | StreamDeletedException |
+    Then this should give the expected results
+    
 Scenario: Already existing
     Given the following streams are created and a single event is appended to each
     | Stream Name     | 

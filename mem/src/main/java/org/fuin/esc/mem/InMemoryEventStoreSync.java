@@ -183,6 +183,11 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
             // Stream never existed
             if (expected == ExpectedVersion.ANY.getNo()
                     || expected == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
+                if (hardDelete) {
+                    final InternalStream hds = new InternalStream();
+                    hds.delete(hardDelete);
+                    streams.put(streamId, hds);
+                }
                 // Ignore
                 return;
             }
