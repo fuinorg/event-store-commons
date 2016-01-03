@@ -15,8 +15,7 @@ identifier without a discriminator is the [SimpleStreamId](https://github.com/fu
 The good new is: There is no need to create any entities if you don't need a discriminator column. There are already 
 two predefined entites [NoParamsEvent](src/main/java/org/fuin/esc/jpa/NoParamsEvent.java) and 
 [NoParamsStream](src/main/java/org/fuin/esc/jpa/NoParamsStream.java) that will be used automatically in this case.
-
-For streams that require discriminator columns you have to create two entity classes ("*Event" + "*Stream") named as described below.
+For streams that require discriminator columns you have to create two entity classes ("XyzEvent" + "XyzStream") named as described below.
 
 Naming conventions
 ------------------
