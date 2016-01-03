@@ -10,7 +10,7 @@ Scenario: Non existing once
     | NameDoesNotMatter5 |
     | NameDoesNotMatter6 |
     When the following deletes are executed
-    | Stream Name       | Hard Delete | Expected Version   | Expected Exception            | 
+    | Stream Name        | Hard Delete | Expected Version   | Expected Exception            | 
     | NameDoesNotMatter1 | true        | ANY                | -                             |
     | NameDoesNotMatter2 | true        | NO_OR_EMPTY_STREAM | -                             |
     | NameDoesNotMatter3 | false       | ANY                | -                             |
@@ -19,7 +19,7 @@ Scenario: Non existing once
     | NameDoesNotMatter6 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
 
-Scenario: Hard delete non existing twice
+Scenario: Hard non existing twice
     Given the following streams don't exist
     | Stream Name                |
     | NonExistingHardDeleteTwice |
