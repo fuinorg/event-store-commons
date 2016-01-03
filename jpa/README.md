@@ -4,8 +4,8 @@ Java Persistence API (JPA) based implementation of the event store commons api.
 Entity types
 ------------
 There are two different scenarios: 
-1. Streams that require one or more discriminator columns 
-2. Streams without the need for a discriminator column
+1.Streams that require one or more discriminator columns 
+2.Streams without the need for a discriminator column
 An example for streams with discriminator columns is the below mentioned "Vendor" aggregate. There is only one
 stream entity (table) and one event entity (table) for **all** vendors. The vendor's ID is used as discriminator
 column to distinguish events for the different vendors.
