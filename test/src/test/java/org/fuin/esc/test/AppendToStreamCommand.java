@@ -129,7 +129,7 @@ public final class AppendToStreamCommand implements TestCommand {
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         eventId = EscTestUtils.emptyAsNull(eventId);
 
-        streamId = new SimpleStreamId(streamName, false);
+        streamId = new SimpleStreamId(streamName);
         expectedIntVersion = ExpectedVersion.no(expectedVersion);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
         if (eventId == null) {

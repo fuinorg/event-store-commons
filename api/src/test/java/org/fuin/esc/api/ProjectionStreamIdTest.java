@@ -24,18 +24,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link SimpleStreamId} class.
+ * Tests the {@link ProjectionStreamId} class.
  */
 // CHECKSTYLE:OFF Test
-public class SimpleStreamIdTest {
+public class ProjectionStreamIdTest {
 
-    private static final String NAME = "MyStream1";
+    private static final String NAME = "MyProjection";
 
-    private SimpleStreamId testee;
+    private ProjectionStreamId testee;
 
     @Before
     public void setup() {
-        testee = new SimpleStreamId(NAME);
+        testee = new ProjectionStreamId(NAME);
     }
 
     @After
@@ -45,14 +45,14 @@ public class SimpleStreamIdTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(SimpleStreamId.class).verify();
+        EqualsVerifier.forClass(ProjectionStreamId.class).verify();
     }
 
     @Test
     public void testGetter() {
         assertThat(testee.getName()).isEqualTo(NAME);
         assertThat(testee.asString()).isEqualTo(NAME);
-        assertThat(testee.isProjection()).isFalse();
+        assertThat(testee.isProjection()).isTrue();
         assertThat(testee.getParameters()).isEmpty();
     }
 

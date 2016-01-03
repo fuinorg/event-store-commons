@@ -89,7 +89,7 @@ public final class EsHttpPerformance {
             waitForInput("APPEND 1");
 
             // Append all together
-            final StreamId streamId1 = new SimpleStreamId("books1", false);
+            final StreamId streamId1 = new SimpleStreamId("books1");
             final List<CommonEvent> togetherList = new ArrayList<>();
             for (int i = 0; i < max; i++) {
                 togetherList.add(new SimpleCommonEvent(new EventId(), dataType, event, metaType, meta));
@@ -100,7 +100,7 @@ public final class EsHttpPerformance {
             waitForInput("APPEND 2");
 
             // Append all separate
-            final StreamId streamId2 = new SimpleStreamId("books2", false);
+            final StreamId streamId2 = new SimpleStreamId("books2");
             final List<CommonEvent> separateList = new ArrayList<>();
             for (int i = 0; i < max; i++) {
                 separateList.add(new SimpleCommonEvent(new EventId(), dataType, event, metaType, meta));

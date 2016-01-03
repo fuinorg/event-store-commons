@@ -78,7 +78,7 @@ public final class EsHttpMixedExample {
         try {
 
             // Prepare
-            StreamId streamId = new SimpleStreamId("books", false); // Unique stream name + NO PROJECTION
+            StreamId streamId = new SimpleStreamId("books"); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
 
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event

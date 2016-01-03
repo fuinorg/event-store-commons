@@ -71,7 +71,7 @@ public class ESHttpEventStoreSyncIT {
 
         // PREPARE
         final MyMeta meta = new MyMeta("john.doe");
-        final StreamId streamId = new SimpleStreamId("MyStreamA", false);
+        final StreamId streamId = new SimpleStreamId("MyStreamA");
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
@@ -97,7 +97,7 @@ public class ESHttpEventStoreSyncIT {
 
         // PREPARE
         final MyMeta meta = new MyMeta("john.doe");
-        final StreamId streamId = new SimpleStreamId("MyStreamB", false);
+        final StreamId streamId = new SimpleStreamId("MyStreamB");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
         final MyEvent one = new MyEvent("One");
@@ -146,7 +146,7 @@ public class ESHttpEventStoreSyncIT {
 
         // PREPARE
         final MyMeta meta = new MyMeta("john.doe");
-        final StreamId streamId = new SimpleStreamId("MyStreamC", false);
+        final StreamId streamId = new SimpleStreamId("MyStreamC");
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");

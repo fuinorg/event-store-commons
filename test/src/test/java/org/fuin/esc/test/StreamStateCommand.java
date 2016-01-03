@@ -91,7 +91,7 @@ public final class StreamStateCommand implements TestCommand {
         expectedState = EscTestUtils.emptyAsNull(expectedState);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
 
-        streamId = new SimpleStreamId(streamName, false);
+        streamId = new SimpleStreamId(streamName);
         if (expectedState == null) {
             expectedStreamState = null;
         } else {

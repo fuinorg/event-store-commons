@@ -98,7 +98,7 @@ public final class ReadEventCommand implements TestCommand {
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         expectedEventXml = EscTestUtils.emptyAsNull(expectedEventXml);
 
-        streamId = new SimpleStreamId(streamName, false);
+        streamId = new SimpleStreamId(streamName);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);        
         final Event event;
         if (expectedEventXml == null) {

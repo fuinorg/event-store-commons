@@ -26,10 +26,10 @@ import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.KeyValue;
 
 /**
- * Stream identifier that is based on a name.
+ * Projection stream identifier that is based on a name.
  */
 @Immutable
-public final class SimpleStreamId implements StreamId {
+public final class ProjectionStreamId implements StreamId {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,7 +41,7 @@ public final class SimpleStreamId implements StreamId {
      * @param name
      *            Unique name.
      */
-    public SimpleStreamId(@NotNull final String name) {
+    public ProjectionStreamId(@NotNull final String name) {
         Contract.requireArgNotNull("name", name);
         this.name = name;
     }
@@ -53,7 +53,7 @@ public final class SimpleStreamId implements StreamId {
 
     @Override
     public final boolean isProjection() {
-        return false;
+        return true;
     }
 
     @Override
@@ -92,9 +92,9 @@ public final class SimpleStreamId implements StreamId {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof SimpleStreamId))
+        if (!(obj instanceof ProjectionStreamId))
             return false;
-        SimpleStreamId other = (SimpleStreamId) obj;
+        ProjectionStreamId other = (ProjectionStreamId) obj;
         if (name == null) {
             if (other.name != null)
                 return false;

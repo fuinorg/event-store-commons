@@ -78,7 +78,7 @@ public final class StreamExistsCommand implements TestCommand {
 
         streamName = EscTestUtils.emptyAsNull(streamName);
 
-        this.streamId = new SimpleStreamId(streamName, false);
+        this.streamId = new SimpleStreamId(streamName);
 
     }
 

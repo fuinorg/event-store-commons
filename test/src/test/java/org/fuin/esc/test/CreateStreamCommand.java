@@ -89,7 +89,7 @@ public final class CreateStreamCommand implements TestCommand {
         streamName = EscTestUtils.emptyAsNull(streamName);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
 
-        this.streamId = new SimpleStreamId(streamName, false);
+        this.streamId = new SimpleStreamId(streamName);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }

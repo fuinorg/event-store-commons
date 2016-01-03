@@ -148,7 +148,7 @@ public final class ReadForwardCommand implements TestCommand {
         resultEventId8 = EscTestUtils.emptyAsNull(resultEventId8);
         resultEventId9 = EscTestUtils.emptyAsNull(resultEventId9);
 
-        streamId = new SimpleStreamId(streamName, true);
+        streamId = new SimpleStreamId(streamName);
         final List<CommonEvent> expectedEvents = new ArrayList<>();
         addEvent(expectedEvents, resultEventId1);
         addEvent(expectedEvents, resultEventId2);

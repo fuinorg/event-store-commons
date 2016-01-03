@@ -96,7 +96,7 @@ public final class ReadBackwardExceptionCommand implements TestCommand {
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
 
-        streamId = new SimpleStreamId(streamName, true);
+        streamId = new SimpleStreamId(streamName);
         expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);
 
     }
