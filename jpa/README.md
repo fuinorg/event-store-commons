@@ -5,7 +5,7 @@ Entity types
 ------------
 There are two different scenarios: Streams that require one or more discriminator columns and 
 simple ones without the need for a discriminator. An example for streams with discriminator columns is the 
-below mentioned "Vendor" aggregate. There is only **one** stream entity (table) and one event entity (table) for 
+below mentioned "Vendor" aggregate. There is only one stream entity (table) and one event entity (table) for 
 **all** vendors. The vendor's ID is used as discriminator column to distinguish events for the different vendors.
 
 The discriminator is coded in the [stream identifier](). An example of an identifier with discriminator column is 
