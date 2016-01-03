@@ -2,16 +2,21 @@ Feature: Delete a stream
 
 Scenario: Non existing
     Given the following streams don't exist
-    | Stream Name       |
-    | NameDoesNotMatter |
+    | Stream Name        |
+    | NameDoesNotMatter1 |
+    | NameDoesNotMatter2 |
+    | NameDoesNotMatter3 |
+    | NameDoesNotMatter4 |
+    | NameDoesNotMatter5 |
+    | NameDoesNotMatter6 |
     When the following deletes are executed
     | Stream Name       | Hard Delete | Expected Version   | Expected Exception            | 
-    | NameDoesNotMatter | true        | ANY                | -                             |
-    | NameDoesNotMatter | true        | NO_OR_EMPTY_STREAM | -                             |
-    | NameDoesNotMatter | false       | ANY                | -                             |
-    | NameDoesNotMatter | false       | NO_OR_EMPTY_STREAM | -                             |
-    | NameDoesNotMatter | true        | 1                  | WrongExpectedVersionException |
-    | NameDoesNotMatter | false       | 1                  | WrongExpectedVersionException |
+    | NameDoesNotMatter1 | true        | ANY                | -                             |
+    | NameDoesNotMatter2 | true        | NO_OR_EMPTY_STREAM | -                             |
+    | NameDoesNotMatter3 | false       | ANY                | -                             |
+    | NameDoesNotMatter4 | false       | NO_OR_EMPTY_STREAM | -                             |
+    | NameDoesNotMatter5 | true        | 1                  | WrongExpectedVersionException |
+    | NameDoesNotMatter6 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
 
 Scenario: Already existing
