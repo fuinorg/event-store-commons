@@ -21,9 +21,14 @@ two predefined entites [NoParamsEvent](src/main/java/org/fuin/esc/jpa/NoParamsEv
 [NoParamsStream](src/main/java/org/fuin/esc/jpa/NoParamsStream.java) that will be used automatically in this case.
 For streams that require discriminator columns you have to create two entity classes ("XyzEvent" + "XyzStream") named as described below.
 
-Naming conventions
-------------------
-The JPA implementation requires a strict naming convention.
+Custom naming of tables and entities
+------------------------------------
+You can use [JpaStreamId](src/main/java/org/fuin/esc/jpa/JpaStreamId.java) to define the names of your stream entities and classes.
+
+Default naming conventions
+--------------------------
+If you don't define an explicit stream name using a [JpaStreamId](src/main/java/org/fuin/esc/jpa/JpaStreamId.java),
+a strict default naming convention applies as described below.
  
 **You have to name your tables and identifiers exactly as described below otherwise it will not work**.
 
