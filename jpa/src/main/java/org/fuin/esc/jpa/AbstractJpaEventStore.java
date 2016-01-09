@@ -16,6 +16,10 @@
  */
 package org.fuin.esc.jpa;
 
+import static org.fuin.esc.jpa.JpaUtils.camelCaseToUnderscore;
+import static org.fuin.esc.jpa.JpaUtils.nativeEventsTableName;
+import static org.fuin.esc.jpa.JpaUtils.streamEntityName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -350,21 +354,6 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     }
 
     /**
-     * Returns the name of the stream entity for a given stream.
-     * 
-     * @param streamId
-     *            Identifier of the stream to return a stream entity name for.
-     * 
-     * @return Name of the entity (simple class name).
-     */
-    protected final String streamEntityName(final StreamId streamId) {
-        if (streamId.getParameters().size() == 0) {
-            return NoParamsStream.class.getSimpleName();
-        }
-        return streamId.getName() + "Stream";
-    }
-
-    /**
      * Sets parameters in a query.
      * 
      * @param query
@@ -404,19 +393,19 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     protected final String createEventSelect(final StreamId streamId, final KeyValue... additionalParams) {
         final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
         if (params.size() == 0) {
-            params.add(new KeyValue("streamName", streamId.getName()));
+            params.add(new KeyValue("streamName", streamEntityName(streamId)));
         }
         if (additionalParams != null) {
             for (final KeyValue kv : additionalParams) {
                 params.add(kv);
             }
         }
-        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeTableName(streamId)
+        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeEventsTableName(streamId)
                 + " s WHERE ev.id=s.events_id");
         for (int i = 0; i < params.size(); i++) {
             final KeyValue param = params.get(i);
             sb.append(" AND ");
-            sb.append("s." + sqlName(param.getKey()) + "=:" + param.getKey());
+            sb.append("s." + camelCaseToUnderscore(param.getKey()) + "=:" + param.getKey());
         }
         return sb.toString();
     }
@@ -430,20 +419,6 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
             sb.append(" DESC");
         }
         return sb.toString();
-    }
-
-    private String nativeTableName(final StreamId streamId) {
-        if (streamId.isProjection()) {
-            return sqlName(streamId.getName());
-        }
-        if (streamId.getParameters().size() == 0) {
-            return NoParamsEvent.NO_PARAMS_EVENTS_TABLE;
-        }
-        return sqlName(streamId.getName()) + "_EVENTS";
-    }
-
-    private String sqlName(final String name) {
-        return name.replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase();
     }
 
     private List<CommonEvent> asCommonEvents(final List<JpaEvent> eventEntries) {

@@ -100,7 +100,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
         registry.add(serDataTypeA, "application/json", jsonDeSer);
         final JsonObject eventA = Json.createObjectBuilder().add("a", "John Doe").build();
         final SimpleStreamId streamA = new SimpleStreamId("StreamA");
-        final EventId eventIdA = new EventId();
+        final EventId eventIdA = new EventId("84fe8213-ac1b-4cda-8321-703c2e448052");
         final TypeName typeA = new TypeName(EVENT_A);
         final CommonEvent commonEventA = new SimpleCommonEvent(eventIdA, typeA, eventA);
 
@@ -108,7 +108,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
         registry.add(serDataTypeB, "application/json", jsonDeSer);
         final JsonObject eventB = Json.createObjectBuilder().add("b", "Jane Doe").build();
         final SimpleStreamId streamB = new SimpleStreamId("StreamB");
-        final EventId eventIdB = new EventId();
+        final EventId eventIdB = new EventId("23962a5e-da10-402f-8560-340745b09b2c");
         final TypeName typeB = new TypeName(EVENT_B);
         final CommonEvent commonEventB = new SimpleCommonEvent(eventIdB, typeB, eventB);
 

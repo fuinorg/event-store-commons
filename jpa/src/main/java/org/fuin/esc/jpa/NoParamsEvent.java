@@ -129,5 +129,4 @@ public class NoParamsEvent extends JpaStreamEvent {
         return streamName + " " + eventNumber;
     }
 
-    
 }
