@@ -36,7 +36,7 @@ public final class SimpleStreamId implements StreamId {
     private final String name;
 
     /**
-     * Constructor for projection.
+     * Constructor with mandatory data.
      * 
      * @param name
      *            Unique name.
