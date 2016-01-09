@@ -89,7 +89,7 @@ public final class NativeSqlCondition {
 /**
      * Returns the operator for comparing the value.
      * 
-     * @return Operator like '=' or '<'.
+     * @return Operator like '=' or '&lt;'.
      */
     public final String getOperator() {
         return operator;
