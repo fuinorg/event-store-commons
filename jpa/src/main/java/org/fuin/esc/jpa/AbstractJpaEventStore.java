@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ReadableEventStoreSync;
+import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Read only JPA implementation of the event store.
  */
-public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
+public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractJpaEventStore.class);
 

@@ -26,7 +26,7 @@ import javax.json.JsonObject;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
@@ -73,7 +73,7 @@ public final class EsHttpJsonExample {
         registry.add(serMetaType, "application/json", jsonDeSer);
 
         // Create an event store instance and open it
-        EventStoreSync eventStore = new ESHttpEventStore(threadFactory, url, 
+        EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
                 ESEnvelopeType.JSON, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer 
                 registry  // Registry used to find a de-serializer

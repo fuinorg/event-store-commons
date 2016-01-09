@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
 
@@ -74,7 +74,7 @@ public final class MultipleCommands implements TestCommand {
     }
 
     @Override
-    public final void init(final EventStoreSync eventStore) {
+    public final void init(final EventStore eventStore) {
         for (final TestCommand command : commands) {
             command.init(eventStore);
         }

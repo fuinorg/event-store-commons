@@ -26,7 +26,7 @@ import javax.persistence.TypedQuery;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * JPA Implementation of the event store.
  */
-public final class JpaEventStore extends AbstractJpaEventStore implements EventStoreSync {
+public final class JpaEventStore extends AbstractJpaEventStore implements EventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);
 

@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Interface for reading events from an event store synchronously.
  */
-public interface ReadableEventStoreSync extends AutoCloseable {
+public interface ReadableEventStore extends AutoCloseable {
 
     /**
      * Opens a connection to the repository.

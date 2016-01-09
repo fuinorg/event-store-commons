@@ -33,7 +33,7 @@ import javax.persistence.Persistence;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
@@ -59,7 +59,7 @@ import cucumber.api.java.en.When;
 // CHECKSTYLE:OFF Test code
 public class TestFeatures {
 
-    private EventStoreSync eventStore;
+    private EventStore eventStore;
 
     private SimpleSerializerDeserializerRegistry registry;
 

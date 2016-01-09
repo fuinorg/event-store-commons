@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
 /**
  * An event store that is capable of handling volatile subscriptions.
  */
-public interface SubscribableEventStoreSync {
+public interface SubscribableEventStore {
 
     /**
      * Subscribe a stream starting with a given event number.

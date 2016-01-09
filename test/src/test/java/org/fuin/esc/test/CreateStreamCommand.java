@@ -18,7 +18,7 @@ package org.fuin.esc.test;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 
@@ -38,7 +38,7 @@ public final class CreateStreamCommand implements TestCommand {
 
     private StreamId streamId;
 
-    private EventStoreSync es;
+    private EventStore es;
 
     private Class<? extends Exception> expectedExceptionClass;
 
@@ -83,7 +83,7 @@ public final class CreateStreamCommand implements TestCommand {
      * @param eventstore
      *            Event store to use.
      */
-    public void init(@NotNull final EventStoreSync eventstore) {
+    public void init(@NotNull final EventStore eventstore) {
         this.es = eventstore;
 
         streamName = EscTestUtils.emptyAsNull(streamName);

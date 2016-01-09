@@ -18,7 +18,7 @@ package org.fuin.esc.test;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 
 /**
  * A command in a test scenario.
@@ -31,7 +31,7 @@ public interface TestCommand {
      * @param eventStore
      *            Event store to use.
      */
-    public void init(@NotNull EventStoreSync eventStore);
+    public void init(@NotNull EventStore eventStore);
 
     /**
      * Executes the command. Exceptions will be catched and are available for verification using the

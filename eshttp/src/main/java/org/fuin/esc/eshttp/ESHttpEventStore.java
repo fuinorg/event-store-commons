@@ -45,7 +45,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.util.EntityUtils;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamAlreadyExistsException;
@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation that connects to the http://www.geteventstore.com via HTTP API.
  */
-public final class ESHttpEventStore implements EventStoreSync {
+public final class ESHttpEventStore implements EventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESHttpEventStore.class);
 

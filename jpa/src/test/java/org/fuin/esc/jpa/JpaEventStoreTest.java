@@ -25,7 +25,7 @@ import javax.json.JsonObject;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -136,7 +136,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
 
     }
 
-    private static void execute(final EventStoreSync eventStore, final StreamId streamId,
+    private static void execute(final EventStore eventStore, final StreamId streamId,
             final CommonEvent commonEvent, final EventId eventId) throws Exception {
         beginTransaction();
         try {

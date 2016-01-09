@@ -43,7 +43,7 @@ public class DelegatingAsyncEventStoreTest {
     private DelegatingAsyncEventStore testee;
 
     @Mock
-    private EventStoreSync delegate;
+    private EventStore delegate;
 
     @Before
     public void setup() {

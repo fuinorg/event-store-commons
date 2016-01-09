@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -69,7 +69,7 @@ public final class EsHttpXmlExample {
         registry.add(serMetaType, "application/xml", xmlDeSer);
 
         // Create an event store instance and open it
-        EventStoreSync eventStore = new ESHttpEventStore(threadFactory, url, 
+        EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
                 ESEnvelopeType.XML, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer 
                 registry  // Registry used to find a de-serializer

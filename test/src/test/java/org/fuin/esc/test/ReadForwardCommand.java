@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStoreSync;
+import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -73,7 +73,7 @@ public final class ReadForwardCommand implements TestCommand {
 
     private StreamId streamId;
 
-    private EventStoreSync es;
+    private EventStore es;
 
     private StreamEventsSlice expectedSlice;
 
@@ -134,7 +134,7 @@ public final class ReadForwardCommand implements TestCommand {
      * @param eventstore
      *            Event store to use.
      */
-    public final void init(@NotNull final EventStoreSync eventstore) {
+    public final void init(@NotNull final EventStore eventstore) {
         this.es = eventstore;
 
         streamName = EscTestUtils.emptyAsNull(streamName);

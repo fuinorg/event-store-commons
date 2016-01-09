@@ -24,7 +24,7 @@ public interface MetaEventStore {
     /**
      * Returns the information if the event store implementation supports creating a stream without appending
      * events to it. If the event store does not support a create operation, a call to
-     * {@link EventStoreSync#createStream(StreamId)} will do nothing, but it will not fail.
+     * {@link EventStore#createStream(StreamId)} will do nothing, but it will not fail.
      * 
      * @return TRUE if it's possible to create a stream without appending events to it or FALSE if only
      *         appending events implicitly creates a stream.

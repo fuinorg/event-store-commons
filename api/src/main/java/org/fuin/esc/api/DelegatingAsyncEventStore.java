@@ -32,7 +32,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     private Executor executor;
 
-    private EventStoreSync delegate;
+    private EventStore delegate;
 
     /**
      * Constructor with all mandatory data.
@@ -43,7 +43,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
      *            Delegate to forward all method calls to.
      */
     public DelegatingAsyncEventStore(@NotNull final Executor executor, 
-            @NotNull final EventStoreSync delegate) {
+            @NotNull final EventStore delegate) {
         super();
         Contract.requireArgNotNull("executor", executor);
         Contract.requireArgNotNull("delegate", delegate);
