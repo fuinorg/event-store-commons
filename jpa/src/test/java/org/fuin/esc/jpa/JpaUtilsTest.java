@@ -27,7 +27,7 @@ import org.fuin.esc.jpa.examples.AggregateStreamId;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF
-public final class EscJpaUtilsTest {
+public final class JpaUtilsTest {
 
     
     @Test
