@@ -38,31 +38,39 @@ import org.joda.time.DateTime;
 /**
  * Stores an event and it's meta data.
  */
-@Table(name = "EVENTS")
+@Table(name = JpaEvent.TABLE_NAME)
 @Entity
 @SequenceGenerator(name = "EventEntrySequenceGenerator", sequenceName = "EVENTS_SEQ", allocationSize = 1000)
 public class JpaEvent {
 
+    /** SQL table name. */
+    public static final String TABLE_NAME = "events";
+
+    /** SQL ID column name. */
+    public static final String COLUMN_ID = "id";
+
+    /** SQL EVENT ID column name. */
+    public static final String COLUMN_EVENT_ID = "event_id";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EventEntrySequenceGenerator")
-    @Column(name = "ID", nullable = false)
+    @Column(name = COLUMN_ID, nullable = false)
     private Long id;
 
-    @Column(name = "EVENT_ID", length = 36, nullable = false, columnDefinition = "VARCHAR(36)")
+    @Column(name = COLUMN_EVENT_ID, length = 36, nullable = false, columnDefinition = "VARCHAR(36)")
     private String eventId;
 
     /** Date, time and zone the event was created. */
     @Convert(converter = DateTimeAdapter.class)
-    @Column(name = "TIMESTAMP", nullable = false)
-    private DateTime timestamp;
+    @Column(name = "created", nullable = false)
+    private DateTime created;
 
     @Embedded
     @NotNull
     private JpaData data;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "type", column = @Column(name = "META_TYPE")),
+    @AttributeOverrides({ @AttributeOverride(name = "type", column = @Column(name = "META_TYPE")),
             @AttributeOverride(name = "mimeType", column = @Column(name = "META_MIME_TYPE")),
             @AttributeOverride(name = "raw", column = @Column(name = "META_RAW")) })
     private JpaData meta;
@@ -78,9 +86,8 @@ public class JpaEvent {
      * Constructor without meta data.
      * 
      * @param eventId
-     *            Unique identifier of the event. Generated on the client and
-     *            used to achieve idempotence when trying to append the same
-     *            event multiple times.
+     *            Unique identifier of the event. Generated on the client and used to achieve idempotence when
+     *            trying to append the same event multiple times.
      * @param data
      *            Data of the event.
      */
@@ -92,16 +99,15 @@ public class JpaEvent {
      * Constructor with all data.
      * 
      * @param eventId
-     *            Unique identifier of the event. Generated on the client and
-     *            used to achieve idempotence when trying to append the same
-     *            event multiple times.
+     *            Unique identifier of the event. Generated on the client and used to achieve idempotence when
+     *            trying to append the same event multiple times.
      * @param data
      *            Data of the event.
      * @param meta
      *            Meta data (Optional).
      */
-    public JpaEvent(@NotNull final EventId eventId,
-            @NotNull final JpaData data, @Nullable final JpaData meta) {
+    public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data, 
+            @Nullable final JpaData meta) {
         super();
         this.eventId = eventId.asBaseType().toString();
         this.data = data;
@@ -118,9 +124,8 @@ public class JpaEvent {
     }
 
     /**
-     * Returns the unique identifier of the event. Generated on the client and
-     * used to achieve idempotence when trying to append the same event multiple
-     * times.
+     * Returns the unique identifier of the event. Generated on the client and used to achieve idempotence
+     * when trying to append the same event multiple times.
      * 
      * @return Unique event ID.
      */
@@ -135,8 +140,8 @@ public class JpaEvent {
      * @return Date, time and zone of event's creation.
      */
     @NotNull
-    public final DateTime getTimestamp() {
-        return timestamp;
+    public final DateTime getCreated() {
+        return created;
     }
 
     /**
@@ -163,7 +168,7 @@ public class JpaEvent {
      */
     @PrePersist
     final void onPrePersist() {
-        timestamp = new DateTime();
+        created = new DateTime();
     }
 
 }

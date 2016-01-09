@@ -147,6 +147,11 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
             // Stream never existed
             if (expected == ExpectedVersion.ANY.getNo()
                     || expected == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
+                if (hardDelete) {
+                    final JpaStream newStream = streamFactory.createStream(streamId);
+                    newStream.delete(true);
+                    getEm().persist(newStream);
+                }
                 // Ignore
                 return;
             }
@@ -171,10 +176,10 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         if (!streamEntityExists(streamId)) {
             return null;
         }
-        final String sql = createStreamSelect(streamId);
+        final String sql = createJpqlStreamSelect(streamId);
         LOG.debug("{}", sql);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
-        setParameters(query, streamId);
+        setJpqlParameters(query, streamId);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         final List<JpaStream> streams = query.getResultList();
         if (streams.size() == 0) {

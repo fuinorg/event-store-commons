@@ -34,15 +34,15 @@ public final class EscJpaUtilsTest {
     public void testCamelCaseToUnderscore() {
 
         // TEST & VERIFY
-        assertThat(JpaUtils.camelCaseToUnderscore(null)).isEqualTo(null);
-        assertThat(JpaUtils.camelCaseToUnderscore("")).isEqualTo("");
-        assertThat(JpaUtils.camelCaseToUnderscore("a")).isEqualTo("a");
-        assertThat(JpaUtils.camelCaseToUnderscore("ab")).isEqualTo("ab");
-        assertThat(JpaUtils.camelCaseToUnderscore("A")).isEqualTo("a");
-        assertThat(JpaUtils.camelCaseToUnderscore("AB")).isEqualTo("a_b");
-        assertThat(JpaUtils.camelCaseToUnderscore("Ab")).isEqualTo("ab");
-        assertThat(JpaUtils.camelCaseToUnderscore("aB")).isEqualTo("a_b");
-        assertThat(JpaUtils.camelCaseToUnderscore("aBcDeF")).isEqualTo("a_bc_de_f");
+        assertThat(JpaUtils.camel2Underscore(null)).isEqualTo(null);
+        assertThat(JpaUtils.camel2Underscore("")).isEqualTo("");
+        assertThat(JpaUtils.camel2Underscore("a")).isEqualTo("a");
+        assertThat(JpaUtils.camel2Underscore("ab")).isEqualTo("ab");
+        assertThat(JpaUtils.camel2Underscore("A")).isEqualTo("a");
+        assertThat(JpaUtils.camel2Underscore("AB")).isEqualTo("a_b");
+        assertThat(JpaUtils.camel2Underscore("Ab")).isEqualTo("ab");
+        assertThat(JpaUtils.camel2Underscore("aB")).isEqualTo("a_b");
+        assertThat(JpaUtils.camel2Underscore("aBcDeF")).isEqualTo("a_bc_de_f");
 
     }
 

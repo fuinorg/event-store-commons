@@ -36,15 +36,18 @@ public class NoParamsEvent extends JpaStreamEvent {
 
     /** Name of the table. */
     public static final String NO_PARAMS_EVENTS_TABLE = "no_params_events";
-    
+
+    /** Column stream name. */
+    public static final String COLUMN_STREAM_NAME = "stream_name";
+
     @Id
     @NotNull
-    @Column(name = "STREAM_NAME", nullable = false, updatable = false, length = 100)
+    @Column(name = COLUMN_STREAM_NAME, nullable = false, updatable = false, length = 100)
     private String streamName;
 
     @Id
     @NotNull
-    @Column(name = "EVENT_NUMBER")
+    @Column(name = COLUMN_EVENT_NUMBER)
     private Integer eventNumber;
 
     /**

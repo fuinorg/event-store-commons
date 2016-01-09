@@ -54,32 +54,27 @@ public final class JpaEventTest extends AbstractPersistenceTest {
         // VERIFY
         beginTransaction();
         final TypedQuery<JpaEvent> query = getEm().createQuery(
-                "select ee from JpaEvent ee where ee.eventId=:eventId",
-                JpaEvent.class);
+                "select ee from JpaEvent ee where ee.eventId=:eventId", JpaEvent.class);
         query.setParameter("eventId", eventId.toString());
         final JpaEvent found = query.getSingleResult();
         assertThat(found).isNotNull();
         assertThat(found.getEventId()).isEqualTo(eventId);
-        assertThat(found.getTimestamp()).isNotNull();
+        assertThat(found.getCreated()).isNotNull();
         assertThat(found.getData()).isNotNull();
         assertThat(found.getData().getType()).isEqualTo(type);
         assertThat(found.getData().getRaw()).isNotNull();
         assertThat(found.getMeta()).isNull();
-        final String data = new String(found.getData().getRaw(), found
-                .getData().getMimeType().getEncoding());
+        final String data = new String(found.getData().getRaw(), found.getData().getMimeType().getEncoding());
         assertThat(data).isEqualTo(xml);
         commitTransaction();
 
     }
 
-    private JpaEvent create(final EventId eventId, final TypeName type,
-            final int version, final String xml) {
+    private JpaEvent create(final EventId eventId, final TypeName type, final int version, final String xml) {
         final Charset encoding = Charset.forName("utf-8");
-        final EnhancedMimeType mimeType = EnhancedMimeType.create(
-                "application", "xml", encoding, "" + version,
-                new HashMap<String, String>());
-        final JpaEvent eventEntry = new JpaEvent(eventId, new JpaData(type,
-                mimeType, xml.getBytes(encoding)));
+        final EnhancedMimeType mimeType = EnhancedMimeType.create("application", "xml", encoding, ""
+                + version, new HashMap<String, String>());
+        final JpaEvent eventEntry = new JpaEvent(eventId, new JpaData(type, mimeType, xml.getBytes(encoding)));
         return eventEntry;
     }
 

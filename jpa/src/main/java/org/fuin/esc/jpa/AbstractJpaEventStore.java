@@ -16,11 +16,12 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.fuin.esc.jpa.JpaUtils.camelCaseToUnderscore;
+import static org.fuin.esc.jpa.JpaUtils.camel2Underscore;
 import static org.fuin.esc.jpa.JpaUtils.nativeEventsTableName;
 import static org.fuin.esc.jpa.JpaUtils.streamEntityName;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.ReadableEventStoreSync;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
@@ -55,6 +57,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractJpaEventStore.class);
+
+    private static final String JPA_EVENT_PREFIX = "ev";
+
+    private static final String JPA_STREAM_EVENT_PREFIX = "se";
 
     private final EntityManager em;
 
@@ -129,11 +135,14 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         Contract.requireArgMin("eventNumber", eventNumber, 0);
         verifyStreamEntityExists(streamId);
 
-        final KeyValue eventNo = new KeyValue("eventNumber", eventNumber);
-        final StringBuilder sb = new StringBuilder(createEventSelect(streamId, eventNo));
+        final NativeSqlCondition eventNo = new NativeSqlCondition(JpaStreamEvent.COLUMN_EVENT_NUMBER, "=",
+                eventNumber);
+        final List<NativeSqlCondition> conditions = createNativeSqlConditions(streamId, eventNo);
 
-        final Query query = em.createNativeQuery(sb.toString(), JpaEvent.class);
-        setParameters(query, streamId, eventNo);
+        final String nativeSql = createNativeSqlEventSelect(streamId, conditions);
+
+        final Query query = em.createNativeQuery(nativeSql, JpaEvent.class);
+        setNativeSqlParameters(query, conditions);
 
         try {
             final JpaEvent result = (JpaEvent) query.getSingleResult();
@@ -151,7 +160,41 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         Contract.requireArgMin("count", count, 1);
         verifyStreamEntityExists(streamId);
 
-        return readStreamEvents(streamId, start, count, true);
+        if (streamId.isProjection()) {
+            final JpaProjection projection = em.find(JpaProjection.class, streamEntityName(streamId));
+            if (projection == null) {
+                throw new StreamNotFoundException(streamId);
+            }
+            if (!projection.isEnabled()) {
+                // The projection does exist, but is not ready yet
+                return new StreamEventsSlice(start, new ArrayList<CommonEvent>(), start, true);
+            }
+        } else {
+            final JpaStream stream = findStream(streamId);
+            if (stream.getState() == StreamState.HARD_DELETED) {
+                throw new StreamDeletedException(streamId);
+            }
+        }
+
+        // Prepare SQL
+        final NativeSqlCondition greaterOrEqualEventNumber = new NativeSqlCondition(JPA_STREAM_EVENT_PREFIX,
+                JpaStreamEvent.COLUMN_EVENT_NUMBER, ">=", start);
+        final List<NativeSqlCondition> conditions = createNativeSqlConditions(streamId,
+                greaterOrEqualEventNumber);
+        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(streamId, true);
+        LOG.debug(sql);
+        final Query query = em.createNativeQuery(sql, JpaEvent.class);
+        setNativeSqlParameters(query, conditions);
+        query.setMaxResults(count);
+        final List<JpaEvent> resultList = query.getResultList();
+
+        // Return result
+        final List<CommonEvent> events = asCommonEvents(resultList);
+        final int fromEventNumber = start;
+        final int nextEventNumber = (start + events.size());
+        final boolean endOfStream = (events.size() < count);
+
+        return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
 
     }
 
@@ -164,16 +207,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
         Contract.requireArgMin("count", count, 1);
         verifyStreamEntityExists(streamId);
 
-        return readStreamEvents(streamId, start, count, false);
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private StreamEventsSlice readStreamEvents(final StreamId streamId, final int start, final int count,
-            final boolean forward) throws StreamNotFoundException {
-
         if (streamId.isProjection()) {
-            final JpaProjection projection = em.find(JpaProjection.class, streamId.asString());
+            final JpaProjection projection = em.find(JpaProjection.class, streamEntityName(streamId));
             if (projection == null) {
                 throw new StreamNotFoundException(streamId);
             }
@@ -181,26 +216,36 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
                 // The projection does exist, but is not ready yet
                 return new StreamEventsSlice(start, new ArrayList<CommonEvent>(), start, true);
             }
+        } else {
+            final JpaStream stream = findStream(streamId);
+            if (stream.getState() == StreamState.HARD_DELETED) {
+                throw new StreamDeletedException(streamId);
+            }
         }
 
         // Prepare SQL
-        final String sql = createEventSelect(streamId) + createOrderBy(streamId, forward);
+        final NativeSqlCondition greaterOrEqualEventNumber = new NativeSqlCondition(JPA_STREAM_EVENT_PREFIX,
+                JpaStreamEvent.COLUMN_EVENT_NUMBER, "<=", start);
+        final List<NativeSqlCondition> conditions = createNativeSqlConditions(streamId,
+                greaterOrEqualEventNumber);
+        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(streamId, false);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
-        setParameters(query, streamId);
-        query.setFirstResult(start);
+        setNativeSqlParameters(query, conditions);
         query.setMaxResults(count);
-
-        // Execute query
-        final List<JpaEvent> resultList = (List<JpaEvent>) query.getResultList();
+        final List<JpaEvent> resultList = query.getResultList();
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
         final int fromEventNumber = start;
-        final int nextEventNumber = (start + events.size());
-        final boolean endOfStream = (events.size() < count);
+        int nextEventNumber = start - resultList.size();
+        if (nextEventNumber < 0) {
+            nextEventNumber = 0;
+        }
+        final boolean endOfStream = (start - count) < 0;
 
         return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
+
     }
 
     @Override
@@ -211,9 +256,9 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
             return false;
         }
 
-        final String sql = createStreamSelect(streamId);
+        final String sql = createJpqlStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
-        setParameters(query, streamId);
+        setJpqlParameters(query, streamId);
         final List<JpaStream> streams = query.getResultList();
         if (streams.size() == 0) {
             return false;
@@ -231,21 +276,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     public final StreamState streamState(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        verifyStreamEntityExists(streamId);
 
-        final String sql = createStreamSelect(streamId);
-        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
-        setParameters(query, streamId);
-        final List<JpaStream> streams = query.getResultList();
-        if (streams.size() == 0) {
-            throw new StreamNotFoundException(streamId);
-        }
-        final JpaStream stream = streams.get(0);
-        if (stream.getState() == StreamState.SOFT_DELETED) {
-            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
-            // streams
-            throw new StreamNotFoundException(streamId);
-        }
+        final JpaStream stream = findStream(streamId);
         return stream.getState();
 
     }
@@ -325,12 +357,11 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
      * Creates the JPQL to select the stream itself.
      * 
      * @param streamId
-     *            Unique stream name. Postfix 'Stream' will be appended to the name (e.g. stream identifier
-     *            'Whatever' will become 'WhateverStream').
+     *            Unique stream identifier.
      * 
-     * @return JPQL that selects the stream with the given identifer.
+     * @return JPQL that selects the stream with the given identifier.
      */
-    protected final String createStreamSelect(final StreamId streamId) {
+    protected final String createJpqlStreamSelect(final StreamId streamId) {
 
         if (streamId.isProjection()) {
             throw new IllegalArgumentException("Projections do not have a stream table : " + streamId);
@@ -354,25 +385,48 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     }
 
     /**
+     * Reads the stream with the given identifier from the DB and returns it.
+     * 
+     * @param streamId
+     *            Stream to load.
+     * 
+     * @return Stream.
+     */
+    @NotNull
+    protected final JpaStream findStream(@NotNull final StreamId streamId) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        verifyStreamEntityExists(streamId);
+
+        final String sql = createJpqlStreamSelect(streamId);
+        final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        setJpqlParameters(query, streamId);
+        final List<JpaStream> streams = query.getResultList();
+        if (streams.size() == 0) {
+            throw new StreamNotFoundException(streamId);
+        }
+        final JpaStream stream = streams.get(0);
+        if (stream.getState() == StreamState.SOFT_DELETED) {
+            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
+            // streams
+            throw new StreamNotFoundException(streamId);
+        }
+        return stream;
+
+    }
+
+    /**
      * Sets parameters in a query.
      * 
      * @param query
      *            Query to set parameters for.
      * @param streamId
      *            Unique stream identifier that has the parameter values.
-     * @param additionalParams
-     *            Parameters to add in addition to the ones from the stream identifier.
      */
-    protected final void setParameters(final Query query, final StreamId streamId,
-            final KeyValue... additionalParams) {
+    protected final void setJpqlParameters(final Query query, final StreamId streamId) {
         final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
         if (params.size() == 0) {
             params.add(new KeyValue("streamName", streamId.getName()));
-        }
-        if (additionalParams != null) {
-            for (final KeyValue kv : additionalParams) {
-                params.add(kv);
-            }
         }
         for (int i = 0; i < params.size(); i++) {
             final KeyValue param = params.get(i);
@@ -381,7 +435,24 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
     }
 
     /**
-     * Creates a JPQL select using the parameters from the stream identifier and optional other arguments.
+     * Sets parameters in a query.
+     * 
+     * @param query
+     *            Query to set parameters for.
+     * @param streamId
+     *            Unique stream identifier that has the parameter values.
+     * @param additionalConditions
+     *            Parameters to add in addition to the ones from the stream identifier.
+     */
+    private final void setNativeSqlParameters(final Query query, final List<NativeSqlCondition> conditions) {
+        for (final NativeSqlCondition condition : conditions) {
+            query.setParameter(condition.getColumn(), condition.getValue());
+        }
+    }
+
+    /**
+     * Creates a native SQL select using the parameters from the stream identifier and optional other
+     * arguments.
      * 
      * @param streamId
      *            Unique stream identifier that has the parameter values.
@@ -390,35 +461,48 @@ public abstract class AbstractJpaEventStore implements ReadableEventStoreSync {
      * 
      * @return JPQL for selecting the events.
      */
-    protected final String createEventSelect(final StreamId streamId, final KeyValue... additionalParams) {
-        final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
-        if (params.size() == 0) {
-            params.add(new KeyValue("streamName", streamEntityName(streamId)));
-        }
-        if (additionalParams != null) {
-            for (final KeyValue kv : additionalParams) {
-                params.add(kv);
-            }
-        }
-        final StringBuilder sb = new StringBuilder("SELECT ev.* FROM events ev, " + nativeEventsTableName(streamId)
-                + " s WHERE ev.id=s.events_id");
-        for (int i = 0; i < params.size(); i++) {
-            final KeyValue param = params.get(i);
+    private final String createNativeSqlEventSelect(final StreamId streamId,
+            final List<NativeSqlCondition> conditions) {
+
+        final StringBuilder sb = new StringBuilder("SELECT " + JPA_EVENT_PREFIX + ".* FROM "
+                + JpaEvent.TABLE_NAME + " " + JPA_EVENT_PREFIX + ", " + nativeEventsTableName(streamId) + " "
+                + JPA_STREAM_EVENT_PREFIX + " WHERE " + JPA_EVENT_PREFIX + "." + JpaEvent.COLUMN_ID + "="
+                + JPA_STREAM_EVENT_PREFIX + "." + JpaStreamEvent.COLUMN_EVENTS_ID);
+        for (final NativeSqlCondition condition : conditions) {
             sb.append(" AND ");
-            sb.append("s." + camelCaseToUnderscore(param.getKey()) + "=:" + param.getKey());
+            sb.append(condition.asWhereConditionWithParam());
         }
         return sb.toString();
     }
 
     private String createOrderBy(final StreamId streamId, final boolean asc) {
         final StringBuilder sb = new StringBuilder(" ORDER BY ");
-        sb.append("ev.id");
+        sb.append(JPA_STREAM_EVENT_PREFIX + "." + JpaStreamEvent.COLUMN_EVENT_NUMBER);
         if (asc) {
             sb.append(" ASC");
         } else {
             sb.append(" DESC");
         }
         return sb.toString();
+    }
+
+    private List<NativeSqlCondition> createNativeSqlConditions(final StreamId streamId,
+            final NativeSqlCondition... additionalConditions) {
+        final List<NativeSqlCondition> conditions;
+        if (additionalConditions == null) {
+            conditions = new ArrayList<>();
+        } else {
+            conditions = new ArrayList<>(Arrays.asList(additionalConditions));
+        }
+        if (streamId.getParameters().size() == 0) {
+            conditions.add(new NativeSqlCondition(JPA_STREAM_EVENT_PREFIX, NoParamsEvent.COLUMN_STREAM_NAME,
+                    "=", streamId.getName()));
+        } else {
+            for (final KeyValue kv : streamId.getParameters()) {
+                conditions.add(new NativeSqlCondition(camel2Underscore(kv.getKey()), "=", kv.getValue()));
+            }
+        }
+        return conditions;
     }
 
     private List<CommonEvent> asCommonEvents(final List<JpaEvent> eventEntries) {

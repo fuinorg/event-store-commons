@@ -67,12 +67,12 @@ final class JpaUtils {
         }
         // Default ID
         if (streamId.isProjection()) {
-            return camelCaseToUnderscore(streamId.getName());
+            return camel2Underscore(streamId.getName());
         }
         if (streamId.getParameters().size() == 0) {
             return NoParamsEvent.NO_PARAMS_EVENTS_TABLE;
         }
-        return camelCaseToUnderscore(streamId.getName()) + "_events";
+        return camel2Underscore(streamId.getName()) + "_events";
     }
     
     /**
@@ -82,7 +82,7 @@ final class JpaUtils {
      * 
      * @return Camel case replaced with underscores.
      */
-    public static String camelCaseToUnderscore(@Nullable final String name) {
+    public static String camel2Underscore(@Nullable final String name) {
         if (name == null) {
             return null;
         }

@@ -29,9 +29,16 @@ import org.fuin.objects4j.common.Contract;
 @MappedSuperclass
 public abstract class JpaStreamEvent {
 
+    /** SQL EVENT ID column name. */
+    public static final String COLUMN_EVENTS_ID = "events_id";
+    
+    /** Column event number - Defined in sub classes as part of the composite identifier. */
+    public static final String COLUMN_EVENT_NUMBER = "event_number";
+    
+    
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "EVENTS_ID", nullable = false, updatable = false)
+    @JoinColumn(name = COLUMN_EVENTS_ID, nullable = false, updatable = false)
     private JpaEvent event;
 
     /**
