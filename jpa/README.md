@@ -24,6 +24,9 @@ For streams that require discriminator columns you have to create two entity cla
 Custom naming of tables and entities
 ------------------------------------
 You can use [JpaStreamId](src/main/java/org/fuin/esc/jpa/JpaStreamId.java) to define the names of your stream entities and classes.
+There are two predfined classes [SimpleJpaStreamId](src/main/java/org/fuin/esc/jpa/SimpleJpaStreamId.java) and
+[ProjectionJpaStreamId](src/main/java/org/fuin/esc/jpa/ProjectionJpaStreamId.java) that already implement this interface.
+
 
 Default naming conventions
 --------------------------
