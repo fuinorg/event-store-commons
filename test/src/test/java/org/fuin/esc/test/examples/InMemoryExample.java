@@ -26,7 +26,7 @@ import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.mem.InMemoryEventStoreSync;
+import org.fuin.esc.mem.InMemoryEventStore;
 
 /**
  * In memory example.
@@ -48,7 +48,7 @@ public final class InMemoryExample {
 
         // Create an event store instance and open it
         // The in-memory implementation requires no special setup except thread pool for subscriptions
-        EventStoreSync eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
+        EventStoreSync eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
         eventStore.open();
         try {
 

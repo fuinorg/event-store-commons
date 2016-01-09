@@ -46,7 +46,7 @@ import org.fuin.objects4j.common.Contract;
 /**
  * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
  */
-public final class InMemoryEventStoreSync implements EventStoreSync, SubscribableEventStoreSync {
+public final class InMemoryEventStore implements EventStoreSync, SubscribableEventStoreSync {
 
     private Executor executor;
 
@@ -62,7 +62,7 @@ public final class InMemoryEventStoreSync implements EventStoreSync, Subscribabl
      * @param executor
      *            Executor used to create the necessary threads for event notifications.
      */
-    public InMemoryEventStoreSync(@NotNull final Executor executor) {
+    public InMemoryEventStore(@NotNull final Executor executor) {
         super();
         Contract.requireArgNotNull("executor", executor);
 

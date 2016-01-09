@@ -36,16 +36,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link InMemoryEventStoreSync} class.
+ * Tests the {@link InMemoryEventStore} class.
  */
 // CHECKSTYLE:OFF Test
-public class InMemoryEventStoreSyncTest {
+public class InMemoryEventStoreTest {
 
-    private InMemoryEventStoreSync testee;
+    private InMemoryEventStore testee;
 
     @Before
     public void setup() {
-        testee = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
+        testee = new InMemoryEventStore(Executors.newCachedThreadPool());
         testee.open();
     }
 

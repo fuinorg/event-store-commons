@@ -39,7 +39,7 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
-import org.fuin.esc.mem.InMemoryEventStoreSync;
+import org.fuin.esc.mem.InMemoryEventStore;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
@@ -76,7 +76,7 @@ public class TestFeatures {
         // Use the property to select the correct implementation:
         final String type = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
         if (type.equals("mem")) {
-            eventStore = new InMemoryEventStoreSync(Executors.newCachedThreadPool());
+            eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
         } else if (type.equals("eshttp") || type.equals("jpa")) {
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
