@@ -37,7 +37,7 @@ import org.fuin.esc.api.EventStoreSync;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStoreSync;
+import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStoreSync;
 import org.fuin.esc.spi.JsonDeSerializer;
@@ -89,7 +89,7 @@ public class TestFeatures {
             if (type.equals("eshttp")) {
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
-                eventStore = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.XML, registry,
+                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry,
                         registry);
             } else {
                 setupDb();

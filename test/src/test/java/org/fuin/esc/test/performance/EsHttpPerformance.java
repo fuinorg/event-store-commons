@@ -37,7 +37,7 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStoreSync;
+import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
@@ -75,7 +75,7 @@ public final class EsHttpPerformance {
         registry.add(serDataType, "application/json", jsonDeSer);
         registry.add(serMetaType, "application/json", jsonDeSer);
 
-        final EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.JSON,
+        final EventStoreSync eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.JSON,
                 registry, registry);
         eventStore.open();
         try {

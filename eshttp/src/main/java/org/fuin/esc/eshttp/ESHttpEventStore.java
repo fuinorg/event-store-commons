@@ -67,9 +67,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation that connects to the http://www.geteventstore.com via HTTP API.
  */
-public final class ESHttpEventStoreSync implements EventStoreSync {
+public final class ESHttpEventStore implements EventStoreSync {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ESHttpEventStoreSync.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ESHttpEventStore.class);
 
     private final ThreadFactory threadFactory;
 
@@ -97,7 +97,7 @@ public final class ESHttpEventStoreSync implements EventStoreSync {
      * @param desRegistry
      *            Registry used to locate deserializers.
      */
-    public ESHttpEventStoreSync(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
+    public ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
             @NotNull final ESEnvelopeType envelopeType, @NotNull final SerializerRegistry serRegistry,
             @NotNull final DeserializerRegistry desRegistry) {
         super();

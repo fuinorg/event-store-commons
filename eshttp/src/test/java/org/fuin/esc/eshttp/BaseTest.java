@@ -38,7 +38,7 @@ public class BaseTest {
                     // Just copied code, not worth to test
                     return false;
                 }
-                if (clasz == ESHttpEventStoreSync.class) {
+                if (clasz == ESHttpEventStore.class) {
                     // Integration Test
                     return false;
                 }

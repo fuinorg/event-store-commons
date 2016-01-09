@@ -29,7 +29,7 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStoreSync;
+import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
@@ -69,7 +69,7 @@ public final class EsHttpMixedExample {
         registry.add(serMetaType, "application/xml", xmlDeSer);
 
         // Create an event store instance and open it
-        EventStoreSync eventStore = new ESHttpEventStoreSync(threadFactory, url, 
+        EventStoreSync eventStore = new ESHttpEventStore(threadFactory, url, 
                 ESEnvelopeType.JSON, // This format will be used to communicate with the event store
                 registry, // Registry used to find a serializer
                 registry // Registry used to find a de-serializer

@@ -39,12 +39,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests the {@link ESHttpEventStoreSync} class.
+ * Tests the {@link ESHttpEventStore} class.
  */
 // CHECKSTYLE:OFF Test
-public class ESHttpEventStoreSyncIT {
+public class ESHttpEventStoreIT {
 
-    private ESHttpEventStoreSync testee;
+    private ESHttpEventStore testee;
 
     @Before
     public void setup() throws MalformedURLException {
@@ -56,7 +56,7 @@ public class ESHttpEventStoreSyncIT {
         registry.add(new SerializedDataType(MyEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
         registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
 
-        testee = new ESHttpEventStoreSync(threadFactory, url, ESEnvelopeType.XML, registry, registry);
+        testee = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
         testee.open();
     }
 
