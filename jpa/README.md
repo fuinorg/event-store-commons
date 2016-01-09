@@ -28,9 +28,7 @@ You can use [JpaStreamId](src/main/java/org/fuin/esc/jpa/JpaStreamId.java) to de
 Default naming conventions
 --------------------------
 If you don't define an explicit stream name using a [JpaStreamId](src/main/java/org/fuin/esc/jpa/JpaStreamId.java),
-a strict default naming convention applies as described below.
- 
-**You have to name your tables and identifiers exactly as described below otherwise it will not work**.
+a strict default naming convention applies. **You have to name your tables and identifiers exactly as described below otherwise it will not work**.
 
 ####StreamId
 Use a camel case stream identifier name that ends *not* on 'Stream', 'Streams', 'Event' or 'Events'.
