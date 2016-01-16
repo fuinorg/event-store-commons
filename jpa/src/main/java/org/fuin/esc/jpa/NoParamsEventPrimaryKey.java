@@ -27,7 +27,7 @@ import org.fuin.objects4j.common.NeverNull;
 /**
  * Identifies a stream event based on a stream name and an event number.
  */
-public class NoParamsEventPrimaryKey implements Serializable {
+public final class NoParamsEventPrimaryKey implements Serializable {
 
     private static final long serialVersionUID = 1000L;
 
