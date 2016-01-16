@@ -30,6 +30,7 @@ import org.fuin.objects4j.common.Contract;
  */
 @Table(name = "NO_PARAMS_STREAMS")
 @Entity
+@SuppressWarnings("checkstyle:designforextension")
 public class NoParamsStream extends JpaStream {
 
     @Id
@@ -57,13 +58,12 @@ public class NoParamsStream extends JpaStream {
     }
 
     @Override
-    public final JpaStreamEvent createEvent(final StreamId streamId, final JpaEvent eventEntry) {
-        incVersion();
-        return new NoParamsEvent(streamId, getVersion(), eventEntry);
+    public JpaStreamEvent createEvent(final StreamId streamId, final JpaEvent eventEntry) {
+        return new NoParamsEvent(streamId, incVersion(), eventEntry);
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return streamName;
     }
 

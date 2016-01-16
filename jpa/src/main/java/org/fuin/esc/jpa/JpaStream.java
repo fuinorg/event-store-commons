@@ -27,6 +27,7 @@ import org.fuin.esc.api.StreamState;
  * Base class for all concrete streams.
  */
 @MappedSuperclass
+@SuppressWarnings("checkstyle:designforextension")
 public abstract class JpaStream {
 
     @Column(name = "STATE", nullable = false)
@@ -40,7 +41,7 @@ public abstract class JpaStream {
      * 
      * @return State.
      */
-    public final StreamState getState() {
+    public StreamState getState() {
         return StreamState.fromDbValue(state);
     }
 
@@ -49,7 +50,7 @@ public abstract class JpaStream {
      * 
      * @return TRUE if soft or hard deleted.
      */
-    public final boolean isDeleted() {
+    public boolean isDeleted() {
         return (state == StreamState.SOFT_DELETED.dbValue() || state == StreamState.HARD_DELETED.dbValue());
     }
 
@@ -59,7 +60,7 @@ public abstract class JpaStream {
      * @param hardDelete
      *            Hard or soft deletion.
      */
-    public final void delete(final boolean hardDelete) {
+    public void delete(final boolean hardDelete) {
         if (hardDelete) {
             this.state = StreamState.HARD_DELETED.dbValue();
         } else {
@@ -72,7 +73,7 @@ public abstract class JpaStream {
      * 
      * @return Version.
      */
-    public final int getVersion() {
+    public int getVersion() {
         return version;
     }
 
@@ -81,8 +82,8 @@ public abstract class JpaStream {
      * 
      * @return New version.
      */
-    public final int incVersion() {
-        return this.version++;
+    public int incVersion() {
+        return ++version;
     }
 
     /**

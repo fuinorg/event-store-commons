@@ -17,15 +17,8 @@
 package org.fuin.esc.jpa;
 
 import static org.fest.assertions.Assertions.assertThat;
-
-import java.util.UUID;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import org.fuin.esc.api.ProjectionStreamId;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.jpa.examples.AggregateStreamId;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF

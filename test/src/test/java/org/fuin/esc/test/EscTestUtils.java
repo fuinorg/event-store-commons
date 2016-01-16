@@ -214,6 +214,7 @@ final class EscTestUtils {
      * 
      * @return TRUE id the events have the same content.
      */
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public static boolean sameContent(@Nullable final CommonEvent eventA, 
             @Nullable final CommonEvent eventB) {
         if (eventA == null) {
@@ -270,6 +271,7 @@ final class EscTestUtils {
      * 
      * @return Exception message.
      */
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     public static String createExceptionFailureMessage(final StreamId streamId,
             final CommonEvent expectedEvent, final CommonEvent actualEvent) {
         if (expectedEvent == null) {

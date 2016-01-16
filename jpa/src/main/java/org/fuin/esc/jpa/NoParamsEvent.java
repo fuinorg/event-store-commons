@@ -32,6 +32,7 @@ import org.fuin.objects4j.common.Contract;
 @Table(name = NoParamsEvent.NO_PARAMS_EVENTS_TABLE)
 @Entity
 @IdClass(NoParamsEventPrimaryKey.class)
+@SuppressWarnings("checkstyle:designforextension")
 public class NoParamsEvent extends JpaStreamEvent {
 
     /** Name of the table. */
@@ -81,14 +82,14 @@ public class NoParamsEvent extends JpaStreamEvent {
      * 
      * @return Number that is unique in combination with the name.
      */
-    public final Integer getEventNumber() {
+    public Integer getEventNumber() {
         return eventNumber;
     }
 
     // CHECKSTYLE:OFF Generated code
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((streamName == null) ? 0 : streamName.hashCode());
@@ -97,7 +98,7 @@ public class NoParamsEvent extends JpaStreamEvent {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -128,7 +129,7 @@ public class NoParamsEvent extends JpaStreamEvent {
     // CHECKSTYLE:ON
 
     @Override
-    public final String toString() {
+    public String toString() {
         return streamName + " " + eventNumber;
     }
 

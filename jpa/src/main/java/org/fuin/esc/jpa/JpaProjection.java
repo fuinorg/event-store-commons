@@ -29,6 +29,7 @@ import org.fuin.objects4j.common.Contract;
  */
 @Table(name = "PROJECTIONS")
 @Entity
+@SuppressWarnings("checkstyle:designforextension")
 public class JpaProjection {
 
     @Id
@@ -78,13 +79,13 @@ public class JpaProjection {
      * 
      * @return FALSE if the query is being created, else TRUE.
      */
-    public final boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
     // CHECKSTYLE:OFF Generated code
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -92,12 +93,12 @@ public class JpaProjection {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof JpaProjection))
             return false;
         JpaProjection other = (JpaProjection) obj;
         if (name == null) {
@@ -111,7 +112,7 @@ public class JpaProjection {
     // CHECKSTYLE:ON
 
     @Override
-    public final String toString() {
+    public String toString() {
         return name;
     }
 

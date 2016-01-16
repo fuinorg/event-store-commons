@@ -41,6 +41,7 @@ import org.joda.time.DateTime;
 @Table(name = JpaEvent.TABLE_NAME)
 @Entity
 @SequenceGenerator(name = "EventEntrySequenceGenerator", sequenceName = "EVENTS_SEQ", allocationSize = 1000)
+@SuppressWarnings("checkstyle:designforextension")
 public class JpaEvent {
 
     /** SQL table name. */
@@ -119,7 +120,7 @@ public class JpaEvent {
      * 
      * @return Unique entry ID.
      */
-    public final Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -130,7 +131,7 @@ public class JpaEvent {
      * @return Unique event ID.
      */
     @NotNull
-    public final EventId getEventId() {
+    public EventId getEventId() {
         return new EventId(eventId);
     }
 
@@ -140,7 +141,7 @@ public class JpaEvent {
      * @return Date, time and zone of event's creation.
      */
     @NotNull
-    public final DateTime getCreated() {
+    public DateTime getCreated() {
         return created;
     }
 
@@ -150,7 +151,7 @@ public class JpaEvent {
      * @return The event.
      */
     @NotNull
-    public final JpaData getData() {
+    public JpaData getData() {
         return data;
     }
 
@@ -159,7 +160,7 @@ public class JpaEvent {
      * 
      * @return The event's meta data or NULL.
      */
-    public final JpaData getMeta() {
+    public JpaData getMeta() {
         return meta;
     }
 
@@ -167,7 +168,7 @@ public class JpaEvent {
      * Initializes object values before it's created in the database.
      */
     @PrePersist
-    final void onPrePersist() {
+    void onPrePersist() {
         created = new DateTime();
     }
 
