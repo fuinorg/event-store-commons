@@ -56,6 +56,8 @@ public final class EsHttpPerformance {
      * 
      * @param args
      *            Not used.
+     *            
+     * @throws IOException Error reading console input.
      */
     public static void main(final String[] args) throws IOException {
 

@@ -16,6 +16,8 @@
  */
 package org.fuin.esc.test;
 
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -48,7 +50,6 @@ import org.fuin.esc.spi.XmlDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.esc.test.examples.MyMeta;
 import org.fuin.esc.test.jpa.TestIdStreamFactory;
-import org.fuin.units4j.Units4JUtils;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -236,7 +237,7 @@ public class TestFeatures {
     }
 
     private void appendXmlEvents(final String streamName, final int version, final String eventsXml) {
-        final Events events = Units4JUtils.unmarshal(eventsXml, Events.class);
+        final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
         final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null,

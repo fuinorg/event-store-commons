@@ -17,9 +17,9 @@
 package org.fuin.esc.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.units4j.Units4JUtils.deserialize;
-import static org.fuin.units4j.Units4JUtils.serialize;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

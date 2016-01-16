@@ -17,8 +17,8 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.units4j.Units4JUtils.deserialize;
-import static org.fuin.units4j.Units4JUtils.serialize;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
 
 import org.fuin.objects4j.common.ContractViolationException;
 import org.junit.Test;

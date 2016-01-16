@@ -16,6 +16,8 @@
  */
 package org.fuin.esc.test;
 
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
+
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -23,7 +25,6 @@ import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import org.fuin.units4j.Units4JUtils;
 
 /**
  * Reads a single event from a stream.
@@ -105,7 +106,7 @@ public final class ReadEventCommand implements TestCommand {
             event = null;
             expectedEvent = null;
         } else {
-            event = Units4JUtils.unmarshal(expectedEventXml, Event.class);
+            event = unmarshal(expectedEventXml, Event.class);
             expectedEvent = event.asCommonEvent(BookAddedEvent.class);
         }
 

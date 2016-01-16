@@ -16,8 +16,8 @@
  */
 package org.fuin.esc.test;
 
-import static org.fuin.units4j.Units4JUtils.marshal;
-import static org.fuin.units4j.Units4JUtils.unmarshal;
+import static org.fuin.utils4j.JaxbUtils.marshal;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.io.Serializable;
 import java.io.StringReader;
