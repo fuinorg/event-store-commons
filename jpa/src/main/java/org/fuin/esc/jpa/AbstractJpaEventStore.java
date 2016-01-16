@@ -520,17 +520,17 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
         if (meta == null) {
-            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data);
+            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data);
         }
-        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getType(), data, jpaEvent
-                .getMeta().getType(), meta);
+        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, jpaEvent
+                .getMeta().getTypeName(), meta);
     }
 
     private Object deserialize(final JpaData data) {
         if (data == null) {
             return null;
         }
-        final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getType()
+        final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getTypeName()
                 .asBaseType()), data.getMimeType(), data.getRaw());
         return EscSpiUtils.deserialize(desRegistry, serializedData);
     }

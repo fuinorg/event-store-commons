@@ -61,7 +61,7 @@ public final class JpaEventTest extends AbstractPersistenceTest {
         assertThat(found.getEventId()).isEqualTo(eventId);
         assertThat(found.getCreated()).isNotNull();
         assertThat(found.getData()).isNotNull();
-        assertThat(found.getData().getType()).isEqualTo(type);
+        assertThat(found.getData().getTypeName()).isEqualTo(type);
         assertThat(found.getData().getRaw()).isNotNull();
         assertThat(found.getMeta()).isNull();
         final String data = new String(found.getData().getRaw(), found.getData().getMimeType().getEncoding());

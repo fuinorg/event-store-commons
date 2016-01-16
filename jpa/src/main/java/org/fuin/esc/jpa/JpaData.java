@@ -68,22 +68,22 @@ public class JpaData implements ValueObject, Serializable {
     /**
      * Creates a data object.
      * 
-     * @param type
+     * @param typeName
      *            Unique identifier for the type of data.
      * @param mimeType
      *            Internet Media Type that classifies the data.
      * @param raw
      *            Raw data block.
      */
-    public JpaData(@NotNull final TypeName type,
+    public JpaData(@NotNull final TypeName typeName,
             @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
-        Contract.requireArgNotNull("type", type);
+        Contract.requireArgNotNull("type", typeName);
         Contract.requireArgNotNull("mimeType", mimeType);
         Contract.requireArgNotNull("raw", raw);
 
-        this.type = type.asBaseType();
+        this.type = typeName.asBaseType();
         this.mimeType = mimeType.toString();
         this.raw = raw;
     }
@@ -110,7 +110,7 @@ public class JpaData implements ValueObject, Serializable {
      * @return Unique and never changing type name.
      */
     @NeverNull
-    public final TypeName getType() {
+    public final TypeName getTypeName() {
         return new TypeName(type);
     }
 

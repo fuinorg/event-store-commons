@@ -65,16 +65,25 @@ public class NoParamsEvent extends JpaStreamEvent {
      *            Unique identifier of the stream.
      * @param version
      *            Version.
-     * @param eventEntry
-     *            Event entry to connect.
+     * @param jpaEvent
+     *            Event to store.
      */
     public NoParamsEvent(@NotNull final StreamId streamId, @NotNull final Integer version,
-            @NotNull final JpaEvent eventEntry) {
-        super(eventEntry);
+            @NotNull final JpaEvent jpaEvent) {
+        super(jpaEvent);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("version", version);
         this.streamName = streamId.getName();
         this.eventNumber = version;
+    }
+
+    /**
+     * Returns the name of the stream.
+     * 
+     * @return Unique identifier name of the stream.
+     */
+    public String getStreamName() {
+        return streamName;
     }
 
     /**
@@ -98,14 +107,14 @@ public class NoParamsEvent extends JpaStreamEvent {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof NoParamsEvent)) {
             return false;
         }
         NoParamsEvent other = (NoParamsEvent) obj;
