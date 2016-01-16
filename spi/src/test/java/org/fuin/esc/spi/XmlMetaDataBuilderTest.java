@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.spi;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;

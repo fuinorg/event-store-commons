@@ -16,7 +16,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
