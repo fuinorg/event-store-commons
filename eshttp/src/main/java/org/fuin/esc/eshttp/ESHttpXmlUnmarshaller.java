@@ -30,8 +30,8 @@ import org.w3c.dom.Node;
 public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
 
     @Override
-    public final Object unmarshal(DeserializerRegistry registry, SerializedDataType dataType,
-            EnhancedMimeType mimeType, Object data) {
+    public final Object unmarshal(final DeserializerRegistry registry, final SerializedDataType dataType,
+            final EnhancedMimeType mimeType, final Object data) {
 
         if (data == null) {
             return null;
@@ -52,8 +52,8 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
 
     }
 
-    private Deserializer getDeserializer(DeserializerRegistry registry, SerializedDataType dataType,
-            EnhancedMimeType mimeType) {
+    private Deserializer getDeserializer(final DeserializerRegistry registry,
+            final SerializedDataType dataType, final EnhancedMimeType mimeType) {
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         if (deSer == null) {
             throw new IllegalStateException("Couldn't find a deserializer for: " + dataType + " + "

@@ -111,6 +111,8 @@ public final class ESHttpXmlMarshaller implements ESHttpMarshaller {
      *            Unique event type.
      * @param serData
      *            Serialized event data.
+     * @param metaType
+     *            Unique meta data type.
      * @param serMeta
      *            Serialized meta data.
      * 

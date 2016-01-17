@@ -186,8 +186,8 @@ public final class ESHttpEventStore implements EventStore {
     }
 
     private void appendToStream(final StreamId streamId, final int expectedVersion,
-            final EnhancedMimeType mimeType, String content, int count) throws StreamDeletedException,
-            WrongExpectedVersionException {
+            final EnhancedMimeType mimeType, final String content, final int count)
+            throws StreamDeletedException, WrongExpectedVersionException {
 
         final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", "
                 + count + ")";
@@ -546,14 +546,14 @@ public final class ESHttpEventStore implements EventStore {
         return Integer.valueOf(str);
     }
 
-    private String streamName(StreamId streamId) {
+    private String streamName(final StreamId streamId) {
         if (streamId.equals(StreamId.ALL)) {
             return "$all";
         }
         return streamId.getName();
     }
 
-    private HttpGet createHttpGet(URI uri) {
+    private HttpGet createHttpGet(final URI uri) {
         final HttpGet request = new HttpGet(uri);
         request.setHeader("Accept", envelopeType.getReadContentType());
         return request;

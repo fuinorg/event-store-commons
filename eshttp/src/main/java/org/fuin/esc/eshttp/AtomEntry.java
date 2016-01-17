@@ -25,7 +25,7 @@ import org.fuin.esc.spi.EnhancedMimeType;
  * @param <TYPE>
  *            Type of data and meta data.
  */
-public class AtomEntry<TYPE> {
+public final class AtomEntry<TYPE> {
 
     private final String eventStreamId;
     private final int eventNumber;
@@ -41,17 +41,27 @@ public class AtomEntry<TYPE> {
      * Constructor with all data.
      * 
      * @param eventStreamId
+     *            Unique stream identifier.
      * @param eventNumber
+     *            Number of the event.
      * @param eventType
+     *            Type of event.
      * @param eventId
+     *            Unique event identifier.
      * @param dataContentType
+     *            Data content type,
      * @param metaContentType
+     *            Meta content type.
      * @param metaType
+     *            Type of meta data.
      * @param data
+     *            Event data.
      * @param meta
+     *            Meta data.
      */
-    public AtomEntry(String eventStreamId, int eventNumber, String eventType, String eventId,
-            EnhancedMimeType dataContentType, EnhancedMimeType metaContentType, String metaType, TYPE data, TYPE meta) {
+    public AtomEntry(final String eventStreamId, final int eventNumber, final String eventType,
+            final String eventId, final EnhancedMimeType dataContentType,
+            final EnhancedMimeType metaContentType, final String metaType, final TYPE data, final TYPE meta) {
         super();
         this.eventStreamId = eventStreamId;
         this.eventNumber = eventNumber;
@@ -64,44 +74,89 @@ public class AtomEntry<TYPE> {
         this.meta = meta;
     }
 
-    public String getEventStreamId() {
+    /**
+     * Returns the stream ID.
+     * 
+     * @return Unique stream identifier.
+     */
+    public final String getEventStreamId() {
         return eventStreamId;
     }
 
-    public int getEventNumber() {
+    /**
+     * Returns the event number.
+     * 
+     * @return Number of the event.
+     */
+    public final int getEventNumber() {
         return eventNumber;
     }
 
-    public String getEventType() {
+    /**
+     * Returns the type of event.
+     * 
+     * @return Type of event.
+     */
+    public final String getEventType() {
         return eventType;
     }
 
-    public String getEventId() {
+    /**
+     * Returns the unique event identifier.
+     * 
+     * @return Unique event identifier.
+     */
+    public final String getEventId() {
         return eventId;
     }
 
-    public EnhancedMimeType getDataContentType() {
+    /**
+     * Returns the Data content type.
+     * 
+     * @return Data content type.
+     */
+    public final EnhancedMimeType getDataContentType() {
         return dataContentType;
     }
 
-    public EnhancedMimeType getMetaContentType() {
+    /**
+     * Returns the meta content type.
+     * 
+     * @return Meta content type.
+     */
+    public final EnhancedMimeType getMetaContentType() {
         return metaContentType;
     }
 
-    public String getMetaType() {
+    /**
+     * Returns the type of meta data.
+     * 
+     * @return Type of meta data.
+     */
+    public final String getMetaType() {
         return metaType;
     }
 
-    public TYPE getData() {
+    /**
+     * Returns the event data.
+     * 
+     * @return Event data.
+     */
+    public final TYPE getData() {
         return data;
     }
 
-    public TYPE getMeta() {
+    /**
+     * Returns the meta data.
+     * 
+     * @return Meta data.
+     */
+    public final TYPE getMeta() {
         return meta;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "AtomEntry [eventStreamId=" + eventStreamId + ", eventNumber=" + eventNumber + ", eventType="
                 + eventType + ", eventId=" + eventId + ", dataContentType=" + dataContentType
                 + ", metaContentType=" + metaContentType + "]";
