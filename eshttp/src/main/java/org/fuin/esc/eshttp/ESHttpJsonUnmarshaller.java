@@ -1,5 +1,6 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. <http://www.fuin.org/>
+ * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * http://www.fuin.org/
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -12,7 +13,7 @@
  * details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library. If not, see <http://www.gnu.org/licenses/>.
+ * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.eshttp;
 
@@ -32,8 +33,8 @@ import org.fuin.esc.spi.SerializedDataType;
 public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
 
     @Override
-    public final Object unmarshal(DeserializerRegistry registry, SerializedDataType dataType,
-            EnhancedMimeType mimeType, Object data) {
+    public final Object unmarshal(final DeserializerRegistry registry, final SerializedDataType dataType,
+            final EnhancedMimeType mimeType, final Object data) {
 
         if (data == null) {
             return null;
@@ -61,8 +62,8 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
 
     }
 
-    private Deserializer getDeserializer(DeserializerRegistry registry, SerializedDataType dataType,
-            EnhancedMimeType mimeType) {
+    private Deserializer getDeserializer(final DeserializerRegistry registry,
+            final SerializedDataType dataType, final EnhancedMimeType mimeType) {
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         if (deSer == null) {
             throw new IllegalStateException("Couldn't find a deserializer for: " + dataType + " + "
