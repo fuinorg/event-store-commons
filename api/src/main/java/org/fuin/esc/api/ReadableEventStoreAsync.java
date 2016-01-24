@@ -119,6 +119,7 @@ public interface ReadableEventStoreAsync {
      * 
      * @return TRUE if the stream exists, else FALSE.
      */
+    @NotNull
     public CompletableFuture<Boolean> streamExists(@NotNull StreamId streamId);
     
     /**
@@ -131,6 +132,7 @@ public interface ReadableEventStoreAsync {
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the repository.
      */
+    @NotNull
     public CompletableFuture<StreamState> streamState(@NotNull StreamId streamId);
     
 }
