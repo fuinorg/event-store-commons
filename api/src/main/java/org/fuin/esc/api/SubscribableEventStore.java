@@ -19,6 +19,8 @@ package org.fuin.esc.api;
 
 import java.util.function.BiConsumer;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * An event store that is capable of handling volatile subscriptions.
  */
@@ -30,35 +32,31 @@ public interface SubscribableEventStore {
      * @param streamId
      *            Unique stream identifier.
      * @param eventNumber
-     *            Number of the event to start (
-     *            {@link EscApiUtils#SUBSCRIBE_TO_NEW_EVENTS} = New events, 0 =
+     *            Number of the event to start ( {@link EscApiUtils#SUBSCRIBE_TO_NEW_EVENTS} = New events, 0 =
      *            First event, 1..N).
      * @param onEvent
      *            Will be called for an event.
      * @param onDrop
-     *            Will be called when the subscription was exceptionally
-     *            dropped.
+     *            Will be called when the subscription was exceptionally dropped.
      * 
      * @return Subscription result.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the
-     *             repository.
+     *             A stream with the given name does not exist in the repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was
-     *             deleted.
+     *             A stream with the given name previously existed but was deleted.
      */
-    public Subscription subscribeToStream(StreamId streamId, int eventNumber,
-            BiConsumer<Subscription, CommonEvent> onEvent,
-            BiConsumer<Subscription, Exception> onDrop);
+    @NotNull
+    public Subscription subscribeToStream(@NotNull StreamId streamId, int eventNumber,
+            @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
+            @NotNull BiConsumer<Subscription, Exception> onDrop);
 
     /**
-     * Unsubscribe from a stream. If the given subscription does not exist,
-     * nothing happens.
+     * Unsubscribe from a stream. If the given subscription does not exist, nothing happens.
      * 
      * @param subscription
      *            to be terminated.
      */
-    public void unsubscribeFromStream(Subscription subscription);
+    public void unsubscribeFromStream(@NotNull Subscription subscription);
 
 }

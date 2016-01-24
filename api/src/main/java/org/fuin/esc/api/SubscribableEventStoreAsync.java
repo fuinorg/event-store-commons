@@ -20,6 +20,8 @@ package org.fuin.esc.api;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * An event store that is capable of handling volatile subscriptions.
  */
@@ -31,20 +33,18 @@ public interface SubscribableEventStoreAsync {
      * @param streamId
      *            Unique stream identifier.
      * @param eventNumber
-     *            Number of the event to start (
-     *            {@link EscApiUtils#SUBSCRIBE_TO_NEW_EVENTS} = New events, 0 =
+     *            Number of the event to start ( {@link EscApiUtils#SUBSCRIBE_TO_NEW_EVENTS} = New events, 0 =
      *            First event, 1..N).
      * @param onEvent
      *            Will be called for an event.
      * @param onDrop
-     *            Will be called when the subscription was exceptionally
-     *            dropped.
+     *            Will be called when the subscription was exceptionally dropped.
      * 
      * @return Future with subscription result.
      */
-    public CompletableFuture<Subscription> subscribeToStream(StreamId streamId,
-            int eventNumber, BiConsumer<Subscription, CommonEvent> onEvent,
-            BiConsumer<Subscription, Exception> onDrop);
+    public CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, int eventNumber,
+            @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
+            @NotNull BiConsumer<Subscription, Exception> onDrop);
 
     /**
      * Unsubscribe from a stream.
@@ -54,7 +54,6 @@ public interface SubscribableEventStoreAsync {
      * 
      * @return Future with no result.
      */
-    public CompletableFuture<Void> unsubscribeFromStream(
-            Subscription subscription);
+    public CompletableFuture<Void> unsubscribeFromStream(@NotNull Subscription subscription);
 
 }
