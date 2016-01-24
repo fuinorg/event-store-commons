@@ -75,7 +75,7 @@ public enum ExpectedVersion {
      * 
      * @return Value.
      */
-    public static int no(final String name) {
+    public static int no(@Nullable final String name) {
         if (name == null) {
             return ANY.no;
         }
