@@ -115,6 +115,7 @@ public interface ReadableEventStore extends AutoCloseable {
      * @throws StreamNotFoundException
      *             A stream with the given name does not exist in the repository.
      */
+    @NotNull
     public StreamState streamState(@NotNull StreamId streamId);
     
 }

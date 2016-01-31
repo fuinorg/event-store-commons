@@ -42,6 +42,7 @@ public interface SubscribableEventStoreAsync {
      * 
      * @return Future with subscription result.
      */
+    @NotNull
     public CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, int eventNumber,
             @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
             @NotNull BiConsumer<Subscription, Exception> onDrop);
@@ -54,6 +55,7 @@ public interface SubscribableEventStoreAsync {
      * 
      * @return Future with no result.
      */
+    @NotNull
     public CompletableFuture<Void> unsubscribeFromStream(@NotNull Subscription subscription);
 
 }

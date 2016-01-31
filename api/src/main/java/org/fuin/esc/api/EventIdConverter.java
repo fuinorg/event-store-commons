@@ -19,13 +19,16 @@ package org.fuin.esc.api;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import org.fuin.objects4j.common.Nullable;
+
 /**
  * XML Converter for event IDs.
  */
 public final class EventIdConverter extends XmlAdapter<String, EventId> {
 
     @Override
-    public final EventId unmarshal(final String value) throws Exception {
+    @Nullable
+    public final EventId unmarshal(@Nullable final String value) throws Exception {
         if (value == null) {
             return null;
         }
@@ -33,7 +36,8 @@ public final class EventIdConverter extends XmlAdapter<String, EventId> {
     }
 
     @Override
-    public final String marshal(final EventId value) throws Exception {
+    @Nullable
+    public final String marshal(@Nullable final EventId value) throws Exception {
         if (value == null) {
             return null;
         }

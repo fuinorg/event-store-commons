@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Immutable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  *
@@ -56,7 +57,7 @@ public final class StreamEventsSlice {
      *            Determines whether or not this is the end of the stream.
      */
     public StreamEventsSlice(final int fromEventNumber,
-            final List<CommonEvent> events, final int nextEventNumber,
+            @Nullable final List<CommonEvent> events, final int nextEventNumber,
             final boolean endOfStream) {
 
         this.fromEventNumber = fromEventNumber;
@@ -159,6 +160,7 @@ public final class StreamEventsSlice {
      * 
      * @return Includes list content.
      */
+    @NotNull
     public final String toDebugString() {
         return new ToStringBuilder(this)
                 .append("fromEventNumber", fromEventNumber)

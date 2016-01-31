@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.api;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * State of a stream.
  */
@@ -54,6 +56,7 @@ public enum StreamState {
      *  
      * @return Enum.
      */
+    @NotNull
     public static StreamState fromDbValue(final int db) {
         for (final StreamState state : values()) {
             if (state.dbValue() == db) {
