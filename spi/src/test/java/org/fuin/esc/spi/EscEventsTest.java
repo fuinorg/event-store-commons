@@ -51,7 +51,6 @@ public class EscEventsTest {
 
         // TEST
         final String xml = marshal(testee, EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class);
-        System.out.println(xml);
 
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
