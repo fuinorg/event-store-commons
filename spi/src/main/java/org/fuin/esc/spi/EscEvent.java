@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 
@@ -32,6 +33,12 @@ import org.fuin.objects4j.common.Nullable;
 @XmlRootElement(name = "Event")
 public final class EscEvent {
 
+    /** Unique name of the event. */
+    public static final TypeName TYPE = new TypeName("Event");
+
+    /** Unique name of the event. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());    
+    
     @XmlElement(name = "EventId")
     private String eventId;
 

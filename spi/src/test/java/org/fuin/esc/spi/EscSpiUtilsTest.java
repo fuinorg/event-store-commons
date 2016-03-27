@@ -19,15 +19,17 @@ package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.activation.MimeTypeParseException;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.TypeName;
 import org.junit.Test;
 
 /**
@@ -169,6 +171,164 @@ public class EscSpiUtilsTest {
 
         // VERIFY
         assertThat(mimeType).isNull();
+
+    }
+
+    @Test
+    public void testConvert2EscEventNull() {
+
+        // PREPARE
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+
+        // TEST
+        final EscEvent result = EscSpiUtils.convert2EscEvent(registry,
+                EnhancedMimeType.create("application/xml"), null);
+
+        // VERIFY
+        assertThat(result).isNull();
+
+    }
+
+    @Test
+    public void testConvert2EscEventTargetXmlDataXmlMetaNull() {
+
+        // PREPARE
+        final String description = "Whatever";
+        final UUID uuid = UUID.randomUUID();
+        final MyEvent myEvent = new MyEvent(uuid, description);
+        final EventId eventId = new EventId();
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
+
+        // TEST
+        final EscEvent result = EscSpiUtils.convert2EscEvent(registry,
+                EnhancedMimeType.create("application/xml"), commonEvent);
+
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getEventId()).isEqualTo(eventId.toString());
+        assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getData().getObj()).isInstanceOf(MyEvent.class);
+        assertThat(result.getMeta()).isNotNull();
+        assertThat(result.getMeta().getSysMeta()).isNotNull();
+        assertThat(result.getMeta().getUserMeta()).isNull();
+        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isNull();
+        assertThat(result.getMeta().getSysMeta().getMetaType()).isNull();
+
+    }
+
+    @Test
+    public void testConvert2EscEventTargetJsonDataXmlMetaNull() {
+
+        // PREPARE
+        final String description = "Whatever";
+        final UUID uuid = UUID.randomUUID();
+        final MyEvent myEvent = new MyEvent(uuid, description);
+        final EventId eventId = new EventId();
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
+
+        // TEST
+        final EscEvent result = EscSpiUtils.convert2EscEvent(registry,
+                EnhancedMimeType.create("application/json"), commonEvent);
+
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getEventId()).isEqualTo(eventId.toString());
+        assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getData().getObj()).isInstanceOf(Base64Data.class);
+        final Base64Data base64Data = (Base64Data) result.getData().getObj();
+        assertThat(new String(base64Data.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
+                "<my-event id=\"" + uuid + "\" description=\"Whatever\"/>");
+        assertThat(result.getMeta()).isNotNull();
+        assertThat(result.getMeta().getSysMeta()).isNotNull();
+        assertThat(result.getMeta().getUserMeta()).isNull();
+        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isNull();
+        assertThat(result.getMeta().getSysMeta().getMetaType()).isNull();
+
+    }
+
+    @Test
+    public void testConvert2EscEventTargetXmlDataXmlMetaXml() {
+
+        // PREPARE
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Whatever");
+        final EventId eventId = new EventId();
+        final MyMeta myMeta = new MyMeta("peter");
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
+                myMeta);
+
+        // TEST
+        final EscEvent result = EscSpiUtils.convert2EscEvent(registry,
+                EnhancedMimeType.create("application/xml"), commonEvent);
+
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getEventId()).isEqualTo(eventId.toString());
+        assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getData().getObj()).isInstanceOf(MyEvent.class);
+        assertThat(result.getMeta()).isNotNull();
+        assertThat(result.getMeta().getSysMeta()).isNotNull();
+        assertThat(result.getMeta().getUserMeta()).isNotNull();
+        assertThat(result.getMeta().getUserMeta().getObj()).isInstanceOf(MyMeta.class);
+        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
+
+    }
+
+    @Test
+    public void testConvert2EscEventTargetJsonDataXmlMetaXml() {
+
+        // PREPARE
+        final String description = "Whatever";
+        final UUID uuid = UUID.randomUUID();
+        final MyEvent myEvent = new MyEvent(uuid, description);
+        final EventId eventId = new EventId();
+        final MyMeta myMeta = new MyMeta("peter");
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
+                myMeta);
+
+        // TEST
+        final EscEvent result = EscSpiUtils.convert2EscEvent(registry,
+                EnhancedMimeType.create("application/json"), commonEvent);
+
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getEventId()).isEqualTo(eventId.toString());
+        assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getData().getObj()).isInstanceOf(Base64Data.class);
+        final Base64Data base64Data = (Base64Data) result.getData().getObj();
+        assertThat(new String(base64Data.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
+                "<my-event id=\"" + uuid + "\" description=\"Whatever\"/>");
+        assertThat(result.getMeta()).isNotNull();
+        assertThat(result.getMeta().getSysMeta()).isNotNull();
+        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isEqualTo(
+                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
+        assertThat(result.getMeta().getSysMeta().getMetaType()).isEqualToIgnoringCase(
+                MyMeta.TYPE.asBaseType());
+
+        assertThat(result.getMeta().getUserMeta()).isNotNull();
+        assertThat(result.getMeta().getUserMeta().getObj()).isInstanceOf(Base64Data.class);
+        final Base64Data base64Meta = (Base64Data) result.getMeta().getUserMeta().getObj();
+        assertThat(new String(base64Meta.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
+                "<my-meta><user>peter</user></my-meta>");
 
     }
 

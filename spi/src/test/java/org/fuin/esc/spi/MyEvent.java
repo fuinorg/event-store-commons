@@ -38,6 +38,9 @@ public final class MyEvent implements Serializable {
 
     /** Unique name of the event. */
     public static TypeName TYPE = new TypeName("MyEvent");
+    
+    /** Unique name of the serialized event. */
+    public static SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlAttribute(name = "id")
     private String id;
