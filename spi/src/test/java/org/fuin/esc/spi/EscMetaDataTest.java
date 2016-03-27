@@ -49,8 +49,8 @@ public class EscMetaDataTest {
         // VERIFY
         assertThat(testee).isNotNull();
         assertThat(testee.getUserMeta()).isNotNull();
-        assertThat(testee.getUserMeta().getMeta()).isInstanceOf(MyMeta.class);
-        final MyMeta userMeta = (MyMeta) testee.getUserMeta().getMeta();
+        assertThat(testee.getUserMeta().getObj()).isInstanceOf(MyMeta.class);
+        final MyMeta userMeta = (MyMeta) testee.getUserMeta().getObj();
         assertThat(userMeta.getUser()).isEqualTo("abc");
 
         assertThat(testee.getSysMeta()).isNotNull();

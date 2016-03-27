@@ -28,10 +28,10 @@ import org.fuin.objects4j.common.Nullable;
  * A structure that contains the user's meta data and the system's meta information.
  */
 @XmlRootElement(name = "MetaData")
-public class EscMetaData {
+public final class EscMetaData {
 
     @XmlElement(name = "EscUserMeta")
-    private EscUserMeta userMeta;
+    private DataWrapper userMeta;
 
     @XmlElement(name = "EscSysMeta")
     private EscSysMeta sysMeta;
@@ -61,7 +61,7 @@ public class EscMetaData {
      * @param userMeta
      *            User's meta data if available.
      */
-    public EscMetaData(@NotNull final EscSysMeta sysMeta, @Nullable final EscUserMeta userMeta) {
+    public EscMetaData(@NotNull final EscSysMeta sysMeta, @Nullable final DataWrapper userMeta) {
         super();
         Contract.requireArgNotNull("sysMeta", sysMeta);
         this.userMeta = userMeta;
@@ -74,7 +74,7 @@ public class EscMetaData {
      * @return System meta data.
      */
     @NotNull
-    public EscSysMeta getSysMeta() {
+    public final EscSysMeta getSysMeta() {
         return sysMeta;
     }
 
@@ -84,7 +84,7 @@ public class EscMetaData {
      * @return User meta data.
      */
     @Nullable
-    public EscUserMeta getUserMeta() {
+    public final DataWrapper getUserMeta() {
         return userMeta;
     }
 

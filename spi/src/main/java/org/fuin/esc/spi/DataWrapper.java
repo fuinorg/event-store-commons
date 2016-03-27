@@ -24,41 +24,41 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.fuin.objects4j.common.Contract;
 
 /**
- * A structure that contains the user's meta data.
+ * A structure that wraps another object of different types.
  */
-@XmlRootElement(name = "EscUserMeta")
-public class EscUserMeta {
+@XmlRootElement(name = "Wrapper")
+public final class DataWrapper {
 
     @XmlAnyElement(lax = true)
-    private Object meta;
+    private Object obj;
 
     /**
      * Default constructor for JAXB.
      */
-    protected EscUserMeta() {
+    protected DataWrapper() {
         super();
     }
 
     /**
      * Constructor with mandatory data.
      * 
-     * @param meta
-     *            User's meta data.
+     * @param obj
+     *            Object to wrap.
      */
-    public EscUserMeta(@NotNull final Object meta) {
+    public DataWrapper(@NotNull final Object obj) {
         super();
-        Contract.requireArgNotNull("meta", meta);
-        this.meta = meta;
+        Contract.requireArgNotNull("obj", obj);
+        this.obj = obj;
     }
 
     /**
-     * Returns the user's meta data.
+     * Returns the wrapped object.
      * 
-     * @return Meta data.
+     * @return Inner object.
      */
     @NotNull
-    public Object getMeta() {
-        return meta;
+    public final Object getObj() {
+        return obj;
     }
 
 }

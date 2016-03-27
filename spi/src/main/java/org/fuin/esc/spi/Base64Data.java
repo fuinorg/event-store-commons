@@ -30,7 +30,7 @@ import org.fuin.objects4j.common.Contract;
  * Contains some Base64 encoded data.
  */
 @XmlRootElement(name = "Base64")
-public class Base64Data {
+public final class Base64Data {
 
     @XmlValue
     private String base64Str;
@@ -76,7 +76,7 @@ public class Base64Data {
      * 
      * @return Base64 string.
      */
-    public String getEncoded() {
+    public final String getEncoded() {
         return base64Str;
     }
 
@@ -85,7 +85,7 @@ public class Base64Data {
      * 
      * @return Binary data.
      */
-    public byte[] getDecoded() {
+    public final byte[] getDecoded() {
         if (binaryData == null) {
             binaryData = Base64.decodeBase64(base64Str);
         }

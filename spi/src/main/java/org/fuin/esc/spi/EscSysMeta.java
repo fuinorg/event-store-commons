@@ -29,7 +29,7 @@ import org.fuin.objects4j.common.Nullable;
  * A structure that contains the system's meta information.
  */
 @XmlRootElement(name = "EscSysMeta")
-public class EscSysMeta {
+public final class EscSysMeta {
 
     @XmlElement(name = "data-content-type")
     private String dataContentTypeStr;
@@ -93,7 +93,7 @@ public class EscSysMeta {
      * @return Data type.
      */
     @NotNull
-    public EnhancedMimeType getDataContentType() {
+    public final EnhancedMimeType getDataContentType() {
         if (dataContentType == null) {
             dataContentType = EnhancedMimeType.create(dataContentTypeStr);
         }
@@ -106,7 +106,7 @@ public class EscSysMeta {
      * @return Meta type.
      */
     @Nullable
-    public EnhancedMimeType getMetaContentType() {
+    public final EnhancedMimeType getMetaContentType() {
         if ((metaContentType == null) && (metaContentTypeStr != null)) {
             metaContentType = EnhancedMimeType.create(metaContentTypeStr);
         }
@@ -119,7 +119,7 @@ public class EscSysMeta {
      * @return Meta type.
      */
     @Nullable
-    public String getMetaType() {
+    public final String getMetaType() {
         return metaType;
     }
 

@@ -27,23 +27,23 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 
 /**
- * Test for {@link EscUserMeta} class.
+ * Test for {@link DataWrapper} class.
  */
-public class EscUserMetaTest {
+public class DataWrapperTest {
 
     @Test
     public final void testMarshal() throws Exception {
 
         // PREPARE
         final Base64Data base64 = new Base64Data("Hello world!".getBytes(Charset.forName("utf-8")));
-        final EscUserMeta testee = new EscUserMeta(base64);
+        final DataWrapper testee = new DataWrapper(base64);
 
         // TEST
-        final String result = marshal(testee, EscUserMeta.class, Base64Data.class);
+        final String result = marshal(testee, DataWrapper.class, Base64Data.class);
 
         // VERIFY
         assertThat(result).isEqualTo(
-                XML_PREFIX + "<EscUserMeta><Base64>SGVsbG8gd29ybGQh</Base64></EscUserMeta>");
+                XML_PREFIX + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>");
 
     }
 
@@ -51,13 +51,13 @@ public class EscUserMetaTest {
     public final void testUnmarshal() throws Exception {
 
         // TEST
-        final EscUserMeta testee = unmarshal(XML_PREFIX
-                + "<EscUserMeta><Base64>SGVsbG8gd29ybGQh</Base64></EscUserMeta>", EscUserMeta.class,
+        final DataWrapper testee = unmarshal(XML_PREFIX
+                + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>", DataWrapper.class,
                 Base64Data.class);
 
         // VERIFY
         assertThat(testee).isNotNull();
-        assertThat(testee.getMeta()).isInstanceOf(Base64Data.class);
+        assertThat(testee.getObj()).isInstanceOf(Base64Data.class);
 
     }
 

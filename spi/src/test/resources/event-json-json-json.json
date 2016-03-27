@@ -1,0 +1,23 @@
+{
+	"EventId":"b2a936ce-d479-414f-b67f-3df4da383d47",
+	"EventType":"MyEvent",
+	"Data":{
+		"my-event":{
+			"id":"b2a936ce-d479-414f-b67f-3df4da383d47",
+			"description":"Hello, JSON!"
+		}
+	},
+	"MetaData":{
+		"EscUserMeta":{
+			"my-meta":{
+				"user":"abc"
+			}
+		},
+		"EscSysMeta":{
+			"data-content-type":"application/json; version=1; encoding=utf-8",
+			"meta-content-type":"application/json; version=1; encoding=utf-8",
+            "meta-type": "MyMeta"
+		}
+		
+	}
+}
