@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -72,6 +75,19 @@ public final class EscEvents {
      */
     public final List<EscEvent> getList() {
         return Collections.unmodifiableList(list);
+    }
+
+    /**
+     * Converts the object into a JSON array.
+     * 
+     * @return JSON object.
+     */
+    public JsonArray toJson() {
+        final JsonArrayBuilder builder = Json.createArrayBuilder();
+        for (final EscEvent event : list) {
+            builder.add(event.toJson());
+        }
+        return builder.build();
     }
 
 }

@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.spi;
 
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -59,6 +60,22 @@ public final class DataWrapper {
     @NotNull
     public final Object getObj() {
         return obj;
+    }
+
+    /**
+     * Converts the object into a JSON object.
+     * 
+     * @return JSON object.
+     */
+    public JsonObject toJson() {
+        if (obj instanceof JsonObject) {
+            return (JsonObject) obj;
+        }
+        if (obj instanceof Base64Data) {
+            final Base64Data base64data = (Base64Data) obj;
+            return base64data.toJson();
+        }
+        throw new IllegalStateException("Unknown wrapped type '" + obj.getClass().getName() + "': " + obj);
     }
 
 }

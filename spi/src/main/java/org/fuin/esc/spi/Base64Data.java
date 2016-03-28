@@ -17,8 +17,9 @@
  */
 package org.fuin.esc.spi;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
-
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
@@ -90,6 +91,15 @@ public final class Base64Data {
             binaryData = Base64.decodeBase64(base64Str);
         }
         return binaryData;
+    }
+
+    /**
+     * Converts the object into a JSON object.
+     * 
+     * @return JSON object.
+     */
+    public JsonObject toJson() {
+        return Json.createObjectBuilder().add("Base64", base64Str).build();
     }
 
 }

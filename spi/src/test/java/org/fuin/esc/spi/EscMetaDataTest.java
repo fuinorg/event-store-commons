@@ -23,6 +23,8 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.io.StringWriter;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
@@ -66,7 +68,35 @@ public class EscMetaDataTest {
         final StringWriter sw = new StringWriter();
         marshaller.marshal(testee, sw);
         assertThat(sw.toString()).isEqualTo(expectedXml);
-        
+
+    }
+
+    @Test
+    public final void testToJson() {
+
+        // PREPARE
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml");
+        final EnhancedMimeType metaContentType = EnhancedMimeType
+                .create("text/plain; transfer-encoding=base64");
+        final String metaType = "JustText";
+        final String base64Str = "SGVsbG8gd29ybGQh";
+        final EscSysMeta sysMeta = new EscSysMeta(dataContentType, metaContentType, metaType);
+        final DataWrapper userMeta = new DataWrapper(new Base64Data(base64Str));
+        final EscMetaData testee = new EscMetaData(sysMeta, userMeta);
+
+        // TEST
+        final JsonObject result = testee.toJson();
+
+        // VERIFY
+        assertThat(result.getJsonObject("EscSysMeta")).isNotNull();
+        assertThat(result.getJsonObject("EscUserMeta")).isNotNull();
+        assertThat(result.getJsonObject("EscSysMeta").getString("data-content-type")).isEqualTo(
+                dataContentType.toString());
+        assertThat(result.getJsonObject("EscSysMeta").getString("meta-content-type")).isEqualTo(
+                metaContentType.toString());
+        assertThat(result.getJsonObject("EscSysMeta").getString("meta-type")).isEqualTo(metaType);
+        assertThat(result.getJsonObject("EscUserMeta").getString("Base64")).isEqualTo(base64Str);
+
     }
 
 }

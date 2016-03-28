@@ -22,6 +22,9 @@ import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
 import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+
 import org.junit.Test;
 
 /**
@@ -68,4 +71,22 @@ public class EscSysMetaTest {
 
     }
 
+    @Test
+    public final void testToJson() {
+
+        // PREPARE
+        final JsonObject event = Json.createObjectBuilder().add("firstName", "Peter")
+                .add("lastName", "Parker").build();
+        final EscSysMeta testee = new EscSysMeta(DATA_CONTENT_TYPE, META_CONTENT_TYPE, MY_META);
+
+        // TEST
+        final JsonObject result = testee.toJson();
+
+        // VERIFY
+        assertThat(result.getString("data-content-type")).isEqualTo(DATA_CONTENT_TYPE.toString());
+        assertThat(result.getString("meta-content-type")).isEqualTo(META_CONTENT_TYPE.toString());
+        assertThat(result.getString("meta-type")).isEqualTo(MY_META);
+
+    }
+    
 }

@@ -21,6 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
+import java.util.UUID;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+
 import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -60,6 +65,51 @@ public class EscEventTest {
         // VERIFY
         XMLUnit.setIgnoreWhitespace(true);
         XMLAssert.assertXMLEqual(expectedXml, xml);
+
+    }
+
+    @Test
+    public final void testToJson() {
+
+        // PREPARE
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml");
+        final EnhancedMimeType metaContentType = EnhancedMimeType
+                .create("text/plain; transfer-encoding=base64");
+        final String metaType = "JustText";
+        final String base64Str = "SGVsbG8gd29ybGQh";
+        final EscSysMeta sysMeta = new EscSysMeta(dataContentType, metaContentType, metaType);
+        final DataWrapper userMeta = new DataWrapper(new Base64Data(base64Str));
+        final EscMetaData meta = new EscMetaData(sysMeta, userMeta);
+        final UUID eventId = UUID.randomUUID();
+        final String eventType = "MyEvent";
+        final String myEventId = "b2a936ce-d479-414f-b67f-3df4da383d47";
+        final String myEventDescription = "Hello, JSON!";
+        final JsonObject myEventFields = Json.createObjectBuilder().add("id", myEventId)
+                .add("description", myEventDescription).build();
+        final JsonObject myEvent = Json.createObjectBuilder().add("my-event", myEventFields).build();
+        final DataWrapper data = new DataWrapper(myEvent);
+        final EscEvent testee = new EscEvent(eventId, eventType, data, meta);
+
+        // TEST
+        final JsonObject result = testee.toJson();
+
+        // VERIFY
+        assertThat(result.getString("EventId")).isEqualTo(eventId.toString());
+        assertThat(result.getString("EventType")).isEqualTo(eventType);
+        final JsonObject jsonData = result.getJsonObject("Data");
+        assertThat(jsonData.getJsonObject("my-event")).isNotNull();
+        final JsonObject jsonMyEvent = jsonData.getJsonObject("my-event");
+        assertThat(jsonMyEvent.getString("id")).isEqualTo(myEventId);
+        assertThat(jsonMyEvent.getString("description")).isEqualTo(myEventDescription);
+        final JsonObject jsonMeta = result.getJsonObject("MetaData");
+        assertThat(jsonMeta.getJsonObject("EscSysMeta")).isNotNull();
+        final JsonObject jsonSysMeta = jsonMeta.getJsonObject("EscSysMeta");
+        assertThat(jsonMeta.getJsonObject("EscUserMeta")).isNotNull();
+        final JsonObject jsonUserMeta = jsonMeta.getJsonObject("EscUserMeta");
+        assertThat(jsonSysMeta.getString("data-content-type")).isEqualTo(dataContentType.toString());
+        assertThat(jsonSysMeta.getString("meta-content-type")).isEqualTo(metaContentType.toString());
+        assertThat(jsonSysMeta.getString("meta-type")).isEqualTo(metaType);
+        assertThat(jsonUserMeta.getString("Base64")).isEqualTo(base64Str);
 
     }
 

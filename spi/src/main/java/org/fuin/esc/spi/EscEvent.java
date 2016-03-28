@@ -19,6 +19,8 @@ package org.fuin.esc.spi;
 
 import java.util.UUID;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,8 +39,8 @@ public final class EscEvent {
     public static final TypeName TYPE = new TypeName("Event");
 
     /** Unique name of the event. */
-    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());    
-    
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+
     @XmlElement(name = "EventId")
     private String eventId;
 
@@ -131,6 +133,20 @@ public final class EscEvent {
      */
     public final EscMetaData getMeta() {
         return meta;
+    }
+
+    /**
+     * Converts the object into a JSON object.
+     * 
+     * @return JSON object.
+     */
+    public JsonObject toJson() {
+        return Json.createObjectBuilder()
+                .add("EventId", eventId)
+                .add("EventType", eventType)
+                .add("Data", data.toJson())
+                .add("MetaData", meta.toJson())
+                .build();
     }
 
 }

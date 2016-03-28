@@ -178,7 +178,6 @@ public final class EscSpiUtils {
         return true;
     }
 
-    
     /**
      * Converts a given a {@link CommonEvent} into an {@link EscEvent}.
      * 
@@ -193,7 +192,7 @@ public final class EscSpiUtils {
      */
     public static EscEvent convert2EscEvent(@NotNull final SerializerRegistry registry,
             @NotNull final EnhancedMimeType targetContentType, @Nullable final CommonEvent commonEvent) {
-        
+
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("targetContentType", targetContentType);
 
@@ -278,5 +277,5 @@ public final class EscSpiUtils {
         }
 
     }
-    
+
 }

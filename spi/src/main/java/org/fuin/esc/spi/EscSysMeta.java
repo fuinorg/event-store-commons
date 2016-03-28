@@ -17,6 +17,9 @@
  */
 package org.fuin.esc.spi;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -121,6 +124,16 @@ public final class EscSysMeta {
     @Nullable
     public final String getMetaType() {
         return metaType;
+    }
+
+    /**
+     * Converts the object into a JSON object.
+     * 
+     * @return JSON object.
+     */
+    public JsonObject toJson() {
+        return Json.createObjectBuilder().add("data-content-type", dataContentTypeStr)
+                .add("meta-content-type", metaContentTypeStr).add("meta-type", metaType).build();
     }
 
 }

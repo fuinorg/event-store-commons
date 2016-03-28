@@ -24,6 +24,9 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.nio.charset.Charset;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+
 import org.junit.Test;
 
 /**
@@ -42,8 +45,7 @@ public class DataWrapperTest {
         final String result = marshal(testee, DataWrapper.class, Base64Data.class);
 
         // VERIFY
-        assertThat(result).isEqualTo(
-                XML_PREFIX + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>");
+        assertThat(result).isEqualTo(XML_PREFIX + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>");
 
     }
 
@@ -52,12 +54,47 @@ public class DataWrapperTest {
 
         // TEST
         final DataWrapper testee = unmarshal(XML_PREFIX
-                + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>", DataWrapper.class,
-                Base64Data.class);
+                + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>", DataWrapper.class, Base64Data.class);
 
         // VERIFY
         assertThat(testee).isNotNull();
         assertThat(testee.getObj()).isInstanceOf(Base64Data.class);
+
+    }
+
+    @Test
+    public final void testToJson() {
+
+        // PREPARE
+        final String id = "b2a936ce-d479-414f-b67f-3df4da383d47";
+        final String description = "Hello, JSON!";
+        final JsonObject fields = Json.createObjectBuilder().add("id", id).add("description", description)
+                .build();
+        final JsonObject event = Json.createObjectBuilder().add("my-event", fields).build();
+        final DataWrapper testee = new DataWrapper(event);
+
+        // TEST
+        final JsonObject result = testee.toJson();
+
+        // VERIFY
+        assertThat(result.getJsonObject("my-event").getString("id")).isEqualTo(id);
+        assertThat(result.getJsonObject("my-event").getString("description")).isEqualTo(description);
+
+    }
+
+    @Test
+    public final void testToJsonBas64() {
+
+        // PREPARE
+        final String base64Str = "SGVsbG8gd29ybGQh";
+        final Base64Data base64data = new Base64Data(base64Str);
+        final DataWrapper testee = new DataWrapper(base64data);
+
+        // TEST
+        final JsonObject result = testee.toJson();
+
+        // VERIFY
+        assertThat(result.getString("Base64")).isEqualTo(base64Str);
 
     }
 

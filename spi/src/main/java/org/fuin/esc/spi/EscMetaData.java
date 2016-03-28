@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.spi;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -88,4 +90,16 @@ public final class EscMetaData {
         return userMeta;
     }
 
+    /**
+     * Converts the object into a JSON object.
+     * 
+     * @return JSON object.
+     */
+    public JsonObject toJson() {
+        if (userMeta == null) {
+            return Json.createObjectBuilder().add("EscSysMeta", sysMeta.toJson()).build();
+        }
+        return Json.createObjectBuilder().add("EscUserMeta", userMeta.toJson())
+                .add("EscSysMeta", sysMeta.toJson()).build();
+    }
 }
