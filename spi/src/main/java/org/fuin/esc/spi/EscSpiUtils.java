@@ -19,7 +19,6 @@ package org.fuin.esc.spi;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
@@ -179,18 +178,18 @@ public final class EscSpiUtils {
     }
 
     /**
-     * Converts a given a {@link CommonEvent} into an {@link EscEvent}.
+     * Create meta information for a given a {@link CommonEvent}.
      * 
      * @param registry
      *            Registry with serializers.
      * @param targetContentType
      *            Content type that will later be used to serialize the created result.
      * @param commonEvent
-     *            Event to convert.
+     *            Event to create meta information for.
      * 
-     * @return New instance that is ready to be serialized into it's target type representation.
+     * @return New meta instance.
      */
-    public static EscEvent convert2EscEvent(@NotNull final SerializerRegistry registry,
+    public static EscMeta createEscMeta(@NotNull final SerializerRegistry registry,
             @NotNull final EnhancedMimeType targetContentType, @Nullable final CommonEvent commonEvent) {
 
         Contract.requireArgNotNull("registry", registry);
@@ -202,80 +201,32 @@ public final class EscSpiUtils {
 
         final Serializer dataSerializer = registry.getSerializer(new SerializedDataType(commonEvent
                 .getDataType().asBaseType()));
-        final Content dataContent = createContent(dataSerializer, targetContentType, commonEvent.getData());
+        final EnhancedMimeType dataContentType = contentType(dataSerializer.getMimeType(), targetContentType);
 
-        final EscMetaData meta;
         if (commonEvent.getMeta() == null) {
-            meta = new EscMetaData(new EscMeta(new EscSysMeta(dataContent.getType())));
-        } else {
-            final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(commonEvent
-                    .getMetaType().asBaseType()));
-            final Content metaContent = createContent(metaSerializer, targetContentType,
-                    commonEvent.getMeta());
-            final EscSysMeta sysMeta = new EscSysMeta(dataContent.getType(), metaContent.getType(),
-                    commonEvent.getMetaType().asBaseType());
-            meta = new EscMetaData(new EscMeta(sysMeta, metaContent.getWrapper()));
+            return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType);
         }
-
-        final UUID eventId = commonEvent.getId().asBaseType();
-        final String eventType = commonEvent.getDataType().asBaseType();
-        return new EscEvent(eventId, eventType, dataContent.getWrapper(), meta);
+        
+        final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(commonEvent
+                .getMetaType().asBaseType()));
+        if (metaSerializer.getMimeType().match(targetContentType)) {
+            return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent
+                    .getMetaType().asBaseType(), metaSerializer.getMimeType(), commonEvent.getMeta());
+        }
+        
+        final byte[] serData = metaSerializer.marshal(commonEvent.getMeta());
+        final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
+        return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent.getMetaType()
+                .asBaseType(), metaContentType, new Base64Data(serData));
 
     }
 
-    private static Content createContent(final Serializer serializer,
-            final EnhancedMimeType targetContentType, final Object obj) {
-
-        if (serializer.getMimeType().getBaseType().equals(targetContentType.getBaseType())) {
-            return new Content(serializer.getMimeType(), new DataWrapper(obj));
+    private static EnhancedMimeType contentType(final EnhancedMimeType sourceContentType,
+            final EnhancedMimeType targetContentType) {
+        if (sourceContentType.match(targetContentType)) {
+            return sourceContentType;
         }
-        final byte[] serData = serializer.marshal(obj);
-        return new Content(EnhancedMimeType.create(serializer.getMimeType().toString()
-                + "; transfer-encoding=base64"), new DataWrapper(new Base64Data(serData)));
-
-    }
-
-    /**
-     * Stores a content type together with it's wrapped object.
-     */
-    private static final class Content {
-
-        private EnhancedMimeType type;
-
-        private DataWrapper wrapper;
-
-        /**
-         * Constructor with mandatory data.
-         * 
-         * @param content
-         *            Type of the content.
-         * @param wrapper
-         *            Content wrapper.
-         */
-        public Content(final EnhancedMimeType type, final DataWrapper wrapper) {
-            super();
-            this.type = type;
-            this.wrapper = wrapper;
-        }
-
-        /**
-         * Type of the content.
-         * 
-         * @return Content type.
-         */
-        public final EnhancedMimeType getType() {
-            return type;
-        }
-
-        /**
-         * Wrapped content.
-         * 
-         * @return Data wrapper.
-         */
-        public final DataWrapper getWrapper() {
-            return wrapper;
-        }
-
+        return EnhancedMimeType.create(sourceContentType.toString() + "; transfer-encoding=base64");
     }
 
 }

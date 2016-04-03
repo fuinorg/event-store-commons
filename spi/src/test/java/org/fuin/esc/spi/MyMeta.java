@@ -28,7 +28,7 @@ import org.fuin.objects4j.common.Nullable;
 /**
  * Example meta data. .
  */
-@XmlRootElement(name = "my-meta")
+@XmlRootElement(name = "MyMeta")
 public final class MyMeta implements Serializable {
 
     private static final long serialVersionUID = 100L;

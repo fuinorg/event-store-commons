@@ -19,9 +19,12 @@ package org.fuin.esc.spi;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
@@ -29,14 +32,29 @@ import org.fuin.objects4j.common.Nullable;
 /**
  * A structure that contains the user's meta data and the system's meta information.
  */
-@XmlRootElement(name = "EscMeta")
+@XmlRootElement(name = "esc-meta")
 public final class EscMeta {
 
-    @XmlElement(name = "EscUserMeta")
-    private DataWrapper userMeta;
+    @XmlElement(name = "data-type")
+    private String dataType;
 
-    @XmlElement(name = "EscSysMeta")
-    private EscSysMeta sysMeta;
+    @XmlElement(name = "data-content-type")
+    private String dataContentTypeStr;
+
+    @XmlElement(name = "meta-type")
+    private String metaType;
+
+    @XmlElement(name = "meta-content-type")
+    private String metaContentTypeStr;
+
+    @XmlAnyElement(lax = true)
+    private Object meta;
+
+    @XmlTransient
+    private EnhancedMimeType dataContentType;
+
+    @XmlTransient
+    private EnhancedMimeType metaContentType;
 
     /**
      * Default constructor for JAXB.
@@ -46,48 +64,103 @@ public final class EscMeta {
     }
 
     /**
-     * Constructor with mandatory data.
+     * Constructor with all mandatory data.
      * 
-     * @param sysMeta
-     *            System's meta information.
+     * @param dataType
+     *            Type of the data.
+     * @param dataContentType
+     *            Content type of the data.
      */
-    public EscMeta(@NotNull final EscSysMeta sysMeta) {
-        this(sysMeta, null);
+    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType) {
+        this(dataType, dataContentType, null, null, null);
     }
 
     /**
      * Constructor with all data.
      * 
-     * @param sysMeta
-     *            System's meta information.
-     * @param userMeta
-     *            User's meta data if available.
+     * @param dataType
+     *            Type of the data.
+     * @param dataContentType
+     *            Type of the data.
+     * @param metaType
+     *            Unique name of the meta data type if available.
+     * @param metaContentType
+     *            Type of the meta data if meta data is available.
+     * @param meta
+     *            Meta data object if available.
      */
-    public EscMeta(@NotNull final EscSysMeta sysMeta, @Nullable final DataWrapper userMeta) {
+    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType,
+            @Nullable final String metaType, @Nullable final EnhancedMimeType metaContentType,
+            @Nullable final Object meta) {
         super();
-        Contract.requireArgNotNull("sysMeta", sysMeta);
-        this.userMeta = userMeta;
-        this.sysMeta = sysMeta;
+        Contract.requireArgNotNull("dataType", dataType);
+        Contract.requireArgNotNull("dataContentType", dataContentType);
+
+        this.dataType = dataType;
+        this.dataContentType = dataContentType;
+        this.dataContentTypeStr = dataContentType.toString();
+        this.metaType = metaType;
+        this.metaContentType = metaContentType;
+        if (metaContentType != null) {
+            this.metaContentTypeStr = metaContentType.toString();
+        }
+        this.meta = meta;
     }
 
     /**
-     * Returns the system's meta information.
+     * Returns the unique name of the data type.
      * 
-     * @return System meta data.
-     */
-    @NotNull
-    public final EscSysMeta getSysMeta() {
-        return sysMeta;
-    }
-
-    /**
-     * Returns the user's meta data if available.
-     * 
-     * @return User meta data.
+     * @return Data type.
      */
     @Nullable
-    public final DataWrapper getUserMeta() {
-        return userMeta;
+    public final String getDataType() {
+        return dataType;
+    }
+
+    /**
+     * Returns the type of the data.
+     * 
+     * @return Data type.
+     */
+    @NotNull
+    public final EnhancedMimeType getDataContentType() {
+        if (dataContentType == null) {
+            dataContentType = EnhancedMimeType.create(dataContentTypeStr);
+        }
+        return dataContentType;
+    }
+
+    /**
+     * Returns the unique name of the meta data type if available.
+     * 
+     * @return Meta type.
+     */
+    @Nullable
+    public final String getMetaType() {
+        return metaType;
+    }
+
+    /**
+     * Returns the type of the meta data if meta data is available.
+     * 
+     * @return Meta type.
+     */
+    @Nullable
+    public final EnhancedMimeType getMetaContentType() {
+        if ((metaContentType == null) && (metaContentTypeStr != null)) {
+            metaContentType = EnhancedMimeType.create(metaContentTypeStr);
+        }
+        return metaContentType;
+    }
+
+    /**
+     * Returns the meta data object.
+     * 
+     * @return Meta data object.
+     */
+    @NotNull
+    public final Object getMeta() {
+        return meta;
     }
 
     /**
@@ -96,10 +169,47 @@ public final class EscMeta {
      * @return JSON object.
      */
     public JsonObject toJson() {
-        if (userMeta == null) {
-            return Json.createObjectBuilder().add("EscSysMeta", sysMeta.toJson()).build();
+        final JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("data-type", dataType);
+        builder.add("data-content-type", dataContentTypeStr);
+        if (meta == null) {
+            return builder.build();
         }
-        return Json.createObjectBuilder().add("EscUserMeta", userMeta.toJson())
-                .add("EscSysMeta", sysMeta.toJson()).build();
+        builder.add("meta-type", metaType);
+        builder.add("meta-content-type", metaContentTypeStr);
+        if (meta instanceof JsonObject) {
+            return builder.add(metaType, (JsonObject) meta).build();
+        }
+        if (meta instanceof Base64Data) {
+            final Base64Data base64data = (Base64Data) meta;
+            return builder.add(Base64Data.TYPE, base64data.getEncoded()).build();
+        }
+        throw new IllegalStateException("Unknown meta object type: " + meta.getClass());
     }
+
+    /**
+     * Creates in instance from the given JSON object.
+     * 
+     * @param jsonObj
+     *            Object to read values from.
+     * 
+     * @return New instance.
+     */
+    public static EscMeta create(final JsonObject jsonObj) {
+        final String dataType = jsonObj.getString("data-type");
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create(jsonObj
+                .getString("data-content-type"));
+        if (!jsonObj.containsKey("meta-type")) {
+            return new EscMeta(jsonObj.getString("data-type"), dataContentType);
+        }
+        final String metaType = jsonObj.getString("meta-type");
+        final EnhancedMimeType metaContentType = EnhancedMimeType.create(jsonObj
+                .getString("meta-content-type"));
+        if (metaType.equals(Base64Data.TYPE)) {
+            return new EscMeta(dataType, dataContentType, metaType, metaContentType, new Base64Data(
+                    jsonObj.getString(metaType)));
+        }
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
+    }
+
 }

@@ -31,7 +31,7 @@ import org.fuin.objects4j.common.NotEmpty;
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.
  */
-@XmlRootElement(name = "my-event")
+@XmlRootElement(name = "MyEvent")
 public final class MyEvent implements Serializable {
 
     private static final long serialVersionUID = 100L;

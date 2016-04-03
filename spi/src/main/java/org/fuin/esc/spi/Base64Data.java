@@ -30,9 +30,12 @@ import org.fuin.objects4j.common.Contract;
 /**
  * Contains some Base64 encoded data.
  */
-@XmlRootElement(name = "Base64")
+@XmlRootElement(name = Base64Data.TYPE)
 public final class Base64Data {
 
+    /** Unique type name. */
+    public static final String TYPE = "Base64"; 
+    
     @XmlValue
     private String base64Str;
 

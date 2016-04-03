@@ -1,12 +1,9 @@
-<EscMeta>
-    <EscUserMeta>
-        <my-meta>
-            <user>abc</user>
-        </my-meta>
-    </EscUserMeta>
-    <EscSysMeta>
-        <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
-        <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
-        <meta-type>MyMeta</meta-type>
-    </EscSysMeta>
-</EscMeta>
+<esc-meta>
+    <data-type>MyEvent</data-type>
+    <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
+    <meta-type>MyMeta</meta-type>
+    <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+	<MyMeta>
+	    <user>abc</user>
+	</MyMeta>
+</esc-meta>
