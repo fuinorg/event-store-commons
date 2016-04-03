@@ -1,10 +1,12 @@
 "MetaData":{
-    "EscUserMeta": { 
-      "Base64":"PG15LW1ldGE+PHVzZXI+YWJjPC91c2VyPjwvbXktbWV0YT4=" 
-    },
-    "EscSysMeta":{
-        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-        "meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-        "meta-type": "MyMeta"
-    }
+	"EscMeta":{
+	    "EscUserMeta": { 
+	      "Base64":"PG15LW1ldGE+PHVzZXI+YWJjPC91c2VyPjwvbXktbWV0YT4=" 
+	    },
+	    "EscSysMeta":{
+	        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+	        "meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+	        "meta-type": "MyMeta"
+	    }
+	}
 }

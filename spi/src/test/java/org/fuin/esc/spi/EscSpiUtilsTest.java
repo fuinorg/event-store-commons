@@ -211,12 +211,13 @@ public class EscSpiUtilsTest {
         assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
         assertThat(result.getData().getObj()).isInstanceOf(MyEvent.class);
         assertThat(result.getMeta()).isNotNull();
-        assertThat(result.getMeta().getSysMeta()).isNotNull();
-        assertThat(result.getMeta().getUserMeta()).isNull();
-        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+        final EscMetaData metaData = result.getMeta();
+        assertThat(metaData.getEscMeta().getSysMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getDataContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isNull();
-        assertThat(result.getMeta().getSysMeta().getMetaType()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaContentType()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaType()).isNull();
 
     }
 
@@ -245,12 +246,13 @@ public class EscSpiUtilsTest {
         assertThat(new String(base64Data.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
                 "<my-event id=\"" + uuid + "\" description=\"Whatever\"/>");
         assertThat(result.getMeta()).isNotNull();
-        assertThat(result.getMeta().getSysMeta()).isNotNull();
-        assertThat(result.getMeta().getUserMeta()).isNull();
-        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+        final EscMetaData metaData = result.getMeta();
+        assertThat(metaData.getEscMeta().getSysMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getDataContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isNull();
-        assertThat(result.getMeta().getSysMeta().getMetaType()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaContentType()).isNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaType()).isNull();
 
     }
 
@@ -277,14 +279,15 @@ public class EscSpiUtilsTest {
         assertThat(result.getEventType()).isEqualTo(MyEvent.TYPE.asBaseType());
         assertThat(result.getData().getObj()).isInstanceOf(MyEvent.class);
         assertThat(result.getMeta()).isNotNull();
-        assertThat(result.getMeta().getSysMeta()).isNotNull();
-        assertThat(result.getMeta().getUserMeta()).isNotNull();
-        assertThat(result.getMeta().getUserMeta().getObj()).isInstanceOf(MyMeta.class);
-        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+        final EscMetaData metaData = result.getMeta();
+        assertThat(metaData.getEscMeta().getSysMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta().getObj()).isInstanceOf(MyMeta.class);
+        assertThat(metaData.getEscMeta().getSysMeta().getDataContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isEqualTo(
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
 
     }
 
@@ -316,17 +319,18 @@ public class EscSpiUtilsTest {
         assertThat(new String(base64Data.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
                 "<my-event id=\"" + uuid + "\" description=\"Whatever\"/>");
         assertThat(result.getMeta()).isNotNull();
-        assertThat(result.getMeta().getSysMeta()).isNotNull();
-        assertThat(result.getMeta().getSysMeta().getDataContentType()).isEqualTo(
+        final EscMetaData metaData = result.getMeta();
+        assertThat(metaData.getEscMeta().getSysMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getSysMeta().getDataContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaContentType()).isEqualTo(
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaContentType()).isEqualTo(
                 EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMeta().getSysMeta().getMetaType()).isEqualToIgnoringCase(
+        assertThat(metaData.getEscMeta().getSysMeta().getMetaType()).isEqualToIgnoringCase(
                 MyMeta.TYPE.asBaseType());
 
-        assertThat(result.getMeta().getUserMeta()).isNotNull();
-        assertThat(result.getMeta().getUserMeta().getObj()).isInstanceOf(Base64Data.class);
-        final Base64Data base64Meta = (Base64Data) result.getMeta().getUserMeta().getObj();
+        assertThat(metaData.getEscMeta().getUserMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta().getObj()).isInstanceOf(Base64Data.class);
+        final Base64Data base64Meta = (Base64Data) metaData.getEscMeta().getUserMeta().getObj();
         assertThat(new String(base64Meta.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
                 "<my-meta><user>peter</user></my-meta>");
 

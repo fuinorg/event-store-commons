@@ -56,8 +56,9 @@ public class EscEventTest {
         assertThat(testee.getData()).isNotNull();
         assertThat(testee.getData().getObj()).isInstanceOf(MyEvent.class);
         assertThat(testee.getMeta()).isNotNull();
-        assertThat(testee.getMeta().getUserMeta()).isNotNull();
-        assertThat(testee.getMeta().getUserMeta().getObj()).isInstanceOf(MyMeta.class);
+        final EscMetaData metaData = testee.getMeta();
+        assertThat(metaData.getEscMeta().getUserMeta()).isNotNull();
+        assertThat(metaData.getEscMeta().getUserMeta().getObj()).isInstanceOf(MyMeta.class);
 
         // TEST
         final String xml = marshal(testee, EscEvent.class, MyMeta.class, MyEvent.class, Base64Data.class);
@@ -79,7 +80,8 @@ public class EscEventTest {
         final String base64Str = "SGVsbG8gd29ybGQh";
         final EscSysMeta sysMeta = new EscSysMeta(dataContentType, metaContentType, metaType);
         final DataWrapper userMeta = new DataWrapper(new Base64Data(base64Str));
-        final EscMetaData meta = new EscMetaData(sysMeta, userMeta);
+        final EscMeta meta = new EscMeta(sysMeta, userMeta);
+        final EscMetaData metaData = new EscMetaData(meta);
         final UUID eventId = UUID.randomUUID();
         final String eventType = "MyEvent";
         final String myEventId = "b2a936ce-d479-414f-b67f-3df4da383d47";
@@ -88,7 +90,7 @@ public class EscEventTest {
                 .add("description", myEventDescription).build();
         final JsonObject myEvent = Json.createObjectBuilder().add("my-event", myEventFields).build();
         final DataWrapper data = new DataWrapper(myEvent);
-        final EscEvent testee = new EscEvent(eventId, eventType, data, meta);
+        final EscEvent testee = new EscEvent(eventId, eventType, data, metaData);
 
         // TEST
         final JsonObject result = testee.toJson();
@@ -101,7 +103,9 @@ public class EscEventTest {
         final JsonObject jsonMyEvent = jsonData.getJsonObject("my-event");
         assertThat(jsonMyEvent.getString("id")).isEqualTo(myEventId);
         assertThat(jsonMyEvent.getString("description")).isEqualTo(myEventDescription);
-        final JsonObject jsonMeta = result.getJsonObject("MetaData");
+        final JsonObject jsonMetaData = result.getJsonObject("MetaData");
+        assertThat(jsonMetaData.getJsonObject("EscMeta")).isNotNull();
+        final JsonObject jsonMeta = jsonMetaData.getJsonObject("EscMeta");
         assertThat(jsonMeta.getJsonObject("EscSysMeta")).isNotNull();
         final JsonObject jsonSysMeta = jsonMeta.getJsonObject("EscSysMeta");
         assertThat(jsonMeta.getJsonObject("EscUserMeta")).isNotNull();

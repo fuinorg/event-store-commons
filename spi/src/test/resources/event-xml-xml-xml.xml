@@ -2,19 +2,22 @@
 	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
 	<EventType>MyEvent</EventType>
 	<Data>
-		<my-event id="68616d90-cf72-4c2a-b913-32bf6e6506ed"
-			description="Hello, XML!" />
+		<my-event id="68616d90-cf72-4c2a-b913-32bf6e6506ed" description="Hello, XML!" />
 	</Data>
 	<MetaData>
-		<EscUserMeta>
-			<my-meta>
-				<user>abc</user>
-			</my-meta>
-		</EscUserMeta>
-		<EscSysMeta>
-			<data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
-			<meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
-            <meta-type>MyMeta</meta-type>
-		</EscSysMeta>
+		<EscMeta>
+			<EscUserMeta>
+				<my-meta>
+					<user>abc</user>
+				</my-meta>
+			</EscUserMeta>
+			<EscSysMeta>
+				<data-content-type>application/xml; version=1; encoding=utf-8
+				</data-content-type>
+				<meta-content-type>application/xml; version=1; encoding=utf-8
+				</meta-content-type>
+				<meta-type>MyMeta</meta-type>
+			</EscSysMeta>
+		</EscMeta>
 	</MetaData>
 </Event>

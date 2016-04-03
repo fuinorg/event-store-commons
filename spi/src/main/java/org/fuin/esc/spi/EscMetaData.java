@@ -27,16 +27,13 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * A structure that contains the user's meta data and the system's meta information.
+ * A structure that contains meta data.
  */
 @XmlRootElement(name = "MetaData")
 public final class EscMetaData {
 
-    @XmlElement(name = "EscUserMeta")
-    private DataWrapper userMeta;
-
-    @XmlElement(name = "EscSysMeta")
-    private EscSysMeta sysMeta;
+    @XmlElement(name = "EscMeta")
+    private EscMeta meta;
 
     /**
      * Default constructor for JAXB.
@@ -48,46 +45,23 @@ public final class EscMetaData {
     /**
      * Constructor with mandatory data.
      * 
-     * @param sysMeta
-     *            System's meta information.
+     * @param meta
+     *            Meta information.
      */
-    public EscMetaData(@NotNull final EscSysMeta sysMeta) {
-        this(sysMeta, null);
-    }
-
-    /**
-     * Constructor with all data.
-     * 
-     * @param sysMeta
-     *            System's meta information.
-     * @param userMeta
-     *            User's meta data if available.
-     */
-    public EscMetaData(@NotNull final EscSysMeta sysMeta, @Nullable final DataWrapper userMeta) {
+    public EscMetaData(@NotNull final EscMeta meta) {
         super();
-        Contract.requireArgNotNull("sysMeta", sysMeta);
-        this.userMeta = userMeta;
-        this.sysMeta = sysMeta;
+        Contract.requireArgNotNull("sysMeta", meta);
+        this.meta = meta;
     }
 
     /**
-     * Returns the system's meta information.
+     * Returns the meta information.
      * 
-     * @return System meta data.
+     * @return Meta data.
      */
     @NotNull
-    public final EscSysMeta getSysMeta() {
-        return sysMeta;
-    }
-
-    /**
-     * Returns the user's meta data if available.
-     * 
-     * @return User meta data.
-     */
-    @Nullable
-    public final DataWrapper getUserMeta() {
-        return userMeta;
+    public final EscMeta getEscMeta() {
+        return meta;
     }
 
     /**
@@ -96,10 +70,6 @@ public final class EscMetaData {
      * @return JSON object.
      */
     public JsonObject toJson() {
-        if (userMeta == null) {
-            return Json.createObjectBuilder().add("EscSysMeta", sysMeta.toJson()).build();
-        }
-        return Json.createObjectBuilder().add("EscUserMeta", userMeta.toJson())
-                .add("EscSysMeta", sysMeta.toJson()).build();
+        return Json.createObjectBuilder().add("EscMeta", meta.toJson()).build();
     }
 }

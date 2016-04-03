@@ -206,7 +206,7 @@ public final class EscSpiUtils {
 
         final EscMetaData meta;
         if (commonEvent.getMeta() == null) {
-            meta = new EscMetaData(new EscSysMeta(dataContent.getType()));
+            meta = new EscMetaData(new EscMeta(new EscSysMeta(dataContent.getType())));
         } else {
             final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(commonEvent
                     .getMetaType().asBaseType()));
@@ -214,7 +214,7 @@ public final class EscSpiUtils {
                     commonEvent.getMeta());
             final EscSysMeta sysMeta = new EscSysMeta(dataContent.getType(), metaContent.getType(),
                     commonEvent.getMetaType().asBaseType());
-            meta = new EscMetaData(sysMeta, metaContent.getWrapper());
+            meta = new EscMetaData(new EscMeta(sysMeta, metaContent.getWrapper()));
         }
 
         final UUID eventId = commonEvent.getId().asBaseType();

@@ -18,25 +18,21 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.io.StringWriter;
 
-import javax.json.Json;
 import javax.json.JsonObject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 
 /**
- * Test for {@link EscMetaData} class.
+ * Test for {@link EscMeta} class.
  */
-public class EscMetaDataTest {
+public class EscMetaTest {
 
     private static final String CONTENT_TYPE = "application/xml; version=1; encoding=utf-8";
 
@@ -45,31 +41,31 @@ public class EscMetaDataTest {
 
         // PREPARE
         final String expectedXml = IOUtils
-                .toString(this.getClass().getResourceAsStream("/meta-data-xml.xml"));
+                .toString(this.getClass().getResourceAsStream("/esc-meta.xml"));
 
         // TEST
-        final EscMetaData testee = unmarshal(expectedXml, EscMetaData.class, MyMeta.class, Base64Data.class);
+        final EscMeta testee = unmarshal(expectedXml, EscMeta.class, MyMeta.class, Base64Data.class);
 
         // VERIFY
         assertThat(testee).isNotNull();
-        assertThat(testee.getEscMeta()).isNotNull();
-        final EscMeta meta = testee.getEscMeta();
-        assertThat(meta.getUserMeta()).isNotNull();
-        assertThat(meta.getUserMeta().getObj()).isInstanceOf(MyMeta.class);
-        final MyMeta userMeta = (MyMeta) meta.getUserMeta().getObj();
+        assertThat(testee.getUserMeta()).isNotNull();
+        assertThat(testee.getUserMeta().getObj()).isInstanceOf(MyMeta.class);
+        final MyMeta userMeta = (MyMeta) testee.getUserMeta().getObj();
         assertThat(userMeta.getUser()).isEqualTo("abc");
 
-        assertThat(meta.getSysMeta()).isNotNull();
-        assertThat(meta.getSysMeta().getDataContentType().toString()).isEqualTo(CONTENT_TYPE);
-        assertThat(meta.getSysMeta().getMetaContentType().toString()).isEqualTo(CONTENT_TYPE);
-        assertThat(meta.getSysMeta().getMetaType().toString()).isEqualTo("MyMeta");
+        assertThat(testee.getSysMeta()).isNotNull();
+        assertThat(testee.getSysMeta().getDataContentType().toString()).isEqualTo(CONTENT_TYPE);
+        assertThat(testee.getSysMeta().getMetaContentType().toString()).isEqualTo(CONTENT_TYPE);
+        assertThat(testee.getSysMeta().getMetaType().toString()).isEqualTo("MyMeta");
 
         // TEST
-        final String xml = marshal(testee, EscMetaData.class, MyMeta.class, Base64Data.class);
-
-        // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert.assertXMLEqual(expectedXml, xml);
+        final JAXBContext ctx = JAXBContext.newInstance(EscMeta.class, MyMeta.class, Base64Data.class);
+        final Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+        final StringWriter sw = new StringWriter();
+        marshaller.marshal(testee, sw);
+        assertThat(sw.toString()).isEqualTo(expectedXml);
 
     }
 
@@ -84,23 +80,20 @@ public class EscMetaDataTest {
         final String base64Str = "SGVsbG8gd29ybGQh";
         final EscSysMeta sysMeta = new EscSysMeta(dataContentType, metaContentType, metaType);
         final DataWrapper userMeta = new DataWrapper(new Base64Data(base64Str));
-        final EscMeta meta = new EscMeta(sysMeta, userMeta);
-        final EscMetaData testee = new EscMetaData(meta);
+        final EscMeta testee = new EscMeta(sysMeta, userMeta);
 
         // TEST
         final JsonObject result = testee.toJson();
 
         // VERIFY
-        assertThat(result.getJsonObject("EscMeta")).isNotNull();
-        final JsonObject jsonMeta = result.getJsonObject("EscMeta");
-        assertThat(jsonMeta.getJsonObject("EscSysMeta")).isNotNull();
-        assertThat(jsonMeta.getJsonObject("EscUserMeta")).isNotNull();
-        assertThat(jsonMeta.getJsonObject("EscSysMeta").getString("data-content-type")).isEqualTo(
+        assertThat(result.getJsonObject("EscSysMeta")).isNotNull();
+        assertThat(result.getJsonObject("EscUserMeta")).isNotNull();
+        assertThat(result.getJsonObject("EscSysMeta").getString("data-content-type")).isEqualTo(
                 dataContentType.toString());
-        assertThat(jsonMeta.getJsonObject("EscSysMeta").getString("meta-content-type")).isEqualTo(
+        assertThat(result.getJsonObject("EscSysMeta").getString("meta-content-type")).isEqualTo(
                 metaContentType.toString());
-        assertThat(jsonMeta.getJsonObject("EscSysMeta").getString("meta-type")).isEqualTo(metaType);
-        assertThat(jsonMeta.getJsonObject("EscUserMeta").getString("Base64")).isEqualTo(base64Str);
+        assertThat(result.getJsonObject("EscSysMeta").getString("meta-type")).isEqualTo(metaType);
+        assertThat(result.getJsonObject("EscUserMeta").getString("Base64")).isEqualTo(base64Str);
 
     }
 
