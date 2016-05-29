@@ -26,25 +26,40 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 
 /**
  * A structure that contains the user's meta data and the system's meta information.
  */
-@XmlRootElement(name = "esc-meta")
-public final class EscMeta {
+@XmlRootElement(name = EscMeta.EL_ROOT_NAME)
+public final class EscMeta implements ToJsonCapable {
 
-    @XmlElement(name = "data-type")
+    /** Unique XML/JSON root element name of the type. */
+    public static final String EL_ROOT_NAME = "esc-meta";
+
+    /** Unique name of the type. */
+    public static final TypeName TYPE = new TypeName(EscMeta.class.getSimpleName());
+    
+    private static final String EL_DATA_TYPE = "data-type";
+
+    private static final String EL_DATA_CONTENT_TYPE = "data-content-type";
+
+    private static final String EL_META_TYPE = "meta-type";
+
+    private static final String EL_META_CONTENT_TYPE = "meta-content-type";
+
+    @XmlElement(name = EL_DATA_TYPE)
     private String dataType;
 
-    @XmlElement(name = "data-content-type")
+    @XmlElement(name = EL_DATA_CONTENT_TYPE)
     private String dataContentTypeStr;
 
-    @XmlElement(name = "meta-type")
+    @XmlElement(name = EL_META_TYPE)
     private String metaType;
 
-    @XmlElement(name = "meta-content-type")
+    @XmlElement(name = EL_META_CONTENT_TYPE)
     private String metaContentTypeStr;
 
     @XmlAnyElement(lax = true)
@@ -170,23 +185,28 @@ public final class EscMeta {
      */
     public JsonObject toJson() {
         final JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("data-type", dataType);
-        builder.add("data-content-type", dataContentTypeStr);
+        builder.add(EL_DATA_TYPE, dataType);
+        builder.add(EL_DATA_CONTENT_TYPE, dataContentTypeStr);
         if (meta == null) {
             return builder.build();
         }
-        builder.add("meta-type", metaType);
-        builder.add("meta-content-type", metaContentTypeStr);
+        builder.add(EL_META_TYPE, metaType);
+        builder.add(EL_META_CONTENT_TYPE, metaContentTypeStr);
         if (meta instanceof JsonObject) {
             return builder.add(metaType, (JsonObject) meta).build();
         }
         if (meta instanceof Base64Data) {
             final Base64Data base64data = (Base64Data) meta;
-            return builder.add(Base64Data.TYPE, base64data.getEncoded()).build();
+            return builder.add(Base64Data.EL_ROOT_NAME, base64data.getEncoded()).build();
         }
         throw new IllegalStateException("Unknown meta object type: " + meta.getClass());
     }
 
+    @Override
+    public String getRootElementName() {
+        return EL_ROOT_NAME;
+    }
+    
     /**
      * Creates in instance from the given JSON object.
      * 
@@ -196,20 +216,20 @@ public final class EscMeta {
      * @return New instance.
      */
     public static EscMeta create(final JsonObject jsonObj) {
-        final String dataType = jsonObj.getString("data-type");
+        final String dataType = jsonObj.getString(EL_DATA_TYPE);
         final EnhancedMimeType dataContentType = EnhancedMimeType.create(jsonObj
-                .getString("data-content-type"));
-        if (!jsonObj.containsKey("meta-type")) {
-            return new EscMeta(jsonObj.getString("data-type"), dataContentType);
+                .getString(EL_DATA_CONTENT_TYPE));
+        if (!jsonObj.containsKey(EL_META_TYPE)) {
+            return new EscMeta(jsonObj.getString(EL_DATA_TYPE), dataContentType);
         }
-        final String metaType = jsonObj.getString("meta-type");
+        final String metaType = jsonObj.getString(EL_META_TYPE);
         final EnhancedMimeType metaContentType = EnhancedMimeType.create(jsonObj
-                .getString("meta-content-type"));
-        if (metaType.equals(Base64Data.TYPE)) {
+                .getString(EL_META_CONTENT_TYPE));
+        if (metaType.equals(Base64Data.EL_ROOT_NAME)) {
             return new EscMeta(dataType, dataContentType, metaType, metaContentType, new Base64Data(
                     jsonObj.getString(metaType)));
         }
         return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
     }
-
+    
 }
