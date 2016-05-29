@@ -64,15 +64,23 @@ public final class JsonDeSerializer implements SerDeserializer {
 
     @Override
     public final byte[] marshal(final Object obj) {
-        if (!(obj instanceof JsonStructure)) {
-            throw new IllegalArgumentException("Can only handle instances of type 'JsonStructure', but not: "
-                    + obj.getClass());
+
+        final JsonStructure struct;
+        if (obj instanceof ToJsonCapable) {
+            struct = ((ToJsonCapable) obj).toJson();
+        } else if (obj instanceof JsonStructure) {
+            struct = (JsonStructure) obj;
+        } else {
+            throw new IllegalArgumentException("Can only handle instances of type '"
+                    + ToJsonCapable.class.getSimpleName() + "' or '" + JsonStructure.class.getSimpleName()
+                    + "', but not: " + obj.getClass());
         }
+
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
         final Writer writer = new OutputStreamWriter(bos, mimeType.getEncoding());
         final JsonWriter jsonWriter = Json.createWriter(writer);
         try {
-            jsonWriter.write((JsonStructure) obj);
+            jsonWriter.write(struct);
         } finally {
             jsonWriter.close();
         }
