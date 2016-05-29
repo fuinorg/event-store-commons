@@ -25,16 +25,20 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.apache.commons.codec.binary.Base64;
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 
 /**
  * Contains some Base64 encoded data.
  */
-@XmlRootElement(name = Base64Data.TYPE)
+@XmlRootElement(name = Base64Data.EL_ROOT_NAME)
 public final class Base64Data {
 
-    /** Unique type name. */
-    public static final String TYPE = "Base64"; 
+    /** Unique XML/JSON root element name of the type. */
+    public static final String EL_ROOT_NAME = "Base64"; 
+
+    /** Unique name of the type. */
+    public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
     
     @XmlValue
     private String base64Str;
