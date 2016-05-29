@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.activation.MimeTypeParseException;
 import javax.validation.constraints.NotNull;
@@ -202,6 +203,20 @@ public final class EnhancedMimeType extends javax.activation.MimeType {
      */
     public final boolean isXml() {
         return getBaseType().equals("application/xml");
+    }
+
+    /**
+     * Determine if the primary, sub type and encoding of this object is the same as what is in the given
+     * type.
+     * 
+     * @param other
+     *            The MimeType object to compare with.
+     * 
+     * @return True if they match.
+     */
+    public final boolean matchEncoding(final EnhancedMimeType other) {
+        return match(other) && Objects.equals(getEncoding(), other.getEncoding());
+
     }
 
     /**
