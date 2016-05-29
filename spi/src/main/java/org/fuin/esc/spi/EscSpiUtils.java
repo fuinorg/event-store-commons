@@ -62,9 +62,6 @@ public final class EscSpiUtils {
         Contract.requireArgNotNull("type", type);
 
         final Serializer serializer = registry.getSerializer(type);
-        if (serializer == null) {
-            throw new IllegalStateException("Couldn't get a serializer for: " + type);
-        }
         return new SerializedData(type, serializer.getMimeType(), serializer.marshal(data));
     }
 
@@ -87,10 +84,6 @@ public final class EscSpiUtils {
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("data", data);
         final Deserializer deserializer = registry.getDeserializer(data.getType(), data.getMimeType());
-        if (deserializer == null) {
-            throw new IllegalStateException("Couldn't get a deserializer for: " + data.getType() + " / "
-                    + data.getMimeType());
-        }
         return deserializer.unmarshal(data.getRaw(), data.getMimeType());
 
     }
@@ -116,10 +109,6 @@ public final class EscSpiUtils {
         for (final CommonEvent commonEvent : commonEvents) {
             final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent
                     .getDataType().asBaseType()));
-            if (serializer == null) {
-                throw new IllegalStateException("Could not find a serializer for event type '"
-                        + commonEvent.getDataType() + "': " + commonEvent);
-            }
             if (mimeType == null) {
                 mimeType = serializer.getMimeType();
             } else {
@@ -206,24 +195,24 @@ public final class EscSpiUtils {
         if (commonEvent.getMeta() == null) {
             return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType);
         }
-        
+
         final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(commonEvent
                 .getMetaType().asBaseType()));
-        if (metaSerializer.getMimeType().match(targetContentType)) {
+        if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
             return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent
                     .getMetaType().asBaseType(), metaSerializer.getMimeType(), commonEvent.getMeta());
         }
-        
-        final byte[] serData = metaSerializer.marshal(commonEvent.getMeta());
+
+        final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
         return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent.getMetaType()
-                .asBaseType(), metaContentType, new Base64Data(serData));
+                .asBaseType(), metaContentType, new Base64Data(serMeta));
 
     }
 
     private static EnhancedMimeType contentType(final EnhancedMimeType sourceContentType,
             final EnhancedMimeType targetContentType) {
-        if (sourceContentType.match(targetContentType)) {
+        if (sourceContentType.matchEncoding(targetContentType)) {
             return sourceContentType;
         }
         return EnhancedMimeType.create(sourceContentType.toString() + "; transfer-encoding=base64");
