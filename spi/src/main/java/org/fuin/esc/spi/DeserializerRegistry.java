@@ -32,25 +32,26 @@ public interface DeserializerRegistry {
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
-     *            Mime type or <code>null</code> to use the default mime type.
+     *            Mime type.
      * 
-     * @return Deserializer instance configured with the arguments or NULL if no
-     *         deserializer was found for the type.
+     * @return Deserializer instance configured with the arguments or throws an
+     *         {@link IllegalArgumentException} if no deserializer was found for the type.
      */
-    @Nullable
-    public Deserializer getDeserializer(@NotNull SerializedDataType type,
-            @Nullable EnhancedMimeType mimeType);
+    @NotNull
+    public Deserializer getDeserializer(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
 
     /**
-     * Tries to find a deserializer for the given type.
+     * Tries to find a deserializer for the given type using the
+     * {@link #getDefaultContentType(SerializedDataType)}. This method fails if the default mime type is not
+     * set.
      * 
      * @param type
      *            Unique identifier for the type of data.
      * 
-     * @return Deserializer instance configured with the arguments or NULL if no
-     *         deserializer was found for the type.
+     * @return Deserializer instance configured with the arguments oor throws an
+     *         {@link IllegalArgumentException} if no deserializer was found for the type.
      */
-    @Nullable
+    @NotNull
     public Deserializer getDeserializer(@NotNull SerializedDataType type);
 
     /**
@@ -59,10 +60,33 @@ public interface DeserializerRegistry {
      * @param type
      *            Unique identifier for the type of data.
      * 
-     * @return Default mime type or NULL if nothing was configured for the given
-     *         type.
+     * @return Default mime type or NULL if nothing was configured for the given type.
      */
     @Nullable
     public EnhancedMimeType getDefaultContentType(@NotNull SerializedDataType type);
+
+    /**
+     * Tries to find a deserializer for the given type using the
+     * {@link #getDefaultContentType(SerializedDataType)}. This method fails if the default mime type is not
+     * set.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return TRUE if a deserializer was found.
+     */
+    public boolean deserializerExists(@NotNull SerializedDataType type);
+
+    /**
+     * Tries to find a deserializer for the given combination.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * @param mimeType
+     *            Mime type.
+     * 
+     * @return TRUE if a deserializer was found.
+     */
+    public boolean deserializerExists(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
 
 }

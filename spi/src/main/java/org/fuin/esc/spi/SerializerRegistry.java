@@ -25,14 +25,24 @@ import javax.validation.constraints.NotNull;
 public interface SerializerRegistry {
 
     /**
-     * Tries to find a deserializer for the given type.
+     * Tries to find a serializer for the given type.
      * 
      * @param type
      *            Unique identifier for the type of data.
      * 
-     * @return Serializer instance or NULL if no serializer was found for the
-     *         type.
+     * @return Serializer instance or throws a {@link IllegalArgumentException} if no serializer was found.
      */
+    @NotNull
     public Serializer getSerializer(@NotNull SerializedDataType type);
+
+    /**
+     * Tries to find a serializer for the given type.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return TRUE if a serializer was found for the type.
+     */
+    public boolean serializerExists(@NotNull SerializedDataType type);
 
 }

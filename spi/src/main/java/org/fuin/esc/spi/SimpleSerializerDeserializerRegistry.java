@@ -27,8 +27,7 @@ import org.fuin.objects4j.common.Contract;
 /**
  * Contains all known serializers and deserializers.
  */
-public final class SimpleSerializerDeserializerRegistry implements
-        SerDeserializerRegistry {
+public final class SimpleSerializerDeserializerRegistry implements SerDeserializerRegistry {
 
     private final Map<SerializedDataType, Serializer> serMap;
 
@@ -52,18 +51,17 @@ public final class SimpleSerializerDeserializerRegistry implements
      * @param type
      *            Type of the data.
      * @param contentType
-     *            Content type like "application/xml" or "application/json"
-     *            (without parameters - Only base type).
+     *            Content type like "application/xml" or "application/json" (without parameters - Only base
+     *            type).
      * @param serDeserializer
      *            Serializer and deserializer.
      */
-    public final void add(@NotNull final SerializedDataType type,
-            final String contentType,
+    public final void add(@NotNull final SerializedDataType type, final String contentType,
             @NotNull final SerDeserializer serDeserializer) {
 
         this.addSerializer(type, serDeserializer);
         this.addDeserializer(type, contentType, serDeserializer);
-        
+
     }
 
     /**
@@ -72,13 +70,13 @@ public final class SimpleSerializerDeserializerRegistry implements
      * @param type
      *            Type of the data.
      * @param contentType
-     *            Content type like "application/xml" or "application/json"
-     *            (without parameters - Only base type).
+     *            Content type like "application/xml" or "application/json" (without parameters - Only base
+     *            type).
      * @param deserializer
      *            Deserializer.
      */
-    public final void addDeserializer(@NotNull final SerializedDataType type,
-            final String contentType, @NotNull final Deserializer deserializer) {
+    public final void addDeserializer(@NotNull final SerializedDataType type, final String contentType,
+            @NotNull final Deserializer deserializer) {
 
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("contentType", contentType);
@@ -95,11 +93,10 @@ public final class SimpleSerializerDeserializerRegistry implements
      * @param type
      *            Type of the data.
      * @param contentType
-     *            Content type like "application/xml" or "application/json"
-     *            (without parameters - Only base type).
+     *            Content type like "application/xml" or "application/json" (without parameters - Only base
+     *            type).
      */
-    public final void setDefaultContentType(
-            @NotNull final SerializedDataType type,
+    public final void setDefaultContentType(@NotNull final SerializedDataType type,
             final EnhancedMimeType contentType) {
 
         Contract.requireArgNotNull("type", type);
@@ -130,18 +127,27 @@ public final class SimpleSerializerDeserializerRegistry implements
     @Override
     public Serializer getSerializer(final SerializedDataType type) {
         Contract.requireArgNotNull("type", type);
-        return serMap.get(type);
+        final Serializer ser = serMap.get(type);
+        if (ser == null) {
+            throw new IllegalArgumentException("No serializer found for: " + type);
+        }
+        return ser;
     }
 
     @Override
-    public final Deserializer getDeserializer(final SerializedDataType type,
+    public final Deserializer getDeserializer(final SerializedDataType type, 
             final EnhancedMimeType mimeType) {
 
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("mimeType", mimeType);
 
         final Key key = new Key(type, mimeType.getBaseType());
-        return desMap.get(key);
+        final Deserializer des = desMap.get(key);
+        if (des == null) {
+            throw new IllegalArgumentException("No deserializer found for: " + key);
+        }
+        return des;
+
     }
 
     @Override
@@ -150,17 +156,19 @@ public final class SimpleSerializerDeserializerRegistry implements
 
         final EnhancedMimeType contentType = contentTypes.get(type);
         if (contentType == null) {
-            throw new IllegalArgumentException(
-                    "No default content type was set for: " + type);
+            throw new IllegalArgumentException("No default content type was set for: " + type);
         }
 
         final Key key = new Key(type, contentType.getBaseType());
-        return desMap.get(key);
+        final Deserializer des = desMap.get(key);
+        if (des == null) {
+            throw new IllegalArgumentException("No deserializer found for: " + key);
+        }
+        return des;
     }
 
     @Override
-    public final EnhancedMimeType getDefaultContentType(
-            final SerializedDataType type) {
+    public final EnhancedMimeType getDefaultContentType(final SerializedDataType type) {
         Contract.requireArgNotNull("type", type);
 
         final EnhancedMimeType contentType = contentTypes.get(type);
@@ -168,6 +176,45 @@ public final class SimpleSerializerDeserializerRegistry implements
             return null;
         }
         return contentType;
+    }
+
+    @Override
+    public final boolean serializerExists(final SerializedDataType type) {
+        final Serializer ser = serMap.get(type);
+        if (ser == null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public final boolean deserializerExists(final SerializedDataType type) {
+        Contract.requireArgNotNull("type", type);
+
+        final EnhancedMimeType contentType = contentTypes.get(type);
+        if (contentType == null) {
+            throw new IllegalArgumentException("No default content type was set for: " + type);
+        }
+
+        final Key key = new Key(type, contentType.getBaseType());
+        final Deserializer des = desMap.get(key);
+        if (des == null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public final boolean deserializerExists(final SerializedDataType type, final EnhancedMimeType mimeType) {
+        Contract.requireArgNotNull("type", type);
+        Contract.requireArgNotNull("mimeType", mimeType);
+
+        final Key key = new Key(type, mimeType.getBaseType());
+        final Deserializer des = desMap.get(key);
+        if (des == null) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -190,8 +237,7 @@ public final class SimpleSerializerDeserializerRegistry implements
             final int prime = 31;
             int result = 1;
             result = prime * result + ((type == null) ? 0 : type.hashCode());
-            result = prime * result
-                    + ((contentType == null) ? 0 : contentType.hashCode());
+            result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
             return result;
         }
 
@@ -218,6 +264,11 @@ public final class SimpleSerializerDeserializerRegistry implements
         }
 
         // CHECKSTYLE:ON
+
+        @Override
+        public String toString() {
+            return "Key [type=" + type + ", contentType=" + contentType + "]";
+        }
 
     }
 
