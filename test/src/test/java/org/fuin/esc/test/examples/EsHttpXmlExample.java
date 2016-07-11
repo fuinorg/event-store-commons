@@ -13,8 +13,8 @@ import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStore;
+//import org.fuin.esc.eshttp.ESEnvelopeType;
+//import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
@@ -35,7 +35,7 @@ public final class EsHttpXmlExample {
      *            Not used.
      */
     public static void main(final String[] args) throws MalformedURLException {
-
+/*
         // Setup for 
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         URL url = new URL("http://127.0.0.1:2113/"); // Default event store port
@@ -80,7 +80,7 @@ public final class EsHttpXmlExample {
             // Don't forget to close
             eventStore.close();
         }
-
+*/
     }
 
 }

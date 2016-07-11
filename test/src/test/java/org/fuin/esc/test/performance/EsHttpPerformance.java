@@ -21,8 +21,8 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStore;
+//import org.fuin.esc.eshttp.ESEnvelopeType;
+//import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
@@ -45,7 +45,8 @@ public final class EsHttpPerformance {
      * @throws IOException Error reading console input.
      */
     public static void main(final String[] args) throws IOException {
-
+/*
+        
         waitForInput("START");
 
         final int max = 100000;
@@ -138,7 +139,7 @@ public final class EsHttpPerformance {
         }
 
         waitForInput("END");
-
+*/
     }
 
     private static void measure(final String name, final int count, final Consumer<String> func) {
@@ -162,6 +163,7 @@ public final class EsHttpPerformance {
         while ((char) System.in.read() != 'c') {
             // Do it again
         }
+        
     }
 
 }

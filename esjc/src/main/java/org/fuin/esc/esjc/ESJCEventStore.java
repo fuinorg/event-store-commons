@@ -35,7 +35,11 @@ import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.spi.Serializer;
+import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.EventData;
@@ -50,16 +54,30 @@ public final class ESJCEventStore implements EventStore {
 
     private final com.github.msemys.esjc.EventStore es;
 
+    private final SerializerRegistry serRegistry;
+
+    private final DeserializerRegistry desRegistry;
+
+    
     /**
      * Constructor with event store to use.
      * 
      * @param es
      *            Delegate.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
      */
-    public ESJCEventStore(@NotNull final com.github.msemys.esjc.EventStore es) {
+    public ESJCEventStore(@NotNull final com.github.msemys.esjc.EventStore es, @NotNull final SerializerRegistry serRegistry,
+            @NotNull final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("es", es);
+        Contract.requireArgNotNull("serRegistry", serRegistry);
+        Contract.requireArgNotNull("desRegistry", desRegistry);
         this.es = es;
+        this.serRegistry = serRegistry;
+        this.desRegistry = desRegistry;
     }
 
     @Override
@@ -201,4 +219,33 @@ public final class ESJCEventStore implements EventStore {
         return null;
     }
 
+    private EventData asEventData(final CommonEvent commonEvent) {
+        
+        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
+        final Serializer dataSerializer = serRegistry.getSerializer(serDataType);
+        final byte[] serData = dataSerializer.marshal(commonEvent.getData());
+        final boolean jsonData = dataSerializer.getMimeType().getSubType().equals("json");
+
+        final SerializedDataType serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+        final Serializer metaSerializer = serRegistry.getSerializer(serMetaType);
+        final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
+        final boolean jsonMeta = metaSerializer.getMimeType().getSubType().equals("json");
+        
+        final EventData.Builder builder = EventData.newBuilder().
+                eventId(commonEvent.getId().asBaseType()).
+                type(commonEvent.getDataType().asBaseType());
+        if (jsonData) {
+            builder.jsonData(serData);
+        } else {
+            builder.data(serData);
+        }
+        if (jsonMeta) {
+            builder.jsonMetadata(serMeta);
+        } else {
+            builder.metadata(serMeta);
+        }
+        return builder.build();
+        
+    }
+    
 }

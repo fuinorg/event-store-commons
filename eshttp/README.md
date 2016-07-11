@@ -1,6 +1,8 @@
 # esc-eshttp
 Event store commons HTTP adapter for Greg Young's [Event Store](https://www.geteventstore.com/).
 
+**CURRENTLY BROKEN (2016-07-01)**
+
 ## ESC Meta Data Structure
 The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. 
 To allow having multiple types and versions of data and meta data, the common event store interface introduces 

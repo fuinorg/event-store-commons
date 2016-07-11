@@ -82,9 +82,9 @@ public class EscSpiUtilsTest {
         // TEST
         try {
             EscSpiUtils.serialize(registry, type, data);
-        } catch (final IllegalStateException ex) {
+        } catch (final IllegalArgumentException ex) {
             // VERIFY
-            assertThat(ex.getMessage()).isEqualTo("Couldn't get a serializer for: whatever");
+            assertThat(ex.getMessage()).isEqualTo("No serializer found for: whatever");
         }
 
     }
@@ -100,9 +100,9 @@ public class EscSpiUtilsTest {
         // TEST
         try {
             EscSpiUtils.deserialize(registry, data);
-        } catch (final IllegalStateException ex) {
+        } catch (final IllegalArgumentException ex) {
             // VERIFY
-            assertThat(ex.getMessage()).isEqualTo("Couldn't get a deserializer for: whatever / text/plain");
+            assertThat(ex.getMessage()).isEqualTo("No deserializer found for: Key [type=whatever, contentType=text/plain]");
         }
 
     }
@@ -203,7 +203,7 @@ public class EscSpiUtilsTest {
 
         // TEST
         final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/xml"), commonEvent);
+                EnhancedMimeType.create("application/xml; encoding=UTF-8"), commonEvent);
 
         // VERIFY
         assertThat(result).isNotNull();
@@ -258,7 +258,7 @@ public class EscSpiUtilsTest {
 
         // TEST
         final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/xml"), commonEvent);
+                EnhancedMimeType.create("application/xml; encoding=UTF-8"), commonEvent);
 
         // VERIFY
         assertThat(result).isNotNull();

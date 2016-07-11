@@ -39,8 +39,8 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStore;
+//import org.fuin.esc.eshttp.ESEnvelopeType;
+//import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStore;
 import org.fuin.esc.spi.JsonDeSerializer;
@@ -89,10 +89,13 @@ public class TestFeatures {
             registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonDeSer);
             registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
             if (type.equals("eshttp")) {
+                /*
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
                 eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry,
                         registry);
+                */
+                throw new UnsupportedOperationException();
             } else {
                 setupDb();
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);

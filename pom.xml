@@ -33,7 +33,9 @@
 		<module>spi</module>
 		<module>mem</module>
 		<module>jpa</module>
+		<!-- Currently broken as of 2016-07-01 
 		<module>eshttp</module>
+		 -->
 		<module>test</module>
 	</modules>
 
