@@ -34,11 +34,12 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.EventData;
+import com.github.msemys.esjc.RecordedEvent;
 
 /**
- * Converts a {@link EventData} into {@link CommonEvent}.
+ * Converts a {@link RecordedEvent} into {@link CommonEvent}.
  */
-public final class EventData2CommonEventConverter implements Converter<EventData, CommonEvent> {
+public final class RecordedEvent2CommonEventConverter implements Converter<RecordedEvent, CommonEvent> {
 
     private final DeserializerRegistry deserRegistry;
 
@@ -48,7 +49,7 @@ public final class EventData2CommonEventConverter implements Converter<EventData
      * @param deserRegistry
      *            Registry used to locate deserializers.
      */
-    public EventData2CommonEventConverter(@NotNull final DeserializerRegistry deserRegistry) {
+    public RecordedEvent2CommonEventConverter(@NotNull final DeserializerRegistry deserRegistry) {
         super();
         Contract.requireArgNotNull("deserRegistry", deserRegistry);
         this.deserRegistry = deserRegistry;
@@ -62,10 +63,11 @@ public final class EventData2CommonEventConverter implements Converter<EventData
      * 
      * @return Converted data das event.
      */
-    public final CommonEvent convert(final EventData eventData) {
+    @Override
+    public final CommonEvent convert(final RecordedEvent eventData) {
 
-        final EnhancedMimeType metaMimeType = metaMimeType(eventData.isJsonMetadata);
-        final SerializedDataType serMetaType = new SerializedDataType(EscMeta.EL_ROOT_NAME);
+        final EnhancedMimeType metaMimeType = metaMimeType(eventData.isJson);
+        final SerializedDataType serMetaType = new SerializedDataType(EscMeta.TYPE.asBaseType());
         final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, metaMimeType);
         final EscMeta meta = metaDeserializer.unmarshal(eventData.metadata, metaMimeType);
 
@@ -75,9 +77,9 @@ public final class EventData2CommonEventConverter implements Converter<EventData
         final Object data = dataDeserializer.unmarshal(eventData.data, dataMimeType);
 
         final EventId eventId = new EventId(eventData.eventId);
-        final TypeName dataType = new TypeName(eventData.type);
+        final TypeName dataType = new TypeName(eventData.eventType);
         final TypeName metaType = new TypeName(meta.getMetaType());
-        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta);
+        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta.getMeta());
     }
 
     private EnhancedMimeType metaMimeType(final boolean json) {
@@ -88,8 +90,8 @@ public final class EventData2CommonEventConverter implements Converter<EventData
     }
 
     @Override
-    public final Class<EventData> getSourceType() {
-        return EventData.class;
+    public final Class<RecordedEvent> getSourceType() {
+        return RecordedEvent.class;
     }
 
     @Override

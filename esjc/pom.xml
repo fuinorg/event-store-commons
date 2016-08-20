@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>com.github.msemys</groupId>
 			<artifactId>esjc</artifactId>
-			<version>1.4.0</version>
+			<version>1.5.0</version>
 		</dependency>
 
 		<!-- test -->

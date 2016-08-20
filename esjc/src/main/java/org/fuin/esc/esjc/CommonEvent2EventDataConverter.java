@@ -81,6 +81,7 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
      * 
      * @return Converted event as event data.
      */
+    @Override
     public final EventData convert(final CommonEvent commonEvent) {
 
         // User's data

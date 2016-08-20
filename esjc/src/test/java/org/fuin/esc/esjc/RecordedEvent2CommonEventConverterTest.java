@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.charset.Charset;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -29,6 +30,7 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
+import org.fuin.esc.spi.EscMetaJsonDeSerializer;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
@@ -37,10 +39,10 @@ import org.junit.Test;
 import com.github.msemys.esjc.EventData;
 
 /**
- * Test for {@link CommonEvent2EventDataConverter} class.
+ * Test for {@link RecordedEvent2CommonEventConverter} class.
  */
 // CHECKSTYLE:OFF Test code
-public final class CommonEvent2EventDataConverterTest {
+public class RecordedEvent2CommonEventConverterTest {
 
     @Test
     public final void testConvert() {
@@ -50,9 +52,9 @@ public final class CommonEvent2EventDataConverterTest {
                 Charset.forName("utf-8"));
         final SimpleSerializerDeserializerRegistry serRegistry = new SimpleSerializerDeserializerRegistry();
         final JsonDeSerializer deserializer = new JsonDeSerializer();
-        serRegistry.addSerializer(new SerializedDataType("MyData"), deserializer);
-        serRegistry.addSerializer(new SerializedDataType("MyMeta"), deserializer);
-        serRegistry.addSerializer(new SerializedDataType(EscMeta.TYPE.asBaseType()), deserializer);
+        serRegistry.add(new SerializedDataType("MyData"), "application/json", deserializer);
+        serRegistry.add(new SerializedDataType("MyMeta"), "application/json", deserializer);
+        serRegistry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/json", new EscMetaJsonDeSerializer());
 
         final EventId id = new EventId();
         final TypeName dataType = new TypeName("MyData");
@@ -60,26 +62,31 @@ public final class CommonEvent2EventDataConverterTest {
         final TypeName metaType = new TypeName("MyMeta");
         final Object meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
         final CommonEvent commonEvent = new SimpleCommonEvent(id, dataType, data, metaType, meta);
-
-        final CommonEvent2EventDataConverter testee = new CommonEvent2EventDataConverter(serRegistry,
+        final CommonEvent2EventDataConverter conv = new CommonEvent2EventDataConverter(serRegistry,
                 targetContentType);
-
+        final EventData eventData = conv.convert(commonEvent);
+        
+        final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(serRegistry);
+        
         // TEST
-        final EventData eventData = testee.convert(commonEvent);
-
+        final CommonEvent result = testee.convert(eventData);
+        
         // VERIFY
-        assertThat(eventData.eventId).isEqualTo(commonEvent.getId().asBaseType());
-        assertThat(eventData.type).isEqualTo(commonEvent.getDataType().asBaseType());
-        assertThat(eventData.isJsonData).isTrue();
-        assertThat(new String(eventData.data, deserializer.getMimeType().getEncoding()))
-                .isEqualTo("{\"id\":1,\"name\":\"Peter\"}");
-        assertThat(eventData.isJsonMetadata).isTrue();
-        assertThat(new String(eventData.metadata, deserializer.getMimeType().getEncoding())).isEqualTo(
-                "{\"data-type\":\"MyData\"," + "\"data-content-type\":\"application/json; encoding=UTF-8\","
-                        + "\"meta-type\":\"MyMeta\",\"meta-content-type\":\"application/json; encoding=UTF-8\","
-                        + "\"MyMeta\":{\"ip\":\"127.0.0.1\"}}");
+        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getDataType()).isEqualTo(dataType);
+        assertThat(result.getMetaType()).isEqualTo(metaType);
+        
+        assertThat(result.getData()).isInstanceOf(JsonObject.class);
+        final JsonObject jsonData = (JsonObject) result.getData();
+        assertThat(jsonData.getInt("id")).isEqualTo(1);
+        assertThat(jsonData.getString("name")).isEqualTo("Peter");
+
+        assertThat(result.getMeta()).isInstanceOf(JsonObject.class);
+        final JsonObject jsonMeta = (JsonObject) result.getMeta();
+        assertThat(jsonMeta.getString("ip")).isEqualTo("127.0.0.1");
+
 
     }
-
+    
 }
-// CHECKSTYLE:ON
+//CHECKSTYLE:ON
