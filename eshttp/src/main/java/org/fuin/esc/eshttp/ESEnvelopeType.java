@@ -26,11 +26,11 @@ public enum ESEnvelopeType {
 
     /** XML envelope. */
     XML("application/xml", "utf-8", "application/atom+xml", "application/vnd.eventstore.events+xml",
-            new ESHttpXmlMarshaller(), new AtomFeedXmlReader()),
+            new ESHttpMarshaller(), new AtomFeedXmlReader()),
 
     /** JSON enevlope. */
     JSON("application/json", "utf-8", "application/vnd.eventstore.atom+json",
-            "application/vnd.eventstore.events+json", new ESHttpJsonMarshaller(), new AtomFeedJsonReader());
+            "application/vnd.eventstore.events+json", new ESHttpMarshaller(), new AtomFeedJsonReader());
 
     private final String metaType;
 

@@ -42,24 +42,14 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
         final Node node = (Node) data;
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
-            final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
+            final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
             return deSer.unmarshal(node, mimeType);
         }
         final String base64str = node.getTextContent();
         final byte[] bytes = Base64.decodeBase64(base64str);
-        final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
+        final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);
 
-    }
-
-    private Deserializer getDeserializer(final DeserializerRegistry registry,
-            final SerializedDataType dataType, final EnhancedMimeType mimeType) {
-        final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-        if (deSer == null) {
-            throw new IllegalStateException("Couldn't find a deserializer for: " + dataType + " + "
-                    + mimeType);
-        }
-        return deSer;
     }
 
 }

@@ -12,22 +12,21 @@
         "eventType": "MyEvent",
         "eventId": "1cc4e29b-c72d-4c15-9c0b-e9f279c45c30",
         "data": {
-            "my-event": {
+            "MyEvent": {
                 "@id": "1cc4e29b-c72d-4c15-9c0b-e9f279c45c30",
                 "@description": "Two"
             }
         },
         "metadata": {
-            "EscUserMeta": {
-                "my-meta": {
-                    "user": "john.doe"
+            "esc-meta":{    
+                "data-type": "MyEvent",
+                "data-content-type":"application/xml; encoding=utf-8",
+                "meta-type": "MyMeta",
+                "meta-content-type":"application/xml; encoding=utf-8",
+                "MyMeta":{
+                    "user":"john.doe"
                 }
-            },
-            "EscSysMeta": {
-                "data-content-type": "application/xml; encoding=UTF-8",
-                "meta-content-type": "application/xml; encoding=UTF-8",
-                "meta-type": "MyMeta"
-            }
+            }   
         }
     },
     "links": [

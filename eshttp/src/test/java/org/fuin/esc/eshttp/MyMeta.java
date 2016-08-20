@@ -28,13 +28,16 @@ import org.fuin.objects4j.common.Nullable;
 /**
  * Example meta data. .
  */
-@XmlRootElement(name = "my-meta")
+@XmlRootElement(name = MyMeta.EL_ROOT_NAME)
 public final class MyMeta implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
+    /** Unique XML/JSON root element name of the type. */
+    public static final String EL_ROOT_NAME = "MyMeta"; 
+    
     /** Unique name of the event. */
-    public static TypeName TYPE = new TypeName("MyMeta");
+    public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
     @XmlElement(name = "user")
     private String user;

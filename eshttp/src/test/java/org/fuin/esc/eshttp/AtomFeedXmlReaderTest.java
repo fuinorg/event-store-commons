@@ -74,9 +74,9 @@ public class AtomFeedXmlReaderTest {
             assertThat(entry.getEventType()).isEqualTo("MyEvent");
             assertThat(entry.getEventId()).isEqualTo("8faef866-b80f-4952-9124-62819a6517aa");
             assertThat(entry.getDataContentType()).isEqualTo(
-                    EnhancedMimeType.create("application/xml; encoding=UTF-8"));
+                    EnhancedMimeType.create("application/xml; version=1; encoding=utf-8"));
             assertThat(entry.getMetaContentType()).isEqualTo(
-                    EnhancedMimeType.create("application/xml; encoding=UTF-8"));
+                    EnhancedMimeType.create("application/xml; version=1; encoding=utf-8"));
             assertThat(entry.getData()).isInstanceOf(Node.class);
             assertThat(entry.getMeta()).isInstanceOf(Node.class);
 

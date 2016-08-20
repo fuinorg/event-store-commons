@@ -112,7 +112,7 @@ public final class MultipleCommands implements TestCommand {
 
     @Override
     public final void verify() {
-        if (!isSuccessful()) {
+        if (!isSuccessful()) {            
             throw new RuntimeException("There was at least one failure:\n" + getFailureDescription());
         }
     }

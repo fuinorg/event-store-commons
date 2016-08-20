@@ -15,19 +15,18 @@
         <eventType>MyEvent</eventType>
         <eventId>1cc4e29b-c72d-4c15-9c0b-e9f279c45c30</eventId>
         <data>
-            <my-event id="1cc4e29b-c72d-4c15-9c0b-e9f279c45c30" description="Two" />
+            <MyEvent id="1cc4e29b-c72d-4c15-9c0b-e9f279c45c30" description="Two" />
         </data>
         <metadata>
-            <EscUserMeta>
-                <my-meta>
-                    <user>john.doe</user>
-                </my-meta>
-            </EscUserMeta>
-            <EscSysMeta>
-                <data-content-type>application/xml; encoding=UTF-8</data-content-type>
-                <meta-content-type>application/xml; encoding=UTF-8</meta-content-type>
-                <meta-type>MyMeta</meta-type>
-            </EscSysMeta>
+	        <esc-meta>
+	            <data-type>MyEvent</data-type>
+	            <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
+	            <meta-type>MyMeta</meta-type>
+	            <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+	            <MyMeta>
+	                <user>john.doe</user>
+	            </MyMeta>
+	        </esc-meta>
         </metadata>
     </atom:content>
 </atom:entry>

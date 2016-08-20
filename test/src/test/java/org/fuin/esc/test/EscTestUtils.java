@@ -133,7 +133,7 @@ final class EscTestUtils {
                 return "[" + streamId + "] OK";
             }
             final String msg = "[" + streamId + "] expected no exception, but was: "
-                    + nameAndMessage(exception);
+                    + nameAndMessage(exception) + " (See log file for exception details)";
             LOG.error(msg, exception);
             return msg;
         }
@@ -144,7 +144,7 @@ final class EscTestUtils {
         }
         final String msg = "[" + streamId + "] expected "
                 + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
-                + nameAndMessage(exception);
+                + nameAndMessage(exception) + " (See log file for exception details)";
         LOG.error(msg, exception);
         return msg;
     }

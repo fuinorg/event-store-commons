@@ -2,16 +2,15 @@
 	<EventId>48ff75a0-d573-44eb-ad89-45b99757ddfc</EventId>
 	<EventType>MyEvent</EventType>
 	<Data>
-	   <Base64>eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNDhmZjc1YTAtZDU3My00NGViLWFkODktNDViOTk3NTdkZGZjIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9</Base64>
+	   <Base64>eyAiTXlFdmVudCI6IHsgImlkIjogICJiZjAxYzAyZi01Njk5LTRlMGYtOGE5Yy05NjM0MzU0NmQzMDYiLCAiZGVzY3JpcHRpb24iOiAiSGVsbG8sIEpTT04hIiB9IH0=</Base64>
 	</Data>
 	<MetaData>
-		<EscUserMeta>
-		  <Base64>eyAibXktbWV0YSI6IHsgInVzZXIiOiAiYWJjIiB9IH0=</Base64>		  
-		</EscUserMeta>
-		<EscSysMeta>
-			<data-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</data-content-type>
-			<meta-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</meta-content-type>
-			<meta-type>MyMeta</meta-type>
-		</EscSysMeta>
+        <esc-meta>
+            <data-type>MyEvent</data-type>
+            <data-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</data-content-type>
+            <meta-type>MyMeta</meta-type>
+            <meta-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</meta-content-type>
+            <Base64>eyAiTXlNZXRhIjogeyAidXNlciI6ICJhYmMiIH0gfQ==</Base64>       
+        </esc-meta>
 	</MetaData>
 </Event>

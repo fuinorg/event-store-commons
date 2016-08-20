@@ -41,6 +41,7 @@ import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.utils4j.Utils4J;
+import org.jboss.jandex.MethodParameterTypeTarget;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -76,26 +77,26 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
 
         final ESHttpXmlUnmarshaller unmarshaller = new ESHttpXmlUnmarshaller();
 
+        final TypeName dataType = new TypeName(entry.getEventType());
         final Object data = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getEventType()),
                 entry.getDataContentType(), entry.getData());
+        final TypeName metaType;
         final Object meta;
         if (entry.getMetaType() == null) {
+            metaType = null;
             meta = null;
         } else {
+            metaType = new TypeName(entry.getMetaType());
             meta = unmarshaller.unmarshal(desRegistry, new SerializedDataType(entry.getMetaType()),
                     entry.getMetaContentType(), entry.getMeta());
         }
-        if (meta == null) {
-            return new SimpleCommonEvent(new EventId(entry.getEventId()),
-                    new TypeName(entry.getEventType()), data);
-        }
-        return new SimpleCommonEvent(new EventId(entry.getEventId()), new TypeName(entry.getEventType()),
-                data, new TypeName(entry.getMetaType()), meta);
+        return new SimpleCommonEvent(new EventId(entry.getEventId()), dataType, data, metaType, meta);
 
     }
 
     /**
-     * Parses the atom data without creating the event itself from data &amp; meta data.
+     * Parses the atom data without creating the event itself from data &amp;
+     * meta data.
      * 
      * @param in
      *            Input stream to read.
@@ -111,20 +112,35 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
         final Integer eventNumber = findContentInteger(doc, xPath, "/atom:entry/atom:content/eventNumber");
         final String eventType = findContentText(doc, xPath, "/atom:entry/atom:content/eventType");
         final String eventId = findContentText(doc, xPath, "/atom:entry/atom:content/eventId");
-        final String dataContextTypeStr = findContentText(doc, xPath,
-                "/atom:entry/atom:content/metadata/EscSysMeta/data-content-type");
+
+        final Node escMetaNode = findNode(doc, xPath, "/atom:entry/atom:content/metadata/esc-meta");
+
+        final String dataContextTypeStr = findContentText(escMetaNode, xPath, "data-content-type");
         final EnhancedMimeType dataContentType = EnhancedMimeType.create(dataContextTypeStr);
-        final String metaContentTypeStr = findContentText(doc, xPath,
-                "/atom:entry/atom:content/metadata/EscSysMeta/meta-content-type");
-        final EnhancedMimeType metaContentType = EnhancedMimeType.create(metaContentTypeStr);
-        final String metaTypeStr = findContentText(doc, xPath,
-                "/atom:entry/atom:content/metadata/EscSysMeta/meta-type");
         final Node data = child(findNode(doc, xPath, "/atom:entry/atom:content/data"));
-        final Node meta = child(findNode(doc, xPath, "/atom:entry/atom:content/metadata/EscUserMeta"));
 
-        return new AtomEntry<Node>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
-                metaContentType, metaTypeStr, data, meta);
+        final EnhancedMimeType metaContentType;
+        final String metaTypeStr;
+        final Node meta;
+        if (hasMetaData(escMetaNode)) {
+            final String metaContentTypeStr = findContentText(escMetaNode, xPath, "meta-content-type");
+            metaContentType = EnhancedMimeType.create(metaContentTypeStr);
+            metaTypeStr = findContentText(escMetaNode, xPath, "meta-type");
+            meta = escMetaNode.getLastChild();
+        } else {
+            metaContentType = null;
+            metaTypeStr = null;
+            meta = null;
+        }
 
+        return new AtomEntry<Node>(eventStreamId, eventNumber, eventType, eventId, dataContentType, metaContentType,
+                metaTypeStr, data, meta);
+
+    }
+
+    private boolean hasMetaData(final Node escMetaNode) {
+        final Node node = escMetaNode.getLastChild();
+        return !"data-content-type".equals(node.getNodeName());
     }
 
     private Node child(final Node node) {

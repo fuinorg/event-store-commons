@@ -2,20 +2,17 @@
 	"EventId":"bd58da40-9249-4b42-a077-10455b483c80",
 	"EventType":"MyEvent",
 	"Data": {
-	   "Base64":"PG15LWV2ZW50IGlkPSJiZDU4ZGE0MC05MjQ5LTRiNDItYTA3Ny0xMDQ1NWI0ODNjODAiIGRlc2NyaXB0aW9uPSJIZWxsbywgWE1MISIgLz4="   
+	   "Base64":"PE15RXZlbnQgaWQ9ImJkNThkYTQwLTkyNDktNGI0Mi1hMDc3LTEwNDU1YjQ4M2M4MCIgZGVzY3JpcHRpb249IkhlbGxvLCBYTUwhIiAvPg=="   
 	},
 	"MetaData":{
-		"EscUserMeta":{
-			"my-meta":{
-				"user":"abc"
-			}
-			
-		},
-		"EscSysMeta":{
-			"data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-			"meta-content-type":"application/json; version=1; encoding=utf-8",
-            "meta-type": "MyMeta"
-		}
-		
+        "esc-meta":{    
+	        "data-type": "MyEvent",
+	        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+	        "meta-type": "MyMeta",
+	        "meta-content-type":"application/json; version=1; encoding=utf-8",
+	        "MyMeta":{
+	            "user":"abc"
+	        }
+        }   
 	}
 }

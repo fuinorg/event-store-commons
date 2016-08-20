@@ -39,10 +39,16 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.eshttp.ESEnvelopeType;
+import org.fuin.esc.eshttp.ESHttpEventStore;
+import org.fuin.esc.eshttp.EscEvent;
+import org.fuin.esc.eshttp.EscEvents;
 //import org.fuin.esc.eshttp.ESEnvelopeType;
 //import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStore;
+import org.fuin.esc.spi.Base64Data;
+import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
@@ -80,22 +86,21 @@ public class TestFeatures {
         if (type.equals("mem")) {
             eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
         } else if (type.equals("eshttp") || type.equals("jpa")) {
-            final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class);
+            final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class, MyMeta.class,
+                    EscEvent.class, EscEvents.class, EscMeta.class, Base64Data.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
             final TextDeSerializer textDeSer = new TextDeSerializer();
             registry = new SimpleSerializerDeserializerRegistry();
-            registry.add(new SerializedDataType(BookAddedEvent.TYPE.asBaseType()), "application/xml",
-                    xmlDeSer);
+            registry.add(new SerializedDataType(BookAddedEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonDeSer);
+            registry.add(new SerializedDataType(EscEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
+            registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
+            registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
             if (type.equals("eshttp")) {
-                /*
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
-                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry,
-                        registry);
-                */
-                throw new UnsupportedOperationException();
+                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
             } else {
                 setupDb();
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
@@ -244,8 +249,7 @@ public class TestFeatures {
         final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
-        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null,
-                commonEvents);
+        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null, commonEvents);
         command.init(eventStore);
         execute(command);
         command.verify();
@@ -263,8 +267,7 @@ public class TestFeatures {
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
     public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) {
-        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null,
-                expectedException);
+        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null, expectedException);
         command.init(eventStore);
         execute(command);
         command.verify();
@@ -337,7 +340,7 @@ public class TestFeatures {
         command.execute();
         endTransaction();
     }
-    
+
     private void beginTransaction() {
         if (em != null) {
             em.getTransaction().begin();

@@ -47,7 +47,7 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
             // JSON Object or Array
-            final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
+            final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
             return deSer.unmarshal(jsonStruct, mimeType);
         }
         if (jsonStruct.getValueType() != JsonValue.ValueType.OBJECT) {
@@ -57,19 +57,9 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         final JsonObject jsonObj = (JsonObject) jsonStruct;
         final String base64str = jsonObj.getString("Base64");
         final byte[] bytes = Base64.decodeBase64(base64str);
-        final Deserializer deSer = getDeserializer(registry, dataType, mimeType);
+        final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);
 
-    }
-
-    private Deserializer getDeserializer(final DeserializerRegistry registry,
-            final SerializedDataType dataType, final EnhancedMimeType mimeType) {
-        final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-        if (deSer == null) {
-            throw new IllegalStateException("Couldn't find a deserializer for: " + dataType + " + "
-                    + mimeType);
-        }
-        return deSer;
     }
 
 }

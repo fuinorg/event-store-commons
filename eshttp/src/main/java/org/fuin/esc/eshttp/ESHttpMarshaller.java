@@ -17,18 +17,25 @@
  */
 package org.fuin.esc.eshttp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.spi.Base64Data;
+import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.spi.EscMeta;
+import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.spi.Serializer;
 import org.fuin.esc.spi.SerializerRegistry;
-import org.fuin.objects4j.common.Nullable;
+import org.fuin.objects4j.common.Contract;
 
 /**
  * Marshals data for sending it to the event store.
  */
-public interface ESHttpMarshaller {
+public final class ESHttpMarshaller {
 
     /**
      * Creates a list of "application/vnd.eventstore.events(+json/+xml)" entries surrounded by "[]" (JSON) or
@@ -41,7 +48,23 @@ public interface ESHttpMarshaller {
      * 
      * @return Single event body.
      */
-    public String marshal(@NotNull SerializerRegistry registry, @NotNull List<CommonEvent> commonEvents);
+    @NotNull
+    public final String marshal(@NotNull final SerializerRegistry registry,
+            @NotNull final List<CommonEvent> commonEvents) {
+
+        Contract.requireArgNotNull("registry", registry);
+        Contract.requireArgNotNull("commonEvents", commonEvents);
+
+        final Serializer serializer = registry.getSerializer(EscEvents.SER_TYPE);
+
+        final List<EscEvent> eventList = new ArrayList<>();
+        for (final CommonEvent commonEvent : commonEvents) {
+            eventList.add(createEscEvent(registry, serializer.getMimeType(), commonEvent));
+        }
+        final EscEvents events = new EscEvents(eventList);
+        final byte[] data = serializer.marshal(events);
+        return new String(data, serializer.getMimeType().getEncoding());
+    }
 
     /**
      * Creates a single "application/vnd.eventstore.events(+json/+xml)" entry surrounded by "[]" (JSON) or
@@ -54,6 +77,52 @@ public interface ESHttpMarshaller {
      * 
      * @return Single event body.
      */
-    public String marshal(@NotNull SerializerRegistry registry, @Nullable CommonEvent commonEvent);
+    @NotNull
+    public final String marshal(@NotNull final SerializerRegistry registry, 
+            @NotNull final CommonEvent commonEvent) {
+
+        Contract.requireArgNotNull("registry", registry);
+        Contract.requireArgNotNull("commonEvent", commonEvent);
+
+        final Serializer serializer = registry.getSerializer(EscEvent.SER_TYPE);
+
+        final EscEvent event = createEscEvent(registry, serializer.getMimeType(), commonEvent);
+        final byte[] data = serializer.marshal(event);
+        return new String(data, serializer.getMimeType().getEncoding());
+    }
+
+    /**
+     * Creates a single "application/vnd.eventstore.events+xml" entry.
+     * 
+     * @param registry
+     *            Registry with known serializers.
+     * @param targetContentType
+     *            Type of content that will be created later on.
+     * @param commonEvent
+     *            Event to marshal.
+     * 
+     * @return Single event that has to be surrounded by "&lt;Events&gt;&lt;/Events&gt;".
+     */
+    private EscEvent createEscEvent(final SerializerRegistry registry,
+            final EnhancedMimeType targetContentType, final CommonEvent commonEvent) {
+
+        Contract.requireArgNotNull("registry", registry);
+        Contract.requireArgNotNull("targetContentType", targetContentType);
+        Contract.requireArgNotNull("commonEvent", commonEvent);
+
+        final EscMeta meta = EscSpiUtils.createEscMeta(registry, targetContentType, commonEvent);
+
+        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
+        final Serializer dataSerializer = registry.getSerializer(serDataType);
+        if (dataSerializer.getMimeType().match(targetContentType)) {
+            return new EscEvent(commonEvent.getId().asBaseType(), commonEvent.getDataType().asBaseType(),
+                    new DataWrapper(commonEvent.getData()), new DataWrapper(meta));
+        }
+
+        final byte[] serData = dataSerializer.marshal(commonEvent.getData());
+        return new EscEvent(commonEvent.getId().asBaseType(), commonEvent.getDataType().asBaseType(),
+                new DataWrapper(new Base64Data(serData)), new DataWrapper(meta));
+
+    }
 
 }

@@ -49,8 +49,8 @@ public final class ESHttpUtils {
     /**
      * Returns an string from a node's content.
      * 
-     * @param doc
-     *            Document to search.
+     * @param rootNode
+     *            Node to search.
      * @param xPath
      *            XPath to use.
      * @param expression
@@ -59,8 +59,8 @@ public final class ESHttpUtils {
      * @return Node or <code>null</code> if no match was found.
      */
     @Nullable
-    public static String findContentText(final Document doc, final XPath xPath, final String expression) {
-        final Node node = findNode(doc, xPath, expression);
+    public static String findContentText(final Node rootNode, final XPath xPath, final String expression) {
+        final Node node = findNode(rootNode, xPath, expression);
         if (node == null) {
             return null;
         }
@@ -70,8 +70,8 @@ public final class ESHttpUtils {
     /**
      * Returns an integer value from a node's content.
      * 
-     * @param doc
-     *            Document to search.
+     * @param rootNode
+     *            Node to search.
      * @param xPath
      *            XPath to use.
      * @param expression
@@ -80,8 +80,8 @@ public final class ESHttpUtils {
      * @return Node or <code>null</code> if no match was found.
      */
     @Nullable
-    public static Integer findContentInteger(final Document doc, final XPath xPath, final String expression) {
-        final Node node = findNode(doc, xPath, expression);
+    public static Integer findContentInteger(final Node rootNode, final XPath xPath, final String expression) {
+        final Node node = findNode(rootNode, xPath, expression);
         if (node == null) {
             return null;
         }
@@ -92,8 +92,8 @@ public final class ESHttpUtils {
     /**
      * Returns a single node from a given document using xpath.
      * 
-     * @param doc
-     *            Document to search.
+     * @param rootNode
+     *            Node to search.
      * @param xPath
      *            XPath to use.
      * @param expression
@@ -102,13 +102,13 @@ public final class ESHttpUtils {
      * @return Node or <code>null</code> if no match was found.
      */
     @Nullable
-    public static Node findNode(@NotNull final Document doc, @NotNull final XPath xPath,
+    public static Node findNode(@NotNull final Node rootNode, @NotNull final XPath xPath,
             @NotNull final String expression) {
-        Contract.requireArgNotNull("doc", doc);
+        Contract.requireArgNotNull("rootNode", rootNode);
         Contract.requireArgNotNull("xPath", xPath);
         Contract.requireArgNotNull("expression", expression);
         try {
-            return (Node) xPath.compile(expression).evaluate(doc, XPathConstants.NODE);
+            return (Node) xPath.compile(expression).evaluate(rootNode, XPathConstants.NODE);
         } catch (final XPathExpressionException ex) {
             throw new RuntimeException("Failed to read node: " + expression, ex);
         }
@@ -117,8 +117,8 @@ public final class ESHttpUtils {
     /**
      * Returns a list of nodes from a given document using xpath.
      * 
-     * @param doc
-     *            Document to search.
+     * @param rootNode
+     *            Node to search.
      * @param xPath
      *            XPath to use.
      * @param expression
@@ -127,13 +127,13 @@ public final class ESHttpUtils {
      * @return Nodes or <code>null</code> if no match was found.
      */
     @Nullable
-    public static NodeList findNodes(@NotNull final Document doc, @NotNull final XPath xPath,
+    public static NodeList findNodes(@NotNull final Node rootNode, @NotNull final XPath xPath,
             @NotNull final String expression) {
-        Contract.requireArgNotNull("doc", doc);
+        Contract.requireArgNotNull("doc", rootNode);
         Contract.requireArgNotNull("xPath", xPath);
         Contract.requireArgNotNull("expression", expression);
         try {
-            return (NodeList) xPath.compile(expression).evaluate(doc, XPathConstants.NODESET);
+            return (NodeList) xPath.compile(expression).evaluate(rootNode, XPathConstants.NODESET);
         } catch (final XPathExpressionException ex) {
             throw new RuntimeException("Failed to read node: " + expression, ex);
         }

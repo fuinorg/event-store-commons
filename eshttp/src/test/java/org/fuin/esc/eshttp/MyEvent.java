@@ -31,13 +31,16 @@ import org.fuin.objects4j.common.NotEmpty;
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.
  */
-@XmlRootElement(name = "my-event")
+@XmlRootElement(name = MyEvent.EL_ROOT_NAME)
 public final class MyEvent implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
+    /** Unique XML/JSON root element name of the type. */
+    public static final String EL_ROOT_NAME = "MyEvent"; 
+    
     /** Unique name of the event. */
-    public static TypeName TYPE = new TypeName("MyEvent");
+    public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
     @XmlAttribute(name = "id")
     private String id;

@@ -27,11 +27,12 @@ import java.util.concurrent.ThreadFactory;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
@@ -52,10 +53,14 @@ public class ESHttpEventStoreIT {
 
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         final URL url = new URL("http://127.0.0.1:2113/");
-        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, MyEvent.class);
+        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, MyEvent.class, EscEvent.class,
+                EscEvents.class, EscMeta.class);
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         registry.add(new SerializedDataType(MyEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
         registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
+        registry.add(new SerializedDataType(EscEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
+        registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
+        registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
 
         testee = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
         testee.open();
@@ -76,11 +81,9 @@ public class ESHttpEventStoreIT {
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
-                meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType,
-                meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
 
         // TEST
         testee.appendToStream(streamId, eventOne, eventTwo);
@@ -106,7 +109,8 @@ public class ESHttpEventStoreIT {
         final MyEvent two = new MyEvent("Two");
         final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
         final MyEvent three = new MyEvent("Three");
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three, metaType, meta);
+        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three, metaType,
+                meta);
         final MyEvent four = new MyEvent("Four");
         final CommonEvent eventFour = new SimpleCommonEvent(new EventId(four.getId()), dataType, four, metaType, meta);
         final MyEvent five = new MyEvent("Five");
@@ -151,11 +155,9 @@ public class ESHttpEventStoreIT {
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
-                meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType,
-                meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
         final MyEvent three = new MyEvent("Three");
         final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three);
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree);

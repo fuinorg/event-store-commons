@@ -66,7 +66,7 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
         final SerializedDataType dataType = new SerializedDataType(MyEvent.TYPE.asBaseType());
         final EnhancedMimeType mimeType = new EnhancedMimeType("application/xml");
         final DeserializerRegistry registry = createRegistry();
-        final Node node = parse("/event-xml-xml-xml.xml", "/Event/Data/my-event");
+        final Node node = parse("/event-xml-xml-xml.xml", "/Event/Data/MyEvent");
 
         // TEST
         final Object obj = new ESHttpXmlUnmarshaller().unmarshal(registry, dataType, mimeType, node);
@@ -94,8 +94,8 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
         // VERIFY
         assertThat(obj).isInstanceOf(JsonObject.class);
         final JsonObject outer = (JsonObject) obj;
-        final JsonObject event = outer.getJsonObject("my-event");
-        assertThat(event.getString("id")).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
+        final JsonObject event = outer.getJsonObject("MyEvent");
+        assertThat(event.getString("id")).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506e");
         assertThat(event.getString("description")).isEqualTo("Hello, JSON!");
 
     }

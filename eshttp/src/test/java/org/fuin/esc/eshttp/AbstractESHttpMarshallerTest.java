@@ -44,11 +44,11 @@ public abstract class AbstractESHttpMarshallerTest {
 
    
     protected final String createMyEventXml(final UUID uuid, final String description) {
-        return "<my-event id=\"" + uuid + "\" description=\"" + description + "\" />";
+        return "<MyEvent id=\"" + uuid + "\" description=\"" + description + "\" />";
     }
 
     protected final String createMyEventJson(final UUID uuid, final String descr) {
-        return "{ \"my-event\": { \"id\":  \"" + uuid + "\", \"description\": \"" + descr + "\" } }";
+        return "{ \"MyEvent\": { \"id\":  \"" + uuid + "\", \"description\": \"" + descr + "\" } }";
     }
 
     protected final String createMyMetaXml() {
