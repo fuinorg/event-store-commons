@@ -17,12 +17,19 @@
  */
 package org.fuin.esc.esjc;
 
+import static com.github.msemys.esjc.util.EmptyArrays.EMPTY_BYTES;
+import static com.github.msemys.esjc.util.UUIDConverter.toUUID;
+import static java.time.Instant.ofEpochMilli;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonWriter;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -31,12 +38,17 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscMetaJsonDeSerializer;
+import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.junit.Test;
 
 import com.github.msemys.esjc.EventData;
+import com.github.msemys.esjc.RecordedEvent;
+import com.github.msemys.esjc.proto.EventStoreClientMessages.EventRecord;
+import com.github.msemys.esjc.util.UUIDConverter;
+import com.google.protobuf.ByteString;
 
 /**
  * Test for {@link RecordedEvent2CommonEventConverter} class.
@@ -45,7 +57,7 @@ import com.github.msemys.esjc.EventData;
 public class RecordedEvent2CommonEventConverterTest {
 
     @Test
-    public final void testConvert() {
+    public final void testConvert() throws UnsupportedEncodingException {
 
         // PREPARE
         final EnhancedMimeType targetContentType = EnhancedMimeType.create("application", "json",
@@ -58,18 +70,32 @@ public class RecordedEvent2CommonEventConverterTest {
 
         final EventId id = new EventId();
         final TypeName dataType = new TypeName("MyData");
-        final Object data = Json.createObjectBuilder().add("id", 1).add("name", "Peter").build();
+        final JsonObject data = Json.createObjectBuilder().add("id", 1).add("name", "Peter").build();
         final TypeName metaType = new TypeName("MyMeta");
-        final Object meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
+        final JsonObject meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
         final CommonEvent commonEvent = new SimpleCommonEvent(id, dataType, data, metaType, meta);
-        final CommonEvent2EventDataConverter conv = new CommonEvent2EventDataConverter(serRegistry,
-                targetContentType);
-        final EventData eventData = conv.convert(commonEvent);
+        
+        final EscMeta escMeta = EscSpiUtils.createEscMeta(serRegistry, targetContentType, commonEvent);
+        
+        // TODO Remove after https://github.com/msemys/esjc/pull/4 is available
+        final EventRecord eventRecord = EventRecord.newBuilder()
+                .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(id.asBaseType())))
+                .setEventStreamId("mystream")
+                .setEventNumber(1)
+                .setEventType(dataType.asBaseType())
+                .setDataContentType(1)
+                .setData(ByteString.copyFrom(marshal(data) , "utf-8"))
+                .setMetadataContentType(1)
+                .setMetadata(ByteString.copyFrom(marshal(escMeta.toJson()) , "utf-8"))
+                .setCreated(System.currentTimeMillis())
+                .build();
+        
+        final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
         
         final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(serRegistry);
         
         // TEST
-        final CommonEvent result = testee.convert(eventData);
+        final CommonEvent result = testee.convert(recordedEvent);
         
         // VERIFY
         assertThat(result.getId()).isEqualTo(id);
@@ -86,6 +112,18 @@ public class RecordedEvent2CommonEventConverterTest {
         assertThat(jsonMeta.getString("ip")).isEqualTo("127.0.0.1");
 
 
+    }
+    
+    
+    private String marshal(final JsonObject jsonObj) {
+        final StringWriter writer = new StringWriter();
+        final JsonWriter jsonWriter = Json.createWriter(writer);
+        try {
+            jsonWriter.write(jsonObj);
+        } finally {
+            jsonWriter.close();
+        }
+        return writer.toString();
     }
     
 }
