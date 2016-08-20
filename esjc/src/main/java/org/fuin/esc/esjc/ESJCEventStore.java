@@ -19,6 +19,7 @@ package org.fuin.esc.esjc;
 
 import static org.fuin.esc.api.ExpectedVersion.ANY;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -36,6 +37,7 @@ import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
+import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.Serializer;
@@ -47,18 +49,18 @@ import com.github.msemys.esjc.ResolvedEvent;
 import com.github.msemys.esjc.WriteResult;
 
 /**
- * Implementation that connects to the event store (http://www.geteventstore.com) using the esjc
+ * Implementation that connects to the event store
+ * (http://www.geteventstore.com) using the esjc
  * (https://github.com/msemys/esjc) API.
  */
 public final class ESJCEventStore implements EventStore {
 
     private final com.github.msemys.esjc.EventStore es;
 
-    private final SerializerRegistry serRegistry;
+    private final CommonEvent2EventDataConverter ce2edConv;
 
-    private final DeserializerRegistry desRegistry;
+    private final RecordedEvent2CommonEventConverter ed2ceConv;
 
-    
     /**
      * Constructor with event store to use.
      * 
@@ -68,16 +70,21 @@ public final class ESJCEventStore implements EventStore {
      *            Registry used to locate serializers.
      * @param desRegistry
      *            Registry used to locate deserializers.
+     * @param targetContentType
+     *            Target content type (Allows only 'application/xml' or
+     *            'application/json' with 'utf-8' encoding).
      */
-    public ESJCEventStore(@NotNull final com.github.msemys.esjc.EventStore es, @NotNull final SerializerRegistry serRegistry,
-            @NotNull final DeserializerRegistry desRegistry) {
+    public ESJCEventStore(@NotNull final com.github.msemys.esjc.EventStore es,
+            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
+            @NotNull final EnhancedMimeType targetContentType) {
         super();
         Contract.requireArgNotNull("es", es);
         Contract.requireArgNotNull("serRegistry", serRegistry);
         Contract.requireArgNotNull("desRegistry", desRegistry);
+        Contract.requireArgNotNull("targetContentType", targetContentType);
         this.es = es;
-        this.serRegistry = serRegistry;
-        this.desRegistry = desRegistry;
+        this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry, targetContentType);
+        this.ed2ceConv = new RecordedEvent2CommonEventConverter(desRegistry);
     }
 
     @Override
@@ -102,9 +109,9 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final CommonEvent... events) throws StreamNotFoundException, StreamDeletedException,
-            WrongExpectedVersionException, StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion, final CommonEvent... events)
+            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
+            StreamReadOnlyException {
         return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
@@ -116,8 +123,8 @@ public final class ESJCEventStore implements EventStore {
 
     @Override
     public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> commonEvents) throws StreamDeletedException,
-            WrongExpectedVersionException, StreamReadOnlyException {
+            final List<CommonEvent> commonEvents)
+            throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
@@ -128,9 +135,9 @@ public final class ESJCEventStore implements EventStore {
         }
 
         try {
-            Iterable<EventData> e = null;
+            final Iterable<EventData> eventDataIt = asEventData(commonEvents);
             final WriteResult result = es.appendToStream(streamId.asString(),
-                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), e).get();
+                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), eventDataIt).get();
             return result.nextExpectedVersion;
         } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
             // TODO Add actual version instead of NULL if ES returns this some day
@@ -144,15 +151,15 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expectedVersion,
-            final boolean hardDelete) throws StreamDeletedException, WrongExpectedVersionException {
+    public final void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
+            throws StreamDeletedException, WrongExpectedVersionException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
 
         try {
-            es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
-                    hardDelete).get();
+            es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), hardDelete)
+                    .get();
         } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
             // TODO Add actual version instead of NULL if ES returns this some day
             throw new WrongExpectedVersionException(streamId, expectedVersion, null);
@@ -176,27 +183,19 @@ public final class ESJCEventStore implements EventStore {
     public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
 
         try {
-            final com.github.msemys.esjc.StreamEventsSlice slice = es.readStreamEventsForward(
-                    streamId.asString(), start, count, true).get();
+            final com.github.msemys.esjc.StreamEventsSlice slice = es
+                    .readStreamEventsForward(streamId.asString(), start, count, true).get();
+            final List<CommonEvent> events = asCommonEvents(slice.events);
+            return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber, slice.isEndOfStream);
 
-            final List<ResolvedEvent> events = slice.events;
-            for (final ResolvedEvent event : events) {
-                
-                
-            }
-
-            // return new StreamEventsSlice(slice.fromEventNumber, commonEvents, slice.nextEventNumber,  slice.isEndOfStream);
-
-            return null;
-            
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
+        
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start, final int count) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -219,33 +218,20 @@ public final class ESJCEventStore implements EventStore {
         return null;
     }
 
-    private EventData asEventData(final CommonEvent commonEvent) {
-        
-        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
-        final Serializer dataSerializer = serRegistry.getSerializer(serDataType);
-        final byte[] serData = dataSerializer.marshal(commonEvent.getData());
-        final boolean jsonData = dataSerializer.getMimeType().getSubType().equals("json");
-
-        final SerializedDataType serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
-        final Serializer metaSerializer = serRegistry.getSerializer(serMetaType);
-        final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
-        final boolean jsonMeta = metaSerializer.getMimeType().getSubType().equals("json");
-        
-        final EventData.Builder builder = EventData.newBuilder().
-                eventId(commonEvent.getId().asBaseType()).
-                type(commonEvent.getDataType().asBaseType());
-        if (jsonData) {
-            builder.jsonData(serData);
-        } else {
-            builder.data(serData);
+    private List<EventData> asEventData(final List<CommonEvent> commonEvents) {
+        final List<EventData> list = new ArrayList<>(commonEvents.size());
+        for (final CommonEvent commonEvent : commonEvents) {
+            list.add(ce2edConv.convert(commonEvent));
         }
-        if (jsonMeta) {
-            builder.jsonMetadata(serMeta);
-        } else {
-            builder.metadata(serMeta);
-        }
-        return builder.build();
-        
+        return list;
     }
-    
+
+    private List<CommonEvent> asCommonEvents(final List<ResolvedEvent> resolvedEvents) {
+        final List<CommonEvent> list = new ArrayList<>(resolvedEvents.size());
+        for (final ResolvedEvent resolvedEvent : resolvedEvents) {
+            list.add(ed2ceConv.convert(resolvedEvent.event));
+        }
+        return list;
+    }
+
 }
