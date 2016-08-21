@@ -5,6 +5,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.SerializedDataType;
 
 /**
  * Example event.
@@ -14,6 +15,9 @@ public class BookAddedEvent {
 
     /** Never changing unique event type name. */
     public static final TypeName TYPE = new TypeName("BookAddedEvent");
+    
+    /** Unique name of the serialized type. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlAttribute
     private String name;

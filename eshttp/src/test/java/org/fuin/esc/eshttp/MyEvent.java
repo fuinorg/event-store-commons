@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
@@ -42,10 +42,10 @@ public final class MyEvent implements Serializable {
     /** Unique name of the event. */
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
-    @XmlAttribute(name = "id")
+    @XmlElement(name = "id")
     private String id;
 
-    @XmlAttribute(name = "description")
+    @XmlElement(name = "description")
     private String description;
 
     /**

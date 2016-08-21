@@ -15,7 +15,7 @@
         <eventType>MyEvent</eventType>
         <eventId>8faef866-b80f-4952-9124-62819a6517aa</eventId>
         <data>
-            <MyEvent id="8faef866-b80f-4952-9124-62819a6517aa" description="One" />
+            <MyEvent><id>8faef866-b80f-4952-9124-62819a6517aa</id><description>One</description></MyEvent>
         </data>
         <metadata>
             <esc-meta>

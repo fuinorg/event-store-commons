@@ -22,6 +22,7 @@ import javax.json.JsonStructure;
 import javax.json.JsonValue;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -39,23 +40,22 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         if (data == null) {
             return null;
         }
-        if (!(data instanceof JsonStructure)) {
-            throw new IllegalArgumentException("Can only unmarshal JsonStructure, but was: " + data);
+        if (!(data instanceof JsonObject)) {
+            throw new IllegalArgumentException("Can only unmarshal JsonObject, but was: " + data + " ["
+                    + data.getClass().getName() + "]");
         }
-        final JsonStructure jsonStruct = (JsonStructure) data;
+        final JsonObject jsonObj = (JsonObject) data;
 
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
             // JSON Object or Array
+            final String key = dataType.asBaseType();
+            final JsonObject innerObj = jsonObj.getJsonObject(key);
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-            return deSer.unmarshal(jsonStruct, mimeType);
+            return deSer.unmarshal(innerObj, mimeType);
         }
-        if (jsonStruct.getValueType() != JsonValue.ValueType.OBJECT) {
-            throw new IllegalStateException("Got transferEncodingData='" + transferEncodingData
-                    + "' and expected JSON Object, but was: " + jsonStruct);
-        }
-        final JsonObject jsonObj = (JsonObject) jsonStruct;
-        final String base64str = jsonObj.getString("Base64");
+        final String key = StringUtils.capitalize(transferEncodingData);
+        final String base64str = jsonObj.getString(key);
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);

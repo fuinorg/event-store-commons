@@ -64,6 +64,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.fuin.esc</groupId>
+			<artifactId>esc-esjc</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.fuin</groupId>
 			<artifactId>objects4j</artifactId>
 			<version>0.6.2</version>

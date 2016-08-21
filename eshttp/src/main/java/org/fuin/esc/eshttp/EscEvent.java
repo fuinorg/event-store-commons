@@ -53,7 +53,7 @@ public final class EscEvent implements ToJsonCapable {
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
     /** Unique name of the serialized type. */
-    public static final SerializedDataType SER_TYPE = new SerializedDataType(EL_ROOT_NAME);
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlElement(name = EL_EVENT_ID)
     private String eventId;

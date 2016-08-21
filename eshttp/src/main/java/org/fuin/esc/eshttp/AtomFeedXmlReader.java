@@ -42,6 +42,8 @@ import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.utils4j.Utils4J;
 import org.jboss.jandex.MethodParameterTypeTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -117,7 +119,7 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
 
         final String dataContextTypeStr = findContentText(escMetaNode, xPath, "data-content-type");
         final EnhancedMimeType dataContentType = EnhancedMimeType.create(dataContextTypeStr);
-        final Node data = child(findNode(doc, xPath, "/atom:entry/atom:content/data"));
+        final Node data = findNode(doc, xPath, "/atom:entry/atom:content/data");
 
         final EnhancedMimeType metaContentType;
         final String metaTypeStr;
@@ -126,7 +128,7 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
             final String metaContentTypeStr = findContentText(escMetaNode, xPath, "meta-content-type");
             metaContentType = EnhancedMimeType.create(metaContentTypeStr);
             metaTypeStr = findContentText(escMetaNode, xPath, "meta-type");
-            meta = escMetaNode.getLastChild();
+            meta = escMetaNode;
         } else {
             metaContentType = null;
             metaTypeStr = null;
@@ -141,13 +143,6 @@ public final class AtomFeedXmlReader implements AtomFeedReader {
     private boolean hasMetaData(final Node escMetaNode) {
         final Node node = escMetaNode.getLastChild();
         return !"data-content-type".equals(node.getNodeName());
-    }
-
-    private Node child(final Node node) {
-        if (node == null) {
-            return null;
-        }
-        return node.getFirstChild();
     }
 
 }

@@ -17,7 +17,14 @@
  */
 package org.fuin.esc.eshttp;
 
+import static org.fuin.esc.eshttp.ESHttpUtils.findContentText;
+import static org.fuin.esc.eshttp.ESHttpUtils.findNode;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -37,15 +44,20 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
             return null;
         }
         if (!(data instanceof Node)) {
-            throw new IllegalArgumentException("Can only unmarshal DOM nodes, but was: " + data);
+            throw new IllegalArgumentException("Can only unmarshal DOM nodes, but was: " + data + " ["
+                    + data.getClass().getName() + "]");
         }
         final Node node = (Node) data;
+        final XPath xPath = XPathFactory.newInstance().newXPath();
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
+            final String tag = dataType.asBaseType();
+            final Node childNode = findNode(node, xPath, tag);
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-            return deSer.unmarshal(node, mimeType);
+            return deSer.unmarshal(childNode, mimeType);
         }
-        final String base64str = node.getTextContent();
+        final String tag = StringUtils.capitalize(transferEncodingData);
+        final String base64str = findContentText(node, xPath, tag);
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);

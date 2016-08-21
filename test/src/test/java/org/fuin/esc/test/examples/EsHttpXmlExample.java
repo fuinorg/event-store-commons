@@ -13,6 +13,10 @@ import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.eshttp.ESEnvelopeType;
+import org.fuin.esc.eshttp.ESHttpEventStore;
+import org.fuin.esc.eshttp.EscEvents;
+import org.fuin.esc.spi.EscMeta;
 //import org.fuin.esc.eshttp.ESEnvelopeType;
 //import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.SerializedDataType;
@@ -35,7 +39,7 @@ public final class EsHttpXmlExample {
      *            Not used.
      */
     public static void main(final String[] args) throws MalformedURLException {
-/*
+
         // Setup for 
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         URL url = new URL("http://127.0.0.1:2113/"); // Default event store port
@@ -45,10 +49,14 @@ public final class EsHttpXmlExample {
         SerializedDataType serDataType = new SerializedDataType("BookAddedEvent");
         
         // Handles XML serialization and de-serialization
-        XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, BookAddedEvent.class);
+        XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, EscEvents.class, EscMeta.class, MyMeta.class, BookAddedEvent.class);
         
         // Registry connects the type with the appropriate serializer and de-serializer
         SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        // Base types always needed
+        registry.add(EscEvents.SER_TYPE, "application/xml", xmlDeSer);
+        registry.add(EscMeta.SER_TYPE, "application/xml", xmlDeSer);
+        // User defined types
         registry.add(serDataType, "application/xml", xmlDeSer);
         registry.add(serMetaType, "application/xml", xmlDeSer);
 
@@ -80,7 +88,7 @@ public final class EsHttpXmlExample {
             // Don't forget to close
             eventStore.close();
         }
-*/
+
     }
 
 }

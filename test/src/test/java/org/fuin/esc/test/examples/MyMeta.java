@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -20,6 +21,9 @@ public final class MyMeta implements Serializable {
     /** Unique name of the event. */
     public static final TypeName TYPE = new TypeName("MyMeta");
 
+    /** Unique name of the serialized type. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+    
     @XmlElement(name = "user")
     private String user;
 

@@ -42,6 +42,8 @@ import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.utils4j.Utils4J;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -51,6 +53,8 @@ import net.minidev.json.JSONArray;
  * Reads and JSON Atom feed.
  */
 public final class AtomFeedJsonReader implements AtomFeedReader {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(AtomFeedJsonReader.class); 
 
     @Override
     public final List<URI> readAtomFeed(final InputStream in) {
@@ -79,7 +83,7 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
     @Override
     public final CommonEvent readEvent(final DeserializerRegistry desRegistry, final InputStream in) {
 
-        final AtomEntry<JsonValue> entry = readAtomEntry(in);
+        final AtomEntry<JsonObject> entry = readAtomEntry(in);
 
         final ESHttpJsonUnmarshaller unmarshaller = new ESHttpJsonUnmarshaller();
 
@@ -110,62 +114,45 @@ public final class AtomFeedJsonReader implements AtomFeedReader {
      * 
      * @return Entry.
      */
-    public final AtomEntry<JsonValue> readAtomEntry(final InputStream in) {
+    public final AtomEntry<JsonObject> readAtomEntry(final InputStream in) {
 
         final JsonReader jsonReader = Json.createReader(new InputStreamReader(in));
         final JsonObject jsonObj = jsonReader.readObject();
-
-        final String eventStreamId = ((JsonString) JsonPath.read(jsonObj, "$.content.eventStreamId")).getString();
-        final int eventNumber = ((JsonNumber) JsonPath.read(jsonObj, "$.content.eventNumber")).intValue();
-        final String eventType = ((JsonString) JsonPath.read(jsonObj, "$.content.eventType")).getString();
-        final String eventId = ((JsonString) JsonPath.read(jsonObj, "$.content.eventId")).getString();
-
-        final JsonObject escMetaObj = JsonPath.read(jsonObj, "$.content.metadata.esc-meta");
-
-        final String dataContentTypeStr = escMetaObj.getString("data-content-type");
-        final EnhancedMimeType dataContentType = EnhancedMimeType.create(dataContentTypeStr);
-        final JsonValue data = JsonPath.read(jsonObj, "$.content.data");
-
-        final EnhancedMimeType metaContentType;
-        final String metaTypeStr;
-        final JsonValue meta;
-        if (escMetaObj.containsKey("meta-type")) {
-            metaTypeStr = escMetaObj.getString("meta-type");
-            final String metaContentTypeStr = escMetaObj.getString("meta-content-type");
-            metaContentType = EnhancedMimeType.create(metaContentTypeStr);
-            final String metaKey = extractMetaKey(escMetaObj);
-            meta = escMetaObj.get(metaKey);
-        } else {
-            metaTypeStr = null;
-            metaContentType = null;
-            meta = null;
-        }
-
-        return new AtomEntry<JsonValue>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
-                metaContentType, metaTypeStr, data, meta);
-
-    }
-
-    private String extractMetaKey(final JsonObject escMetaObj) {
-        final Set<String> keySet = escMetaObj.keySet();
-        for (String key : keySet) {
-            if (!(key.equals("data-type") || key.equals("data-content-type") || key.equals("meta-type")
-                    || key.equals("meta-content-type"))) {
-                return key;
-            }
-        }
-        throw new IllegalStateException("Meta key not found in: " + marshal(escMetaObj));
-    }
-
-    private String marshal(final JsonObject jsonObj) {
-        final StringWriter writer = new StringWriter();
-        final JsonWriter jsonWriter = Json.createWriter(writer);
         try {
-            jsonWriter.write(jsonObj);
-        } finally {
-            jsonWriter.close();
+        
+            final String eventStreamId = ((JsonString) JsonPath.read(jsonObj, "$.content.eventStreamId")).getString();
+            final int eventNumber = ((JsonNumber) JsonPath.read(jsonObj, "$.content.eventNumber")).intValue();
+            final String eventType = ((JsonString) JsonPath.read(jsonObj, "$.content.eventType")).getString();
+            final String eventId = ((JsonString) JsonPath.read(jsonObj, "$.content.eventId")).getString();
+    
+            final JsonObject escMetaObj = JsonPath.read(jsonObj, "$.content.metadata");
+    
+            final String dataContentTypeStr = escMetaObj.getString("data-content-type");
+            final EnhancedMimeType dataContentType = EnhancedMimeType.create(dataContentTypeStr);
+            final JsonObject data = JsonPath.read(jsonObj, "$.content.data");
+    
+            final EnhancedMimeType metaContentType;
+            final String metaTypeStr;
+            final JsonObject meta;
+            if (escMetaObj.containsKey("meta-type")) {
+                metaTypeStr = escMetaObj.getString("meta-type");
+                final String metaContentTypeStr = escMetaObj.getString("meta-content-type");
+                metaContentType = EnhancedMimeType.create(metaContentTypeStr);
+                meta = escMetaObj;
+            } else {
+                metaTypeStr = null;
+                metaContentType = null;
+                meta = null;
+            }
+    
+            return new AtomEntry<JsonObject>(eventStreamId, eventNumber, eventType, eventId, dataContentType,
+                    metaContentType, metaTypeStr, data, meta);
+
+        } catch (final RuntimeException ex) {
+            LOG.error("Failed to parse JSON atom feed: " + jsonObj);
+            throw ex;
         }
-        return writer.toString();
+            
     }
 
 }

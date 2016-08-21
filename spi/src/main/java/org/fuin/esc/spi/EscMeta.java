@@ -42,6 +42,9 @@ public final class EscMeta implements ToJsonCapable {
     /** Unique name of the type. */
     public static final TypeName TYPE = new TypeName(EscMeta.class.getSimpleName());
     
+    /** Unique name of the serialized type. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+    
     private static final String EL_DATA_TYPE = "data-type";
 
     private static final String EL_DATA_CONTENT_TYPE = "data-content-type";

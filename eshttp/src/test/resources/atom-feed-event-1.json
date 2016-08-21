@@ -13,8 +13,8 @@
         "eventId": "1cc4e29b-c72d-4c15-9c0b-e9f279c45c30",
         "data": {
             "MyEvent": {
-                "@id": "1cc4e29b-c72d-4c15-9c0b-e9f279c45c30",
-                "@description": "Two"
+                "id": "1cc4e29b-c72d-4c15-9c0b-e9f279c45c30",
+                "description": "Two"
             }
         },
         "metadata": {

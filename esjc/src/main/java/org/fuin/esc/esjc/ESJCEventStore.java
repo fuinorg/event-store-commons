@@ -39,8 +39,6 @@ import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.Serializer;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 
@@ -109,9 +107,9 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion, final CommonEvent... events)
-            throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
-            StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) throws StreamNotFoundException, StreamDeletedException,
+            WrongExpectedVersionException, StreamReadOnlyException {
         return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
@@ -140,7 +138,8 @@ public final class ESJCEventStore implements EventStore {
                     com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), eventDataIt).get();
             return result.nextExpectedVersion;
         } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
-            // TODO Add actual version instead of NULL if ES returns this some day
+            // TODO Add actual version instead of NULL if ES returns this some
+            // day
             throw new WrongExpectedVersionException(streamId, expectedVersion, null);
         } catch (final com.github.msemys.esjc.operation.StreamDeletedException ex) {
             throw new StreamDeletedException(streamId);
@@ -151,17 +150,18 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expectedVersion, final boolean hardDelete)
-            throws StreamDeletedException, WrongExpectedVersionException {
+    public final void deleteStream(final StreamId streamId, final int expectedVersion,
+            final boolean hardDelete) throws StreamDeletedException, WrongExpectedVersionException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
 
         try {
-            es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), hardDelete)
-                    .get();
+            es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
+                    hardDelete).get();
         } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
-            // TODO Add actual version instead of NULL if ES returns this some day
+            // TODO Add actual version instead of NULL if ES returns this some
+            // day
             throw new WrongExpectedVersionException(streamId, expectedVersion, null);
         } catch (final com.github.msemys.esjc.operation.StreamDeletedException ex) {
             throw new StreamDeletedException(streamId);
@@ -180,22 +180,25 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
+            final int count) {
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
                     .readStreamEventsForward(streamId.asString(), start, count, true).get();
             final List<CommonEvent> events = asCommonEvents(slice.events);
-            return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber, slice.isEndOfStream);
+            return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber,
+                    slice.isEndOfStream);
 
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
-        
+
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start, final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
+            final int count) {
         // TODO Auto-generated method stub
         return null;
     }

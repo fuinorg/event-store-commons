@@ -32,14 +32,14 @@ import org.fuin.objects4j.common.Contract;
  * Contains some Base64 encoded data.
  */
 @XmlRootElement(name = Base64Data.EL_ROOT_NAME)
-public final class Base64Data {
+public final class Base64Data implements ToJsonCapable {
 
     /** Unique XML/JSON root element name of the type. */
-    public static final String EL_ROOT_NAME = "Base64"; 
+    public static final String EL_ROOT_NAME = "Base64";
 
     /** Unique name of the type. */
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
-    
+
     @XmlValue
     private String base64Str;
 
@@ -107,6 +107,11 @@ public final class Base64Data {
      */
     public JsonObject toJson() {
         return Json.createObjectBuilder().add("Base64", base64Str).build();
+    }
+
+    @Override
+    public String getRootElementName() {
+        return EL_ROOT_NAME;
     }
 
 }

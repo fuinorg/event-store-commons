@@ -12,9 +12,9 @@
         "eventType": "MyEvent",
         "eventId": "8faef866-b80f-4952-9124-62819a6517aa",
         "data": {
-            "my-event": {
-                "@id": "8faef866-b80f-4952-9124-62819a6517aa",
-                "@description": "One"
+            "MyEvent": {
+                "id": "8faef866-b80f-4952-9124-62819a6517aa",
+                "description": "One"
             }
         },
         "metadata": {
