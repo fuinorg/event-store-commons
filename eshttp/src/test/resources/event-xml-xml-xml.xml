@@ -2,7 +2,7 @@
 	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
 	<EventType>MyEvent</EventType>
 	<Data>
-		<MyEvent><id>68616d90-cf72-4c2a-b913-32bf6e6506ed</id><escription>Hello, XML!</escription></MyEvent>
+		<MyEvent><id>68616d90-cf72-4c2a-b913-32bf6e6506ed</id><description>Hello, XML!</description></MyEvent>
 	</Data>
 	<MetaData>
 		<esc-meta>

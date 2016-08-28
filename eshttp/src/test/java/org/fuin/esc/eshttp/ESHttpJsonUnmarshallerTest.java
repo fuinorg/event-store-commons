@@ -66,7 +66,7 @@ public class ESHttpJsonUnmarshallerTest extends AbstractESHttpMarshallerTest {
         final SerializedDataType dataType = new SerializedDataType(MyEvent.TYPE.asBaseType());
         final EnhancedMimeType mimeType = new EnhancedMimeType("application/json");
         final DeserializerRegistry registry = createRegistry();
-        final JsonObject jsonObj = parse("/event-json-json-json.json", "$.Data.MyEvent");
+        final JsonObject jsonObj = parse("/event-json-json-json.json", "$.Data");
 
         // TEST
         final Object obj = new ESHttpJsonUnmarshaller().unmarshal(registry, dataType, mimeType, jsonObj);

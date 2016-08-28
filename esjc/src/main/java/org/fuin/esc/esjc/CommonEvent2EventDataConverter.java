@@ -85,8 +85,8 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
     public final EventData convert(final CommonEvent commonEvent) {
 
         // User's data
-        final SerializedDataType serUserDataType = new SerializedDataType(commonEvent.getDataType()
-                .asBaseType());
+        final String dataType = commonEvent.getDataType().asBaseType();
+        final SerializedDataType serUserDataType = new SerializedDataType(dataType);
         final Serializer userDataSerializer = serRegistry.getSerializer(serUserDataType);
         final byte[] serUserData = userDataSerializer.marshal(commonEvent.getData());
         final byte[] serData;
@@ -94,7 +94,7 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
             serData = serUserData;
         } else {
             final Serializer dataSerializer = getSerializer(Base64Data.TYPE);
-            serData = dataSerializer.marshal(new Base64Data(serUserData));
+            serData = dataSerializer.marshal(new Base64Data(dataType, serUserData));
         }
 
         // EscMeta
@@ -104,7 +104,7 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
 
         // Create event data
         final EventData.Builder builder = EventData.newBuilder().eventId(commonEvent.getId().asBaseType())
-                .type(commonEvent.getDataType().asBaseType());
+                .type(dataType);
         if (targetContentType.isJson()) {
             builder.jsonData(serData);
             builder.jsonMetadata(escSerMeta);

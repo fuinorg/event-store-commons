@@ -112,16 +112,17 @@ public final class ESHttpMarshaller {
 
         final EscMeta meta = EscSpiUtils.createEscMeta(registry, targetContentType, commonEvent);
 
-        final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
+        final String dataType = commonEvent.getDataType().asBaseType();
+        final SerializedDataType serDataType = new SerializedDataType(dataType);
         final Serializer dataSerializer = registry.getSerializer(serDataType);
         if (dataSerializer.getMimeType().match(targetContentType)) {
-            return new EscEvent(commonEvent.getId().asBaseType(), commonEvent.getDataType().asBaseType(),
+            return new EscEvent(commonEvent.getId().asBaseType(), dataType,
                     new DataWrapper(commonEvent.getData()), new DataWrapper(meta));
         }
 
         final byte[] serData = dataSerializer.marshal(commonEvent.getData());
-        return new EscEvent(commonEvent.getId().asBaseType(), commonEvent.getDataType().asBaseType(),
-                new DataWrapper(new Base64Data(serData)), new DataWrapper(meta));
+        return new EscEvent(commonEvent.getId().asBaseType(), dataType,
+                new DataWrapper(new Base64Data(dataType, serData)), new DataWrapper(meta));
 
     }
 

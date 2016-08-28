@@ -31,7 +31,8 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * A structure that contains the user's meta data and the system's meta information.
+ * A structure that contains the user's meta data and the system's meta
+ * information.
  */
 @XmlRootElement(name = EscMeta.EL_ROOT_NAME)
 public final class EscMeta implements ToJsonCapable {
@@ -41,10 +42,10 @@ public final class EscMeta implements ToJsonCapable {
 
     /** Unique name of the type. */
     public static final TypeName TYPE = new TypeName(EscMeta.class.getSimpleName());
-    
+
     /** Unique name of the serialized type. */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
-    
+
     private static final String EL_DATA_TYPE = "data-type";
 
     private static final String EL_DATA_CONTENT_TYPE = "data-content-type";
@@ -196,20 +197,20 @@ public final class EscMeta implements ToJsonCapable {
         builder.add(EL_META_TYPE, metaType);
         builder.add(EL_META_CONTENT_TYPE, metaContentTypeStr);
         if (meta instanceof JsonObject) {
-            return builder.add(metaType, (JsonObject) meta).build();
+            final JsonObject jo = (JsonObject) meta;
+            return builder.add(metaType, jo).build();
+        }
+        if (meta instanceof ToJsonCapable) {
+            final ToJsonCapable tjc = (ToJsonCapable) meta;
+            return builder.add(metaType, tjc.toJson()).build();
         }
         if (meta instanceof Base64Data) {
             final Base64Data base64data = (Base64Data) meta;
-            return builder.add(Base64Data.EL_ROOT_NAME, base64data.getEncoded()).build();
+            return builder.add(metaType, base64data.getEncoded()).build();
         }
         throw new IllegalStateException("Unknown meta object type: " + meta.getClass());
     }
 
-    @Override
-    public String getRootElementName() {
-        return EL_ROOT_NAME;
-    }
-    
     /**
      * Creates in instance from the given JSON object.
      * 
@@ -220,19 +221,20 @@ public final class EscMeta implements ToJsonCapable {
      */
     public static EscMeta create(final JsonObject jsonObj) {
         final String dataType = jsonObj.getString(EL_DATA_TYPE);
-        final EnhancedMimeType dataContentType = EnhancedMimeType.create(jsonObj
-                .getString(EL_DATA_CONTENT_TYPE));
+        final EnhancedMimeType dataContentType = EnhancedMimeType
+                .create(jsonObj.getString(EL_DATA_CONTENT_TYPE));
         if (!jsonObj.containsKey(EL_META_TYPE)) {
             return new EscMeta(jsonObj.getString(EL_DATA_TYPE), dataContentType);
         }
         final String metaType = jsonObj.getString(EL_META_TYPE);
-        final EnhancedMimeType metaContentType = EnhancedMimeType.create(jsonObj
-                .getString(EL_META_CONTENT_TYPE));
-        if (metaType.equals(Base64Data.EL_ROOT_NAME)) {
-            return new EscMeta(dataType, dataContentType, metaType, metaContentType, new Base64Data(
-                    jsonObj.getString(metaType)));
+        final EnhancedMimeType metaContentType = EnhancedMimeType
+                .create(jsonObj.getString(EL_META_CONTENT_TYPE));
+        final String transferEncoding = metaContentType.getParameter("transfer-encoding");
+        if (transferEncoding == null) {
+            return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
         }
-        return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType,
+                new Base64Data(dataType, jsonObj.getString(metaType)));
     }
-    
+
 }

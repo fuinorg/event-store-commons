@@ -53,9 +53,8 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
         // TEST & VERIFY
-        assertThat(
-                new ESHttpXmlUnmarshaller().unmarshal(registry, new SerializedDataType("whatever"),
-                        new EnhancedMimeType("application/xml"), null)).isNull();
+        assertThat(new ESHttpXmlUnmarshaller().unmarshal(registry, new SerializedDataType("whatever"),
+                new EnhancedMimeType("application/xml"), null)).isNull();
 
     }
 
@@ -66,7 +65,7 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
         final SerializedDataType dataType = new SerializedDataType(MyEvent.TYPE.asBaseType());
         final EnhancedMimeType mimeType = new EnhancedMimeType("application/xml");
         final DeserializerRegistry registry = createRegistry();
-        final Node node = parse("/event-xml-xml-xml.xml", "/Event/Data/MyEvent");
+        final Node node = parse("/event-xml-xml-xml.xml", "/Event/Data");
 
         // TEST
         final Object obj = new ESHttpXmlUnmarshaller().unmarshal(registry, dataType, mimeType, node);
@@ -84,7 +83,8 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
 
         // PREPARE
         final SerializedDataType dataType = new SerializedDataType(MyEvent.TYPE.asBaseType());
-        final EnhancedMimeType mimeType = new EnhancedMimeType("application/json; version=1; encoding=utf-8; transfer-encoding=base64");
+        final EnhancedMimeType mimeType = new EnhancedMimeType(
+                "application/json; version=1; encoding=utf-8; transfer-encoding=base64");
         final DeserializerRegistry registry = createRegistry();
         final Node node = parse("/event-xml-xml-other.xml", "/Event/Data");
 
@@ -93,13 +93,12 @@ public class ESHttpXmlUnmarshallerTest extends AbstractESHttpMarshallerTest {
 
         // VERIFY
         assertThat(obj).isInstanceOf(JsonObject.class);
-        final JsonObject outer = (JsonObject) obj;
-        final JsonObject event = outer.getJsonObject("MyEvent");
+        final JsonObject event = (JsonObject) obj;
         assertThat(event.getString("id")).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506e");
         assertThat(event.getString("description")).isEqualTo("Hello, JSON!");
 
     }
-    
+
     private Node parse(final String resource, final String expression) throws IOException {
         final InputStream in = this.getClass().getResourceAsStream(resource);
         try {

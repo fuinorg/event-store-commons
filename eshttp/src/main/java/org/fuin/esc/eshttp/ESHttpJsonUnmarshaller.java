@@ -18,11 +18,8 @@
 package org.fuin.esc.eshttp;
 
 import javax.json.JsonObject;
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -49,12 +46,10 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
             // JSON Object or Array
-            final String key = dataType.asBaseType();
-            final JsonObject innerObj = jsonObj.getJsonObject(key);
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-            return deSer.unmarshal(innerObj, mimeType);
+            return deSer.unmarshal(jsonObj, mimeType);
         }
-        final String key = StringUtils.capitalize(transferEncodingData);
+        final String key = dataType.asBaseType();
         final String base64str = jsonObj.getString(key);
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);

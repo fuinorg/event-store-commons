@@ -2,15 +2,13 @@
 	"EventId":"bf01c02f-5699-4e0f-8a9c-96343546d306",
 	"EventType":"MyEvent",
 	"Data": {
-	    "Base64":"eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiYmYwMWMwMmYtNTY5OS00ZTBmLThhOWMtOTYzNDM1NDZkMzA2IiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9"   
+	    "MyEvent":"eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiYmYwMWMwMmYtNTY5OS00ZTBmLThhOWMtOTYzNDM1NDZkMzA2IiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9"   
 	},
 	"MetaData":{
-        "esc-meta":{    
-	        "data-type": "MyEvent",
-	        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-	        "meta-type": "MyMeta",
-	        "meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
-	        "Base64":"PG15LW1ldGE+PHVzZXI+YWJjPC91c2VyPjwvbXktbWV0YT4=" 
-        }
+        "data-type": "MyEvent",
+        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+        "meta-type": "MyMeta",
+        "meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+        "MyMeta":"PG15LW1ldGE+PHVzZXI+YWJjPC91c2VyPjwvbXktbWV0YT4=" 
 	}
 }

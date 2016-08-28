@@ -19,20 +19,16 @@ package org.fuin.esc.eshttp;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.json.Json;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
-import javax.json.JsonValue;
-import javax.json.JsonWriter;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;

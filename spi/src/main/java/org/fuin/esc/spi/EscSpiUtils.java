@@ -17,14 +17,22 @@
  */
 package org.fuin.esc.spi;
 
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
+import org.w3c.dom.Node;
 
 /**
  * Utilities to ease the implementation of service provider implementations.
@@ -39,7 +47,8 @@ public final class EscSpiUtils {
     }
 
     /**
-     * Tries to find a serializer for the given type of object and converts it into a storable data block.
+     * Tries to find a serializer for the given type of object and converts it
+     * into a storable data block.
      * 
      * @param registry
      *            Registry with known serializers.
@@ -48,7 +57,8 @@ public final class EscSpiUtils {
      * @param data
      *            Event of the given type.
      * 
-     * @return Event ready to persist or <code>null</code> if the given data was <code>null</code>.
+     * @return Event ready to persist or <code>null</code> if the given data was
+     *         <code>null</code>.
      */
     @Nullable
     public static SerializedData serialize(@NotNull final SerializerRegistry registry,
@@ -92,12 +102,13 @@ public final class EscSpiUtils {
      * Returns the mime types shared by all events in the list.
      * 
      * @param registry
-     *            Registry used to peek the mime type used to serialize the event.
+     *            Registry used to peek the mime type used to serialize the
+     *            event.
      * @param commonEvents
      *            List to test.
      * 
-     * @return Mime type if all events share the same type or <code>null</code> if there are events with
-     *         different mime types.
+     * @return Mime type if all events share the same type or <code>null</code>
+     *         if there are events with different mime types.
      */
     public static EnhancedMimeType mimeType(@NotNull final SerializerRegistry registry,
             @NotNull final List<CommonEvent> commonEvents) {
@@ -107,8 +118,8 @@ public final class EscSpiUtils {
 
         EnhancedMimeType mimeType = null;
         for (final CommonEvent commonEvent : commonEvents) {
-            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent
-                    .getDataType().asBaseType()));
+            final Serializer serializer = registry
+                    .getSerializer(new SerializedDataType(commonEvent.getDataType().asBaseType()));
             if (mimeType == null) {
                 mimeType = serializer.getMimeType();
             } else {
@@ -146,7 +157,8 @@ public final class EscSpiUtils {
      * @param eventsB
      *            Second event list.
      * 
-     * @return TRUE if both lists have the same size and all event identifiers are equal.
+     * @return TRUE if both lists have the same size and all event identifiers
+     *         are equal.
      */
     public static boolean eventsEqual(final List<CommonEvent> eventsA, final List<CommonEvent> eventsB) {
         if (eventsA.size() < eventsB.size()) {
@@ -172,7 +184,8 @@ public final class EscSpiUtils {
      * @param registry
      *            Registry with serializers.
      * @param targetContentType
-     *            Content type that will later be used to serialize the created result.
+     *            Content type that will later be used to serialize the created
+     *            result.
      * @param commonEvent
      *            Event to create meta information for.
      * 
@@ -188,25 +201,25 @@ public final class EscSpiUtils {
             return null;
         }
 
-        final Serializer dataSerializer = registry.getSerializer(new SerializedDataType(commonEvent
-                .getDataType().asBaseType()));
+        final String dataType = commonEvent.getDataType().asBaseType();
+        final Serializer dataSerializer = registry.getSerializer(new SerializedDataType(dataType));
         final EnhancedMimeType dataContentType = contentType(dataSerializer.getMimeType(), targetContentType);
 
         if (commonEvent.getMeta() == null) {
-            return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType);
+            return new EscMeta(dataType, dataContentType);
         }
 
-        final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(commonEvent
-                .getMetaType().asBaseType()));
+        final String metaType = commonEvent.getMetaType().asBaseType();
+        final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(metaType));
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
-            return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent
-                    .getMetaType().asBaseType(), metaSerializer.getMimeType(), commonEvent.getMeta());
+            return new EscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(),
+                    commonEvent.getMeta());
         }
 
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
-        return new EscMeta(commonEvent.getDataType().asBaseType(), dataContentType, commonEvent.getMetaType()
-                .asBaseType(), metaContentType, new Base64Data(serMeta));
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType,
+                new Base64Data(metaType, serMeta));
 
     }
 
@@ -216,6 +229,26 @@ public final class EscSpiUtils {
             return sourceContentType;
         }
         return EnhancedMimeType.create(sourceContentType.toString() + "; transfer-encoding=base64");
+    }
+
+    /**
+     * Render a node as string.
+     * 
+     * @param node
+     *            Node to render.
+     * 
+     * @return XML.
+     */
+    public static String nodeToString(final Node node) {
+        try {
+            final Transformer t = TransformerFactory.newInstance().newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            final StringWriter sw = new StringWriter();
+            t.transform(new DOMSource(node), new StreamResult(sw));
+            return sw.toString();
+        } catch (final TransformerException ex) {
+            throw new RuntimeException("Failed to render node", ex);
+        }
     }
 
 }

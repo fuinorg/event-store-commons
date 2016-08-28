@@ -2,7 +2,7 @@
 	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
 	<EventType>MyEvent</EventType>
 	<Data>
-	   <Base64>eyAiTXlFdmVudCI6IHsgImlkIjogICI2ODYxNmQ5MC1jZjcyLTRjMmEtYjkxMy0zMmJmNmU2NTA2ZSIsICJkZXNjcmlwdGlvbiI6ICJIZWxsbywgSlNPTiEiIH0gfQ==</Base64>
+	   <Base64>eyAiaWQiOiAgIjY4NjE2ZDkwLWNmNzItNGMyYS1iOTEzLTMyYmY2ZTY1MDZlIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfQ==</Base64>
 	</Data>
 	<MetaData>
         <esc-meta>

@@ -20,7 +20,6 @@ package org.fuin.esc.eshttp;
 import java.util.UUID;
 
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
@@ -152,11 +151,6 @@ public final class EscEvent implements ToJsonCapable {
     public final JsonObject toJson() {
         return Json.createObjectBuilder().add(EL_EVENT_ID, eventId).add(EL_EVENT_TYPE, eventType)
                 .add(EL_DATA, data.toJson()).add(EL_META_DATA, meta.toJson()).build();
-    }
-
-    @Override
-    public String getRootElementName() {
-        return EL_ROOT_NAME;
     }
 
     /**

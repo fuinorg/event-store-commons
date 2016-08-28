@@ -103,11 +103,6 @@ public final class EscEvents implements ToJsonCapable {
         return builder.build();
     }
 
-    @Override
-    public String getRootElementName() {
-        return EL_ROOT_NAME;
-    }
-    
     /**
      * Creates in instance from the given JSON array.
      * 

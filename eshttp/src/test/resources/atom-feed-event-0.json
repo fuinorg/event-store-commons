@@ -18,15 +18,13 @@
             }
         },
         "metadata": {
-            "esc-meta":{    
-                "data-type": "MyEvent",
-                "data-content-type":"application/xml; encoding=utf-8",
-                "meta-type": "MyMeta",
-                "meta-content-type":"application/xml; encoding=utf-8",
-                "MyMeta":{
-                    "user":"john.doe"
-                }
-            }   
+            "data-type": "MyEvent",
+            "data-content-type":"application/xml; encoding=utf-8",
+            "meta-type": "MyMeta",
+            "meta-content-type":"application/xml; encoding=utf-8",
+            "MyMeta":{
+                "user":"john.doe"
+            }
         }
     },
     "links": [

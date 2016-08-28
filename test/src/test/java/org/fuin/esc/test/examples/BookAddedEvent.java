@@ -1,7 +1,7 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
@@ -19,10 +19,10 @@ public class BookAddedEvent {
     /** Unique name of the serialized type. */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
-    @XmlAttribute
+    @XmlElement
     private String name;
 
-    @XmlAttribute
+    @XmlElement
     private String author;
 
     /**

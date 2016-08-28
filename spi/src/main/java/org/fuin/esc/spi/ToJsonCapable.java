@@ -21,7 +21,7 @@ import javax.json.JsonStructure;
 import javax.validation.constraints.NotNull;
 
 /**
- * Marks an object that can be converted into a JSON object.
+ * Marks an object that can be converted into a JSON object or array.
  */
 public interface ToJsonCapable {
 
@@ -32,13 +32,5 @@ public interface ToJsonCapable {
      */
     @NotNull
     public JsonStructure toJson();
-
-    /**
-     * Returns the name of the JSON structure.
-     * 
-     * @return Root name that may be used as 'key' for the object.
-     */
-    @NotNull
-    public String getRootElementName();
 
 }

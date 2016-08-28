@@ -17,19 +17,16 @@
  */
 package org.fuin.esc.eshttp;
 
-import static org.fuin.esc.eshttp.ESHttpUtils.findContentText;
-import static org.fuin.esc.eshttp.ESHttpUtils.findNode;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
+import static org.fuin.esc.spi.EscSpiUtils.nodeToString;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Unmarshals data in XML format after reading it from the event store.
@@ -48,20 +45,31 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
                     + data.getClass().getName() + "]");
         }
         final Node node = (Node) data;
-        final XPath xPath = XPathFactory.newInstance().newXPath();
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
-            final String tag = dataType.asBaseType();
-            final Node childNode = findNode(node, xPath, tag);
+            final Node childNode = findChildNode(node, dataType.asBaseType());
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
             return deSer.unmarshal(childNode, mimeType);
         }
-        final String tag = StringUtils.capitalize(transferEncodingData);
-        final String base64str = findContentText(node, xPath, tag);
+        final Node childNode = findChildNode(node, Base64Data.EL_ROOT_NAME);
+        final String base64str = childNode.getTextContent();
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
         return deSer.unmarshal(bytes, mimeType);
 
+    }
+
+    private Node findChildNode(final Node node, final String name) {
+        final NodeList childs = node.getChildNodes();
+        final int count = childs.getLength();
+        for (int i = 0; i < count; i++) {
+            final Node child = childs.item(i);
+            if (name.equals(child.getNodeName())) {
+                return child;
+            }
+
+        }
+        throw new IllegalStateException("Child node '" + name + "' not found: " + nodeToString(node));
     }
 
 }

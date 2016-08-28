@@ -17,8 +17,6 @@
  */
 package org.fuin.esc.spi;
 
-import javax.json.Json;
-import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -32,7 +30,7 @@ import org.fuin.objects4j.common.Contract;
  * Contains some Base64 encoded data.
  */
 @XmlRootElement(name = Base64Data.EL_ROOT_NAME)
-public final class Base64Data implements ToJsonCapable {
+public final class Base64Data {
 
     /** Unique XML/JSON root element name of the type. */
     public static final String EL_ROOT_NAME = "Base64";
@@ -46,6 +44,9 @@ public final class Base64Data implements ToJsonCapable {
     @XmlTransient
     private byte[] binaryData;
 
+    @XmlTransient
+    private String dataType;
+
     /**
      * Default constructor for JAXB.
      */
@@ -56,12 +57,16 @@ public final class Base64Data implements ToJsonCapable {
     /**
      * Constructor with Base64 encoded string.
      * 
+     * @param dataType
+     *            Unique type name of the encoded content.
      * @param base64Str
      *            Base64 encoded data.
      */
-    public Base64Data(@NotNull final String base64Str) {
+    public Base64Data(@NotNull final String dataType, @NotNull final String base64Str) {
         super();
+        Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("base64Str", base64Str);
+        this.dataType = dataType;
         this.base64Str = base64Str;
         this.binaryData = Base64.decodeBase64(base64Str);
     }
@@ -69,14 +74,27 @@ public final class Base64Data implements ToJsonCapable {
     /**
      * Constructor with binary data that will be Base64 encoded.
      * 
+     * @param dataType
+     *            Unique type name of the encoded content.
      * @param binaryData
      *            Binary data.
      */
-    public Base64Data(@NotNull final byte[] binaryData) {
+    public Base64Data(@NotNull final String dataType, @NotNull final byte[] binaryData) {
         super();
+        Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("binaryData", binaryData);
+        this.dataType = dataType;
         this.base64Str = Base64.encodeBase64String(binaryData);
         this.binaryData = binaryData;
+    }
+
+    /**
+     * Returns the unique type name of the encoded data.
+     * 
+     * @return Type of data inside the base64 encoded bytes.
+     */
+    public String getDataType() {
+        return dataType;
     }
 
     /**
@@ -98,20 +116,6 @@ public final class Base64Data implements ToJsonCapable {
             binaryData = Base64.decodeBase64(base64Str);
         }
         return binaryData;
-    }
-
-    /**
-     * Converts the object into a JSON object.
-     * 
-     * @return JSON object.
-     */
-    public JsonObject toJson() {
-        return Json.createObjectBuilder().add("Base64", base64Str).build();
-    }
-
-    @Override
-    public String getRootElementName() {
-        return EL_ROOT_NAME;
     }
 
 }

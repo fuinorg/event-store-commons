@@ -17,11 +17,13 @@
  */
 package org.fuin.esc.eshttp;
 
+import javax.json.Json;
 import javax.json.JsonStructure;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.ToJsonCapable;
 import org.fuin.objects4j.common.Contract;
 
@@ -72,16 +74,13 @@ public final class DataWrapper implements ToJsonCapable {
             return ((ToJsonCapable) obj).toJson();
         } else if (obj instanceof JsonStructure) {
             return (JsonStructure) obj;
+        } else if (obj instanceof Base64Data) {
+            final Base64Data base64data = (Base64Data) obj;
+            return Json.createObjectBuilder().add(base64data.getDataType(), base64data.getEncoded()).build();
         }
-        throw new IllegalStateException("Wrapped object is not an instance of '" 
-                + ToJsonCapable.class.getSimpleName()
-                + "' or 'JsonStructure': " + obj 
-                + " [" + obj.getClass().getName() + "]");
-    }
-
-    @Override
-    public String getRootElementName() {
-        return EL_ROOT;
+        throw new IllegalStateException(
+                "Wrapped object is not an instance of '" + ToJsonCapable.class.getSimpleName()
+                        + "' or 'JsonStructure': " + obj + " [" + obj.getClass().getName() + "]");
     }
 
 }
