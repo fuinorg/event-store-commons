@@ -172,8 +172,10 @@ public final class ESHttpEventStore implements EventStore {
         int nextExpectedVersion = 0;
         if (mimeType == null) {
             // Not all events have same type
-            for (final CommonEvent commonEvent : commonEvents) {
-                final String content = marshaller.marshal(serRegistry, commonEvent);
+            for (final CommonEvent commonEvent : commonEvents) {                
+                final List<CommonEvent> list = new ArrayList<>(1);
+                list.add(commonEvent);
+                final String content = marshaller.marshal(serRegistry, list);
                 appendToStream(streamId, expectedVersion, mimeType, content, 1);
             }
         } else {
@@ -225,7 +227,7 @@ public final class ESHttpEventStore implements EventStore {
                 }
 
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+                throw new RuntimeException(msg + " [Status=" + statusLine + ", Content=" + content + "]");
 
             } finally {
                 post.reset();
