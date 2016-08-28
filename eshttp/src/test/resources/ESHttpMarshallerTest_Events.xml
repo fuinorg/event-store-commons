@@ -1,0 +1,36 @@
+<Events>
+	<Event>
+		<EventId>a07d6a1a-715d-4d8e-98fa-b158e3339303</EventId>
+		<EventType>MyEvent</EventType>
+		<Data>
+			<MyEvent>
+				<id>a07d6a1a-715d-4d8e-98fa-b158e3339303</id>
+				<description>Whatever...</description>
+			</MyEvent>
+		</Data>
+		<MetaData>
+			<esc-meta>
+				<data-type>MyEvent</data-type>
+				<data-content-type>application/xml; encoding=UTF-8
+				</data-content-type>
+			</esc-meta>
+		</MetaData>
+	</Event>
+	<Event>
+		<EventId>ee9e13fc-e799-4835-9830-ecb9d620c1c9</EventId>
+		<EventType>MyEvent</EventType>
+		<Data>
+			<MyEvent>
+				<id>ee9e13fc-e799-4835-9830-ecb9d620c1c9</id>
+				<description>Hello XML</description>
+			</MyEvent>
+		</Data>
+		<MetaData>
+			<esc-meta>
+				<data-type>MyEvent</data-type>
+				<data-content-type>application/xml; encoding=UTF-8
+				</data-content-type>
+			</esc-meta>
+		</MetaData>
+	</Event>
+</Events>

@@ -22,11 +22,11 @@ import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.EscMeta;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 /**
  * Test for {@link EscEvent} class.
@@ -37,8 +37,8 @@ public class EscEventTest {
     public final void testUnMarshal() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream(
-                "/event-xml-xml-xml.xml"));
+        final String expectedXml = IOUtils
+                .toString(this.getClass().getResourceAsStream("/event-xml-xml-xml.xml"));
 
         // TEST
         final EscEvent testee = unmarshal(expectedXml, EscEvent.class, EscMeta.class, MyMeta.class,
@@ -59,8 +59,8 @@ public class EscEventTest {
                 Base64Data.class);
 
         // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert.assertXMLEqual(expectedXml, xml);
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 
