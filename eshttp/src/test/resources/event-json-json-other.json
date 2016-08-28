@@ -1,10 +1,10 @@
 {
-	"EventId":"bd58da40-9249-4b42-a077-10455b483c80",
-	"EventType":"MyEvent",
-	"Data": {
-	   "MyEvent":"PE15RXZlbnQ+PGlkPmJkNThkYTQwLTkyNDktNGI0Mi1hMDc3LTEwNDU1YjQ4M2M4MDwvaWQ+PGRlc2NyaXB0aW9uPkhlbGxvLCBYTUwhPC9kZXNjcmlwdGlvbj48L015RXZlbnQ+"   
-	},
-	"MetaData":{
+    "EventId":"bd58da40-9249-4b42-a077-10455b483c80",
+    "EventType":"MyEvent",
+    "Data": {
+       "MyEvent":"PE15RXZlbnQ+PGlkPmJkNThkYTQwLTkyNDktNGI0Mi1hMDc3LTEwNDU1YjQ4M2M4MDwvaWQ+PGRlc2NyaXB0aW9uPkhlbGxvLCBYTUwhPC9kZXNjcmlwdGlvbj48L015RXZlbnQ+"   
+    },
+    "MetaData":{
         "data-type": "MyEvent",
         "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
         "meta-type": "MyMeta",
@@ -12,5 +12,5 @@
         "MyMeta":{
             "user":"abc"
         }
-	}
+    }
 }

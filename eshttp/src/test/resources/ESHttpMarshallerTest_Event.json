@@ -1,12 +1,12 @@
 {
-	"EventId": "a07d6a1a-715d-4d8e-98fa-b158e3339303",
-	"EventType": "MyEvent",
-	"Data": {
-		"id": "a07d6a1a-715d-4d8e-98fa-b158e3339303",
-		"description": "Whatever..."
-	},
-	"MetaData": {
-		"data-type": "MyEvent",
-		"data-content-type": "application/json; encoding=UTF-8"
-	}
+    "EventId": "a07d6a1a-715d-4d8e-98fa-b158e3339303",
+    "EventType": "MyEvent",
+    "Data": {
+        "id": "a07d6a1a-715d-4d8e-98fa-b158e3339303",
+        "description": "Whatever..."
+    },
+    "MetaData": {
+        "data-type": "MyEvent",
+        "data-content-type": "application/json; encoding=UTF-8"
+    }
 }

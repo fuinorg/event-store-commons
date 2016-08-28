@@ -1,19 +1,20 @@
 <Event>
-	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
-	<EventType>MyEvent</EventType>
-	<Data>eyAibXktZXZlbnQiOiB7ICJAaWQiOiAgIjY4NjE2ZDkwLWNmNzItNGMyYS1iOTEzLTMyYmY2ZTY1MDZlZCIsICJAZGVzY3JpcHRpb24iOiAiSGVsbG8sIEpTT04hIiB9IH0=
-	</Data>
-	<MetaData>
-		<EscUserMeta>
-			<my-meta>
-				<user>abc</user>
-			</my-meta>
-		</EscUserMeta>
-		<EscSysMeta>
-			<data-content-type>application/json; version=1; encoding=utf-8;
-				transfer-encoding=base64</data-content-type>
-			<meta-content-type>application/xml; version=1; encoding=utf-8
-			</meta-content-type>
-		</EscSysMeta>
-	</MetaData>
+    <EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
+    <EventType>MyEvent</EventType>
+    <Data>eyAibXktZXZlbnQiOiB7ICJAaWQiOiAgIjY4NjE2ZDkwLWNmNzItNGMyYS1iOTEzLTMyYmY2ZTY1MDZlZCIsICJAZGVzY3JpcHRpb24iOiAiSGVsbG8sIEpTT04hIiB9IH0=
+    </Data>
+    <MetaData>
+        <EscUserMeta>
+            <my-meta>
+                <user>abc</user>
+            </my-meta>
+        </EscUserMeta>
+        <EscSysMeta>
+            <data-content-type>application/json; version=1; encoding=utf-8;
+                transfer-encoding=base64
+            </data-content-type>
+            <meta-content-type>application/xml; version=1; encoding=utf-8
+            </meta-content-type>
+        </EscSysMeta>
+    </MetaData>
 </Event>

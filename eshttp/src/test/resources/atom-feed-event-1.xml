@@ -18,15 +18,15 @@
             <MyEvent><id>1cc4e29b-c72d-4c15-9c0b-e9f279c45c30</id><description>Two</description></MyEvent>
         </data>
         <metadata>
-	        <esc-meta>
-	            <data-type>MyEvent</data-type>
-	            <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
-	            <meta-type>MyMeta</meta-type>
-	            <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
-	            <MyMeta>
-	                <user>john.doe</user>
-	            </MyMeta>
-	        </esc-meta>
+            <esc-meta>
+                <data-type>MyEvent</data-type>
+                <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
+                <meta-type>MyMeta</meta-type>
+                <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+                <MyMeta>
+                    <user>john.doe</user>
+                </MyMeta>
+            </esc-meta>
         </metadata>
     </atom:content>
 </atom:entry>

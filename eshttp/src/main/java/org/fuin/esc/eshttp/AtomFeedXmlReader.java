@@ -35,15 +35,12 @@ import javax.xml.xpath.XPath;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.utils4j.Utils4J;
-import org.jboss.jandex.MethodParameterTypeTarget;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

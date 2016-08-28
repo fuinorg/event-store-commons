@@ -8,7 +8,7 @@
         </Data>
         <MetaData>
             <esc-meta>
-	            <data-type>MyEvent</data-type>
+                <data-type>MyEvent</data-type>
                 <data-content-type>application/json; version=1; encoding=utf-8;transfer-encoding=base64</data-content-type>
                 <meta-type>MyMeta</meta-type>
                 <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
@@ -26,7 +26,7 @@
         </Data>
         <MetaData>
             <esc-meta>
-	            <data-type>MyEvent</data-type>
+                <data-type>MyEvent</data-type>
                 <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
                 <meta-type>MyMeta</meta-type>
                 <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>

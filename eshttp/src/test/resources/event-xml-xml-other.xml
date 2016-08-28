@@ -1,10 +1,10 @@
 <Event>
-	<EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
-	<EventType>MyEvent</EventType>
-	<Data>
-	   <Base64>eyAiaWQiOiAgIjY4NjE2ZDkwLWNmNzItNGMyYS1iOTEzLTMyYmY2ZTY1MDZlIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfQ==</Base64>
-	</Data>
-	<MetaData>
+    <EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
+    <EventType>MyEvent</EventType>
+    <Data>
+       <Base64>eyAiaWQiOiAgIjY4NjE2ZDkwLWNmNzItNGMyYS1iOTEzLTMyYmY2ZTY1MDZlIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfQ==</Base64>
+    </Data>
+    <MetaData>
         <esc-meta>
             <data-type>MyEvent</data-type>
             <data-content-type>application/json; version=1; encoding=utf-8; transfer-encoding=base64</data-content-type>
@@ -14,5 +14,5 @@
                 <user>abc</user>
             </MyMeta>
         </esc-meta>
-	</MetaData>
+    </MetaData>
 </Event>
