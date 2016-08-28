@@ -47,11 +47,11 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
         final Node node = (Node) data;
         final String transferEncodingData = mimeType.getParameter("transfer-encoding");
         if (transferEncodingData == null) {
-            final Node childNode = findChildNode(node, dataType.asBaseType());
+            final Node childNode = findLastChildElement(node);
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
             return deSer.unmarshal(childNode, mimeType);
         }
-        final Node childNode = findChildNode(node, Base64Data.EL_ROOT_NAME);
+        final Node childNode = findLastChildElement(node);
         final String base64str = childNode.getTextContent();
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
@@ -59,17 +59,21 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
 
     }
 
-    private Node findChildNode(final Node node, final String name) {
+    private Node findLastChildElement(final Node node) {
         final NodeList childs = node.getChildNodes();
         final int count = childs.getLength();
+        Node element = null;
         for (int i = 0; i < count; i++) {
             final Node child = childs.item(i);
-            if (name.equals(child.getNodeName())) {
-                return child;
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                element = child;
             }
 
         }
-        throw new IllegalStateException("Child node '" + name + "' not found: " + nodeToString(node));
+        if (element == null) {
+            throw new IllegalStateException("No child element node found: " + nodeToString(node));
+        }
+        return element;
     }
-
+    
 }
