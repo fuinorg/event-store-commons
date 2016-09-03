@@ -32,7 +32,6 @@ import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.Serializer;
 import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.RecordedEvent;
@@ -73,14 +72,18 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
                 escMetaMimeType);
         final EscMeta escMeta = escMetaDeserializer.unmarshal(eventData.metadata, escMetaMimeType);
         final EnhancedMimeType metaMimeType = escMeta.getMetaContentType();
-        final String metaTransferEncoding = escMeta.getMetaContentType().getParameter("transfer-encoding");
-
+        final String metaTransferEncoding;
+        if (escMeta.getMetaType() == null) {
+            metaTransferEncoding = null;
+        } else {
+            metaTransferEncoding = escMeta.getMetaContentType().getParameter("transfer-encoding");
+        }
         final EnhancedMimeType dataMimeType = escMeta.getDataContentType();
         final SerializedDataType serDataType = new SerializedDataType(escMeta.getDataType());
         final Deserializer dataDeserializer = deserRegistry.getDeserializer(serDataType, dataMimeType);
         final String dataTransferEncoding = escMeta.getDataContentType().getParameter("transfer-encoding");
         final Object data = unmarshal(dataTransferEncoding, dataDeserializer, dataMimeType, eventData.data,
-                metaMimeType);
+                metaMimeType, escMetaMimeType);
 
         final EventId eventId = new EventId(eventData.eventId);
         final TypeName dataType = new TypeName(eventData.eventType);
@@ -91,19 +94,26 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         final SerializedDataType serMetaType = new SerializedDataType(escMeta.getMetaType());
         final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, metaMimeType);
         final Object meta = unmarshal(metaTransferEncoding, metaDeserializer, metaMimeType, escMeta.getMeta(),
-                metaMimeType);
-
+                metaMimeType, escMetaMimeType);
         return new SimpleCommonEvent(eventId, dataType, data, metaType, meta);
     }
 
     private Object unmarshal(final String transferEncoding, final Deserializer dataDeserializer,
-            final EnhancedMimeType dataMimeType, final Object data, final EnhancedMimeType metaMimeType) {
+            final EnhancedMimeType dataMimeType, final Object data, final EnhancedMimeType metaMimeType,
+            final EnhancedMimeType escMetaMimeType) {
+
         if (transferEncoding == null) {
             return dataDeserializer.unmarshal(data, dataMimeType);
         }
+
+        if (data instanceof Base64Data) {
+            final Base64Data base64Data = (Base64Data) data;
+            return dataDeserializer.unmarshal(base64Data.getDecoded(), dataMimeType);
+        }
+
         // Currently only 'base64' is supported
         final Deserializer base64Deserializer = deserRegistry.getDeserializer(Base64Data.SER_TYPE,
-                metaMimeType);
+                escMetaMimeType);
         final Base64Data base64Data = base64Deserializer.unmarshal(data, metaMimeType);
         return dataDeserializer.unmarshal(base64Data.getDecoded(), dataMimeType);
     }

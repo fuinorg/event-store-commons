@@ -31,7 +31,6 @@ import org.fuin.esc.spi.Base64Data.Base64DataJsonDeSerializer;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscMetaJsonDeSerializer;
-import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
 import org.junit.Test;
@@ -48,48 +47,50 @@ import com.google.protobuf.ByteString;
 // CHECKSTYLE:OFF Test code
 public class RecordedEvent2CommonEventConverterTest {
 
+    private static final Class<?>[] JAXB_CLASSES = new Class<?>[] { EscMeta.class, MyEvent.class,
+            MyMeta.class, Base64Data.class };
+
     /**
-     * Tests envelope JSON + meta JSON + data JSON 
+     * Tests envelope JSON + meta JSON + data JSON
      */
     @Test
     public final void testConvertJsonJsonJson() throws IOException {
 
-        // PREPARE        
-        final EnhancedMimeType targetContentType = EnhancedMimeType.create("application", "json", Charset.forName("utf-8"));
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "json",
+                Charset.forName("utf-8"));
+        final int json = 1;
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new EscMetaJsonDeSerializer());
         registry.add(MyEvent.SER_TYPE, "application/json", new MyEvent.MyEventJsonDeSerializer());
         registry.add(MyMeta.SER_TYPE, "application/json", new MyMeta.MyMetaJsonDeSerializer());
-        registry.add(EscMeta.SER_TYPE, "application/json", new EscMetaJsonDeSerializer());
-        
+
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
-        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta);
-        
-        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry, targetContentType);
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
         final EventData eventData = converter.convert(commonEvent);
-        
+
         final EventRecord eventRecord = EventRecord.newBuilder()
                 .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
-                .setEventStreamId("mystream")
-                .setEventNumber(1)
-                .setEventType(eventData.type)
-                .setDataContentType(1)
-                .setData(ByteString.copyFrom(eventData.data))
-                .setMetadataContentType(1)
-                .setMetadata(ByteString.copyFrom(eventData.metadata))
-                .setCreated(System.currentTimeMillis())
-                .build();
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
         final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
         final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
-        
+
         // TEST
         final CommonEvent result = testee.convert(recordedEvent);
-        
+
         // VERIFY
         assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
         assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
         assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
-        
+
         assertThat(result.getData()).isInstanceOf(MyEvent.class);
         final MyEvent copyMyEvent = (MyEvent) result.getData();
         assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
@@ -99,53 +100,50 @@ public class RecordedEvent2CommonEventConverterTest {
         final MyMeta copyMyMeta = (MyMeta) result.getMeta();
         assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
 
-
     }
-    
-    
+
     /**
-     * Tests envelope JSON + meta JSON + data XML (non JSON) 
+     * Tests envelope JSON + meta JSON + data XML (non JSON)
      */
     @Test
     public final void testConvertJsonJsonOther() throws IOException {
 
-        // PREPARE        
-        final EnhancedMimeType targetContentType = EnhancedMimeType.create("application", "json", Charset.forName("utf-8"));
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "json",
+                Charset.forName("utf-8"));
+        final int json = 1;
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.add(MyEvent.SER_TYPE, "application/xml", new XmlDeSerializer(MyEvent.class));
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new EscMetaJsonDeSerializer());
+        registry.add(Base64Data.SER_TYPE, envelope.getBaseType(), new Base64DataJsonDeSerializer());
         registry.add(MyMeta.SER_TYPE, "application/json", new MyMeta.MyMetaJsonDeSerializer());
-        registry.add(EscMeta.SER_TYPE, "application/json", new EscMetaJsonDeSerializer());
-        registry.add(Base64Data.SER_TYPE, "application/json", new Base64DataJsonDeSerializer());
-        
-        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
+        registry.add(MyEvent.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
         final MyMeta myMeta = new MyMeta("michael");
-        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta);
-        
-        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry, targetContentType);
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
         final EventData eventData = converter.convert(commonEvent);
-        
+
         final EventRecord eventRecord = EventRecord.newBuilder()
                 .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
-                .setEventStreamId("mystream")
-                .setEventNumber(1)
-                .setEventType(eventData.type)
-                .setDataContentType(1)
-                .setData(ByteString.copyFrom(eventData.data))
-                .setMetadataContentType(1)
-                .setMetadata(ByteString.copyFrom(eventData.metadata))
-                .setCreated(System.currentTimeMillis())
-                .build();
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
         final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
         final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
-        
+
         // TEST
         final CommonEvent result = testee.convert(recordedEvent);
-        
+
         // VERIFY
         assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
         assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
         assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
-        
+
         assertThat(result.getData()).isInstanceOf(MyEvent.class);
         final MyEvent copyMyEvent = (MyEvent) result.getData();
         assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
@@ -155,8 +153,218 @@ public class RecordedEvent2CommonEventConverterTest {
         final MyMeta copyMyMeta = (MyMeta) result.getMeta();
         assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
 
+    }
+
+    /**
+     * Tests envelope JSON + meta JSON + data XML (non JSON)
+     */
+    @Test
+    public final void testConvertJsonOtherOther() throws IOException {
+
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "json",
+                Charset.forName("utf-8"));
+        final int json = 1;
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new EscMetaJsonDeSerializer());
+        registry.add(Base64Data.SER_TYPE, envelope.getBaseType(), new Base64DataJsonDeSerializer());
+        registry.add(MyMeta.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyEvent.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
+        final MyMeta myMeta = new MyMeta("michael");
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
+        final EventData eventData = converter.convert(commonEvent);
+
+        final EventRecord eventRecord = EventRecord.newBuilder()
+                .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
+        final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
+        final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
+
+        // TEST
+        final CommonEvent result = testee.convert(recordedEvent);
+
+        // VERIFY
+        assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
+
+        assertThat(result.getData()).isInstanceOf(MyEvent.class);
+        final MyEvent copyMyEvent = (MyEvent) result.getData();
+        assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
+        assertThat(copyMyEvent.getDescription()).isEqualTo(myEvent.getDescription());
+
+        assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta copyMyMeta = (MyMeta) result.getMeta();
+        assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
 
     }
-    
+
+    /**
+     * Tests envelope XML + meta XML + data XML
+     */
+    @Test
+    public final void testConvertXmlXmlXml() throws IOException {
+
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "xml",
+                Charset.forName("utf-8"));
+        final int json = 0;
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyEvent.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyMeta.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
+        final MyMeta myMeta = new MyMeta("michael");
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
+        final EventData eventData = converter.convert(commonEvent);
+
+        final EventRecord eventRecord = EventRecord.newBuilder()
+                .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
+        final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
+        final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
+
+        // TEST
+        final CommonEvent result = testee.convert(recordedEvent);
+
+        // VERIFY
+        assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
+
+        assertThat(result.getData()).isInstanceOf(MyEvent.class);
+        final MyEvent copyMyEvent = (MyEvent) result.getData();
+        assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
+        assertThat(copyMyEvent.getDescription()).isEqualTo(myEvent.getDescription());
+
+        assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta copyMyMeta = (MyMeta) result.getMeta();
+        assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
+
+    }
+
+    /**
+     * Tests envelope XML + meta XML + data JSON (non XML)
+     */
+    @Test
+    public final void testConvertXmlXmlOther() throws IOException {
+
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "xml",
+                Charset.forName("utf-8"));
+        final int json = 0;
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(Base64Data.SER_TYPE, envelope.getBaseType(), new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyMeta.SER_TYPE, "application/xml", new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyEvent.SER_TYPE, "application/json", new MyEvent.MyEventJsonDeSerializer());
+
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
+        final MyMeta myMeta = new MyMeta("michael");
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
+        final EventData eventData = converter.convert(commonEvent);
+
+        final EventRecord eventRecord = EventRecord.newBuilder()
+                .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
+        final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
+        final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
+
+        // TEST
+        final CommonEvent result = testee.convert(recordedEvent);
+
+        // VERIFY
+        assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
+
+        assertThat(result.getData()).isInstanceOf(MyEvent.class);
+        final MyEvent copyMyEvent = (MyEvent) result.getData();
+        assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
+        assertThat(copyMyEvent.getDescription()).isEqualTo(myEvent.getDescription());
+
+        assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta copyMyMeta = (MyMeta) result.getMeta();
+        assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
+
+    }
+
+    /**
+     * Tests envelope XML + meta JSON + data JSON (non XML)
+     */
+    @Test
+    public final void testConvertXmlOtherOther() throws IOException {
+
+        // PREPARE
+        final EnhancedMimeType envelope = EnhancedMimeType.create("application", "xml",
+                Charset.forName("utf-8"));
+        final int json = 0;
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        registry.add(EscMeta.SER_TYPE, envelope.getBaseType(), new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(Base64Data.SER_TYPE, envelope.getBaseType(), new XmlDeSerializer(JAXB_CLASSES));
+        registry.add(MyMeta.SER_TYPE, "application/json", new MyMeta.MyMetaJsonDeSerializer());
+        registry.add(MyEvent.SER_TYPE, "application/json", new MyEvent.MyEventJsonDeSerializer());
+
+        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
+        final MyMeta myMeta = new MyMeta("michael");
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE,
+                myEvent, MyMeta.TYPE, myMeta);
+
+        final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(registry,
+                envelope);
+        final EventData eventData = converter.convert(commonEvent);
+
+        final EventRecord eventRecord = EventRecord.newBuilder()
+                .setEventId(ByteString.copyFrom(UUIDConverter.toBytes(eventData.eventId)))
+                .setEventStreamId("mystream").setEventNumber(1).setEventType(eventData.type)
+                .setDataContentType(json).setData(ByteString.copyFrom(eventData.data))
+                .setMetadataContentType(1).setMetadata(ByteString.copyFrom(eventData.metadata))
+                .setCreated(System.currentTimeMillis()).build();
+        final RecordedEvent recordedEvent = new RecordedEvent(eventRecord);
+        final RecordedEvent2CommonEventConverter testee = new RecordedEvent2CommonEventConverter(registry);
+
+        // TEST
+        final CommonEvent result = testee.convert(recordedEvent);
+
+        // VERIFY
+        assertThat(result.getId()).isEqualTo(new EventId(myEvent.getId()));
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE);
+
+        assertThat(result.getData()).isInstanceOf(MyEvent.class);
+        final MyEvent copyMyEvent = (MyEvent) result.getData();
+        assertThat(copyMyEvent.getId()).isEqualTo(myEvent.getId());
+        assertThat(copyMyEvent.getDescription()).isEqualTo(myEvent.getDescription());
+
+        assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta copyMyMeta = (MyMeta) result.getMeta();
+        assertThat(copyMyMeta.getUser()).isEqualTo(myMeta.getUser());
+
+    }
+
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON
