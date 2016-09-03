@@ -125,7 +125,7 @@ public final class ESHttpMarshaller {
 
         final byte[] serData = dataSerializer.marshal(commonEvent.getData());
         return new EscEvent(commonEvent.getId().asBaseType(), dataType,
-                new DataWrapper(new Base64Data(dataType, serData)), new DataWrapper(meta));
+                new DataWrapper(new Base64Data(serData)), new DataWrapper(meta));
 
     }
 

@@ -219,7 +219,7 @@ public final class EscSpiUtils {
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
         return new EscMeta(dataType, dataContentType, metaType, metaContentType,
-                new Base64Data(metaType, serMeta));
+                new Base64Data(serMeta));
 
     }
 

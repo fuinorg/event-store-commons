@@ -27,7 +27,7 @@ import cucumber.api.CucumberOptions;
 // CHECKSTYLE:OFF Test code
 // @formatter:off
 @RunWith(EscCucumber.class)
-@EscCucumberArgs({ "jpa", "mem", "eshttp" })
+@EscCucumberArgs({ /* "jpa", "mem", "eshttp", */ "esjc" })
 @CucumberOptions(features = { "src/test/resources/features/" }, glue = { "org.fuin.esc.test" }, strict = true, monochrome = true, format = {
         "pretty", "html:target/cucumber-html-report",
         "junit:target/cucumber-junit-report/allcukes.xml" })

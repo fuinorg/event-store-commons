@@ -17,6 +17,10 @@
  */
 package org.fuin.esc.spi;
 
+import java.nio.charset.Charset;
+
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -30,7 +34,7 @@ import org.fuin.objects4j.common.Contract;
  * Contains some Base64 encoded data.
  */
 @XmlRootElement(name = Base64Data.EL_ROOT_NAME)
-public final class Base64Data {
+public final class Base64Data implements ToJsonCapable {
 
     /** Unique XML/JSON root element name of the type. */
     public static final String EL_ROOT_NAME = "Base64";
@@ -38,14 +42,14 @@ public final class Base64Data {
     /** Unique name of the type. */
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
+    /** Unique name of the serialized type. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+
     @XmlValue
     private String base64Str;
 
     @XmlTransient
     private byte[] binaryData;
-
-    @XmlTransient
-    private String dataType;
 
     /**
      * Default constructor for JAXB.
@@ -57,16 +61,12 @@ public final class Base64Data {
     /**
      * Constructor with Base64 encoded string.
      * 
-     * @param dataType
-     *            Unique type name of the encoded content.
      * @param base64Str
      *            Base64 encoded data.
      */
-    public Base64Data(@NotNull final String dataType, @NotNull final String base64Str) {
+    public Base64Data(@NotNull final String base64Str) {
         super();
-        Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("base64Str", base64Str);
-        this.dataType = dataType;
         this.base64Str = base64Str;
         this.binaryData = Base64.decodeBase64(base64Str);
     }
@@ -74,27 +74,14 @@ public final class Base64Data {
     /**
      * Constructor with binary data that will be Base64 encoded.
      * 
-     * @param dataType
-     *            Unique type name of the encoded content.
      * @param binaryData
      *            Binary data.
      */
-    public Base64Data(@NotNull final String dataType, @NotNull final byte[] binaryData) {
+    public Base64Data(@NotNull final byte[] binaryData) {
         super();
-        Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("binaryData", binaryData);
-        this.dataType = dataType;
         this.base64Str = Base64.encodeBase64String(binaryData);
         this.binaryData = binaryData;
-    }
-
-    /**
-     * Returns the unique type name of the encoded data.
-     * 
-     * @return Type of data inside the base64 encoded bytes.
-     */
-    public String getDataType() {
-        return dataType;
     }
 
     /**
@@ -116,6 +103,70 @@ public final class Base64Data {
             binaryData = Base64.decodeBase64(base64Str);
         }
         return binaryData;
+    }
+
+    @Override
+    public final JsonObject toJson() {
+        return Json.createObjectBuilder().add(EL_ROOT_NAME, base64Str).build();
+    }
+
+    /**
+     * Creates in instance from the given JSON object.
+     * 
+     * @param jsonObj
+     *            Object to read values from.
+     * 
+     * @return New instance.
+     */
+    public static Base64Data create(final JsonObject jsonObj) {
+        final String base64Str = jsonObj.getString(EL_ROOT_NAME);
+        return new Base64Data(base64Str);
+    }
+
+    /**
+     * Serializes and deserializes a {@link Base64Data} object as JSON. The
+     * content type for serialization is always "application/json".
+     */
+    public static class Base64DataJsonDeSerializer implements SerDeserializer {
+
+        private final JsonDeSerializer jsonDeSer;
+
+        /**
+         * Default constructor.
+         */
+        public Base64DataJsonDeSerializer() {
+            super();
+            this.jsonDeSer = new JsonDeSerializer();
+        }
+
+        /**
+         * Constructor with encoding.
+         * 
+         * @param encoding
+         *            Default encoding to use.
+         */
+        public Base64DataJsonDeSerializer(final Charset encoding) {
+            super();
+            this.jsonDeSer = new JsonDeSerializer(encoding);
+        }
+
+        @Override
+        public final EnhancedMimeType getMimeType() {
+            return jsonDeSer.getMimeType();
+        }
+
+        @Override
+        public final <T> byte[] marshal(final T obj) {
+            return jsonDeSer.marshal(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public final Base64Data unmarshal(final Object data, final EnhancedMimeType mimeType) {
+            final JsonObject jsonObj = jsonDeSer.unmarshal(data, mimeType);
+            return Base64Data.create(jsonObj);
+        }
+
     }
 
 }

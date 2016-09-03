@@ -194,6 +194,9 @@ public final class ReadForwardCommand implements TestCommand {
         if (actualException != null) {
             return EscTestUtils.createExceptionFailureMessage(streamId, actualException);
         }
+        if (actualSlice == null) {
+            return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: null";
+        }
         return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: "
                 + actualSlice.toDebugString();
     }

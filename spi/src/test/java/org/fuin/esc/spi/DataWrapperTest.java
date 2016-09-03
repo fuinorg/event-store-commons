@@ -37,7 +37,7 @@ public class DataWrapperTest {
     public final void testMarshal() throws Exception {
 
         // PREPARE
-        final Base64Data base64 = new Base64Data("MyTextType", "Hello world!".getBytes(Charset.forName("utf-8")));
+        final Base64Data base64 = new Base64Data("Hello world!".getBytes(Charset.forName("utf-8")));
         final DataWrapper testee = new DataWrapper(base64);
 
         // TEST

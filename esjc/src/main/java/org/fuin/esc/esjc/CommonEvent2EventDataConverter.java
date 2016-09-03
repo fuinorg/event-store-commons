@@ -93,8 +93,9 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
         if (userDataSerializer.getMimeType().matchEncoding(targetContentType)) {
             serData = serUserData;
         } else {
-            final Serializer dataSerializer = getSerializer(Base64Data.TYPE);
-            serData = dataSerializer.marshal(new Base64Data(dataType, serUserData));
+            final Base64Data base64data = new Base64Data(serUserData);
+            final Serializer base64Serializer = serRegistry.getSerializer(Base64Data.SER_TYPE);
+            serData = base64Serializer.marshal(base64data);
         }
 
         // EscMeta

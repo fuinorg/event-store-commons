@@ -35,7 +35,7 @@ public class Base64DataTest {
     public final void testMarshal() throws Exception {
 
         // PREPARE
-        final Base64Data testee = new Base64Data("MyType", "Hello world!".getBytes(Charset.forName("utf-8")));
+        final Base64Data testee = new Base64Data("Hello world!".getBytes(Charset.forName("utf-8")));
 
         // TEST
         final String result = marshal(testee, Base64Data.class);

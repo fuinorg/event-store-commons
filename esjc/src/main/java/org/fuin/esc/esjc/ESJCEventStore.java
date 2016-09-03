@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
@@ -43,7 +44,9 @@ import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.EventData;
+import com.github.msemys.esjc.EventReadResult;
 import com.github.msemys.esjc.ResolvedEvent;
+import com.github.msemys.esjc.SliceReadStatus;
 import com.github.msemys.esjc.WriteResult;
 
 /**
@@ -159,13 +162,21 @@ public final class ESJCEventStore implements EventStore {
         try {
             es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
                     hardDelete).get();
-        } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
-            // TODO Add actual version instead of NULL if ES returns this some
-            // day
-            throw new WrongExpectedVersionException(streamId, expectedVersion, null);
-        } catch (final com.github.msemys.esjc.operation.StreamDeletedException ex) {
-            throw new StreamDeletedException(streamId);
-        } catch (InterruptedException | ExecutionException ex) {
+        } catch (final ExecutionException ex) {
+            if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
+                final com.github.msemys.esjc.operation.WrongExpectedVersionException weve = (com.github.msemys.esjc.operation.WrongExpectedVersionException) ex
+                        .getCause();
+                // TODO Add actual version instead of NULL if ES returns this
+                // some day
+                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+            }
+            if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
+                final com.github.msemys.esjc.operation.StreamDeletedException sde = (com.github.msemys.esjc.operation.StreamDeletedException) ex
+                        .getCause();
+                throw new StreamDeletedException(streamId);
+            }
+            throw new RuntimeException("Error executing delete", ex);
+        } catch (final InterruptedException ex) {
             throw new RuntimeException("Error waiting for delete result", ex);
         }
 
@@ -183,13 +194,22 @@ public final class ESJCEventStore implements EventStore {
     public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
             final int count) {
 
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 0);
+        Contract.requireArgMin("count", count, 1);
+        
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
                     .readStreamEventsForward(streamId.asString(), start, count, true).get();
+            if (SliceReadStatus.StreamDeleted == slice.status) {
+                throw new StreamDeletedException(streamId);
+            }
+            if (SliceReadStatus.StreamNotFound == slice.status) {
+                throw new StreamNotFoundException(streamId);
+            }
             final List<CommonEvent> events = asCommonEvents(slice.events);
             return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber,
                     slice.isEndOfStream);
-
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
@@ -199,24 +219,50 @@ public final class ESJCEventStore implements EventStore {
     @Override
     public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
             final int count) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("start", start, 0);
+        Contract.requireArgMin("count", count, 1);
+        
         // TODO Auto-generated method stub
+        // TODO throw StreamNotFoundException
+        // TODO throw StreamDeletedException
         return null;
     }
 
     @Override
     public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
-        // TODO Auto-generated method stub
-        return null;
+
+        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgMin("eventNumber", eventNumber, 0);
+        
+        try {
+            final EventReadResult eventReadResult = es.readEvent(streamId.asString(), eventNumber, true)
+                    .get();
+            return asCommonEvent(eventReadResult.event);
+            // TODO throw EventNotFoundException
+            // TODO throw StreamNotFoundException
+            // TODO throw StreamDeletedException
+        } catch (InterruptedException | ExecutionException ex) {
+            throw new RuntimeException("Error waiting for read forward result", ex);
+        }
+
     }
 
     @Override
     public final boolean streamExists(final StreamId streamId) {
+        
+        Contract.requireArgNotNull("streamId", streamId);
+        
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public final StreamState streamState(final StreamId streamId) {
+        
+        Contract.requireArgNotNull("streamId", streamId);
+        
         // TODO Auto-generated method stub
         return null;
     }
@@ -232,9 +278,13 @@ public final class ESJCEventStore implements EventStore {
     private List<CommonEvent> asCommonEvents(final List<ResolvedEvent> resolvedEvents) {
         final List<CommonEvent> list = new ArrayList<>(resolvedEvents.size());
         for (final ResolvedEvent resolvedEvent : resolvedEvents) {
-            list.add(ed2ceConv.convert(resolvedEvent.event));
+            list.add(asCommonEvent(resolvedEvent));
         }
         return list;
+    }
+
+    private CommonEvent asCommonEvent(final ResolvedEvent resolvedEvent) {
+        return ed2ceConv.convert(resolvedEvent.event);
     }
 
 }

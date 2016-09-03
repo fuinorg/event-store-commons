@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.spi;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -122,4 +123,50 @@ public final class EscEvents implements ToJsonCapable {
         return new EscEvents(events);
     }
 
+    /**
+     * Serializes and deserializes a {@link EscEvents} object as JSON. The content
+     * type for serialization is always "application/json".
+     */
+    public static class EscEventsJsonDeSerializer implements SerDeserializer {
+
+        private JsonDeSerializer jsonDeSer;
+
+        /**
+         * Constructor with UTF-8 encoding.
+         */
+        public EscEventsJsonDeSerializer() {
+            super();
+            this.jsonDeSer = new JsonDeSerializer();
+        }
+
+        /**
+         * Constructor with type and encoding.
+         * 
+         * @param encoding
+         *            Default encoding to use.
+         */
+        public EscEventsJsonDeSerializer(final Charset encoding) {
+            super();
+            this.jsonDeSer = new JsonDeSerializer(encoding);
+        }
+
+        @Override
+        public final EnhancedMimeType getMimeType() {
+            return jsonDeSer.getMimeType();
+        }
+
+        @Override
+        public final <T> byte[] marshal(final T obj) {
+            return jsonDeSer.marshal(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public final EscEvents unmarshal(final Object data, final EnhancedMimeType mimeType) {
+            final JsonArray jsonArray = jsonDeSer.unmarshal(data, mimeType);
+            return EscEvents.create(jsonArray);
+        }
+
+    }
+    
 }

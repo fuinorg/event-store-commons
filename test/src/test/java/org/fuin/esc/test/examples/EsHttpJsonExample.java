@@ -19,7 +19,7 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStore;
-import org.fuin.esc.eshttp.EscEvents;
+import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
