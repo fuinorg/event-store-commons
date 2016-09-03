@@ -16,8 +16,7 @@ Defines a common event store Java interface and provides some adapters (like for
 |:-------|:------------|--------|:--------|
 | [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~92% |
 | [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
-| [esc-esjc](esjc) | [esjc](| [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
-) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![IN WORK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/work-in-progress.png) |  |
+| [esc-esjc](esjc) | [Event Store Java Client](https://github.com/msemys/esjc) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![IN WORK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/work-in-progress.png) |  |
 | [esc-jpa](jpa) | JPA adapter | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~59% |
 | [esc-mem](mem) | In-memory implementation | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60% |
 | [esc-spi](spi) | Helper classes for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~67% |
