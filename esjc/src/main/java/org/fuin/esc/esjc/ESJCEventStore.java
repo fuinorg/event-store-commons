@@ -45,6 +45,7 @@ import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.EventData;
 import com.github.msemys.esjc.EventReadResult;
+import com.github.msemys.esjc.EventReadStatus;
 import com.github.msemys.esjc.ResolvedEvent;
 import com.github.msemys.esjc.SliceReadStatus;
 import com.github.msemys.esjc.WriteResult;
@@ -197,7 +198,7 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        
+
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
                     .readStreamEventsForward(streamId.asString(), start, count, true).get();
@@ -223,7 +224,7 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        
+
         // TODO Auto-generated method stub
         // TODO throw StreamNotFoundException
         // TODO throw StreamDeletedException
@@ -235,14 +236,20 @@ public final class ESJCEventStore implements EventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
-        
+
         try {
             final EventReadResult eventReadResult = es.readEvent(streamId.asString(), eventNumber, true)
                     .get();
+            if (eventReadResult.status == EventReadStatus.NoStream) {
+                throw new StreamNotFoundException(streamId);
+            }
+            if (eventReadResult.status == EventReadStatus.NotFound) {
+                throw new EventNotFoundException(streamId, eventNumber);
+            }
+            if (eventReadResult.status == EventReadStatus.StreamDeleted) {
+                throw new StreamDeletedException(streamId);
+            }
             return asCommonEvent(eventReadResult.event);
-            // TODO throw EventNotFoundException
-            // TODO throw StreamNotFoundException
-            // TODO throw StreamDeletedException
         } catch (InterruptedException | ExecutionException ex) {
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
@@ -251,18 +258,18 @@ public final class ESJCEventStore implements EventStore {
 
     @Override
     public final boolean streamExists(final StreamId streamId) {
-        
+
         Contract.requireArgNotNull("streamId", streamId);
-        
+
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public final StreamState streamState(final StreamId streamId) {
-        
+
         Contract.requireArgNotNull("streamId", streamId);
-        
+
         // TODO Auto-generated method stub
         return null;
     }
