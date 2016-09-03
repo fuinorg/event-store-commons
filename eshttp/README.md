@@ -1,15 +1,13 @@
 # esc-eshttp
 Event store commons HTTP adapter for Greg Young's [Event Store](https://www.geteventstore.com/).
 
-**CURRENTLY BROKEN (2016-07-01)**
-
 ## ESC Meta Data Structure
 The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. 
 To allow having multiple types and versions of data and meta data, the common event store interface introduces 
 a separate meta data structure. It contains information about content-types, encoding, version, meta type and 
 the meta information provided by the user.
 
-Here is how the data structure looks like that is sent using the [Event Store Events Media Type](http://docs.geteventstore.com/http-api/3.4.0/writing-to-a-stream/):
+Here is how the data structure looks like that is sent using the [Event Store Events Media Type](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/):
 ```json
 [
     {
@@ -20,48 +18,47 @@ Here is how the data structure looks like that is sent using the [Event Store Ev
             "author":"Stephen King"
         },
         "MetaData":{
-            "EscUserMeta":{
+	        "data-type":"MyEvent",
+            "data-content-type":"application/json; encoding=UTF-8",
+	        "meta-type":"MyMeta",
+            "meta-content-type":"application/json; encoding=UTF-8; version=3",
+            "MyMeta":{
                 "user":"michael"
-            },
-            "EscSysMeta":{
-                "data-content-type":"application/json; encoding=UTF-8",
-                "meta-content-type":"application/json; encoding=UTF-8; version=3",
-                "meta-type":"MyMeta"
             }
         }
     }
 ]
 ```
 Some things to note:
-- "Data" contains the user's data (event)
-- "EscUserMeta" contains the user's meta data
-- "EscSysMeta" has type informations about "Data" and "EscUserMeta"
-- "*-content-type" contains the mime-type, encoding and and an optional version of the data structure
-- "meta-type" is the unique type name of the meta data (equivalent to "EventType" for data)
-
+- **EventId** Universally Unique Identifier (UUID) of the event (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/)) 
+- **Data** contains the user's event data (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/))
+- **MetaData** contains some additional information required by event store commons (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/))
+- **data-type** is the unique type name of the event stored in the data element. It's actually a copy of the "EventType" field and only there to have complete meta information describing the data structure.
+- **data-content-type** contains the mime-type, encoding and and an optional version of the data 
+- **meta-type** is the unique type name of the meta data (equivalent to "EventType"/"data-type" for data)
+- **meta-content-type** contains the mime-type, encoding and and an optional version of the meta data
+- **MyMeta** is always the last optional element in the meta data structure and contains the user's meta data. The "meta-type" and "meta-content-type" are only available if there is such user meta data available. 
 
 Here is another example of event (XML) and mime type (TEXT) with a different format than the surrounding JSON envelope:
 ```json
 [
-    {
-        "EventId":"b3074933-c3ac-44c1-8854-04a21d560999",
-        "EventType":"BookAddedEvent",
-        "Data":{
-            "Base64": "PGJvb2stYWRkZWQtZXZlbnQgbmFtZT0iU2hpbmluZyIgYXV0aG9yPSJTdGVwaGVuIEtpbmciLz4="
-        },
-        "MetaData":{
-            "EscUserMeta": {
-                "Base64": "QW55dGhpbmcgZ29lcw=="
-            },
-            "EscSysMeta": {
-                "data-content-type": "application/xml; encoding=UTF-8; transfer-encoding=base64",
-                "meta-content-type": "text/plain; encoding=UTF-8; transfer-encoding=base64; version=2",
-                "meta-type":"AnyMeta"
-            }
-        }
+{
+    "EventId":"bd58da40-9249-4b42-a077-10455b483c80",
+    "EventType":"MyEvent",
+    "Data": {
+        "MyEvent":"PE15RXZlbnQ+PGlkPmJkNThkYTQwLTkyNDktNGI0Mi1hMDc3LTEwNDU1YjQ4M2M4MDwvaWQ+PGRlc2NyaXB0aW9uPkhlbGxvLCBYTUwhPC9kZXNjcmlwdGlvbj48L015RXZlbnQ+"   
+    },
+    "MetaData":{
+        "data-type": "MyEvent",
+        "data-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+        "meta-type": "MyMeta",
+        "meta-content-type":"application/xml; version=1; encoding=utf-8; transfer-encoding=base64",
+        "MyMeta":"PG15LW1ldGE+PHVzZXI+YWJjPC91c2VyPjwvbXktbWV0YT4=" 
     }
+}
 ]
 ```
 The actual data and meta data is base64 encoded. This way you can use any data format you like for storing your content.
-If you decode the base 64 data, it's "```<book-added-event name="Shining" author="Stephen King"/>```" (Data) and 
-"```Anything goes```" (EscUserMeta).
+If you decode the base 64 data, it's "```<MyEvent><id>bd58da40-9249-4b42-a077-10455b483c80</id><description>Hello, XML!</description></MyEvent>```" (Data) and 
+```<my-meta><user>abc</user></my-meta>``` (MyMeta).
+
