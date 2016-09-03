@@ -17,7 +17,8 @@
  */
 package org.fuin.esc.spi;
 
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
@@ -30,6 +31,8 @@ import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 /**
  * Test for {@link EscMeta} class.
@@ -65,7 +68,7 @@ public class EscMetaTest {
         final String actualJson = sw.toString();
 
         // VERIFY
-        assertJsonEquals(expectedJson, actualJson);
+        assertThatJson(expectedJson).isEqualTo(actualJson);
 
     }
 

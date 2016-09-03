@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.eshttp;
+package org.fuin.esc.spi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +32,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.ToJsonCapable;
 import org.fuin.objects4j.common.Contract;
 
 /**

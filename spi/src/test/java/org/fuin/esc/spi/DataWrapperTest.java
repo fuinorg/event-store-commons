@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.eshttp;
+package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.XML_PREFIX;
@@ -25,6 +25,7 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import java.nio.charset.Charset;
 
 import org.fuin.esc.spi.Base64Data;
+import org.fuin.esc.spi.DataWrapper;
 import org.junit.Test;
 
 /**

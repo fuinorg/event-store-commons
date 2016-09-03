@@ -32,6 +32,8 @@ import org.apache.commons.io.IOUtils;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.spi.EscEvent;
+import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerDeserializerRegistry;

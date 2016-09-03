@@ -24,7 +24,10 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.spi.Base64Data;
+import org.fuin.esc.spi.DataWrapper;
 import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.spi.EscEvent;
+import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedDataType;

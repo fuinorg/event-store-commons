@@ -34,10 +34,10 @@ public final class MyMeta implements Serializable {
     private static final long serialVersionUID = 100L;
 
     /** Unique name of the meta type. */
-    public static TypeName TYPE = new TypeName("MyMeta");
+    public static final TypeName TYPE = new TypeName("MyMeta");
 
     /** Unique name of the serialized meta type. */
-    public static SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
     
     @XmlElement(name = "user")
     private String user;

@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
@@ -37,15 +37,15 @@ public final class MyEvent implements Serializable {
     private static final long serialVersionUID = 100L;
 
     /** Unique name of the event. */
-    public static TypeName TYPE = new TypeName("MyEvent");
+    public static final TypeName TYPE = new TypeName("MyEvent");
     
     /** Unique name of the serialized event. */
-    public static SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
-    @XmlAttribute(name = "id")
+    @XmlElement(name = "id")
     private String id;
 
-    @XmlAttribute(name = "description")
+    @XmlElement(name = "description")
     private String description;
 
     /**
@@ -76,7 +76,7 @@ public final class MyEvent implements Serializable {
      * @param description
      *            The description.
      */
-    public MyEvent(@NotNull UUID uuid, @NotEmpty final String description) {
+    public MyEvent(@NotNull final UUID uuid, @NotEmpty final String description) {
         super();
         Contract.requireArgNotNull("uuid", uuid);
         Contract.requireArgNotEmpty("description", description);
