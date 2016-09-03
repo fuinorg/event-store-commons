@@ -179,9 +179,8 @@ public final class XmlDeSerializer implements SerDeserializer {
             if (data instanceof Node) {
                 return (T) unmarshaller.unmarshal((Node) data);
             }
-            throw new IllegalArgumentException("This deserializer only supports input of type '"
-                    + Node.class.getName() + "' and 'byte[]', but was: " + data);
-
+            return (T) data;
+            
         } catch (final JAXBException ex) {
             throw new RuntimeException("Error de-serializing data", ex);
         }
