@@ -233,8 +233,9 @@ public final class EscMeta implements ToJsonCapable {
         if (transferEncoding == null) {
             return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
         }
+        final JsonObject base64obj = jsonObj.getJsonObject(metaType);
         return new EscMeta(dataType, dataContentType, metaType, metaContentType,
-                new Base64Data(jsonObj.getString(metaType)));
+                new Base64Data(base64obj.getString(Base64Data.EL_ROOT_NAME)));
     }
 
 }
