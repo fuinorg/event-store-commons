@@ -75,9 +75,9 @@ public final class MultipleCommands implements TestCommand {
     }
 
     @Override
-    public final void init(final EventStore eventStore) {
+    public void init(final String currentEventStoreImplType, final EventStore eventStore) {
         for (final TestCommand command : commands) {
-            command.init(eventStore);
+            command.init(currentEventStoreImplType, eventStore);
         }
     }
 

@@ -29,20 +29,25 @@ public interface TestCommand {
     /**
      * Initializes the command before execuing it.
      * 
+     * @param currentEventStoreImplType
+     *            Type name of the currently tested event store implementation.
+     *            Will be used to prefix the stream names to avoid name clashes
+     *            for multiple implementations for the same backend store.
      * @param eventStore
      *            Event store to use.
      */
-    public void init(@NotNull EventStore eventStore);
+    public void init(@NotNull String currentEventStoreImplType, @NotNull EventStore eventStore);
 
     /**
-     * Executes the command. Exceptions will be catched and are available for verification using the
-     * {@link #getException()} method.
+     * Executes the command. Exceptions will be catched and are available for
+     * verification using the {@link #getException()} method.
      */
     public void execute();
 
     /**
-     * Returns if the command execution was successful. If this method is called before {@link #execute()} was
-     * executed, an illegal state exception will be thrown.
+     * Returns if the command execution was successful. If this method is called
+     * before {@link #execute()} was executed, an illegal state exception will
+     * be thrown.
      * 
      * @return TRUE if it was successful, else FALSE if it was a failure.
      */
@@ -56,7 +61,8 @@ public interface TestCommand {
     public String getFailureDescription();
 
     /**
-     * Verifies that the command was successful and throws a runtime exception otherwise.
+     * Verifies that the command was successful and throws a runtime exception
+     * otherwise.
      */
     public void verify();
 

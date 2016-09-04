@@ -78,16 +78,11 @@ public final class CreateStreamCommand implements TestCommand {
         this.expectedException = expectedException;
     }
 
-    /**
-     * Initializes the command before execution.
-     * 
-     * @param eventstore
-     *            Event store to use.
-     */
-    public void init(@NotNull final EventStore eventstore) {
+    @Override
+    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
         this.es = eventstore;
+        this.streamName = currentEventStoreImplType + "_" + streamName;
 
-        streamName = EscTestUtils.emptyAsNull(streamName);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
 
         this.streamId = new SimpleStreamId(streamName);

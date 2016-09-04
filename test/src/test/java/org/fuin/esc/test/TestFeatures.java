@@ -72,6 +72,8 @@ import cucumber.api.java.en.When;
 // CHECKSTYLE:OFF Test code
 public class TestFeatures {
 
+    private String currentEventStoreImplType;
+    
     private EventStore eventStore;
 
     private SimpleSerializerDeserializerRegistry registry;
@@ -87,10 +89,11 @@ public class TestFeatures {
     @Before
     public void beforeFeature() throws MalformedURLException {
         // Use the property to select the correct implementation:
-        final String type = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
-        if (type.equals("mem")) {
+        currentEventStoreImplType = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
+        if (currentEventStoreImplType.equals("mem")) {
             eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
-        } else if (type.equals("eshttp") || type.equals("jpa") || type.equals("esjc")) {
+        } else if (currentEventStoreImplType.equals("eshttp") || currentEventStoreImplType.equals("jpa") 
+                || currentEventStoreImplType.equals("esjc")) {
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class, MyMeta.class,
                     EscEvent.class, EscEvents.class, EscMeta.class, Base64Data.class);
             final JsonDeSerializer jsonDeSer = new JsonDeSerializer();
@@ -104,23 +107,23 @@ public class TestFeatures {
             registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
             registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
-            if (type.equals("eshttp")) {
+            if (currentEventStoreImplType.equals("eshttp")) {
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
                 eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
-            } else if (type.equals("jpa")) {
+            } else if (currentEventStoreImplType.equals("jpa")) {
                 setupDb();
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
-            } else if (type.equals("esjc")) {
+            } else if (currentEventStoreImplType.equals("esjc")) {
                 final com.github.msemys.esjc.EventStore es = EventStoreBuilder.newBuilder()
                         .singleNodeAddress("127.0.0.1", 1113).build();
                 eventStore = new ESJCEventStore(es, registry, registry,
                         EnhancedMimeType.create("application", "xml", Charset.forName("utf-8")));
             } else {
-                throw new IllegalStateException("Unknown type: " + type);
+                throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
             }
         } else {
-            throw new IllegalStateException("Unknown type: " + type);
+            throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
         }
         eventStore.open();
         lastCommand = null;
@@ -155,7 +158,7 @@ public class TestFeatures {
     @When("^the following deletes are executed$")
     public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         lastCommand = command;
     }
@@ -163,7 +166,7 @@ public class TestFeatures {
     @Then("^executing the following deletes should have the given result$")
     public void thenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -181,7 +184,7 @@ public class TestFeatures {
             command.add(new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, event));
         }
 
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
 
@@ -200,7 +203,7 @@ public class TestFeatures {
     @Then("^reading forward from the following streams should raise the given exceptions$")
     public void thenReadForwardException(final List<ReadForwardExceptionCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -208,7 +211,7 @@ public class TestFeatures {
     @When("^I read forward from the following streams$")
     public void whenReadForwardException(final List<ReadForwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         lastCommand = command;
     }
@@ -216,7 +219,7 @@ public class TestFeatures {
     @When("^I read backward from the following streams$")
     public void whenReadBackwardException(final List<ReadBackwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         lastCommand = command;
     }
@@ -224,7 +227,7 @@ public class TestFeatures {
     @Given("^the stream \"(.*?)\" does not exist$")
     public void givenStreamDoesNotExist(final String streamName) {
         final TestCommand command = new StreamExistsCommand(streamName, false);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -235,7 +238,7 @@ public class TestFeatures {
         for (final AppendToStreamCommand cmd : commands) {
             command.add(cmd);
         }
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -243,7 +246,7 @@ public class TestFeatures {
     @Then("^reading forward from stream should have the following results$")
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -251,7 +254,7 @@ public class TestFeatures {
     @Then("^reading backward from stream should have the following results$")
     public void thenReadBackward(final List<ReadBackwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -265,9 +268,9 @@ public class TestFeatures {
         final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
-        final AppendToStreamCommand command = new AppendToStreamCommand(streamName, version, null,
+        final TestCommand command = new AppendToStreamCommand(streamName, version, null,
                 commonEvents);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -276,9 +279,9 @@ public class TestFeatures {
     public void thenReadXmlEvent(final int eventNumber, final String streamName,
             final String expectedEventXml) {
 
-        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml,
+        final TestCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml,
                 null);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
 
@@ -286,9 +289,9 @@ public class TestFeatures {
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
     public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) {
-        final ReadEventCommand command = new ReadEventCommand(streamName, eventNumber, null,
+        final TestCommand command = new ReadEventCommand(streamName, eventNumber, null,
                 expectedException);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -296,7 +299,7 @@ public class TestFeatures {
     @When("^the following state queries are executed$")
     public void whenStateQueriesAreExecuted(final List<StreamStateCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
@@ -317,7 +320,7 @@ public class TestFeatures {
             final String streamName = streams.get(i);
             command.add(new StreamExistsCommand(streamName, exist));
         }
-        command.init(eventStore);
+        command.init(currentEventStoreImplType, eventStore);
         execute(command);
         command.verify();
     }
