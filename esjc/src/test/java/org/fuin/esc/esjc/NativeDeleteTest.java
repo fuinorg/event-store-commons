@@ -35,6 +35,7 @@ public class NativeDeleteTest {
             if (result.isStreamDeleted) {
                 System.out.println("SOFT DELETED");
             } else {
+                // === THIS IS PRINTED ===
                 System.out.println("HARD DELETED");
             }
 
