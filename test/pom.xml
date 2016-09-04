@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.fuin.esc</groupId>
 		<artifactId>esc-parent</artifactId>
-		<version>0.1.0</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>esc-test</artifactId>
@@ -31,56 +31,48 @@
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-api</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-spi</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-mem</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-eshttp</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
-        
+
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-jpa</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fuin.esc</groupId>
 			<artifactId>esc-esjc</artifactId>
-			<version>0.1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fuin</groupId>
 			<artifactId>objects4j</artifactId>
-			<version>0.6.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
 			<optional>true</optional>
 			<scope>test</scope>
 		</dependency>
@@ -88,42 +80,36 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.12</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.json</groupId>
 			<artifactId>javax.json-api</artifactId>
-			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.3.0</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.fuin</groupId>
 			<artifactId>units4j</artifactId>
-            <version>0.8.1</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -136,7 +122,6 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>5.2.2.Final</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -155,79 +140,68 @@
 		</dependency>
 
 		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.6</version>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>nl.jqno.equalsverifier</groupId>
 			<artifactId>equalsverifier</artifactId>
-			<version>1.7.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
-			<version>1.0.4</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>info.cukes</groupId>
 			<artifactId>cucumber-java</artifactId>
-			<version>1.2.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>info.cukes</groupId>
 			<artifactId>cucumber-junit</artifactId>
-			<version>1.2.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
-			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>3.3.0.Final</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.jboss.logging</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>5.0.6.Final</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
 

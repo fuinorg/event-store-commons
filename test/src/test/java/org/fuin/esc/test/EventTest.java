@@ -18,21 +18,21 @@
 package org.fuin.esc.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
 
 /**
  * Tests the {@link Event} class.
@@ -49,8 +49,7 @@ public class EventTest extends AbstractXmlTest {
 
     private static final String DATA_CONTENT = "<myEvent/>";
 
-    private static final Data DATA = new Data(DATA_TYPE, DATA_MIME_TYPE,
-            DATA_CONTENT);
+    private static final Data DATA = new Data(DATA_TYPE, DATA_MIME_TYPE, DATA_CONTENT);
 
     private static final String META_TYPE = "MyMeta";
 
@@ -59,8 +58,7 @@ public class EventTest extends AbstractXmlTest {
 
     private static final String META_CONTENT = "{ \"a\" : \"1\" }";
 
-    private static final Data META = new Data(META_TYPE, META_MIME_TYPE,
-            META_CONTENT);
+    private static final Data META = new Data(META_TYPE, META_MIME_TYPE, META_CONTENT);
 
     private Event testee;
 
@@ -106,24 +104,20 @@ public class EventTest extends AbstractXmlTest {
         final Event original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Event.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Event.class);
 
         // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert
-                .assertXMLEqual(
+        final String expectedXml =
                 // @formatter:off
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                                + "<event id=\"" + ID.asBaseType() + "\">"
-                                + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
-                                + "        <![CDATA[<myEvent/>]]>"
-                                + "    </data>"
-                                + "    <meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
-                                + "        <![CDATA[{ \"a\" : \"1\" }]]>"
-                                + "    </meta>" + "</event>"
-                        // @formatter:on
-                        , xml);
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + "<event id=\""
+                        + ID.asBaseType() + "\">"
+                        + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
+                        + "        <![CDATA[<myEvent/>]]>" + "    </data>"
+                        + "    <meta type=\"MyMeta\" mime-type=\"application/json; encoding=utf-8\">"
+                        + "        <![CDATA[{ \"a\" : \"1\" }]]>" + "    </meta>" + "</event>";
+        // @formatter:on
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 
@@ -134,8 +128,7 @@ public class EventTest extends AbstractXmlTest {
         final Event original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Event.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Event.class);
         final Event copy = unmarshal(xml, createXmlAdapter(), Event.class);
 
         // VERIFY

@@ -18,24 +18,24 @@
 package org.fuin.esc.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
 
 /**
  * Tests the {@link Slice} class.
@@ -44,7 +44,7 @@ import org.junit.Test;
 public class SliceTest extends AbstractXmlTest {
 
     private static final EventId ID = new EventId();
-    
+
     private static final int FROM = 0;
 
     private static final int NEXT = 1;
@@ -58,10 +58,8 @@ public class SliceTest extends AbstractXmlTest {
     @Before
     public void setup() throws Exception {
         events = new ArrayList<Event>();
-        events.add(new Event(ID, new Data(
-                "MyEvent", new EnhancedMimeType(
-                        "application/xml; version=2; encoding=utf-8"),
-                "<my-event/>"), null));
+        events.add(new Event(ID, new Data("MyEvent",
+                new EnhancedMimeType("application/xml; version=2; encoding=utf-8"), "<my-event/>"), null));
         testee = new Slice(FROM, events, NEXT, EOS);
     }
 
@@ -106,22 +104,19 @@ public class SliceTest extends AbstractXmlTest {
         final Slice original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Slice.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Slice.class);
 
         // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert
-                .assertXMLEqual(
+        final String expectedXml =
                 // @formatter:off
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                                + "<slice from-stream-no=\"0\" next-stream-no=\"1\" end-of-stream=\"true\">"
-                                + "<event id=\"" + ID + "\">"
-                                + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=2; encoding=utf-8\">"
-                                + "        <![CDATA[<my-event/>]]>"
-                                + "    </data>" + "</event>" + "</slice>"
-                        // @formatter:on
-                        , xml);
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                        + "<slice from-stream-no=\"0\" next-stream-no=\"1\" end-of-stream=\"true\">"
+                        + "<event id=\"" + ID + "\">"
+                        + "    <data type=\"MyEvent\" mime-type=\"application/xml; version=2; encoding=utf-8\">"
+                        + "        <![CDATA[<my-event/>]]>" + "    </data>" + "</event>" + "</slice>";
+        // @formatter:on
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 
@@ -132,8 +127,7 @@ public class SliceTest extends AbstractXmlTest {
         final Slice original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Slice.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Slice.class);
         final Slice copy = unmarshal(xml, createXmlAdapter(), Slice.class);
 
         // VERIFY

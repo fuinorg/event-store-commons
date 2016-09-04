@@ -18,9 +18,9 @@
 package org.fuin.esc.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import javax.activation.MimeTypeParseException;
 import javax.json.Json;
@@ -29,14 +29,14 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.units4j.Units4JUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 /**
  * Tests the {@link Data} class.
@@ -90,10 +90,11 @@ public class DataTest extends AbstractXmlTest {
         final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
 
         // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert.assertXMLEqual("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
-                + "    <![CDATA[" + CONTENT + "]]>" + "</data>", xml);
+                + "    <![CDATA[" + CONTENT + "]]>" + "</data>";
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 

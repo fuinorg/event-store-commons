@@ -28,8 +28,6 @@ import java.io.StringWriter;
 import javax.json.Json;
 
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -37,6 +35,7 @@ import org.xmlunit.diff.Diff;
 /**
  * Test for {@link EscMeta} class.
  */
+// CHECKSTYLE:OFF Test
 public class EscMetaTest {
 
     @Test
@@ -50,8 +49,9 @@ public class EscMetaTest {
         final String actualXml = marshal(testee, EscMeta.class, MyMeta.class, Base64Data.class);
 
         // VERIFY
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLAssert.assertXMLEqual(expectedXml, actualXml);
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(actualXml).ignoreWhitespace()
+                .build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 
@@ -73,3 +73,4 @@ public class EscMetaTest {
     }
 
 }
+//CHECKSTYLE:ON
