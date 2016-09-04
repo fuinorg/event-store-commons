@@ -23,6 +23,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class SimpleCommonEventTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(SimpleCommonEvent.class).verify();
+        EqualsVerifier.forClass(SimpleCommonEvent.class).suppress(Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
