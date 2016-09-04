@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.activation.MimeTypeParameterList;
 import javax.activation.MimeTypeParseException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -111,9 +112,12 @@ public class EnhancedMimeTypeTest {
     }
 
     @Test
-    public void testEqualsHashCode() {
+    public void testEqualsHashCode() throws MimeTypeParseException {
+        final MimeTypeParameterList listA = new MimeTypeParameterList(";charset=utf-8");
+        final MimeTypeParameterList listB = new MimeTypeParameterList(";charset=iso-8859-2");
         EqualsVerifier.forClass(EnhancedMimeType.class)
                 .suppress(Warning.NULL_FIELDS, Warning.NONFINAL_FIELDS)
+                .withPrefabValues(MimeTypeParameterList.class, listA, listB)
                 .verify();
     }
 
