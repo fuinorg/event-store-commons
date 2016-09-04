@@ -166,9 +166,11 @@ public interface WritableEventStore extends AutoCloseable {
      *             A stream with the given name previously existed but was hard deleted.
      * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
+     * @throws StreamReadOnlyException
+     *             The given stream identifier points to a projection.
      */
     public void deleteStream(@NotNull StreamId streamId, int expectedVersion, boolean hardDelete)
-            throws StreamDeletedException, WrongExpectedVersionException;
+            throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
      * Deletes a stream from the event store not matter what the current version is.
@@ -184,8 +186,10 @@ public interface WritableEventStore extends AutoCloseable {
      *             A stream with the given name does not exist in the repository.
      * @throws StreamDeletedException
      *             A stream with the given name previously existed but was deleted.
+     * @throws StreamReadOnlyException
+     *             The given stream identifier points to a projection.
      */
     public void deleteStream(@NotNull StreamId streamId, boolean hardDelete) throws StreamNotFoundException,
-            StreamDeletedException;
+            StreamDeletedException, StreamReadOnlyException;
 
 }

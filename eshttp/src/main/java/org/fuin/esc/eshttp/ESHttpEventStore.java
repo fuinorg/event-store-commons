@@ -245,6 +245,10 @@ public final class ESHttpEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
+        
         final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();

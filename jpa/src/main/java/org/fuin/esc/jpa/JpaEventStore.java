@@ -33,6 +33,7 @@ import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
@@ -101,6 +102,10 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("toAppend", toAppend);
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
+        
         JpaStream stream = findAndLockJpaStream(streamId);
         if (stream == null) {
             LOG.debug("Stream '{}' not found, creating it", streamId);
@@ -143,6 +148,10 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
+        
         final JpaStream stream = findAndLockJpaStream(streamId);
         if (stream == null) {
             // Stream never existed

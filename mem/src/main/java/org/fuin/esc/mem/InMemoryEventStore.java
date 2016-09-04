@@ -37,6 +37,7 @@ import org.fuin.esc.api.StreamDeletedException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.SubscribableEventStore;
 import org.fuin.esc.api.Subscription;
@@ -176,6 +177,9 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
         Contract.requireArgNotNull("streamId", streamId);
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
         if (streamId == StreamId.ALL) {
             throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
@@ -224,6 +228,10 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
+        
         InternalStream stream = streams.get(streamId);
         if (stream == null) {
             stream = new InternalStream();

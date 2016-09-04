@@ -160,6 +160,10 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
 
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
+        }
+
         try {
             es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
                     hardDelete).get();
