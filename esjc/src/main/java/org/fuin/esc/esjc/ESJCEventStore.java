@@ -306,9 +306,9 @@ public final class ESJCEventStore implements EventStore {
             if (SliceReadStatus.StreamDeleted == slice.status) {
                 final StreamMetadataResult result = es.getStreamMetadata(streamId.asString()).get();
                 if (result.isStreamDeleted) {
-                    return StreamState.SOFT_DELETED;
+                    return StreamState.HARD_DELETED;
                 }
-                return StreamState.HARD_DELETED;
+                return StreamState.SOFT_DELETED;
             }
             if (SliceReadStatus.StreamNotFound == slice.status) {
                 throw new StreamNotFoundException(streamId);
