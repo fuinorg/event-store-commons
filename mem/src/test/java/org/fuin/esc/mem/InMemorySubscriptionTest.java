@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
@@ -52,7 +53,7 @@ public class InMemorySubscriptionTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(InMemorySubscription.class).verify();
+        EqualsVerifier.forClass(InMemorySubscription.class).suppress(Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
 }

@@ -33,6 +33,7 @@ import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 /**
  * Tests the {@link Event} class.
@@ -74,7 +75,7 @@ public class EventTest extends AbstractXmlTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(Event.class).verify();
+        EqualsVerifier.forClass(Event.class).suppress(Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
