@@ -30,3 +30,23 @@ Defines a common event store Java interface and provides some adapters (like for
 - [Event store with HTTP interface and XML](test/src/test/java/org/fuin/esc/test/examples/EsHttpXmlExample.java)
 - [Event store with HTTP interface and JSON](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonExample.java)
 - [Event store with HTTP interface and mixed JSON/XML content](test/src/test/java/org/fuin/esc/test/examples/EsHttpMixedExample.java)
+
+###Snapshots
+
+Snapshots can be found on the [OSS Sonatype Snapshots Repository](https://oss.sonatype.org/content/repositories/snapshots/org/fuin/esc/ "Snapshot Repository"). 
+
+Add the following to your [.m2/settings.xml](http://maven.apache.org/ref/3.2.1/maven-settings/settings.html "Reference configuration") to enable snapshots in your Maven build:
+
+```xml
+<repository>
+    <id>sonatype.oss.snapshots</id>
+    <name>Sonatype OSS Snapshot Repository</name>
+    <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    <releases>
+        <enabled>false</enabled>
+    </releases>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+</repository>
+```
