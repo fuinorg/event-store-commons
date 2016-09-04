@@ -32,14 +32,14 @@ Here is how the data structure looks like that is sent using the [Event Store Ev
 Some things to note:
 - **EventId** Universally Unique Identifier (UUID) of the event (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/)) 
 - **Data** contains the user's event data (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/))
-- **MetaData** contains some additional information required by event store commons (See [Event Store HTTP API](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/))
+- **MetaData** contains some additional information required by event store commons
 - **data-type** is the unique type name of the event stored in the data element. It's actually a copy of the "EventType" field and only there to have complete meta information describing the data structure.
 - **data-content-type** contains the mime-type, encoding and and an optional version of the data 
 - **meta-type** is the unique type name of the meta data (equivalent to "EventType"/"data-type" for data)
 - **meta-content-type** contains the mime-type, encoding and and an optional version of the meta data
 - **MyMeta** is always the last optional element in the meta data structure and contains the user's meta data. The "meta-type" and "meta-content-type" are only available if there is such user meta data available. 
 
-Here is another example of event (XML) and mime type (TEXT) with a different format than the surrounding JSON envelope:
+Here is another example of event (XML) and meta data (XML) with a different format than the surrounding JSON envelope:
 ```json
 [
 {
