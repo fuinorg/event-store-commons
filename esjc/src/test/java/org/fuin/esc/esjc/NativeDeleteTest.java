@@ -25,17 +25,17 @@ public class NativeDeleteTest {
             List<EventData> events = new ArrayList<>();
             events.add(EventData.newBuilder().eventId(UUID.randomUUID()).type("baz").data("dummy content")
                     .build());
-            es.appendToStream(streamId, ExpectedVersion.any(), events);
+            es.appendToStream(streamId, ExpectedVersion.any(), events).join();
 
             // Hard delete
-            es.deleteStream(streamId, ExpectedVersion.any(), true);
+            es.deleteStream(streamId, ExpectedVersion.any(), true).join();
 
             // Get status
             final StreamMetadataResult result = es.getStreamMetadata(streamId).get();
             if (result.isStreamDeleted) {
+                // === THIS IS PRINTED ===
                 System.out.println("SOFT DELETED");
             } else {
-                // === THIS IS PRINTED ===
                 System.out.println("HARD DELETED");
             }
 
