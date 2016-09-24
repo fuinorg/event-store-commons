@@ -54,7 +54,7 @@ public class YourSelectedNameEvent extends JpaStreamEvent {
 Table name is the same as the stream identifier plus '_STREAMS' and uses an 'underscore' for replacing camel case parts.   
 Class name is the same as the stream identifier plus 'Stream' (Note that there is no 's' at the end!).
 ```java
-@Table(name = "APPEND_MULTIPLE_AGAIN_STREAMS")
+@Table(name = "YOUR_SELECTED_NAME_STREAMS")
 @Entity
 public class YourSelectedNameStream extends JpaStream { 
     // ... 
