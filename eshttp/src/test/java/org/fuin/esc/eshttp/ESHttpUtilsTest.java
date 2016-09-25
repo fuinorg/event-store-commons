@@ -116,13 +116,14 @@ public class ESHttpUtilsTest {
         try {
             doc = ESHttpUtils.parseDocument(ESHttpUtils.createDocumentBuilder(), in);
             xpath = ESHttpUtils.createXPath("atom", "http://www.w3.org/2005/Atom");
-            
+
             // TEST
-            final Integer value = ESHttpUtils.findContentInteger(doc, xpath, "/atom:entry/atom:content/eventNumber");
+            final Integer value = ESHttpUtils.findContentInteger(doc, xpath,
+                    "/atom:entry/atom:content/eventNumber");
 
             // VERIFY
             assertThat(value).isEqualTo(1);
-            
+
         } finally {
             in.close();
         }
@@ -137,6 +138,14 @@ public class ESHttpUtilsTest {
 
         // VERIFY
         assertThat(value).isEqualTo("1@MyStreamA");
+
+    }
+
+    @Test
+    public void testYesNo() {
+
+        assertThat(ESHttpUtils.yesNo(true)).isEqualTo("yes");
+        assertThat(ESHttpUtils.yesNo(false)).isEqualTo("no");
 
     }
 

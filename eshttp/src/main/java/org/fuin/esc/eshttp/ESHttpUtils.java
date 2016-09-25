@@ -80,7 +80,8 @@ public final class ESHttpUtils {
      * @return Node or <code>null</code> if no match was found.
      */
     @Nullable
-    public static Integer findContentInteger(final Node rootNode, final XPath xPath, final String expression) {
+    public static Integer findContentInteger(final Node rootNode, final XPath xPath,
+            final String expression) {
         final Node node = findNode(rootNode, xPath, expression);
         if (node == null) {
             return null;
@@ -191,6 +192,21 @@ public final class ESHttpUtils {
         } catch (final ParserConfigurationException ex) {
             throw new RuntimeException("Couldn't create document builder", ex);
         }
+    }
+
+    /**
+     * Converts a boolean value to "yes" or "no".
+     * 
+     * @param b
+     *            Boolean value to convert.
+     * 
+     * @return String "yes" or "no".
+     */
+    public static String yesNo(final boolean b) {
+        if (b) {
+            return "yes";
+        }
+        return "no";
     }
 
 }
