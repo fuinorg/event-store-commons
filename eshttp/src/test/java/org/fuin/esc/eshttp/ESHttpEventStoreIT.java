@@ -21,12 +21,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Supplier;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
@@ -48,6 +56,12 @@ import org.junit.Test;
 // CHECKSTYLE:OFF Test
 public class ESHttpEventStoreIT {
 
+    private static final int MAX_TRIES = 10;
+
+    private static final TypeName CUSTOMER_RENAMED = new TypeName("CustomerRenamed");
+
+    private static final TypeName CUSTOMER_CREATED = new TypeName("CustomerCreated");
+
     private ESHttpEventStore testee;
 
     @Before
@@ -55,8 +69,9 @@ public class ESHttpEventStoreIT {
 
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
         final URL url = new URL("http://127.0.0.1:2113/");
-        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, MyEvent.class, EscEvent.class,
-                EscEvents.class, EscMeta.class);
+        final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, MyMeta.class, MyEvent.class,
+                EscEvent.class, EscEvents.class, EscMeta.class);
+
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         registry.add(new SerializedDataType(MyEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
         registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
@@ -64,8 +79,17 @@ public class ESHttpEventStoreIT {
         registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
         registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
 
-        testee = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
+        registry.add(new SerializedDataType(CUSTOMER_CREATED.asBaseType()), "application/xml", xmlDeSer);
+        registry.add(new SerializedDataType(CUSTOMER_RENAMED.asBaseType()), "application/xml", xmlDeSer);
+
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "changeit");
+        credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+
+        testee = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry,
+                credentialsProvider);
         testee.open();
+        
     }
 
     @After
@@ -83,9 +107,11 @@ public class ESHttpEventStoreIT {
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
+                meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType,
+                meta);
 
         // TEST
         testee.appendToStream(streamId, eventOne, eventTwo);
@@ -107,16 +133,20 @@ public class ESHttpEventStoreIT {
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
         final MyEvent one = new MyEvent("One");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
-        final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
-        final MyEvent three = new MyEvent("Three");
-        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three, metaType,
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
                 meta);
+        final MyEvent two = new MyEvent("Two");
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType,
+                meta);
+        final MyEvent three = new MyEvent("Three");
+        final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three,
+                metaType, meta);
         final MyEvent four = new MyEvent("Four");
-        final CommonEvent eventFour = new SimpleCommonEvent(new EventId(four.getId()), dataType, four, metaType, meta);
+        final CommonEvent eventFour = new SimpleCommonEvent(new EventId(four.getId()), dataType, four,
+                metaType, meta);
         final MyEvent five = new MyEvent("Five");
-        final CommonEvent eventFive = new SimpleCommonEvent(new EventId(five.getId()), dataType, five, metaType, meta);
+        final CommonEvent eventFive = new SimpleCommonEvent(new EventId(five.getId()), dataType, five,
+                metaType, meta);
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree, eventFour, eventFive);
 
         // TEST Slice 1
@@ -157,9 +187,11 @@ public class ESHttpEventStoreIT {
         final MyEvent one = new MyEvent("One");
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
-        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType, meta);
+        final CommonEvent eventOne = new SimpleCommonEvent(new EventId(one.getId()), dataType, one, metaType,
+                meta);
         final MyEvent two = new MyEvent("Two");
-        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType, meta);
+        final CommonEvent eventTwo = new SimpleCommonEvent(new EventId(two.getId()), dataType, two, metaType,
+                meta);
         final MyEvent three = new MyEvent("Three");
         final CommonEvent eventThree = new SimpleCommonEvent(new EventId(three.getId()), dataType, three);
         testee.appendToStream(streamId, eventOne, eventTwo, eventThree);
@@ -184,11 +216,85 @@ public class ESHttpEventStoreIT {
 
     }
 
+    @Test
+    public void testProjection() {
+
+        // PREPARE
+        final StreamId customer1Stream = new SimpleStreamId("customer-1");
+        final CommonEvent customer1Created = new SimpleCommonEvent(new EventId(), CUSTOMER_CREATED,
+                new MyEvent("Customer 1 created"));
+        final CommonEvent customer1Renamed = new SimpleCommonEvent(new EventId(), CUSTOMER_RENAMED,
+                new MyEvent("Customer 1 renamed"));
+        testee.appendToStream(customer1Stream, customer1Created, customer1Renamed);
+
+        final StreamId customer2Stream = new SimpleStreamId("customer-2");
+        final CommonEvent customer2Created = new SimpleCommonEvent(new EventId(), CUSTOMER_CREATED,
+                new MyEvent("Customer 2 created"));
+        final CommonEvent customer2Renamed = new SimpleCommonEvent(new EventId(), CUSTOMER_RENAMED,
+                new MyEvent("Customer 2 renamed"));
+        testee.appendToStream(customer2Stream, customer2Created, customer2Renamed);
+
+        final ProjectionStreamId projectionId = new ProjectionStreamId("NewCustomersView");
+        final StreamId category = new SimpleStreamId("customer");
+
+        final ProjectionStreamId byCategoryProjectionId = new ProjectionStreamId("$by_category");
+        waitFor( () -> testee.projectionExists(byCategoryProjectionId), MAX_TRIES);
+        testee.enableProjection(byCategoryProjectionId);
+        
+        // TEST
+        testee.createProjection(projectionId, category, true, CUSTOMER_CREATED);
+
+        // VERIFY
+        waitFor(() -> testee.streamExists(projectionId), MAX_TRIES);
+
+        final Set<CommonEvent> events = new HashSet<>();
+        executeMultipleAndWaitFor(() -> events.addAll(testee.readEventsForward(projectionId, 0, 10).getEvents()),
+                () -> events.size() == 2, MAX_TRIES);
+        assertThat(events).contains(customer1Created, customer2Created);
+
+    }
+
     @SuppressWarnings("unused")
     private void println(String prefix, List<CommonEvent> events) {
         System.out.println(prefix);
         for (CommonEvent event : events) {
             System.out.println(event + " {" + event.getData() + "}");
+        }
+    }
+
+    private static void sleep(final long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static void executeMultipleAndWaitFor(final Runnable runnable, final Supplier<Boolean> finished,
+            final int maxTries) {
+        int tries = 0;
+        do {
+            runnable.run();
+            if (!finished.get()) {
+                sleep(100);
+                tries++;
+            }
+        } while (!finished.get() || (tries == maxTries));
+        if (!finished.get()) {
+            throw new IllegalStateException("Waiting for result failed!");
+        }
+    }
+
+    private static void waitFor(final Supplier<Boolean> finished, final int maxTries) {
+        int tries = 0;
+        while (!finished.get() && (tries < maxTries)) {
+            if (!finished.get()) {
+                sleep(100);
+                tries++;
+            }
+        }
+        if (!finished.get()) {
+            throw new IllegalStateException("Waiting for result failed!");
         }
     }
 

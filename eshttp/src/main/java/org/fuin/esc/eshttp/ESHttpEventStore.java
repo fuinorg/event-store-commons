@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -35,6 +36,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -42,12 +44,14 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.util.EntityUtils;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.ProjectionAdminEventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
@@ -56,19 +60,22 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ContractViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation that connects to the http://www.geteventstore.com via HTTP API.
+ * Implementation that connects to the http://www.geteventstore.com via HTTP
+ * API.
  */
-public final class ESHttpEventStore implements EventStore {
+public final class ESHttpEventStore implements EventStore, ProjectionAdminEventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(ESHttpEventStore.class);
 
@@ -81,6 +88,8 @@ public final class ESHttpEventStore implements EventStore {
     private final SerializerRegistry serRegistry;
 
     private final DeserializerRegistry desRegistry;
+
+    private final CredentialsProvider credentialsProvider;
 
     private CloseableHttpAsyncClient httpclient;
 
@@ -101,6 +110,28 @@ public final class ESHttpEventStore implements EventStore {
     public ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
             @NotNull final ESEnvelopeType envelopeType, @NotNull final SerializerRegistry serRegistry,
             @NotNull final DeserializerRegistry desRegistry) {
+        this(threadFactory, url, envelopeType, serRegistry, desRegistry, null);
+    }
+
+    /**
+     * Constructor with credential provider.
+     * 
+     * @param threadFactory
+     *            Factory used to create the necessary internal threads.
+     * @param url
+     *            Event store base URL like "http://127.0.0.1:2113/".
+     * @param envelopeType
+     *            Envelope type for reading/writing events.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param credentialsProvider
+     *            Provided authentication information.
+     */
+    public ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url,
+            @NotNull final ESEnvelopeType envelopeType, @NotNull final SerializerRegistry serRegistry,
+            @NotNull final DeserializerRegistry desRegistry, final CredentialsProvider credentialsProvider) {
         super();
         Contract.requireArgNotNull("threadFactory", threadFactory);
         Contract.requireArgNotNull("url", url);
@@ -112,11 +143,16 @@ public final class ESHttpEventStore implements EventStore {
         this.envelopeType = envelopeType;
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
+        this.credentialsProvider = credentialsProvider;
     }
 
     @Override
     public void open() {
-        httpclient = HttpAsyncClients.custom().setThreadFactory(threadFactory).build();
+        final HttpAsyncClientBuilder builder = HttpAsyncClients.custom().setThreadFactory(threadFactory);
+        if (credentialsProvider != null) {
+            builder.setDefaultCredentialsProvider(credentialsProvider);
+        }
+        httpclient = builder.build();
         httpclient.start();
     }
 
@@ -155,8 +191,8 @@ public final class ESHttpEventStore implements EventStore {
 
     @Override
     public int appendToStream(final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> commonEvents) throws StreamDeletedException,
-            WrongExpectedVersionException, StreamReadOnlyException {
+            final List<CommonEvent> commonEvents)
+            throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
@@ -169,10 +205,10 @@ public final class ESHttpEventStore implements EventStore {
         final ESHttpMarshaller marshaller = envelopeType.getMarshaller();
         final EnhancedMimeType mimeType = EscSpiUtils.mimeType(serRegistry, commonEvents);
         // TODO Get next expected version from event store!
-        int nextExpectedVersion = 0;
+        final int nextExpectedVersion = 0;
         if (mimeType == null) {
             // Not all events have same type
-            for (final CommonEvent commonEvent : commonEvents) {                
+            for (final CommonEvent commonEvent : commonEvents) {
                 final List<CommonEvent> list = new ArrayList<>(1);
                 list.add(commonEvent);
                 final String content = marshaller.marshal(serRegistry, list);
@@ -208,7 +244,8 @@ public final class ESHttpEventStore implements EventStore {
                     return;
                 }
                 if (statusLine.getStatusCode() == 301) {
-                    // FOUND - Event(s) already existed and where not created again
+                    // FOUND - Event(s) already existed and where not created
+                    // again
                     // (Idempotency)
                     LOG.debug(msg + " RESPONSE: {}", response);
                     return;
@@ -248,7 +285,7 @@ public final class ESHttpEventStore implements EventStore {
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
-        
+
         final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
@@ -306,8 +343,8 @@ public final class ESHttpEventStore implements EventStore {
 
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + start + "/forward/" + count).build();
+            final URI uri = new URIBuilder(url.toURI())
+                    .setPath("/streams/" + streamName(streamId) + "/" + start + "/forward/" + count).build();
             return readEvents(streamId, true, uri, start, count, msg, false);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
@@ -324,8 +361,8 @@ public final class ESHttpEventStore implements EventStore {
 
         final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + start + "/backward/" + count).build();
+            final URI uri = new URIBuilder(url.toURI())
+                    .setPath("/streams/" + streamName(streamId) + "/" + start + "/backward/" + count).build();
             return readEvents(streamId, false, uri, start, count, msg, true);
         } catch (final IOException | URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
@@ -340,8 +377,8 @@ public final class ESHttpEventStore implements EventStore {
 
         final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath(
-                    "/streams/" + streamName(streamId) + "/" + eventNumber).build();
+            final URI uri = new URIBuilder(url.toURI())
+                    .setPath("/streams/" + streamName(streamId) + "/" + eventNumber).build();
             return readEvent(uri);
         } catch (final URISyntaxException ex) {
             throw new RuntimeException(msg, ex);
@@ -402,7 +439,8 @@ public final class ESHttpEventStore implements EventStore {
                 }
                 if (status.getStatusCode() == 404) {
                     // May have never existed or was soft deleted...
-                    // TODO Maybe the event store can send something to distinguish this?
+                    // TODO Maybe the event store can send something to
+                    // distinguish this?
                     LOG.debug(msg + " RESPONSE: {}", response);
                     throw new StreamNotFoundException(streamId);
                 }
@@ -419,6 +457,170 @@ public final class ESHttpEventStore implements EventStore {
         } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
+    }
+
+    @Override
+    public boolean projectionExists(final StreamId projectionId) {
+
+        Contract.requireArgNotNull("projectionId", projectionId);
+        requireProjection(projectionId);
+
+        final String msg = "projectionExists(" + projectionId + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI())
+                    .setPath("/projection/" + projectionId.getName() + "/state").build();
+            LOG.info(uri.toString());
+            final HttpGet get = new HttpGet(uri);
+            get.setHeader("Accept", ESEnvelopeType.JSON.getMetaType());
+            try {
+                final Future<HttpResponse> future = httpclient.execute(get, null);
+                final HttpResponse response = future.get();
+                final StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() == 404) {
+                    return false;
+                }
+                if (status.getStatusCode() == 200) {
+                    return true;
+                }
+                LOG.debug(msg + " RESPONSE: {}", response);
+                throw new RuntimeException(msg + " [Status=" + status + "]");
+            } finally {
+                get.reset();
+            }
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(msg, ex);
+        }
+
+    }
+
+    @Override
+    public final void enableProjection(final StreamId projectionId) throws StreamNotFoundException {
+        enableDisable(projectionId, "enable");
+    }
+
+    @Override
+    public final void disableProjection(final StreamId projectionId) throws StreamNotFoundException {
+        enableDisable(projectionId, "disable");
+    }
+
+    private void enableDisable(final StreamId projectionId, final String action) {
+
+        Contract.requireArgNotNull("projectionId", projectionId);
+        requireProjection(projectionId);
+
+        final String msg = action + "Projection(" + projectionId + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI())
+                    .setPath("/projection/" + projectionId.getName() + "/command/" + action).build();
+            LOG.info("{}", uri);
+            final HttpPost post = createPost(uri, "", ESEnvelopeType.JSON);
+            try {
+                LOG.debug(msg + " POST: {}", post);
+                final Future<HttpResponse> future = httpclient.execute(post, null);
+                final HttpResponse response = future.get();
+                final StatusLine status = response.getStatusLine();
+                LOG.debug(msg + " RESPONSE: {}", response);
+                if (status.getStatusCode() == 200) {
+                    return;
+                }
+                if (status.getStatusCode() == 404) {
+                    // 404 Not Found
+                    throw new StreamNotFoundException(projectionId);
+                }
+                throw new RuntimeException(msg + " [Status=" + status + "]");
+            } finally {
+                post.reset();
+            }
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(msg, ex);
+        }
+    }
+
+    @Override
+    public final void createProjection(final StreamId projectionId, final StreamId category,
+            final boolean enable, final TypeName... eventType) throws StreamAlreadyExistsException {
+
+        Contract.requireArgNotNull("eventType", eventType);
+        createProjection(projectionId, category, enable, Arrays.asList(eventType));
+
+    }
+
+    @Override
+    public final void createProjection(final StreamId projectionId, final StreamId category,
+            final boolean enable, final List<TypeName> eventTypes) throws StreamAlreadyExistsException {
+
+        Contract.requireArgNotNull("projectionId", projectionId);
+        Contract.requireArgNotNull("category", category);
+        Contract.requireArgNotNull("eventTypes", eventTypes);
+        requireProjection(projectionId);
+
+        final String msg = "createProjection(" + projectionId + "," + enable + "," + category
+                + type2str(eventTypes) + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous")
+                    .addParameter("name", projectionId.getName()).addParameter("emit", "yes")
+                    .addParameter("checkpoints", "yes").addParameter("enabled", ESHttpUtils.yesNo(enable))
+                    .build();
+            final String javascript = new ProjectionJavaScriptBuilder(projectionId, category)
+                    .types(eventTypes).build();
+            LOG.info("{}: {}", uri, javascript);
+            final HttpPost post = createPost(uri, javascript, ESEnvelopeType.JSON);
+            try {
+                LOG.debug(msg + " POST: {}", post);
+                final Future<HttpResponse> future = httpclient.execute(post, null);
+                final HttpResponse response = future.get();
+                final StatusLine status = response.getStatusLine();
+                LOG.debug(msg + " RESPONSE: {}", response);
+                if (status.getStatusCode() == 201) {
+                    // CREATED
+                    return;
+                }
+                throw new RuntimeException(msg + " [Status=" + status + "]");
+            } finally {
+                post.reset();
+            }
+        } catch (final URISyntaxException | InterruptedException | ExecutionException ex) {
+            throw new RuntimeException(msg, ex);
+        }
+
+    }
+
+    @Override
+    public final void deleteProjection(final StreamId projectionId) throws StreamNotFoundException {
+
+        Contract.requireArgNotNull("projectionId", projectionId);
+        requireProjection(projectionId);
+
+        final String msg = "deleteProjection(" + projectionId + ")";
+        try {
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.getName())
+                    .addParameter("deleteCheckpointStream", "yes").addParameter("deleteStateStream", "yes")
+                    .build();
+            final HttpDelete delete = new HttpDelete(uri);
+            try {
+                LOG.debug(msg + " DELETE: {}", delete);
+                final Future<HttpResponse> future = httpclient.execute(delete, null);
+                final HttpResponse response = future.get();
+                final StatusLine statusLine = response.getStatusLine();
+                LOG.debug(msg + " RESPONSE: {}", response);
+                if (statusLine.getStatusCode() == 204) {
+                    // Also delete the event stream
+                    deleteStream(new SimpleStreamId(projectionId.getName()), false);
+                    return;
+                }
+                if (statusLine.getStatusCode() == 404) {
+                    throw new StreamNotFoundException(projectionId);
+                }
+                throw new RuntimeException(msg + " [Status=" + statusLine + "]");
+
+            } finally {
+                delete.reset();
+            }
+
+        } catch (final URISyntaxException | ExecutionException | InterruptedException ex) {
+            throw new RuntimeException(msg, ex);
+        }
+
     }
 
     private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri,
@@ -560,20 +762,50 @@ public final class ESHttpEventStore implements EventStore {
     }
 
     private HttpGet createHttpGet(final URI uri) {
+        return createHttpGet(uri, envelopeType);
+    }
+
+    private static HttpGet createHttpGet(final URI uri, final ESEnvelopeType envelopeType) {
         final HttpGet request = new HttpGet(uri);
         request.setHeader("Accept", envelopeType.getReadContentType());
         return request;
     }
 
     private HttpPost createPost(final URI uri, final int expectedVersion, final String content) {
+        return createPost(uri, expectedVersion, content, envelopeType);
+    }
+
+    private static HttpPost createPost(final URI uri, final int expectedVersion, final String content,
+            final ESEnvelopeType envelopeType) {
+        final HttpPost post = createPost(uri, content, envelopeType);
+        post.setHeader("ES-ExpectedVersion", "" + expectedVersion);
+        return post;
+    }
+
+    private static HttpPost createPost(final URI uri, final String content,
+            final ESEnvelopeType envelopeType) {
         final HttpPost post = new HttpPost(uri);
         post.setHeader("Content-Type",
                 envelopeType.getWriteContentType() + "; charset=" + envelopeType.getMetaCharset());
-        post.setHeader("ES-ExpectedVersion", "" + expectedVersion);
         final ContentType contentType = ContentType.create(envelopeType.getMetaType(),
                 envelopeType.getMetaCharset());
         post.setEntity(new StringEntity(content, contentType));
         return post;
+    }
+
+    private static String type2str(final List<TypeName> eventTypes) {
+        final StringBuilder sb = new StringBuilder();
+        for (final TypeName eventType : eventTypes) {
+            sb.append(",");
+            sb.append(eventType.asBaseType());
+        }
+        return sb.toString();
+    }
+
+    private static void requireProjection(final StreamId projectionId) {
+        if (!projectionId.isProjection()) {
+            throw new ContractViolationException("The stream identifier is not a projection id");
+        }
     }
 
 }
