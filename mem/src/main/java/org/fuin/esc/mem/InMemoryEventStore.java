@@ -43,10 +43,12 @@ import org.fuin.esc.api.SubscribableEventStore;
 import org.fuin.esc.api.Subscription;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 
 /**
- * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
+ * In-memory implementation for unit testing. This implementation is **NOT**
+ * thread-safe.
  */
 public final class InMemoryEventStore implements EventStore, SubscribableEventStore {
 
@@ -58,11 +60,14 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
     private Map<StreamId, List<InternalSubscription>> subscriptions;
 
+    private boolean open;
+
     /**
      * Constructor with all mandatory data.
      * 
      * @param executor
-     *            Executor used to create the necessary threads for event notifications.
+     *            Executor used to create the necessary threads for event
+     *            notifications.
      */
     public InMemoryEventStore(@NotNull final Executor executor) {
         super();
@@ -72,20 +77,28 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         all = new ArrayList<CommonEvent>();
         streams = new HashMap<>();
         subscriptions = new HashMap<>();
+        this.open = false;
     }
 
     @Override
     public final void open() {
-        // Do nothing
+        if (open) {
+            throw new ConstraintViolationException(
+                    "The event store is already open. Don't call 'open()' more than once.");
+        }
+        this.open = true;
     }
 
     @Override
     public final void close() {
-        // Do nothing
+        requireOpen();
+        this.open = false;
     }
 
     @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+        Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
         // Do nothing
     }
 
@@ -93,6 +106,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
 
         final InternalStream internalStream = streams.get(streamId);
         return (internalStream != null && internalStream.getState() == StreamState.ACTIVE);
@@ -104,6 +118,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
+        requireOpen();
 
         final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         if (events.size() - 1 < eventNumber) {
@@ -114,12 +129,13 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, 
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
             final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
 
         final List<CommonEvent> events;
         if (streamId == StreamId.ALL) {
@@ -147,6 +163,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
 
         final List<CommonEvent> events;
         if (streamId == StreamId.ALL) {
@@ -176,6 +193,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     public final void deleteStream(final StreamId streamId, final int expected, final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -227,11 +245,12 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
-        
+
         InternalStream stream = streams.get(streamId);
         if (stream == null) {
             stream = new InternalStream();
@@ -292,6 +311,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("onEvent", onEvent);
         Contract.requireArgNotNull("onDrop", onDrop);
+        requireOpen();
 
         final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
         final Integer lastEventNumber = events.size();
@@ -317,6 +337,7 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     public final void unsubscribeFromStream(final Subscription subscription) {
 
         Contract.requireArgNotNull("subscription", subscription);
+        requireOpen();
         if (!(subscription instanceof InMemorySubscription)) {
             throw new IllegalArgumentException("Can only handle subscriptions of type "
                     + InMemorySubscription.class.getSimpleName() + ", not: ");
@@ -335,17 +356,29 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
     @Override
     public final StreamState streamState(final StreamId streamId) {
+
+        Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
+
         final InternalStream stream = streams.get(streamId);
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
         final StreamState state = stream.getState();
         if (state == StreamState.SOFT_DELETED) {
-            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
+            // TODO Remove after event store has a way to distinguish between
+            // never-existing and soft deleted
             // streams
             throw new StreamNotFoundException(streamId);
         }
         return state;
+    }
+
+    private void requireOpen() {
+        if (!open) {
+            throw new ConstraintViolationException(
+                    "Please use 'open()' to connect to the event store before calling any method");
+        }
     }
 
     private void notifyListeners(final StreamId streamId, final List<CommonEvent> events, final int idx) {

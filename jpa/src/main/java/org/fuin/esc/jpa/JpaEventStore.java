@@ -75,6 +75,8 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+        Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
         // Do nothing as the operation is not supported
     }
 
@@ -101,6 +103,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("toAppend", toAppend);
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -147,6 +150,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);

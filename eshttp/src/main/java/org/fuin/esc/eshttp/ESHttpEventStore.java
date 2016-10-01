@@ -151,6 +151,10 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     @Override
     public void open() {
+        if (open) {
+            throw new ConstraintViolationException(
+                    "The event store is already open. Don't call 'open()' more than once.");
+        }
         final HttpAsyncClientBuilder builder = HttpAsyncClients.custom().setThreadFactory(threadFactory);
         if (credentialsProvider != null) {
             builder.setDefaultCredentialsProvider(credentialsProvider);

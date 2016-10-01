@@ -47,6 +47,7 @@ import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.vo.KeyValue;
 import org.slf4j.Logger;
@@ -69,6 +70,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
     private final DeserializerRegistry desRegistry;
 
+    private boolean open;
+
     /**
      * Constructor with all mandatory data.
      * 
@@ -88,6 +91,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         this.em = em;
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
+        this.open = false;
     }
 
     /**
@@ -121,12 +125,17 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
     @Override
     public final void open() {
-        // Do nothing
+        if (open) {
+            throw new ConstraintViolationException(
+                    "The event store is already open. Don't call 'open()' more than once.");
+        }
+        this.open = true;
     }
 
     @Override
     public final void close() {
-        // Do nothing
+        requireOpen();
+        this.open = false;
     }
 
     @Override
@@ -134,6 +143,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
+        requireOpen();
         verifyStreamEntityExists(streamId);
 
         final NativeSqlCondition eventNo = new NativeSqlCondition(JpaStreamEvent.COLUMN_EVENT_NUMBER, "=",
@@ -155,12 +165,13 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start, 
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
             final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
         verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
@@ -209,6 +220,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
         verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
@@ -256,6 +268,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
         if (!streamEntityExists(streamId)) {
             return false;
         }
@@ -271,8 +284,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
             final JpaStream stream = streams.get(0);
             return (stream.getState() == StreamState.ACTIVE);
         }
-        throw new IllegalStateException("Select returned more than one stream: " + streams.size() + " ["
-                + sql + "]");
+        throw new IllegalStateException(
+                "Select returned more than one stream: " + streams.size() + " [" + sql + "]");
 
     }
 
@@ -280,6 +293,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     public final StreamState streamState(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
 
         final JpaStream stream = findStream(streamId);
         return stream.getState();
@@ -287,7 +301,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     }
 
     /**
-     * Verifies if a stream entity exists or throws an {@link StreamNotFoundException} otherwise.
+     * Verifies if a stream entity exists or throws an
+     * {@link StreamNotFoundException} otherwise.
      * 
      * @param streamId
      *            Stream to test.
@@ -329,7 +344,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     }
 
     /**
-     * Tries to find a serializer for the given type of object and converts it into a storable data block.
+     * Tries to find a serializer for the given type of object and converts it
+     * into a storable data block.
      * 
      * @param type
      *            Type of event.
@@ -411,7 +427,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         }
         final JpaStream stream = streams.get(0);
         if (stream.getState() == StreamState.SOFT_DELETED) {
-            // TODO Remove after event store has a way to distinguish between never-existing and soft deleted
+            // TODO Remove after event store has a way to distinguish between
+            // never-existing and soft deleted
             // streams
             throw new StreamNotFoundException(streamId);
         }
@@ -446,7 +463,8 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
      * @param streamId
      *            Unique stream identifier that has the parameter values.
      * @param additionalConditions
-     *            Parameters to add in addition to the ones from the stream identifier.
+     *            Parameters to add in addition to the ones from the stream
+     *            identifier.
      */
     private final void setNativeSqlParameters(final Query query, final List<NativeSqlCondition> conditions) {
         for (final NativeSqlCondition condition : conditions) {
@@ -455,13 +473,14 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     }
 
     /**
-     * Creates a native SQL select using the parameters from the stream identifier and optional other
-     * arguments.
+     * Creates a native SQL select using the parameters from the stream
+     * identifier and optional other arguments.
      * 
      * @param streamId
      *            Unique stream identifier that has the parameter values.
      * @param additionalParams
-     *            Parameters to add in addition to the ones from the stream identifier.
+     *            Parameters to add in addition to the ones from the stream
+     *            identifier.
      * 
      * @return JPQL for selecting the events.
      */
@@ -523,17 +542,28 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         if (meta == null) {
             return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data);
         }
-        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, jpaEvent
-                .getMeta().getTypeName(), meta);
+        return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data,
+                jpaEvent.getMeta().getTypeName(), meta);
     }
 
     private Object deserialize(final JpaData data) {
         if (data == null) {
             return null;
         }
-        final SerializedData serializedData = new SerializedData(new SerializedDataType(data.getTypeName()
-                .asBaseType()), data.getMimeType(), data.getRaw());
+        final SerializedData serializedData = new SerializedData(
+                new SerializedDataType(data.getTypeName().asBaseType()), data.getMimeType(), data.getRaw());
         return EscSpiUtils.deserialize(desRegistry, serializedData);
+    }
+
+    /**
+     * Makes sure the event store was opened before or throws a
+     * {@link ConstraintViolationException} otherwise.
+     */
+    protected final void requireOpen() {
+        if (!open) {
+            throw new ConstraintViolationException(
+                    "Please use 'open()' to connect to the event store before calling any method");
+        }
     }
 
 }
