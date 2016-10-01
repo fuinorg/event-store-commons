@@ -17,10 +17,11 @@
  */
 package org.fuin.esc.jpa;
 
+import java.time.ZonedDateTime;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,11 +31,12 @@ import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.esc.api.EventId;
-import org.fuin.objects4j.common.DateTimeAdapter;
 import org.fuin.objects4j.common.Nullable;
-import org.joda.time.DateTime;
+
+import com.migesok.jaxb.adapter.javatime.ZonedDateTimeXmlAdapter;
 
 /**
  * Stores an event and it's meta data.
@@ -62,10 +64,9 @@ public class JpaEvent {
     @Column(name = COLUMN_EVENT_ID, length = 36, nullable = false, columnDefinition = "VARCHAR(36)")
     private String eventId;
 
-    /** Date, time and zone the event was created. */
-    @Convert(converter = DateTimeAdapter.class)
+    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     @Column(name = "created", nullable = false)
-    private DateTime created;
+    private ZonedDateTime created;
 
     @Embedded
     @NotNull
@@ -88,8 +89,9 @@ public class JpaEvent {
      * Constructor without meta data.
      * 
      * @param eventId
-     *            Unique identifier of the event. Generated on the client and used to achieve idempotence when
-     *            trying to append the same event multiple times.
+     *            Unique identifier of the event. Generated on the client and
+     *            used to achieve idempotence when trying to append the same
+     *            event multiple times.
      * @param data
      *            Data of the event.
      */
@@ -101,14 +103,15 @@ public class JpaEvent {
      * Constructor with all data.
      * 
      * @param eventId
-     *            Unique identifier of the event. Generated on the client and used to achieve idempotence when
-     *            trying to append the same event multiple times.
+     *            Unique identifier of the event. Generated on the client and
+     *            used to achieve idempotence when trying to append the same
+     *            event multiple times.
      * @param data
      *            Data of the event.
      * @param meta
      *            Meta data (Optional).
      */
-    public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data, 
+    public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data,
             @Nullable final JpaData meta) {
         super();
         this.eventId = eventId.asBaseType().toString();
@@ -126,8 +129,9 @@ public class JpaEvent {
     }
 
     /**
-     * Returns the unique identifier of the event. Generated on the client and used to achieve idempotence
-     * when trying to append the same event multiple times.
+     * Returns the unique identifier of the event. Generated on the client and
+     * used to achieve idempotence when trying to append the same event multiple
+     * times.
      * 
      * @return Unique event ID.
      */
@@ -142,7 +146,7 @@ public class JpaEvent {
      * @return Date, time and zone of event's creation.
      */
     @NotNull
-    public DateTime getCreated() {
+    public ZonedDateTime getCreated() {
         return created;
     }
 
@@ -170,7 +174,7 @@ public class JpaEvent {
      */
     @PrePersist
     void onPrePersist() {
-        created = new DateTime();
+        created = ZonedDateTime.now();
     }
 
 }
