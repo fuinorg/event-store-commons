@@ -93,6 +93,8 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     private CloseableHttpAsyncClient httpclient;
 
+    private boolean open;
+
     /**
      * Constructor with all mandatory data.
      * 
@@ -144,6 +146,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
         this.credentialsProvider = credentialsProvider;
+        this.open = false;
     }
 
     @Override
@@ -154,22 +157,24 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         }
         httpclient = builder.build();
         httpclient.start();
+        this.open = true;
     }
 
     @Override
     public void close() {
-        if (httpclient == null) {
-            throw new IllegalStateException("The 'open()' method was never called!");
-        }
+        requireOpen();
         try {
             httpclient.close();
         } catch (final IOException ex) {
             throw new RuntimeException("Cannot close http client", ex);
         }
+        this.open = false;
     }
 
     @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+        Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
         // Do nothing as the operation is not supported
     }
 
@@ -197,6 +202,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -281,6 +287,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        requireOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -340,6 +347,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
 
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
@@ -358,6 +366,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
+        requireOpen();
 
         final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
         try {
@@ -374,6 +383,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
+        requireOpen();
 
         final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
         try {
@@ -389,11 +399,12 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
 
         final String msg = "streamExists(" + streamId + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
-            LOG.info(uri.toString());
+            LOG.debug(uri.toString());
             final HttpGet get = createHttpGet(uri);
             try {
                 final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -423,11 +434,12 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     @Override
     public final StreamState streamState(final StreamId streamId) {
         Contract.requireArgNotNull("streamId", streamId);
+        requireOpen();
 
         final String msg = "streamState(" + streamId + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
-            LOG.info(uri.toString());
+            LOG.debug(uri.toString());
             final HttpGet get = createHttpGet(uri);
             try {
                 final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -464,12 +476,13 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
+        requireOpen();
 
         final String msg = "projectionExists(" + projectionId + ")";
         try {
             final URI uri = new URIBuilder(url.toURI())
                     .setPath("/projection/" + projectionId.getName() + "/state").build();
-            LOG.info(uri.toString());
+            LOG.debug(uri.toString());
             final HttpGet get = new HttpGet(uri);
             get.setHeader("Accept", ESEnvelopeType.JSON.getMetaType());
             try {
@@ -507,12 +520,13 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
+        requireOpen();
 
         final String msg = action + "Projection(" + projectionId + ")";
         try {
             final URI uri = new URIBuilder(url.toURI())
                     .setPath("/projection/" + projectionId.getName() + "/command/" + action).build();
-            LOG.info("{}", uri);
+            LOG.debug("{}", uri);
             final HttpPost post = createPost(uri, "", ESEnvelopeType.JSON);
             try {
                 LOG.debug(msg + " POST: {}", post);
@@ -552,6 +566,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("projectionId", projectionId);
         Contract.requireArgNotNull("eventTypes", eventTypes);
         requireProjection(projectionId);
+        requireOpen();
 
         final String msg = "createProjection(" + projectionId + "," + enable + type2str(eventTypes) + ")";
         try {
@@ -560,7 +575,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
                     .addParameter("checkpoints", "yes").addParameter("enabled", ESHttpUtils.yesNo(enable))
                     .build();
             final String javascript = new ProjectionJavaScriptBuilder(projectionId).types(eventTypes).build();
-            LOG.info("{}: {}", uri, javascript);
+            LOG.debug("{}: {}", uri, javascript);
             final HttpPost post = createPost(uri, javascript, ESEnvelopeType.JSON);
             try {
                 LOG.debug(msg + " POST: {}", post);
@@ -587,6 +602,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
+        requireOpen();
 
         final String msg = "deleteProjection(" + projectionId + ")";
         try {
@@ -620,10 +636,17 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     }
 
+    private void requireOpen() {
+        if (!open) {
+            throw new ConstraintViolationException(
+                    "Please use 'open()' to connect to the event store before calling any method");
+        }
+    }
+
     private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri,
             final int start, final int count, final String msg, final boolean reverseOrder)
             throws InterruptedException, ExecutionException, IOException {
-        LOG.info(uri.toString());
+        LOG.debug(uri.toString());
         final HttpGet get = createHttpGet(uri);
         try {
             final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -687,7 +710,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     }
 
     private CommonEvent readEvent(final URI uri) {
-        LOG.info(uri.toString());
+        LOG.debug(uri.toString());
         final String msg = "readEvent(" + uri + ")";
         try {
             final HttpGet get = createHttpGet(uri);
