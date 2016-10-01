@@ -25,12 +25,12 @@ import javax.validation.constraints.NotNull;
 public interface ReadableEventStore extends AutoCloseable {
 
     /**
-     * Opens a connection to the repository.
+     * Opens a connection to the event store.
      */
     public void open();
 
     /**
-     * Closes the connection to the repository.
+     * Closes the connection to the event store.
      */
     public void close();
 
