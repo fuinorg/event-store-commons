@@ -18,47 +18,40 @@
 package org.fuin.esc.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.junit.Test;
 
 // CHECKSTYLE:OFF
 public final class NativeSqlConditionTest {
 
-    
-    @Test
-    public void testEqualsHashCode() {
-        EqualsVerifier.forClass(NativeSqlCondition.class).verify();
-    }
-    
     @Test
     public void testGetter() {
 
         // PREPARE
         final NativeSqlCondition testee = new NativeSqlCondition("a", "=", 4711L);
-        
+
         // TEST
         assertThat(testee.getColumn()).isEqualTo("a");
         assertThat(testee.getOperator()).isEqualTo("=");
         assertThat(testee.getValue()).isEqualTo(4711L);
 
     }
-    
+
     @Test
     public void testAsWhereConditionWithParam() {
-        
+
         // PREPARE
         final NativeSqlCondition testee1 = new NativeSqlCondition("a", "=", 4711L);
         final NativeSqlCondition testee2 = new NativeSqlCondition("t", "a", "=", 4711L);
-        
+
         // TEST
         final String whereSql1 = testee1.asWhereConditionWithParam();
         final String whereSql2 = testee2.asWhereConditionWithParam();
-        
+
         // VERIFY
         assertThat(whereSql1).isEqualTo("a=:a");
         assertThat(whereSql2).isEqualTo("t.a=:a");
-        
+
     }
 
 }

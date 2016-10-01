@@ -30,8 +30,8 @@ public final class NoParamsEventTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(NoParamsEvent.class)
-                .suppress(Warning.NONFINAL_FIELDS, Warning.STRICT_INHERITANCE).verify();
+        EqualsVerifier.forClass(NoParamsEvent.class).suppress(Warning.NONFINAL_FIELDS,
+                Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test

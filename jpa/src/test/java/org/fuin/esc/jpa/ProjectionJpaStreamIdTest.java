@@ -19,6 +19,7 @@ package org.fuin.esc.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +49,8 @@ public class ProjectionJpaStreamIdTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(ProjectionJpaStreamId.class).verify();
+        EqualsVerifier.forClass(ProjectionJpaStreamId.class).suppress(Warning.ALL_FIELDS_SHOULD_BE_USED)
+                .verify();
     }
 
     @Test
