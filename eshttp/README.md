@@ -2,8 +2,7 @@
 Event store commons HTTP adapter for Greg Young's [Event Store](https://www.geteventstore.com/).
 
 ## ESC Meta Data Structure
-The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. 
-To allow having multiple types and versions of data and meta data, the common event store interface introduces 
+The [Event Store](https://geteventstore.com/) has only limited support for different types of stored data. For example only UTF-8 encoding is supported if you want to use projections or the main data formats are JSON and (limited) XML. To allow having multiple types, different encodings and versions of data and meta data, the common event store interface introduces 
 a separate meta data structure. It contains information about content-types, encoding, version, meta type and 
 the meta information provided by the user.
 
