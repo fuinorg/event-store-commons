@@ -2,9 +2,9 @@ Feature: Read a stream forward
 
 Scenario: Illegal start or count 
     When I read forward from the following streams
-    | Stream Name       | Start | Count | Expected Exception                                   | Expected Message                                               |
-    | NameDoesNotMatter | -1    | 1     | org.fuin.objects4j.common.ContractViolationException | Min value of argument 'start' is 0, but was: -1 | 
-    | NameDoesNotMatter | 1     | 0     | org.fuin.objects4j.common.ContractViolationException | Min value of argument 'count' is 1, but was: 0  | 
+    | Stream Name       | Start | Count | Expected Exception                                     | Expected Message                                               |
+    | NameDoesNotMatter | -1    | 1     | org.fuin.objects4j.common.ConstraintViolationException | Min value of argument 'start' is 0, but was: -1 | 
+    | NameDoesNotMatter | 1     | 0     | org.fuin.objects4j.common.ConstraintViolationException | Min value of argument 'count' is 1, but was: 0  | 
     Then this should give the expected results
 
 Scenario: Read non existing
