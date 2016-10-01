@@ -66,8 +66,8 @@ import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.ContractViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -801,7 +801,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     private static void requireProjection(final StreamId projectionId) {
         if (!projectionId.isProjection()) {
-            throw new ContractViolationException("The stream identifier is not a projection id");
+            throw new ConstraintViolationException("The stream identifier is not a projection id");
         }
     }
 

@@ -23,7 +23,7 @@ import static org.fuin.utils4j.Utils4J.serialize;
 
 import java.util.UUID;
 
-import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
@@ -43,17 +43,17 @@ public final class EventIdTest {
         assertThat(new EventId(uuid).asBaseType()).isEqualTo(uuid);
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructNullString() {
         new EventId((String) null);
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructNullUUID() {
         new EventId((UUID) null);
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructInvalidString() {
         new EventId("x");
     }

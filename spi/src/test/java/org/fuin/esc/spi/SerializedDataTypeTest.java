@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
 
-import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
@@ -39,16 +39,15 @@ public final class SerializedDataTypeTest {
     public final void testConstructValid() {
         final String name = "MyType";
         assertThat(new SerializedDataType(name).toString()).isEqualTo(name);
-        assertThat(new SerializedDataType(name).length()).isEqualTo(
-                name.length());
+        assertThat(new SerializedDataType(name).length()).isEqualTo(name.length());
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructNullString() {
         new SerializedDataType(null);
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructEmpty() {
         new SerializedDataType("");
     }

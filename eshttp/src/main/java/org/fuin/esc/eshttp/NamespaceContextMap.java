@@ -28,7 +28,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Nullable;
 
 /**
@@ -49,7 +49,7 @@ public final class NamespaceContextMap implements NamespaceContext {
     public NamespaceContextMap(@Nullable final String... values) {
         super();
         if (values != null && values.length % 2 != 0) {
-            throw new ContractViolationException(
+            throw new ConstraintViolationException(
                     "Only an even number of strings (Pairs of 'prefix' + 'uri') is allowed");
         }
         prefixMap = new HashMap<>();

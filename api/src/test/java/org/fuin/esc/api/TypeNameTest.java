@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
 
-import org.fuin.objects4j.common.ContractViolationException;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
@@ -42,12 +42,12 @@ public final class TypeNameTest {
         assertThat(new TypeName(name).length()).isEqualTo(name.length());
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructNullString() {
         new TypeName(null);
     }
 
-    @Test(expected = ContractViolationException.class)
+    @Test(expected = ConstraintViolationException.class)
     public final void testConstructEmpty() {
         new TypeName("");
     }
