@@ -24,8 +24,18 @@ import javax.validation.constraints.NotNull;
 /**
  * An event store that provides a projection administration API.
  */
-public interface ProjectionAdminEventStore {
+public interface ProjectionAdminEventStore extends AutoCloseable {
 
+    /**
+     * Opens a connection to the event store.
+     */
+    public void open();
+
+    /**
+     * Closes the connection to the event store.
+     */
+    public void close();
+    
     /**
      * Determines if a projection exists.
      * 
