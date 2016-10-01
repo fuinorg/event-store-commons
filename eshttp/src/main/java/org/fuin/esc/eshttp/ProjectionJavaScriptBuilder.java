@@ -34,6 +34,30 @@ public final class ProjectionJavaScriptBuilder {
     private StringBuilder sb;
 
     /**
+     * Constructor for building an 'all' based projection.
+     * 
+     * @param projectionId
+     *            Projection name.
+     */
+    public ProjectionJavaScriptBuilder(final StreamId projectionId) {
+        this(projectionId.getName());
+    }
+    
+    /**
+     * Constructor for building a 'category' based projection.
+     * 
+     * @param projection
+     *            Projection name.
+     */
+    public ProjectionJavaScriptBuilder(final String projection) {
+        super();
+        count = 0;
+        this.projection = projection;
+        sb = new StringBuilder();
+        sb.append("fromAll().foreachStream().when({");
+    }
+    
+    /**
      * Constructor for building a 'category' based projection.
      * 
      * @param projectionId

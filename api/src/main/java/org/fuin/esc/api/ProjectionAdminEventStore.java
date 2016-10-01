@@ -29,12 +29,13 @@ public interface ProjectionAdminEventStore {
     /**
      * Determines if a projection exists.
      * 
-     * @param projectionId Unique identifier of the projection.
+     * @param projectionId
+     *            Unique identifier of the projection.
      * 
      * @return TRUE if the projection exists, else FALSE.
      */
     public boolean projectionExists(@NotNull StreamId projectionId);
-    
+
     /**
      * Enables an existing projection. If the projection is already enabled, the
      * command is ignored.
@@ -66,10 +67,6 @@ public interface ProjectionAdminEventStore {
      * 
      * @param projectionId
      *            Unique name of the projection to create.
-     * @param category
-     *            Category of streams to select events from. A category is the
-     *            first part of the stream name before any dashes. Example:
-     *            "Vendor" is the category for "Vendor-1" and "Vendor-123".
      * @param enable
      *            Enable the projection (<code>true</code>) or not
      *            (<code>false</code>).
@@ -80,7 +77,7 @@ public interface ProjectionAdminEventStore {
      *             The given projection could not be created because it already
      *             exists.
      */
-    public void createProjection(@NotNull StreamId projectionId, @NotNull StreamId category, boolean enable,
+    public void createProjection(@NotNull StreamId projectionId, boolean enable,
             @NotNull TypeName... eventType) throws StreamAlreadyExistsException;
 
     /**
@@ -88,10 +85,6 @@ public interface ProjectionAdminEventStore {
      * 
      * @param projectionId
      *            Unique name of the projection to create.
-     * @param category
-     *            Category of streams to select events from. A category is the
-     *            first part of the stream name before any dashes. Example:
-     *            "Vendor" is the category for "Vendor-1" and "Vendor-123".
      * @param enable
      *            Enable the projection (<code>true</code>) or not
      *            (<code>false</code>).
@@ -102,7 +95,7 @@ public interface ProjectionAdminEventStore {
      *             The given projection could not be created because it already
      *             exists.
      */
-    public void createProjection(@NotNull StreamId projectionId, @NotNull StreamId category, boolean enable,
+    public void createProjection(@NotNull StreamId projectionId, boolean enable,
             @NotNull List<TypeName> eventTypes) throws StreamAlreadyExistsException;
 
     /**

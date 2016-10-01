@@ -537,32 +537,29 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     }
 
     @Override
-    public final void createProjection(final StreamId projectionId, final StreamId category,
-            final boolean enable, final TypeName... eventType) throws StreamAlreadyExistsException {
+    public final void createProjection(final StreamId projectionId, final boolean enable,
+            final TypeName... eventType) throws StreamAlreadyExistsException {
 
         Contract.requireArgNotNull("eventType", eventType);
-        createProjection(projectionId, category, enable, Arrays.asList(eventType));
+        createProjection(projectionId, enable, Arrays.asList(eventType));
 
     }
 
     @Override
-    public final void createProjection(final StreamId projectionId, final StreamId category,
-            final boolean enable, final List<TypeName> eventTypes) throws StreamAlreadyExistsException {
+    public final void createProjection(final StreamId projectionId, final boolean enable,
+            final List<TypeName> eventTypes) throws StreamAlreadyExistsException {
 
         Contract.requireArgNotNull("projectionId", projectionId);
-        Contract.requireArgNotNull("category", category);
         Contract.requireArgNotNull("eventTypes", eventTypes);
         requireProjection(projectionId);
 
-        final String msg = "createProjection(" + projectionId + "," + enable + "," + category
-                + type2str(eventTypes) + ")";
+        final String msg = "createProjection(" + projectionId + "," + enable + type2str(eventTypes) + ")";
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous")
                     .addParameter("name", projectionId.getName()).addParameter("emit", "yes")
                     .addParameter("checkpoints", "yes").addParameter("enabled", ESHttpUtils.yesNo(enable))
                     .build();
-            final String javascript = new ProjectionJavaScriptBuilder(projectionId, category)
-                    .types(eventTypes).build();
+            final String javascript = new ProjectionJavaScriptBuilder(projectionId).types(eventTypes).build();
             LOG.info("{}: {}", uri, javascript);
             final HttpPost post = createPost(uri, javascript, ESEnvelopeType.JSON);
             try {

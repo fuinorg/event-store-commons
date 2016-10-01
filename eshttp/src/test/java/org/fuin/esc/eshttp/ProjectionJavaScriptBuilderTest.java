@@ -33,6 +33,17 @@ import org.junit.Test;
 // CHECKSTYLE:OFF Test
 public class ProjectionJavaScriptBuilderTest {
 
+    
+    @Test
+    public void testFromAll() {
+
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("AccountsView");
+        testee.type("AccountDebited");
+        assertThat(testee.build()).isEqualTo("fromAll().foreachStream().when({"
+                + "'AccountDebited': function(state, ev) { linkTo('AccountsView', ev); }" + "})");
+
+    }
+    
     @Test
     public void testNoEventType() {
 

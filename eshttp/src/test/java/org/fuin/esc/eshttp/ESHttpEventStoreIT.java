@@ -89,7 +89,7 @@ public class ESHttpEventStoreIT {
         testee = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry,
                 credentialsProvider);
         testee.open();
-        
+
     }
 
     @After
@@ -235,20 +235,16 @@ public class ESHttpEventStoreIT {
         testee.appendToStream(customer2Stream, customer2Created, customer2Renamed);
 
         final ProjectionStreamId projectionId = new ProjectionStreamId("NewCustomersView");
-        final StreamId category = new SimpleStreamId("customer");
 
-        final ProjectionStreamId byCategoryProjectionId = new ProjectionStreamId("$by_category");
-        waitFor( () -> testee.projectionExists(byCategoryProjectionId), MAX_TRIES);
-        testee.enableProjection(byCategoryProjectionId);
-        
         // TEST
-        testee.createProjection(projectionId, category, true, CUSTOMER_CREATED);
+        testee.createProjection(projectionId, true, CUSTOMER_CREATED);
 
         // VERIFY
         waitFor(() -> testee.streamExists(projectionId), MAX_TRIES);
 
         final Set<CommonEvent> events = new HashSet<>();
-        executeMultipleAndWaitFor(() -> events.addAll(testee.readEventsForward(projectionId, 0, 10).getEvents()),
+        executeMultipleAndWaitFor(
+                () -> events.addAll(testee.readEventsForward(projectionId, 0, 10).getEvents()),
                 () -> events.size() == 2, MAX_TRIES);
         assertThat(events).contains(customer1Created, customer2Created);
 
