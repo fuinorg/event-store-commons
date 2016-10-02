@@ -209,7 +209,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpasyncclient</artifactId>
-				<version>4.1.2</version>
+				<version>4.1</version>
 			</dependency>
 
 			<dependency>
