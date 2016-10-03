@@ -263,7 +263,10 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
             stream.undelete();
         }
         if (expectedVersion != ExpectedVersion.ANY.getNo() && expectedVersion != stream.getVersion()) {
-            final List<CommonEvent> events = stream.getEvents();
+            // Test for idempotency
+            final StreamEventsSlice slice = readEventsBackward(streamId, stream.getVersion(),
+                    toAppend.size());
+            final List<CommonEvent> events = slice.getEvents();
             if (EscSpiUtils.eventsEqual(events, toAppend)) {
                 return stream.getVersion();
             }
