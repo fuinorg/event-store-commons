@@ -156,13 +156,16 @@ public final class ESJCEventStore implements EventStore {
             final WriteResult result = es.appendToStream(streamId.asString(),
                     com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), eventDataIt).get();
             return result.nextExpectedVersion;
-        } catch (final com.github.msemys.esjc.operation.WrongExpectedVersionException ex) {
-            // TODO Add actual version instead of NULL if ES returns this some
-            // day
-            throw new WrongExpectedVersionException(streamId, expectedVersion, null);
-        } catch (final com.github.msemys.esjc.operation.StreamDeletedException ex) {
-            throw new StreamDeletedException(streamId);
-        } catch (InterruptedException | ExecutionException ex) {
+        } catch (final ExecutionException ex) {
+            if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
+                // TODO Add actual version instead of NULL if ES returns this some day
+                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+            }
+            if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
+                throw new StreamDeletedException(streamId);
+            }
+            throw new RuntimeException("Error executing append", ex);
+        } catch (InterruptedException ex) {
             throw new RuntimeException("Error waiting for append result", ex);
         }
 
@@ -185,8 +188,7 @@ public final class ESJCEventStore implements EventStore {
                     hardDelete).get();
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
-                // TODO Add actual version instead of NULL if ES returns this
-                // some day
+                // TODO Add actual version instead of NULL if ES returns this some day
                 throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
