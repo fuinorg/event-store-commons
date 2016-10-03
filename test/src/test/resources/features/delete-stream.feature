@@ -85,18 +85,15 @@ Scenario: Delete after delete
     | DeleteAfterSoftDelete3 |
     | DeleteAfterSoftDelete4 |
     When the following deletes are executed
-    | Stream Name            | Hard Delete | Expected Version | Expected Exception | 
-    | DeleteAfterHardDelete1 | true        | ANY              | -                  |
-    | DeleteAfterHardDelete2 | true        | ANY              | -                  |
-    | DeleteAfterHardDelete3 | true        | ANY              | -                  |
-    | DeleteAfterHardDelete4 | true        | ANY              | -                  |
-    | DeleteAfterSoftDelete1 | false       | ANY              | -                  |
-    | DeleteAfterSoftDelete2 | false       | ANY              | -                  |
-    | DeleteAfterSoftDelete3 | false       | ANY              | -                  |
-    | DeleteAfterSoftDelete4 | false       | ANY              | -                  |
-    Then this should give the expected results
-    And executing the following deletes should have the given result
     | Stream Name            | Hard Delete | Expected Version | Expected Exception      | 
+    | DeleteAfterHardDelete1 | true        | ANY              | -                       |
+    | DeleteAfterHardDelete2 | true        | ANY              | -                       |
+    | DeleteAfterHardDelete3 | true        | ANY              | -                       |
+    | DeleteAfterHardDelete4 | true        | ANY              | -                       |
+    | DeleteAfterSoftDelete1 | false       | ANY              | -                       |
+    | DeleteAfterSoftDelete2 | false       | ANY              | -                       |
+    | DeleteAfterSoftDelete3 | false       | ANY              | -                       |
+    | DeleteAfterSoftDelete4 | false       | ANY              | -                       |
     | DeleteAfterHardDelete1 | true        | ANY              | StreamDeletedException  |
     | DeleteAfterHardDelete2 | false       | ANY              | StreamDeletedException  |
     | DeleteAfterHardDelete3 | true        | 0                | StreamDeletedException  |
@@ -105,4 +102,5 @@ Scenario: Delete after delete
     | DeleteAfterSoftDelete2 | false       | ANY              | -                       |
     | DeleteAfterSoftDelete3 | true        | 0                | -                       |
     | DeleteAfterSoftDelete4 | false       | 0                | -                       |
+    Then this should give the expected results
     

@@ -40,3 +40,18 @@ Scenario: Append single again
     """
     Then this should raise no exception
  
+ Scenario: Wrong expected version 
+    Given the following streams don't exist
+    | Stream Name          |
+    | WrongExpectedVersion |
+    And I append the following events in the given order
+    | Stream Name          | Expected Version   |  Event Id                             | Expected Exception |
+    | WrongExpectedVersion | NO_OR_EMPTY_STREAM |  f98c7eb9-a29a-4c6c-999b-be6d6e4b51b3 | -                  |
+    | WrongExpectedVersion | 0                  |  853f86e2-881c-4647-99f2-d579f280561f | -                  |
+    | WrongExpectedVersion | 1                  |  a45ea42f-0825-440b-8ddf-9d1aaebd627a | -                  |
+    When I append the following events in the given order
+    | Stream Name          | Expected Version   |  Event Id                             | Expected Exception            |
+    | WrongExpectedVersion | 1                  |  c58d47d0-9d56-4d47-8889-3b0932b16054 | WrongExpectedVersionException |
+    Then this should give the expected results
+
+ 

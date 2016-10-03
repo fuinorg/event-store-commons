@@ -73,7 +73,7 @@ import cucumber.api.java.en.When;
 public class TestFeatures {
 
     private String currentEventStoreImplType;
-    
+
     private EventStore eventStore;
 
     private SimpleSerializerDeserializerRegistry registry;
@@ -92,7 +92,7 @@ public class TestFeatures {
         currentEventStoreImplType = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
         if (currentEventStoreImplType.equals("mem")) {
             eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
-        } else if (currentEventStoreImplType.equals("eshttp") || currentEventStoreImplType.equals("jpa") 
+        } else if (currentEventStoreImplType.equals("eshttp") || currentEventStoreImplType.equals("jpa")
                 || currentEventStoreImplType.equals("esjc")) {
             final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, BookAddedEvent.class, MyMeta.class,
                     EscEvent.class, EscEvents.class, EscMeta.class, Base64Data.class);
@@ -143,32 +143,19 @@ public class TestFeatures {
 
     @Then("^this should give the expected results$")
     public void success() {
-        if (lastCommand == null) {
-            throw new IllegalStateException("Last command was not set in the 'when' condition");
-        }
-        lastCommand.verify();
-        lastCommand = null;
+        verifyThen();
     }
 
     @Then("^this should raise no exception$")
     public void thenNoException() {
-        // Do nothing, just to create a nice 'then' text
+        verifyThen();
     }
 
     @When("^the following deletes are executed$")
     public void whenExecuteDeletes(final List<DeleteCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        lastCommand = command;
-    }
-
-    @Then("^executing the following deletes should have the given result$")
-    public void thenExecuteDeletes(final List<DeleteCommand> commands) {
-        final TestCommand command = new MultipleCommands(commands);
-        command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeWhen(command);
     }
 
     @Given("^the following streams are created and a single event is appended to each$")
@@ -185,51 +172,58 @@ public class TestFeatures {
         }
 
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeGiven(command);
 
     }
 
     @Given("^the following streams don't exist$")
     public void givenStreamsDontExist(final List<String> streams) {
-        streamsExists(streams, false);
+        final MultipleCommands command = new MultipleCommands();
+        for (int i = 1; i < streams.size(); i++) {
+            final String streamName = streams.get(i);
+            command.add(new StreamExistsCommand(streamName, false));
+        }
+        command.init(currentEventStoreImplType, eventStore);
+        executeGiven(command);
     }
 
     @Then("^following streams should not exist$")
     public void thenStreamsShouldNotExist(final List<String> streams) {
-        streamsExists(streams, false);
+        final MultipleCommands command = new MultipleCommands();
+        for (int i = 1; i < streams.size(); i++) {
+            final String streamName = streams.get(i);
+            command.add(new StreamExistsCommand(streamName, false));
+        }
+        command.init(currentEventStoreImplType, eventStore);
+        executeThen(command);
     }
 
     @Then("^reading forward from the following streams should raise the given exceptions$")
     public void thenReadForwardException(final List<ReadForwardExceptionCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
     }
 
     @When("^I read forward from the following streams$")
     public void whenReadForwardException(final List<ReadForwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        lastCommand = command;
+        executeWhen(command);
     }
 
     @When("^I read backward from the following streams$")
     public void whenReadBackwardException(final List<ReadBackwardExceptionCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        lastCommand = command;
+        executeWhen(command);
     }
 
     @Given("^the stream \"(.*?)\" does not exist$")
     public void givenStreamDoesNotExist(final String streamName) {
         final TestCommand command = new StreamExistsCommand(streamName, false);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeGiven(command);
     }
 
     @When("^I append the following events in the given order$")
@@ -239,90 +233,82 @@ public class TestFeatures {
             command.add(cmd);
         }
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeWhen(command);
     }
 
     @Then("^reading forward from stream should have the following results$")
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
     }
 
     @Then("^reading backward from stream should have the following results$")
     public void thenReadBackward(final List<ReadBackwardCommand> commands) throws Exception {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
     }
 
     @When("^I append the following events to stream \"(.*?)\"$")
     public void whenAppendXmlEvents(final String streamName, final String eventsXml) {
-        appendXmlEvents(streamName, ExpectedVersion.ANY.getNo(), eventsXml);
+        whenAppendXmlEvents(streamName, ExpectedVersion.ANY.getNo(), eventsXml);
     }
 
-    private void appendXmlEvents(final String streamName, final int version, final String eventsXml) {
+    private void whenAppendXmlEvents(final String streamName, final int version, final String eventsXml) {
         final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events.asCommonEvents(BookAddedEvent.class);
 
-        final TestCommand command = new AppendToStreamCommand(streamName, version, null,
-                commonEvents);
+        final TestCommand command = new AppendToStreamCommand(streamName, version, null, commonEvents);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeWhen(command);
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
     public void thenReadXmlEvent(final int eventNumber, final String streamName,
             final String expectedEventXml) {
 
-        final TestCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml,
-                null);
+        final TestCommand command = new ReadEventCommand(streamName, eventNumber, expectedEventXml, null);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
 
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
     public void thenReadingEventShouldThrow_a(int eventNumber, String streamName, String expectedException) {
-        final TestCommand command = new ReadEventCommand(streamName, eventNumber, null,
-                expectedException);
+        final TestCommand command = new ReadEventCommand(streamName, eventNumber, null, expectedException);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
     }
 
     @When("^the following state queries are executed$")
     public void whenStateQueriesAreExecuted(final List<StreamStateCommand> commands) {
         final TestCommand command = new MultipleCommands(commands);
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeWhen(command);
     }
 
     @Given("^the following streams exist$")
     public void givenStreamsExist(final List<String> streams) {
-        streamsExists(streams, true);
+        final MultipleCommands command = new MultipleCommands();
+        for (int i = 1; i < streams.size(); i++) {
+            final String streamName = streams.get(i);
+            command.add(new StreamExistsCommand(streamName, true));
+        }
+        command.init(currentEventStoreImplType, eventStore);
+        executeGiven(command);
+
     }
 
     @Then("^following streams should exist$")
     public void thenStreamsShouldExist(final List<String> streams) {
-        streamsExists(streams, true);
-    }
-
-    private void streamsExists(final List<String> streams, final boolean exist) {
         final MultipleCommands command = new MultipleCommands();
         for (int i = 1; i < streams.size(); i++) {
             final String streamName = streams.get(i);
-            command.add(new StreamExistsCommand(streamName, exist));
+            command.add(new StreamExistsCommand(streamName, true));
         }
         command.init(currentEventStoreImplType, eventStore);
-        execute(command);
-        command.verify();
+        executeThen(command);
     }
 
     private void setupDb() {
@@ -358,10 +344,34 @@ public class TestFeatures {
         }
     }
 
-    private void execute(TestCommand command) {
+    private void executeGiven(TestCommand command) {
         beginTransaction();
         command.execute();
         endTransaction();
+        command.verify();
+    }
+
+    private void executeWhen(TestCommand command) {
+        lastCommand = command;
+        beginTransaction();
+        command.execute();
+        endTransaction();
+    }
+
+    private void executeThen(TestCommand command) {
+        lastCommand = null;
+        beginTransaction();
+        command.execute();
+        endTransaction();
+        command.verify();
+    }
+    
+    private void verifyThen() {
+        if (lastCommand == null) {
+            throw new IllegalStateException("Last command was not set in the 'when' condition");
+        }
+        lastCommand.verify();
+        lastCommand = null;
     }
 
     private void beginTransaction() {
