@@ -39,6 +39,31 @@ import org.junit.Test;
 public class EscSpiUtilsTest {
 
     @Test
+    public void testEventsEqual() {
+
+        // PREPARE
+        final UUID uuidA = UUID.randomUUID();
+        final UUID uuidB = UUID.randomUUID();
+        final CommonEvent eventA = new SimpleCommonEvent(new EventId(uuidA), new TypeName("A"), "a");
+        final CommonEvent eventB = new SimpleCommonEvent(new EventId(uuidB), new TypeName("B"), "b");
+        final CommonEvent eventAa = new SimpleCommonEvent(new EventId(uuidA), new TypeName("Aa"), "aa");
+
+        // TEST & VERIFY
+        assertThat(EscSpiUtils.eventsEqual(null, null)).isTrue();
+        assertThat(EscSpiUtils.eventsEqual(null, new ArrayList<>())).isFalse();
+        assertThat(EscSpiUtils.eventsEqual(new ArrayList<>(), null)).isFalse();
+        assertThat(EscSpiUtils.eventsEqual(new ArrayList<>(), new ArrayList<>())).isTrue();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventA))).isTrue();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventB))).isFalse();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventB), asList(eventA))).isFalse();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventAa))).isTrue();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventA, eventB))).isFalse();
+        assertThat(EscSpiUtils.eventsEqual(asList(eventA, eventB), asList(eventB))).isFalse();
+        
+    }
+    
+    
+    @Test
     public void testSerializeNull() {
 
         // PREPARE
@@ -344,5 +369,13 @@ public class EscSpiUtilsTest {
         };
     }
 
+    private List<CommonEvent> asList(CommonEvent...events) {
+        final List<CommonEvent> list = new ArrayList<>();
+        for (final CommonEvent event : events) {
+            list.add(event);
+        }
+        return list;
+    }
+    
 }
 // CHECKSTYLE:ON

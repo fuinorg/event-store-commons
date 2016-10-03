@@ -160,16 +160,26 @@ public final class EscSpiUtils {
      * @return TRUE if both lists have the same size and all event identifiers
      *         are equal.
      */
-    public static boolean eventsEqual(final List<CommonEvent> eventsA, final List<CommonEvent> eventsB) {
-        if (eventsA.size() < eventsB.size()) {
+    public static boolean eventsEqual(@Nullable final List<CommonEvent> eventsA,
+            @Nullable final List<CommonEvent> eventsB) {
+        if ((eventsA == null) && (eventsB == null)) {
+            return true;
+        }
+        if ((eventsA == null) && (eventsB != null)) {
+            return false;
+        }
+        if ((eventsA != null) && (eventsB == null)) {
+            return false;
+        }
+        if (eventsA.size() != eventsB.size()) {
             return false;
         }
         int currentIdx = eventsA.size() - 1;
         int appendIdx = eventsB.size() - 1;
-        while (appendIdx > 0) {
+        while (appendIdx >= 0) {
             final CommonEvent current = eventsA.get(currentIdx);
-            final CommonEvent append = eventsA.get(appendIdx);
-            if (!current.getId().equals(append.getId())) {
+            final CommonEvent append = eventsB.get(appendIdx);
+            if (!current.equals(append)) {
                 return false;
             }
             currentIdx--;
@@ -218,8 +228,7 @@ public final class EscSpiUtils {
 
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
-        return new EscMeta(dataType, dataContentType, metaType, metaContentType,
-                new Base64Data(serMeta));
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType, new Base64Data(serMeta));
 
     }
 
