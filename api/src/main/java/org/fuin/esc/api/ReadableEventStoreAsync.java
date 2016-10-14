@@ -22,22 +22,10 @@ import java.util.concurrent.CompletableFuture;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interface for reading events from an event store asynchronously.
+ * Interface for reading events from an event store asynchronously. Calling any
+ * method on a non-open event store will implicitly {@link #open()} it.
  */
-public interface ReadableEventStoreAsync {
-
-    /**
-     * Opens a connection to the repository.
-     * 
-     * @return Nothing.
-     */
-    @NotNull
-    public CompletableFuture<Void> open();
-
-    /**
-     * Closes the connection to the repository.
-     */
-    public void close();
+public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
 
     /**
      * Reads count Events from an Event Stream forwards (e.g. oldest to newest)
@@ -61,8 +49,8 @@ public interface ReadableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<StreamEventsSlice> readEventsForward(
-            @NotNull StreamId streamId, int start, int count);
+    public CompletableFuture<StreamEventsSlice> readEventsForward(@NotNull StreamId streamId, int start,
+            int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
@@ -86,8 +74,8 @@ public interface ReadableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<StreamEventsSlice> readEventsBackward(
-            @NotNull StreamId streamId, int start, int count);
+    public CompletableFuture<StreamEventsSlice> readEventsBackward(@NotNull StreamId streamId, int start,
+            int count);
 
     /**
      * Reads a single event from a stream.
@@ -109,30 +97,32 @@ public interface ReadableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId,
-            int eventNumber);
+    public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId, int eventNumber);
 
     /**
      * Determines if a stream exists.
      * 
-     * @param streamId Unique identifier of the stream.
+     * @param streamId
+     *            Unique identifier of the stream.
      * 
      * @return TRUE if the stream exists, else FALSE.
      */
     @NotNull
     public CompletableFuture<Boolean> streamExists(@NotNull StreamId streamId);
-    
+
     /**
      * Returns the state of the stream.
      * 
-     * @param streamId Unique identifier of the stream.
+     * @param streamId
+     *            Unique identifier of the stream.
      * 
      * @return State.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      */
     @NotNull
     public CompletableFuture<StreamState> streamState(@NotNull StreamId streamId);
-    
+
 }

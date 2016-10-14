@@ -41,7 +41,6 @@ import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializerRegistry;
-import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 
 import com.github.msemys.esjc.EventData;
@@ -66,7 +65,7 @@ public final class ESJCEventStore implements EventStore {
     private final RecordedEvent2CommonEventConverter ed2ceConv;
 
     private boolean open;
-    
+
     /**
      * Constructor with event store to use.
      * 
@@ -97,8 +96,8 @@ public final class ESJCEventStore implements EventStore {
     @Override
     public final void open() {
         if (open) {
-            throw new ConstraintViolationException(
-                    "The event store is already open. Don't call 'open()' more than once.");
+            // Ignore
+            return;
         }
         es.connect();
         this.open = true;
@@ -106,15 +105,21 @@ public final class ESJCEventStore implements EventStore {
 
     @Override
     public final void close() {
-        requireOpen();
+        if (!open) {
+            // Ignore
+            return;
+        }
         es.disconnect();
         this.open = false;
     }
 
     @Override
+    public final boolean isSupportsCreateStream() {
+        return false;
+    }
+
+    @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
-        Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
         // Do nothing as the operation is not supported
     }
 
@@ -145,7 +150,7 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
-        requireOpen();
+        ensureOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -158,7 +163,8 @@ public final class ESJCEventStore implements EventStore {
             return result.nextExpectedVersion;
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
-                // TODO Add actual version instead of NULL if ES returns this some day
+                // TODO Add actual version instead of NULL if ES returns this
+                // some day
                 throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
@@ -177,7 +183,7 @@ public final class ESJCEventStore implements EventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
-        requireOpen();
+        ensureOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -188,7 +194,8 @@ public final class ESJCEventStore implements EventStore {
                     hardDelete).get();
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
-                // TODO Add actual version instead of NULL if ES returns this some day
+                // TODO Add actual version instead of NULL if ES returns this
+                // some day
                 throw new WrongExpectedVersionException(streamId, expectedVersion, null);
             }
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
@@ -216,7 +223,7 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
@@ -243,7 +250,7 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
@@ -272,7 +279,7 @@ public final class ESJCEventStore implements EventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
-        requireOpen();
+        ensureOpen();
 
         try {
             final EventReadResult eventReadResult = es.readEvent(streamId.asString(), eventNumber, true)
@@ -297,7 +304,7 @@ public final class ESJCEventStore implements EventStore {
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
@@ -319,7 +326,7 @@ public final class ESJCEventStore implements EventStore {
     public final StreamState streamState(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
 
         try {
 
@@ -363,10 +370,9 @@ public final class ESJCEventStore implements EventStore {
         return ed2ceConv.convert(resolvedEvent.event);
     }
 
-    private void requireOpen() {
+    private void ensureOpen() {
         if (!open) {
-            throw new ConstraintViolationException(
-                    "Please use 'open()' to connect to the event store before calling any method");
+            open();
         }
     }
 

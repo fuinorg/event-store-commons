@@ -43,8 +43,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
      * @param delegate
      *            Delegate to forward all method calls to.
      */
-    public DelegatingAsyncEventStore(@NotNull final Executor executor, 
-            @NotNull final EventStore delegate) {
+    public DelegatingAsyncEventStore(@NotNull final Executor executor, @NotNull final EventStore delegate) {
         super();
         Contract.requireArgNotNull("executor", executor);
         Contract.requireArgNotNull("delegate", delegate);
@@ -131,8 +130,8 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> toAppend) {
+    public final CompletableFuture<Integer> appendToStream(final StreamId streamId, final int expectedVersion,
+            final List<CommonEvent> toAppend) {
 
         return CompletableFuture.supplyAsync(new Supplier<Integer>() {
             @Override
@@ -144,8 +143,8 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final CompletableFuture<Integer> appendToStream(final StreamId streamId, final int expectedVersion,
+            final CommonEvent... events) {
 
         return CompletableFuture.supplyAsync(new Supplier<Integer>() {
             @Override
@@ -200,6 +199,23 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
                 return delegate.streamState(streamId);
             }
         }, executor);
+    }
+
+    @Override
+    public final boolean isSupportsCreateStream() {
+        return delegate.isSupportsCreateStream();
+    }
+
+    @Override
+    public CompletableFuture<Void> createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+
+        return CompletableFuture.runAsync(new Runnable() {
+            @Override
+            public void run() {
+                delegate.createStream(streamId);
+            }
+        }, executor);
+
     }
 
 }

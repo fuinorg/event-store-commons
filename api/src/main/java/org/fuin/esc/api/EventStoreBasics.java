@@ -18,8 +18,20 @@
 package org.fuin.esc.api;
 
 /**
- * Combines all event store features for asynchronous access.
+ * Basic synchronous operations shared by all event store types.
  */
-public interface EventStoreAsync extends WritableEventStoreAsync, ReadableEventStoreAsync {
+public interface EventStoreBasics extends AutoCloseable {
+
+    /**
+     * Opens a connection to the event store. Opening an already opened event
+     * store is ignored.
+     */
+    public void open();
+
+    /**
+     * Closes the connection to the event store. Closing an already closed or
+     * never opened event store is simply ignored.
+     */
+    public void close();
 
 }

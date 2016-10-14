@@ -23,22 +23,28 @@ import java.util.concurrent.CompletableFuture;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interface for writing events to an event store asynchronously.
+ * Interface for writing events to an event store asynchronously. Calling any
+ * method on a non-open event store will implicitly {@link #open()} it.
  */
-public interface WritableEventStoreAsync {
+public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
 
     /**
-     * Opens a connection to the repository.
+     * Creates a new stream. Some implementations may do nothing, because the
+     * create streams when the first event is appended. If
+     * {@link MetaEventStore#isSupportsCreate()} returns FALSE, this method does
+     * nothing, but is expected not fail.
+     * 
+     * @param streamId
+     *            The unique identifier of the stream to create.
      * 
      * @return Nothing.
+     * 
+     * @throws StreamAlreadyExistsException
+     *             The stream already exists.
      */
     @NotNull
-    public CompletableFuture<Void> open();
-
-    /**
-     * Closes the connection to the repository.
-     */
-    public void close();
+    public CompletableFuture<Void> createStream(@NotNull StreamId streamId)
+            throws StreamAlreadyExistsException;
 
     /**
      * Appends one or more events to a stream. If the stream does not exist, the
@@ -65,8 +71,7 @@ public interface WritableEventStoreAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(
-            @NotNull StreamId streamId, int expectedVersion,
+    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull CommonEvent... events);
 
     /**
@@ -90,8 +95,8 @@ public interface WritableEventStoreAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(
-            @NotNull StreamId streamId, @NotNull CommonEvent... events);
+    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId,
+            @NotNull CommonEvent... events);
 
     /**
      * Appends a list of events to a stream. If the stream does not exist, the
@@ -117,8 +122,7 @@ public interface WritableEventStoreAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(
-            @NotNull StreamId streamId, int expectedVersion,
+    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId, int expectedVersion,
             @NotNull List<CommonEvent> events);
 
     /**
@@ -141,8 +145,8 @@ public interface WritableEventStoreAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(
-            @NotNull StreamId streamId, @NotNull List<CommonEvent> events);
+    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId,
+            @NotNull List<CommonEvent> events);
 
     /**
      * Deletes a stream from the event store if it has a given version.
@@ -169,8 +173,8 @@ public interface WritableEventStoreAsync {
      *             The expected version didn't match the actual version.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId,
-            int expectedVersion, boolean hardDelete);
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, int expectedVersion,
+            boolean hardDelete);
 
     /**
      * Deletes a stream from the event store not matter what the current version
@@ -194,7 +198,19 @@ public interface WritableEventStoreAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId,
-            boolean hardDelete);
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, boolean hardDelete);
+
+    /**
+     * Returns the information if the event store implementation supports
+     * creating a stream without appending events to it. If the event store does
+     * not support a create operation, a call to
+     * {@link EventStore#createStream(StreamId)} will do nothing, but it will
+     * not fail.
+     * 
+     * @return TRUE if it's possible to create a stream without appending events
+     *         to it or FALSE if only appending events implicitly creates a
+     *         stream.
+     */
+    public boolean isSupportsCreateStream();
 
 }

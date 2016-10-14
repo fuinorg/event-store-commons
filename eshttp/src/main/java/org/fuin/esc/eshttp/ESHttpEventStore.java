@@ -152,8 +152,8 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     @Override
     public void open() {
         if (open) {
-            throw new ConstraintViolationException(
-                    "The event store is already open. Don't call 'open()' more than once.");
+            // Ignore
+            return;
         }
         final HttpAsyncClientBuilder builder = HttpAsyncClients.custom().setThreadFactory(threadFactory);
         if (credentialsProvider != null) {
@@ -166,7 +166,10 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     @Override
     public void close() {
-        requireOpen();
+        if (!open) {
+            // Ignore
+            return;
+        }
         try {
             httpclient.close();
         } catch (final IOException ex) {
@@ -176,9 +179,12 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     }
 
     @Override
+    public final boolean isSupportsCreateStream() {
+        return false;
+    }
+
+    @Override
     public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
-        Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
         // Do nothing as the operation is not supported
     }
 
@@ -206,7 +212,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
-        requireOpen();
+        ensureOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -291,7 +297,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
-        requireOpen();
+        ensureOpen();
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
@@ -351,7 +357,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
         try {
@@ -370,7 +376,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
         try {
@@ -387,7 +393,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
         try {
@@ -403,7 +409,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "streamExists(" + streamId + ")";
         try {
@@ -438,7 +444,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
     @Override
     public final StreamState streamState(final StreamId streamId) {
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "streamState(" + streamId + ")";
         try {
@@ -480,7 +486,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "projectionExists(" + projectionId + ")";
         try {
@@ -524,7 +530,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = action + "Projection(" + projectionId + ")";
         try {
@@ -570,7 +576,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
         Contract.requireArgNotNull("projectionId", projectionId);
         Contract.requireArgNotNull("eventTypes", eventTypes);
         requireProjection(projectionId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "createProjection(" + projectionId + "," + enable + type2str(eventTypes) + ")";
         try {
@@ -606,7 +612,7 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
-        requireOpen();
+        ensureOpen();
 
         final String msg = "deleteProjection(" + projectionId + ")";
         try {
@@ -640,10 +646,9 @@ public final class ESHttpEventStore implements EventStore, ProjectionAdminEventS
 
     }
 
-    private void requireOpen() {
+    private void ensureOpen() {
         if (!open) {
-            throw new ConstraintViolationException(
-                    "Please use 'open()' to connect to the event store before calling any method");
+            open();
         }
     }
 

@@ -17,19 +17,27 @@
  */
 package org.fuin.esc.api;
 
+import java.util.concurrent.CompletableFuture;
+
+import javax.validation.constraints.NotNull;
+
 /**
- * Interface for determining capabilities of an event store.
+ * Basic synchronous operations shared by all event store types.
  */
-public interface MetaEventStore {
+public interface EventStoreBasicsAsync extends AutoCloseable {
 
     /**
-     * Returns the information if the event store implementation supports creating a stream without appending
-     * events to it. If the event store does not support a create operation, a call to
-     * {@link EventStore#createStream(StreamId)} will do nothing, but it will not fail.
+     * Opens a connection to the event store.
      * 
-     * @return TRUE if it's possible to create a stream without appending events to it or FALSE if only
-     *         appending events implicitly creates a stream.
+     * @return Nothing.
      */
-    public boolean isSupportsCreate();
+    @NotNull
+    public CompletableFuture<Void> open();
 
+    /**
+     * Closes the connection to the event store. Closing an already closed or
+     * never opened event store is simply ignored.
+     */
+    public void close();
+    
 }

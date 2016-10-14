@@ -126,15 +126,18 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     @Override
     public final void open() {
         if (open) {
-            throw new ConstraintViolationException(
-                    "The event store is already open. Don't call 'open()' more than once.");
+            // Ignore
+            return;
         }
         this.open = true;
     }
 
     @Override
     public final void close() {
-        requireOpen();
+        if (!open) {
+            // Ignore
+            return;
+        }
         this.open = false;
     }
 
@@ -143,7 +146,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
-        requireOpen();
+        ensureOpen();
         verifyStreamEntityExists(streamId);
 
         final NativeSqlCondition eventNo = new NativeSqlCondition(JpaStreamEvent.COLUMN_EVENT_NUMBER, "=",
@@ -171,7 +174,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
         verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
@@ -220,7 +223,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
-        requireOpen();
+        ensureOpen();
         verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
@@ -268,7 +271,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     public final boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
         if (!streamEntityExists(streamId)) {
             return false;
         }
@@ -293,7 +296,7 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
     public final StreamState streamState(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
-        requireOpen();
+        ensureOpen();
 
         final JpaStream stream = findStream(streamId);
         return stream.getState();
@@ -559,10 +562,9 @@ public abstract class AbstractJpaEventStore implements ReadableEventStore {
      * Makes sure the event store was opened before or throws a
      * {@link ConstraintViolationException} otherwise.
      */
-    protected final void requireOpen() {
+    protected final void ensureOpen() {
         if (!open) {
-            throw new ConstraintViolationException(
-                    "Please use 'open()' to connect to the event store before calling any method");
+            open();
         }
     }
 

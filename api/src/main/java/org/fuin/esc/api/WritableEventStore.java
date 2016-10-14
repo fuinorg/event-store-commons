@@ -22,23 +22,27 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interface for writing events to an event store synchronously..
+ * Interface for writing events to an event store synchronously. Calling any
+ * method on a non-open event store will implicitly {@link #open()} it.
  */
-public interface WritableEventStore extends AutoCloseable {
+public interface WritableEventStore extends EventStoreBasics {
 
     /**
-     * Opens a connection to the repository.
+     * Returns the information if the event store implementation supports
+     * creating a stream without appending events to it. If the event store does
+     * not support a create operation, a call to {@link #createStream(StreamId)}
+     * will do nothing, but it will not fail.
+     * 
+     * @return TRUE if it's possible to create a stream without appending events
+     *         to it or FALSE if only appending events implicitly creates a
+     *         stream.
      */
-    public void open();
+    public boolean isSupportsCreateStream();
 
     /**
-     * Closes the connection to the repository.
-     */
-    public void close();
-
-    /**
-     * Creates a new stream. Some implementations may do nothing, because the create streams when the first
-     * event is appended. If {@link MetaEventStore#isSupportsCreate()} returns FALSE, this method does
+     * Creates a new stream. Some implementations may do nothing, because the
+     * create streams when the first event is appended. If
+     * {@link MetaEventStore#isSupportsCreate()} returns FALSE, this method does
      * nothing, but is expected not fail.
      * 
      * @param streamId
@@ -50,8 +54,8 @@ public interface WritableEventStore extends AutoCloseable {
     public void createStream(@NotNull StreamId streamId) throws StreamAlreadyExistsException;
 
     /**
-     * Appends one or more events to a stream. If the stream does not exist, the implementation may create it
-     * on the fly.
+     * Appends one or more events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -63,10 +67,11 @@ public interface WritableEventStore extends AutoCloseable {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             The stream does not exist in the repository and the implementation cannot create it
-     *             on-the-fly.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
@@ -77,8 +82,8 @@ public interface WritableEventStore extends AutoCloseable {
             StreamReadOnlyException;
 
     /**
-     * Appends one or more events to a stream. If the stream does not exist, the implementation may create it
-     * on the fly.
+     * Appends one or more events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -88,10 +93,11 @@ public interface WritableEventStore extends AutoCloseable {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             The stream does not exist in the repository and the implementation cannot create it
-     *             on-the-fly.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
@@ -99,8 +105,8 @@ public interface WritableEventStore extends AutoCloseable {
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
-     * Appends a list of events to a stream. If the stream does not exist, the implementation may create it on
-     * the fly.
+     * Appends a list of events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -112,8 +118,8 @@ public interface WritableEventStore extends AutoCloseable {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             The stream does not exist in the repository and the implementation cannot create it
-     *             on-the-fly.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
      * @throws WrongExpectedVersionException
@@ -126,8 +132,8 @@ public interface WritableEventStore extends AutoCloseable {
             WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
-     * Appends a list of events to a stream. If the stream does not exist, the implementation may create it on
-     * the fly.
+     * Appends a list of events to a stream. If the stream does not exist, the
+     * implementation may create it on the fly.
      * 
      * @param streamId
      *            The unique identifier of the stream to append the events to.
@@ -137,8 +143,8 @@ public interface WritableEventStore extends AutoCloseable {
      * @return The next expected version for the stream.
      * 
      * @throws StreamNotFoundException
-     *             The stream does not exist in the repository and the implementation cannot create it
-     *             on-the-fly.
+     *             The stream does not exist in the repository and the
+     *             implementation cannot create it on-the-fly.
      * @throws StreamDeletedException
      *             The stream previously existed but was deleted.
      * @throws StreamReadOnlyException
@@ -148,22 +154,25 @@ public interface WritableEventStore extends AutoCloseable {
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
-     * Deletes a stream from the event store if it has a given version. Deleting a previously soft-deleted
-     * stream again does NOT throw an exception. Deleting a non-existing stream with an expected version of
-     * {@link ExpectedVersion#ANY} or {@link ExpectedVersion#NO_OR_EMPTY_STREAM} does also NOT throw an
-     * exception.
+     * Deletes a stream from the event store if it has a given version. Deleting
+     * a previously soft-deleted stream again does NOT throw an exception.
+     * Deleting a non-existing stream with an expected version of
+     * {@link ExpectedVersion#ANY} or {@link ExpectedVersion#NO_OR_EMPTY_STREAM}
+     * does also NOT throw an exception.
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
      * @param expectedVersion
      *            The version the stream should have when being deleted.
      * @param hardDelete
-     *            TRUE if it should be impossible to recreate the stream. FALSE (soft delete) if appending to
-     *            it will recreate it. Please note that in this case the version numbers do not start at zero
-     *            but at where you previously soft deleted the stream from.
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was hard deleted.
+     *             A stream with the given name previously existed but was hard
+     *             deleted.
      * @throws WrongExpectedVersionException
      *             The expected version didn't match the actual version.
      * @throws StreamReadOnlyException
@@ -173,23 +182,27 @@ public interface WritableEventStore extends AutoCloseable {
             throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
-     * Deletes a stream from the event store not matter what the current version is.
+     * Deletes a stream from the event store not matter what the current version
+     * is.
      * 
      * @param streamId
      *            The unique identifier of the stream to be deleted
      * @param hardDelete
-     *            TRUE if it should be impossible to recreate the stream. FALSE (soft delete) if appending to
-     *            it will recreate it. Please note that in this case the version numbers do not start at zero
-     *            but at where you previously soft deleted the stream from.
+     *            TRUE if it should be impossible to recreate the stream. FALSE
+     *            (soft delete) if appending to it will recreate it. Please note
+     *            that in this case the version numbers do not start at zero but
+     *            at where you previously soft deleted the stream from.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public void deleteStream(@NotNull StreamId streamId, boolean hardDelete) throws StreamNotFoundException,
-            StreamDeletedException, StreamReadOnlyException;
+    public void deleteStream(@NotNull StreamId streamId, boolean hardDelete)
+            throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
 }

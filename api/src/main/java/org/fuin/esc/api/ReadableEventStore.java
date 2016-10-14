@@ -20,22 +20,14 @@ package org.fuin.esc.api;
 import javax.validation.constraints.NotNull;
 
 /**
- * Interface for reading events from an event store synchronously.
+ * Interface for reading events from an event store synchronously. Calling any
+ * method on a non-open event store will implicitly {@link #open()} it.
  */
-public interface ReadableEventStore extends AutoCloseable {
+public interface ReadableEventStore extends EventStoreBasics {
 
     /**
-     * Opens a connection to the event store.
-     */
-    public void open();
-
-    /**
-     * Closes the connection to the event store.
-     */
-    public void close();
-
-    /**
-     * Reads count Events from an Event Stream forwards (e.g. oldest to newest) starting from position start.
+     * Reads count Events from an Event Stream forwards (e.g. oldest to newest)
+     * starting from position start. traing to read from a non-open
      * 
      * @param streamId
      *            The stream to read from.
@@ -44,19 +36,22 @@ public interface ReadableEventStore extends AutoCloseable {
      * @param count
      *            The count of items to read.
      * 
-     * @return A slice containing the results of the read operation. Never <code>null</code>, but may be an
-     *         empty list.
+     * @return A slice containing the results of the read operation. Never
+     *         <code>null</code>, but may be an empty list.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      */
     @NotNull
     public StreamEventsSlice readEventsForward(@NotNull StreamId streamId, int start, int count);
 
     /**
-     * Reads count Events from an Event Stream backwards (e.g. newest to oldest) starting from position start.
+     * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
+     * starting from position start.
      * 
      * @param streamId
      *            The stream to read from.
@@ -65,13 +60,15 @@ public interface ReadableEventStore extends AutoCloseable {
      * @param count
      *            The count of items to read.
      * 
-     * @return A slice containing the results of the read operation. Never <code>null</code>, but may be an
-     *         empty list.
+     * @return A slice containing the results of the read operation. Never
+     *         <code>null</code>, but may be an empty list.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      */
     @NotNull
     public StreamEventsSlice readEventsBackward(@NotNull StreamId streamId, int start, int count);
@@ -89,9 +86,11 @@ public interface ReadableEventStore extends AutoCloseable {
      * @throws EventNotFoundException
      *             An event with the given number was not found in the stream.
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      * @throws StreamDeletedException
-     *             A stream with the given name previously existed but was deleted.
+     *             A stream with the given name previously existed but was
+     *             deleted.
      */
     @NotNull
     public CommonEvent readEvent(@NotNull StreamId streamId, int eventNumber);
@@ -99,23 +98,26 @@ public interface ReadableEventStore extends AutoCloseable {
     /**
      * Determines if a stream exists.
      * 
-     * @param streamId Unique identifier of the stream.
+     * @param streamId
+     *            Unique identifier of the stream.
      * 
      * @return TRUE if the stream exists, else FALSE.
      */
     public boolean streamExists(@NotNull StreamId streamId);
-    
+
     /**
      * Returns the state of the stream.
      * 
-     * @param streamId Unique identifier of the stream.
+     * @param streamId
+     *            Unique identifier of the stream.
      * 
      * @return State.
      * 
      * @throws StreamNotFoundException
-     *             A stream with the given name does not exist in the repository.
+     *             A stream with the given name does not exist in the
+     *             repository.
      */
     @NotNull
     public StreamState streamState(@NotNull StreamId streamId);
-    
+
 }
