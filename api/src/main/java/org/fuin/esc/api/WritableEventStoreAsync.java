@@ -31,7 +31,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
     /**
      * Creates a new stream. Some implementations may do nothing, because the
      * create streams when the first event is appended. If
-     * {@link MetaEventStore#isSupportsCreate()} returns FALSE, this method does
+     * {@link #isSupportsCreateStream()} returns FALSE, this method does
      * nothing, but is expected not fail.
      * 
      * @param streamId

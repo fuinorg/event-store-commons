@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
  * An event store that is capable of handling volatile subscriptions. Calling
  * any method on a non-open event store will implicitly {@link #open()} it.
  */
-public interface SubscribableEventStore {
+public interface SubscribableEventStore extends EventStoreBasics {
 
     /**
      * Subscribe a stream starting with a given event number.
