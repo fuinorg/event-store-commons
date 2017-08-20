@@ -37,6 +37,7 @@ import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
+import org.fuin.utils4j.CDataXmlAdapter;
 
 /**
  * Represents a block of data in a serialized form.

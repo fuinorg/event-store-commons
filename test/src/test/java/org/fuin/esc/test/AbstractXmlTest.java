@@ -21,11 +21,14 @@ import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+
+import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.CDataXmlStreamWriter;
+import org.fuin.utils4j.JaxbUtils;
 
 /**
  * Base class for XML marshal/unmarshal tests.
@@ -54,38 +57,22 @@ public abstract class AbstractXmlTest {
      * @param <T>
      *            Type of the data.
      */
-    // TODO Add handling of CDATA to units4j and remove this method
-    protected static <T> String marshalToStr(final T data,
-            final XmlAdapter<?, ?>[] adapters,
+    protected static <T> String marshalToStr(final T data, final XmlAdapter<?, ?>[] adapters,
             final Class<?>... classesToBeBound) {
-        try {
+
+        final StringWriter writer = new StringWriter();
+
+        try (final CDataXmlStreamWriter sw = new CDataXmlStreamWriter(
+                XMLOutputFactory.newInstance().createXMLStreamWriter(writer));) {
+
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
-            final Marshaller marshaller = ctx.createMarshaller();
-            if (adapters != null) {
-                for (XmlAdapter<?, ?> adapter : adapters) {
-                    marshaller.setAdapter(adapter);
-                }
-            }
-            final StringWriter writer = new StringWriter();
-            final XMLOutputFactory xof = XMLOutputFactory.newInstance();
-            final XMLStreamWriter sw = xof.createXMLStreamWriter(writer);
-            final XMLStreamWriterAdapter swa = new XMLStreamWriterAdapter(sw) {
-                @Override
-                public void writeCharacters(String text)
-                        throws XMLStreamException {
-                    if (text.startsWith("<![CDATA[") && text.endsWith("]]>")) {
-                        final String str = text.substring(9, text.length() - 3);
-                        super.writeCData(str);
-                    } else {
-                        super.writeCharacters(text);
-                    }
-                }
-            };
-            marshaller.marshal(data, swa);
-            return writer.toString();
-        } catch (final JAXBException | XMLStreamException ex) {
-            throw new RuntimeException("Error marshalling test data", ex);
+            JaxbUtils.marshal(ctx, data, adapters, writer);
+
+        } catch (XMLStreamException | FactoryConfigurationError | JAXBException ex) {
+            throw new RuntimeException(ex);
         }
+
+        return writer.toString();
     }
 
 }
