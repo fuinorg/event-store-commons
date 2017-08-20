@@ -66,7 +66,7 @@ public abstract class AbstractXmlTest {
                 XMLOutputFactory.newInstance().createXMLStreamWriter(writer));) {
 
             final JAXBContext ctx = JAXBContext.newInstance(classesToBeBound);
-            JaxbUtils.marshal(ctx, data, adapters, writer);
+            JaxbUtils.marshal(ctx, data, adapters, sw);
 
         } catch (XMLStreamException | FactoryConfigurationError | JAXBException ex) {
             throw new RuntimeException(ex);

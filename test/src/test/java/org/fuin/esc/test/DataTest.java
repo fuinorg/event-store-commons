@@ -127,6 +127,7 @@ public class DataTest extends AbstractXmlTest {
 
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
+        System.out.println(xml);
         final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
 
         // VERIFY
