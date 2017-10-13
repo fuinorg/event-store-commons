@@ -158,10 +158,10 @@ public interface ReadableEventStore extends EventStoreBasics {
         /**
          * List of events to handle.
          * 
-         * @param events
-         *            Events.
+         * @param currentSlice
+         *            Slice with events to handle.
          */
-        public void handle(List<CommonEvent> events);
+        public void handle(StreamEventsSlice currentSlice);
 
     }
 

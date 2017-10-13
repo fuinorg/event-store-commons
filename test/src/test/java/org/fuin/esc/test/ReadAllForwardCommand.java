@@ -22,10 +22,10 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 
 /**
@@ -94,8 +94,10 @@ public final class ReadAllForwardCommand implements TestCommand {
             es.readAllEventsForward(streamId, start, chunkSize,
                     new ReadableEventStore.ChunkEventHandler() {
                         @Override
-                        public void handle(final List<CommonEvent> events) {
-                            actualChunks.add(new ReadAllForwardChunk(events));
+                        public void handle(
+                                final StreamEventsSlice currentSlice) {
+                            actualChunks.add(new ReadAllForwardChunk(
+                                    currentSlice.getEvents()));
                         }
                     });
         } catch (final Exception ex) {

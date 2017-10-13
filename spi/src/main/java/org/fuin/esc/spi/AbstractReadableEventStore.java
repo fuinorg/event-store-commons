@@ -53,7 +53,7 @@ public abstract class AbstractReadableEventStore implements ReadableEventStore {
                 break;
             }
             if (currentSlice.getEvents().size() > 0) {
-                handler.handle(currentSlice.getEvents());
+                handler.handle(currentSlice);
             }
             sliceStart = currentSlice.getNextEventNumber();
         } while (!currentSlice.isEndOfStream());
