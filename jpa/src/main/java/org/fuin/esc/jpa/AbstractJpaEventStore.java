@@ -42,6 +42,7 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamState;
+import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
@@ -56,7 +57,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Read only JPA implementation of the event store.
  */
-public abstract class AbstractJpaEventStore implements ReadableEventStore {
+public abstract class AbstractJpaEventStore extends AbstractReadableEventStore implements ReadableEventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractJpaEventStore.class);
 

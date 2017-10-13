@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.api;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 /**
@@ -47,7 +49,8 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    public StreamEventsSlice readEventsForward(@NotNull StreamId streamId, int start, int count);
+    public StreamEventsSlice readEventsForward(@NotNull StreamId streamId,
+            int start, int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
@@ -71,7 +74,8 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    public StreamEventsSlice readEventsBackward(@NotNull StreamId streamId, int start, int count);
+    public StreamEventsSlice readEventsBackward(@NotNull StreamId streamId,
+            int start, int count);
 
     /**
      * Reads a single event from a stream.
@@ -119,5 +123,46 @@ public interface ReadableEventStore extends EventStoreBasics {
      */
     @NotNull
     public StreamState streamState(@NotNull StreamId streamId);
+
+    /**
+     * Reads all events until the end of the stream. A stream that does not
+     * exist will be ignored without any exception. CAUTION: Internally a
+     * {@link StreamNotFoundException} may be thrown. There might be cases in an
+     * EJB environment that require to configure this runtime exception as an
+     * application exceptions using the "ejb-jar.xml" (If you don't know what
+     * this is, just google for "ejb-jar.xml assembly-descriptor
+     * application-exception").
+     * 
+     * @param streamId
+     *            Unique identifier of the stream.
+     * @param startingAtEventNumber
+     *            First event number to read.
+     * @param chunkSize
+     *            Number of events to read in a single operation.
+     * @param handler
+     *            Handler to pass a read chunk to.
+     * 
+     * @throws StreamDeletedException
+     *             A stream with the given name previously existed but was
+     *             deleted.
+     */
+    public void readAllEventsForward(StreamId streamId,
+            int startingAtEventNumber, int chunkSize,
+            ChunkEventHandler handler);
+
+    /**
+     * Handles a number of events.
+     */
+    public interface ChunkEventHandler {
+
+        /**
+         * List of events to handle.
+         * 
+         * @param events
+         *            Events.
+         */
+        public void handle(List<CommonEvent> events);
+
+    }
 
 }

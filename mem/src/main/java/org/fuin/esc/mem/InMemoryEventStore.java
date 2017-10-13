@@ -42,15 +42,16 @@ import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.SubscribableEventStore;
 import org.fuin.esc.api.Subscription;
 import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 
 /**
  * In-memory implementation for unit testing. This implementation is **NOT**
  * thread-safe.
  */
-public final class InMemoryEventStore implements EventStore, SubscribableEventStore {
+public final class InMemoryEventStore extends AbstractReadableEventStore
+        implements EventStore, SubscribableEventStore {
 
     private Executor executor;
 
@@ -104,7 +105,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     }
 
     @Override
-    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+    public final void createStream(final StreamId streamId)
+            throws StreamAlreadyExistsException {
         // Do nothing
     }
 
@@ -115,18 +117,21 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         ensureOpen();
 
         final InternalStream internalStream = streams.get(streamId);
-        return (internalStream != null && internalStream.getState() == StreamState.ACTIVE);
+        return (internalStream != null
+                && internalStream.getState() == StreamState.ACTIVE);
 
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId,
+            final int eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
         ensureOpen();
 
-        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
+        final List<CommonEvent> events = getStream(streamId,
+                ExpectedVersion.ANY.getNo()).getEvents();
         if (events.size() - 1 < eventNumber) {
             throw new EventNotFoundException(streamId, eventNumber);
         }
@@ -135,8 +140,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId,
+            final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -147,7 +152,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         if (streamId == StreamId.ALL) {
             events = all;
         } else {
-            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
+            events = getStream(streamId, ExpectedVersion.ANY.getNo())
+                    .getEvents();
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
@@ -158,13 +164,14 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         final int nextEventNumber = (start + result.size());
         final boolean endOfStream = (result.size() < count);
 
-        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);
+        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
+                endOfStream);
 
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
+            final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -175,7 +182,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         if (streamId == StreamId.ALL) {
             events = all;
         } else {
-            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
+            events = getStream(streamId, ExpectedVersion.ANY.getNo())
+                    .getEvents();
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
@@ -192,11 +200,13 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         }
         final boolean endOfStream = (start - count) < 0;
 
-        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);
+        return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
+                endOfStream);
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expected, final boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final int expected,
+            final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
@@ -205,7 +215,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
             throw new StreamReadOnlyException(streamId);
         }
         if (streamId == StreamId.ALL) {
-            throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
+            throw new IllegalArgumentException(
+                    "It's not possible to delete the 'all' stream");
         }
 
         final InternalStream stream = streams.get(streamId);
@@ -231,23 +242,26 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
             throw new StreamDeletedException(streamId);
         }
         // StreamState.ACTIVE
-        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
-            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
+        if (expected != ExpectedVersion.ANY.getNo()
+                && expected != stream.getVersion()) {
+            throw new WrongExpectedVersionException(streamId, expected,
+                    stream.getVersion());
         }
         stream.delete(hardDelete);
 
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId,
+            final boolean hardDelete) {
 
         deleteStream(streamId, ExpectedVersion.ANY.getNo(), hardDelete);
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -268,15 +282,17 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         if (stream.getState() == StreamState.SOFT_DELETED) {
             stream.undelete();
         }
-        if (expectedVersion != ExpectedVersion.ANY.getNo() && expectedVersion != stream.getVersion()) {
+        if (expectedVersion != ExpectedVersion.ANY.getNo()
+                && expectedVersion != stream.getVersion()) {
             // Test for idempotency
-            final StreamEventsSlice slice = readEventsBackward(streamId, stream.getVersion(),
-                    toAppend.size());
+            final StreamEventsSlice slice = readEventsBackward(streamId,
+                    stream.getVersion(), toAppend.size());
             final List<CommonEvent> events = slice.getEvents();
             if (EscSpiUtils.eventsEqual(events, toAppend)) {
                 return stream.getVersion();
             }
-            throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
+            throw new WrongExpectedVersionException(streamId, expectedVersion,
+                    stream.getVersion());
         }
 
         all.addAll(toAppend);
@@ -289,22 +305,25 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final CommonEvent... events) {
 
-        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
+        return appendToStream(streamId, expectedVersion,
+                EscSpiUtils.asList(events));
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final List<CommonEvent> toAppend) {
+    public final int appendToStream(final StreamId streamId,
+            final List<CommonEvent> toAppend) {
 
         return appendToStream(streamId, ExpectedVersion.ANY.getNo(), toAppend);
 
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
+    public final int appendToStream(final StreamId streamId,
+            final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
 
@@ -313,7 +332,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
     }
 
     @Override
-    public final Subscription subscribeToStream(final StreamId streamId, final int eventNumber,
+    public final Subscription subscribeToStream(final StreamId streamId,
+            final int eventNumber,
             final BiConsumer<Subscription, CommonEvent> onEvent,
             final BiConsumer<Subscription, Exception> onDrop) {
 
@@ -322,12 +342,13 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         Contract.requireArgNotNull("onDrop", onDrop);
         ensureOpen();
 
-        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
+        final List<CommonEvent> events = getStream(streamId,
+                ExpectedVersion.ANY.getNo()).getEvents();
         final Integer lastEventNumber = events.size();
         final int subscriberId = subscriptions.size();
 
-        final InMemorySubscription subscription = new InMemorySubscription(subscriberId, streamId,
-                lastEventNumber);
+        final InMemorySubscription subscription = new InMemorySubscription(
+                subscriberId, streamId, lastEventNumber);
 
         List<InternalSubscription> list = subscriptions.get(streamId);
         if (list == null) {
@@ -348,12 +369,15 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         Contract.requireArgNotNull("subscription", subscription);
         ensureOpen();
         if (!(subscription instanceof InMemorySubscription)) {
-            throw new IllegalArgumentException("Can only handle subscriptions of type "
-                    + InMemorySubscription.class.getSimpleName() + ", not: ");
+            throw new IllegalArgumentException(
+                    "Can only handle subscriptions of type "
+                            + InMemorySubscription.class.getSimpleName()
+                            + ", not: ");
         }
         final InMemorySubscription inMemSubscription = (InMemorySubscription) subscription;
 
-        final List<InternalSubscription> list = subscriptions.get(subscription.getStreamId());
+        final List<InternalSubscription> list = subscriptions
+                .get(subscription.getStreamId());
         if (list != null) {
             final int idx = indexOf(list, inMemSubscription);
             if (idx > -1) {
@@ -389,18 +413,22 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         }
     }
 
-    private void notifyListeners(final StreamId streamId, final List<CommonEvent> events, final int idx) {
+    private void notifyListeners(final StreamId streamId,
+            final List<CommonEvent> events, final int idx) {
 
         if ((idx > -1) && (idx < events.size())) {
 
-            final List<InternalSubscription> internalSubscriptions = subscriptions.get(streamId);
+            final List<InternalSubscription> internalSubscriptions = subscriptions
+                    .get(streamId);
             if (internalSubscriptions != null) {
-                final Iterator<InternalSubscription> it = internalSubscriptions.iterator();
+                final Iterator<InternalSubscription> it = internalSubscriptions
+                        .iterator();
                 while (it.hasNext()) {
                     final InternalSubscription internalSubscription = it.next();
                     final BiConsumer<Subscription, CommonEvent> eventListener = internalSubscription
                             .getEventListener();
-                    final InMemorySubscription subscription = internalSubscription.getSubscription();
+                    final InMemorySubscription subscription = internalSubscription
+                            .getSubscription();
                     final List<CommonEvent> copy = new ArrayList<>(events);
                     executor.execute(new Runnable() {
                         @Override
@@ -417,11 +445,13 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
 
     }
 
-    private int indexOf(final List<InternalSubscription> list, final InMemorySubscription inMemSubscription) {
+    private int indexOf(final List<InternalSubscription> list,
+            final InMemorySubscription inMemSubscription) {
         return list.indexOf(new InternalSubscription(inMemSubscription));
     }
 
-    private InternalStream getStream(final StreamId streamId, final int expected) {
+    private InternalStream getStream(final StreamId streamId,
+            final int expected) {
         final InternalStream stream = streams.get(streamId);
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
@@ -432,8 +462,10 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
         if (stream.getState() == StreamState.HARD_DELETED) {
             throw new StreamDeletedException(streamId);
         }
-        if (expected != ExpectedVersion.ANY.getNo() && expected != stream.getVersion()) {
-            throw new WrongExpectedVersionException(streamId, expected, stream.getVersion());
+        if (expected != ExpectedVersion.ANY.getNo()
+                && expected != stream.getVersion()) {
+            throw new WrongExpectedVersionException(streamId, expected,
+                    stream.getVersion());
         }
         return stream;
     }
@@ -514,7 +546,8 @@ public final class InMemoryEventStore implements EventStore, SubscribableEventSt
          */
         public final void undelete() {
             if (state != StreamState.SOFT_DELETED) {
-                throw new IllegalStateException("Undelete impossible, state was: " + state);
+                throw new IllegalStateException(
+                        "Undelete impossible, state was: " + state);
             }
             this.state = StreamState.ACTIVE;
         }

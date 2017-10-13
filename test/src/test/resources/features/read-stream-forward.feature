@@ -39,3 +39,27 @@ Scenario: Append and read multiple
     | Stream Name           | Start | Count | Result From  | Result Next | End Of Stream | Result Event Id 1                    | Result Event Id 2                    | Result Event Id 3                    |
     | AppendMultipleForward | 0     | 3     | 0            | 3           | false         | 26d53452-30a8-473b-b5cc-58650265dfb3 | 6e4f3687-ccec-496b-8c22-c3848e6f2250 | 2ce79b07-020c-4908-ad6f-cd63498d4c9f |
     | AppendMultipleForward | 3     | 3     | 3            | 5           | true          | cf27403b-f701-4288-9668-6173e9dbce71 | ce75244f-c3f6-44a0-a263-c94abf0ac480 | -                                    |
+
+Scenario: Append and read all
+    Given the stream "AppendAllForward" does not exist
+    When I append the following events in the given order
+    | Stream Name      | Expected Version   |  Event Id                             |
+    | AppendAllForward | NO_OR_EMPTY_STREAM |  26d53452-30a8-473b-b5cc-58650265dfb3 |
+    | AppendAllForward | 0                  |  6e4f3687-ccec-496b-8c22-c3848e6f2250 |
+    | AppendAllForward | 1                  |  2ce79b07-020c-4908-ad6f-cd63498d4c9f |
+    | AppendAllForward | 2                  |  cf27403b-f701-4288-9668-6173e9dbce71 |
+    | AppendAllForward | 3                  |  ce75244f-c3f6-44a0-a263-c94abf0ac480 |
+    Then reading all events from stream "AppendAllForward" starting at position 0 with chunk size 3 should have the following results
+    | Result Event Id 1                    | Result Event Id 2                    | Result Event Id 3                    |
+    | 26d53452-30a8-473b-b5cc-58650265dfb3 | 6e4f3687-ccec-496b-8c22-c3848e6f2250 | 2ce79b07-020c-4908-ad6f-cd63498d4c9f |
+    | cf27403b-f701-4288-9668-6173e9dbce71 | ce75244f-c3f6-44a0-a263-c94abf0ac480 | -                                    |
+    And reading all events from stream "AppendAllForward" starting at position 1 with chunk size 3 should have the following results
+    | Result Event Id 1                    | Result Event Id 2                    | Result Event Id 3                    |
+    | 6e4f3687-ccec-496b-8c22-c3848e6f2250 | 2ce79b07-020c-4908-ad6f-cd63498d4c9f | cf27403b-f701-4288-9668-6173e9dbce71 |
+    | ce75244f-c3f6-44a0-a263-c94abf0ac480 | -                                    | -                                    |
+    And reading all events from stream "AppendAllForward" starting at position 2 with chunk size 2 should have the following results
+    | Result Event Id 1                    | Result Event Id 2                    | 
+    | 2ce79b07-020c-4908-ad6f-cd63498d4c9f | cf27403b-f701-4288-9668-6173e9dbce71 |
+    | ce75244f-c3f6-44a0-a263-c94abf0ac480 | -                                    | 
+    
+

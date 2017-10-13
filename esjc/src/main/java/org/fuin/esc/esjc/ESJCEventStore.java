@@ -37,6 +37,7 @@ import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
 import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
@@ -56,7 +57,8 @@ import com.github.msemys.esjc.WriteResult;
  * (http://www.geteventstore.com) using the esjc
  * (https://github.com/msemys/esjc) API.
  */
-public final class ESJCEventStore implements EventStore {
+public final class ESJCEventStore extends AbstractReadableEventStore
+        implements EventStore {
 
     private final com.github.msemys.esjc.EventStore es;
 
@@ -80,7 +82,8 @@ public final class ESJCEventStore implements EventStore {
      *            'application/json' with 'utf-8' encoding).
      */
     public ESJCEventStore(@NotNull final com.github.msemys.esjc.EventStore es,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
+            @NotNull final SerializerRegistry serRegistry,
+            @NotNull final DeserializerRegistry desRegistry,
             @NotNull final EnhancedMimeType targetContentType) {
         super();
         Contract.requireArgNotNull("es", es);
@@ -88,7 +91,8 @@ public final class ESJCEventStore implements EventStore {
         Contract.requireArgNotNull("desRegistry", desRegistry);
         Contract.requireArgNotNull("targetContentType", targetContentType);
         this.es = es;
-        this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry, targetContentType);
+        this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry,
+                targetContentType);
         this.ed2ceConv = new RecordedEvent2CommonEventConverter(desRegistry);
         this.open = false;
     }
@@ -119,36 +123,43 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+    public final void createStream(final StreamId streamId)
+            throws StreamAlreadyExistsException {
         // Do nothing as the operation is not supported
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final CommonEvent... events)
-            throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId,
+            final CommonEvent... events) throws StreamNotFoundException,
+            StreamDeletedException, StreamReadOnlyException {
         return appendToStream(streamId, -2, EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final CommonEvent... events) throws StreamNotFoundException, StreamDeletedException,
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final CommonEvent... events)
+            throws StreamNotFoundException, StreamDeletedException,
             WrongExpectedVersionException, StreamReadOnlyException {
-        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
+        return appendToStream(streamId, expectedVersion,
+                EscSpiUtils.asList(events));
     }
 
     @Override
-    public int appendToStream(final StreamId streamId, final List<CommonEvent> events)
-            throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException {
+    public int appendToStream(final StreamId streamId,
+            final List<CommonEvent> events) throws StreamNotFoundException,
+            StreamDeletedException, StreamReadOnlyException {
         return appendToStream(streamId, -2, events);
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
-            final List<CommonEvent> commonEvents)
-            throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException {
+    public final int appendToStream(final StreamId streamId,
+            final int expectedVersion, final List<CommonEvent> commonEvents)
+            throws StreamDeletedException, WrongExpectedVersionException,
+            StreamReadOnlyException {
 
         Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        Contract.requireArgMin("expectedVersion", expectedVersion,
+                ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
         ensureOpen();
 
@@ -159,13 +170,15 @@ public final class ESJCEventStore implements EventStore {
         try {
             final Iterable<EventData> eventDataIt = asEventData(commonEvents);
             final WriteResult result = es.appendToStream(streamId.asString(),
-                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion), eventDataIt).get();
+                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
+                    eventDataIt).get();
             return result.nextExpectedVersion;
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
                 // TODO Add actual version instead of NULL if ES returns this
                 // some day
-                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+                throw new WrongExpectedVersionException(streamId,
+                        expectedVersion, null);
             }
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
                 throw new StreamDeletedException(streamId);
@@ -178,11 +191,13 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expectedVersion,
-            final boolean hardDelete) throws StreamDeletedException, WrongExpectedVersionException {
+    public final void deleteStream(final StreamId streamId,
+            final int expectedVersion, final boolean hardDelete)
+            throws StreamDeletedException, WrongExpectedVersionException {
 
         Contract.requireArgNotNull("streamId", streamId);
-        Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        Contract.requireArgMin("expectedVersion", expectedVersion,
+                ExpectedVersion.ANY.getNo());
         ensureOpen();
 
         if (streamId.isProjection()) {
@@ -190,13 +205,15 @@ public final class ESJCEventStore implements EventStore {
         }
 
         try {
-            es.deleteStream(streamId.asString(), com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
+            es.deleteStream(streamId.asString(),
+                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
                     hardDelete).get();
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
                 // TODO Add actual version instead of NULL if ES returns this
                 // some day
-                throw new WrongExpectedVersionException(streamId, expectedVersion, null);
+                throw new WrongExpectedVersionException(streamId,
+                        expectedVersion, null);
             }
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.StreamDeletedException) {
                 throw new StreamDeletedException(streamId);
@@ -209,7 +226,8 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final boolean hardDelete)
+    public final void deleteStream(final StreamId streamId,
+            final boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException {
 
         deleteStream(streamId, ANY.getNo(), hardDelete);
@@ -217,8 +235,8 @@ public final class ESJCEventStore implements EventStore {
     }
 
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsForward(final StreamId streamId,
+            final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -227,7 +245,9 @@ public final class ESJCEventStore implements EventStore {
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
-                    .readStreamEventsForward(streamId.asString(), start, count, true).get();
+                    .readStreamEventsForward(streamId.asString(), start, count,
+                            true)
+                    .get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
                 throw new StreamDeletedException(streamId);
             }
@@ -236,16 +256,18 @@ public final class ESJCEventStore implements EventStore {
             }
             final List<CommonEvent> events = asCommonEvents(slice.events);
             final boolean endOfStream = count > events.size();
-            return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber, endOfStream);
+            return new StreamEventsSlice(slice.fromEventNumber, events,
+                    slice.nextEventNumber, endOfStream);
         } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Error waiting for read forward result", ex);
+            throw new RuntimeException("Error waiting for read forward result",
+                    ex);
         }
 
     }
 
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
-            final int count) {
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId,
+            final int start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -254,7 +276,9 @@ public final class ESJCEventStore implements EventStore {
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
-                    .readStreamEventsBackward(streamId.asString(), start, count, true).get();
+                    .readStreamEventsBackward(streamId.asString(), start, count,
+                            true)
+                    .get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
                 throw new StreamDeletedException(streamId);
             }
@@ -267,23 +291,26 @@ public final class ESJCEventStore implements EventStore {
             if (endOfStream) {
                 nextEventNumber = 0;
             }
-            return new StreamEventsSlice(slice.fromEventNumber, events, nextEventNumber, endOfStream);
+            return new StreamEventsSlice(slice.fromEventNumber, events,
+                    nextEventNumber, endOfStream);
         } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Error waiting for read forward result", ex);
+            throw new RuntimeException("Error waiting for read forward result",
+                    ex);
         }
 
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId,
+            final int eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
         ensureOpen();
 
         try {
-            final EventReadResult eventReadResult = es.readEvent(streamId.asString(), eventNumber, true)
-                    .get();
+            final EventReadResult eventReadResult = es
+                    .readEvent(streamId.asString(), eventNumber, true).get();
             if (eventReadResult.status == EventReadStatus.NoStream) {
                 throw new StreamNotFoundException(streamId);
             }
@@ -295,7 +322,8 @@ public final class ESJCEventStore implements EventStore {
             }
             return asCommonEvent(eventReadResult.event);
         } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Error waiting for read forward result", ex);
+            throw new RuntimeException("Error waiting for read forward result",
+                    ex);
         }
 
     }
@@ -308,7 +336,8 @@ public final class ESJCEventStore implements EventStore {
 
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es
-                    .readStreamEventsForward(streamId.asString(), 0, 1, false).get();
+                    .readStreamEventsForward(streamId.asString(), 0, 1, false)
+                    .get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
                 return false;
             }
@@ -317,7 +346,8 @@ public final class ESJCEventStore implements EventStore {
             }
             return true;
         } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Error waiting for read forward result", ex);
+            throw new RuntimeException("Error waiting for read forward result",
+                    ex);
         }
 
     }
@@ -331,9 +361,11 @@ public final class ESJCEventStore implements EventStore {
         try {
 
             final com.github.msemys.esjc.StreamEventsSlice slice = es
-                    .readStreamEventsForward(streamId.asString(), 0, 1, false).get();
+                    .readStreamEventsForward(streamId.asString(), 0, 1, false)
+                    .get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
-                final StreamMetadataResult result = es.getStreamMetadata(streamId.asString()).get();
+                final StreamMetadataResult result = es
+                        .getStreamMetadata(streamId.asString()).get();
                 if (result.isStreamDeleted) {
                     return StreamState.HARD_DELETED;
                 }
@@ -345,7 +377,8 @@ public final class ESJCEventStore implements EventStore {
             return StreamState.ACTIVE;
 
         } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Error waiting for read forward result", ex);
+            throw new RuntimeException("Error waiting for read forward result",
+                    ex);
         }
 
     }
@@ -358,7 +391,8 @@ public final class ESJCEventStore implements EventStore {
         return list;
     }
 
-    private List<CommonEvent> asCommonEvents(final List<ResolvedEvent> resolvedEvents) {
+    private List<CommonEvent> asCommonEvents(
+            final List<ResolvedEvent> resolvedEvents) {
         final List<CommonEvent> list = new ArrayList<>(resolvedEvents.size());
         for (final ResolvedEvent resolvedEvent : resolvedEvents) {
             list.add(asCommonEvent(resolvedEvent));
