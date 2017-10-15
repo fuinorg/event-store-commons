@@ -200,12 +200,20 @@ public final class Data implements ValueObject, Serializable {
 
         // We can only handle JSON...
         if (isJson()) {
-            return (T) Json.createReader(new StringReader(content))
-                    .readObject();
+            try {
+                return (T) Json.createReader(new StringReader(content))
+                        .readObject();
+            } catch (final RuntimeException ex) {
+                throw new RuntimeException("Error parsing json content: '" + content + "'", ex);
+            }
         }
         // ...or XML
         if (isXml()) {
-            return unmarshal(content, adapters, classesToBeBound);
+            try {
+                return unmarshal(content, adapters, classesToBeBound);
+            } catch (final RuntimeException ex) {
+                throw new RuntimeException("Error parsing xml content: '" + content + "'", ex);
+            }
         }
         // ...or TEXT
         return (T) content;
