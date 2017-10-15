@@ -25,6 +25,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
@@ -106,9 +107,26 @@ public final class Events implements Serializable {
      */
     public List<CommonEvent> asCommonEvents(
             final Class<?>... classesToBeBound) {
+        return asCommonEvents(null, classesToBeBound);
+    }
+
+    /**
+     * Returns this object as a list of common event objects.
+     * 
+     * @param adapters
+     *            In case the XML JAXB unmarshalling is used, you can optionally
+     *            pass some adapters here.
+     * @param classesToBeBound
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
+     * 
+     * @return Converted list.
+     */
+    public List<CommonEvent> asCommonEvents(final XmlAdapter<?, ?>[] adapters,
+            final Class<?>... classesToBeBound) {
         final List<CommonEvent> list = new ArrayList<CommonEvent>();
         for (final Event event : events) {
-            list.add(event.asCommonEvent(classesToBeBound));
+            list.add(event.asCommonEvent(adapters, classesToBeBound));
         }
         return list;
     }

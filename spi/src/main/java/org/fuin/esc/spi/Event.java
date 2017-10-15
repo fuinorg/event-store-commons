@@ -23,12 +23,13 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.Nullable;
@@ -133,13 +134,30 @@ public final class Event implements Serializable, ValueObject {
      * @return Converted object.
      */
     public final CommonEvent asCommonEvent(final Class<?>... classesToBeBound) {
+        return asCommonEvent(null, classesToBeBound);
+    }
+
+    /**
+     * Returns this object as a common event object.
+     * 
+     * @param adapters
+     *            In case the XML JAXB unmarshalling is used, you can optionally
+     *            pass some adapters here.
+     * @param classesToBeBound
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
+     * 
+     * @return Converted object.
+     */
+    public final CommonEvent asCommonEvent(final XmlAdapter<?, ?>[] adapters,
+            final Class<?>... classesToBeBound) {
         final Object m;
         if (getMeta() == null) {
             m = null;
         } else {
-            m = getMeta().unmarshalContent(classesToBeBound);
+            m = getMeta().unmarshalContent(adapters, classesToBeBound);
         }
-        final Object d = getData().unmarshalContent(classesToBeBound);
+        final Object d = getData().unmarshalContent(adapters, classesToBeBound);
         if (getMeta() == null) {
             return new SimpleCommonEvent(getId(),
                     new TypeName(getData().getType()), d);

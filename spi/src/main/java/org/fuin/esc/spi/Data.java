@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -168,9 +169,29 @@ public final class Data implements ValueObject, Serializable {
      * @param <T>
      *            Type expected to be returned.
      */
-    @SuppressWarnings("unchecked")
     public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {
+        return unmarshalContent(null, classesToBeBound);
+    }
 
+    /**
+     * Unmarshals the content into an object. Content is required to be
+     * "application/xml", "application/json" or "text/plain".
+     *
+     * @param adapters
+     *            In case the XML JAXB unmarshalling is used, you can optionally
+     *            pass some adapters here.
+     * @param classesToBeBound
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
+     * 
+     * @return Object created from content.
+     * 
+     * @param <T>
+     *            Type expected to be returned.
+     */
+    @SuppressWarnings("unchecked")
+    public final <T> T unmarshalContent(final XmlAdapter<?, ?>[] adapters,
+            final Class<?>... classesToBeBound) {
         if (!(isJson() || isXml() || isText())) {
             throw new IllegalStateException(
                     "Can only unmarshal JSON, XML or TEXT content, not: "
@@ -184,7 +205,7 @@ public final class Data implements ValueObject, Serializable {
         }
         // ...or XML
         if (isXml()) {
-            return unmarshal(content, classesToBeBound);
+            return unmarshal(content, adapters, classesToBeBound);
         }
         // ...or TEXT
         return (T) content;
