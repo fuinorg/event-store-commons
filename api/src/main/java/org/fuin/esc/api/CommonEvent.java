@@ -57,7 +57,7 @@ public interface CommonEvent {
      * 
      * @return Never changing unique event meta data type name.
      */
-    @NotNull
+    @Nullable
     public TypeName getMetaType();
     
     /**

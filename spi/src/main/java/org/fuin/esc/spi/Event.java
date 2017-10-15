@@ -58,7 +58,6 @@ public final class Event implements Serializable, ValueObject {
     private Data data;
 
     /** The meta data. */
-    @NotNull
     @XmlElement(name = "meta")
     private Data meta;
 
@@ -69,6 +68,20 @@ public final class Event implements Serializable, ValueObject {
         super();
     }
 
+    /**
+     * Constructor without XML meta data.
+     * 
+     * @param id
+     *            The ID of the event, used as part of the idempotent write
+     *            check.
+     * @param data
+     *            Event data.
+     * 
+     */
+    public Event(@NotNull final EventId id, @NotNull final Data data) {
+        this(id, data, null);
+    }
+    
     /**
      * Constructor with XML meta data.
      * 
@@ -119,7 +132,7 @@ public final class Event implements Serializable, ValueObject {
      * 
      * @return Meta data.
      */
-    @NotNull
+    @Nullable
     public final Data getMeta() {
         return meta;
     }
@@ -212,6 +225,9 @@ public final class Event implements Serializable, ValueObject {
     public static Event valueOf(final CommonEvent selEvent) {
         final Data data = Data.valueOf(selEvent.getDataType().asBaseType(),
                 selEvent.getData());
+        if (selEvent.getMeta() == null) {
+            return new Event(selEvent.getId(), data);
+        }
         final Data meta = Data.valueOf("meta", selEvent.getMeta());
         return new Event(selEvent.getId(), data, meta);
     }
