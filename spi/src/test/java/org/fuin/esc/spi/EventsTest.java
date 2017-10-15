@@ -18,44 +18,41 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import org.apache.commons.io.IOUtils;
+import org.fuin.esc.api.EventId;
 import org.junit.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
 /**
- * Test for {@link EscEvent} class.
+ * Tests the {@link Events} class.
  */
-//CHECKSTYLE:OFF Test
-public class EscEventTest {
+// CHECKSTYLE:OFF Test
+public class EventsTest extends AbstractXmlTest {
 
     @Test
     public final void testUnMarshal() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils
-                .toString(this.getClass().getResourceAsStream("/esc-event.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/events.xml"));
 
         // TEST
-        final EscEvent testee = unmarshal(expectedXml, EscEvent.class, EscMeta.class, MyMeta.class,
-                MyEvent.class, Base64Data.class);
+        final Events testee = unmarshal(expectedXml, Events.class);
 
         // VERIFY
         assertThat(testee).isNotNull();
-        assertThat(testee.getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
-        assertThat(testee.getEventType()).isEqualTo("MyEvent");
-        assertThat(testee.getData()).isNotNull();
-        assertThat(testee.getData().getObj()).isInstanceOf(MyEvent.class);
-        assertThat(testee.getMeta()).isNotNull();
-        assertThat(testee.getMeta().getObj()).isNotNull();
-        assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
+        assertThat(testee.getEvents()).isNotNull();
+        assertThat(testee.getEvents().size()).isEqualTo(2);
+        assertThat(testee.getEvents().get(0).getId()).isEqualTo(new EventId("7ab8e400-373b-4f65-96e1-96b78a791a42"));
+        assertThat(testee.getEvents().get(1).getId()).isEqualTo(new EventId("35ae2b63-c820-4cea-8ad6-0d25e4519390"));
 
         // TEST
-        final String xml = marshal(testee, EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class,
-                Base64Data.class);
+        final String xml = marshalToStr(testee, createXmlAdapter(), Events.class);
+        System.out.println(xml);
 
         // VERIFY
         final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
@@ -63,5 +60,9 @@ public class EscEventTest {
 
     }
 
+    private XmlAdapter<?, ?>[] createXmlAdapter() {
+        return new XmlAdapter[] {};
+    }
+    
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON

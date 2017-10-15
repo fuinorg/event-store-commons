@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
 import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
@@ -33,14 +33,15 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
 import org.fuin.utils4j.CDataXmlAdapter;
 
 /**
- * Represents a block of data in a serialized form.
+ * Helper class that allows sending the data of an event as XML directly to the
+ * event store. Represents a block of data in a serialized form. This class
+ * might be useful for tests. It's not used in the 'esc-spi' code itself
  */
 @Immutable
 @XmlRootElement(name = "data")
@@ -77,11 +78,13 @@ public final class Data implements ValueObject, Serializable {
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
-     *            Internet Media Type with encoding and version that classifies the data.
+     *            Internet Media Type with encoding and version that classifies
+     *            the data.
      * @param content
      *            Content.
      */
-    public Data(@NotNull final String type, @NotNull final EnhancedMimeType mimeType,
+    public Data(@NotNull final String type,
+            @NotNull final EnhancedMimeType mimeType,
             @NotNull final String content) {
         super();
 
@@ -153,12 +156,12 @@ public final class Data implements ValueObject, Serializable {
     }
 
     /**
-     * Unmarshals the content into an object. Content is required to be "application/xml", "application/json"
-     * or "text/plain".
+     * Unmarshals the content into an object. Content is required to be
+     * "application/xml", "application/json" or "text/plain".
      * 
      * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass the classes for the content
-     *            here.
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
      * 
      * @return Object created from content.
      * 
@@ -169,12 +172,15 @@ public final class Data implements ValueObject, Serializable {
     public final <T> T unmarshalContent(final Class<?>... classesToBeBound) {
 
         if (!(isJson() || isXml() || isText())) {
-            throw new IllegalStateException("Can only unmarshal JSON, XML or TEXT content, not: " + mimeType);
+            throw new IllegalStateException(
+                    "Can only unmarshal JSON, XML or TEXT content, not: "
+                            + mimeType);
         }
 
         // We can only handle JSON...
         if (isJson()) {
-            return (T) Json.createReader(new StringReader(content)).readObject();
+            return (T) Json.createReader(new StringReader(content))
+                    .readObject();
         }
         // ...or XML
         if (isXml()) {
@@ -186,8 +192,9 @@ public final class Data implements ValueObject, Serializable {
 
     @Override
     public final String toString() {
-        return new ToStringBuilder(this).append("type", type).append("mimeType", mimeType)
-                .append("content", content).toString();
+        return new ToStringBuilder(this).append("type", type)
+                .append("mimeType", mimeType).append("content", content)
+                .toString();
     }
 
     /**

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
 import java.io.Serializable;
 
@@ -35,8 +35,10 @@ import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
- * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
- * <code>id</code>.
+ * Helper class that allows sending an event as XML directly to the event store.
+ * The event is uniquely identified by a UUID. It's equals and hash code methods
+ * are defined on the <code>id</code>. This class might be useful for tests.
+ * It's not used in the 'esc-spi' code itself
  */
 @Immutable
 @XmlRootElement(name = "event")
@@ -70,14 +72,16 @@ public final class Event implements Serializable, ValueObject {
      * Constructor with XML meta data.
      * 
      * @param id
-     *            The ID of the event, used as part of the idempotent write check.
+     *            The ID of the event, used as part of the idempotent write
+     *            check.
      * @param data
      *            Event data.
      * @param meta
      *            Meta data.
      * 
      */
-    public Event(@NotNull final EventId id, @NotNull final Data data, @Nullable final Data meta) {
+    public Event(@NotNull final EventId id, @NotNull final Data data,
+            @Nullable final Data meta) {
         super();
 
         Contract.requireArgNotNull("id", id);
@@ -123,8 +127,8 @@ public final class Event implements Serializable, ValueObject {
      * Returns this object as a common event object.
      * 
      * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass the classes for the content
-     *            here.
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
      * 
      * @return Converted object.
      */
@@ -137,10 +141,11 @@ public final class Event implements Serializable, ValueObject {
         }
         final Object d = getData().unmarshalContent(classesToBeBound);
         if (getMeta() == null) {
-            return new SimpleCommonEvent(getId(), new TypeName(getData().getType()), d);
+            return new SimpleCommonEvent(getId(),
+                    new TypeName(getData().getType()), d);
         }
-        return new SimpleCommonEvent(getId(), new TypeName(getData().getType()), d, new TypeName(getMeta()
-                .getType()), m);
+        return new SimpleCommonEvent(getId(), new TypeName(getData().getType()),
+                d, new TypeName(getMeta().getType()), m);
     }
 
     // CHECKSTYLE:OFF Generated code
@@ -174,8 +179,8 @@ public final class Event implements Serializable, ValueObject {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("id", id).append("data", data).append("meta", meta)
-                .toString();
+        return new ToStringBuilder(this).append("id", id).append("data", data)
+                .append("meta", meta).toString();
     }
 
     /**
@@ -187,7 +192,8 @@ public final class Event implements Serializable, ValueObject {
      * @return New instance.
      */
     public static Event valueOf(final CommonEvent selEvent) {
-        final Data data = Data.valueOf(selEvent.getDataType().asBaseType(), selEvent.getData());
+        final Data data = Data.valueOf(selEvent.getDataType().asBaseType(),
+                selEvent.getData());
         final Data meta = Data.valueOf("meta", selEvent.getMeta());
         return new Event(selEvent.getId(), data, meta);
     }

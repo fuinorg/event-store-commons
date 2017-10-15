@@ -1,39 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Events>
-    <Event>
-        <EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
-        <EventType>MyEvent</EventType>
-        <Data>
-            <Base64>eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9</Base64>
-        </Data>
-        <MetaData>
-            <esc-meta>
-                <data-type>MyEvent</data-type>
-                <data-content-type>application/json; version=1; encoding=utf-8;transfer-encoding=base64</data-content-type>
-                <meta-type>MyMeta</meta-type>
-                <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
-                <my-meta>
-                    <user>abc</user>
-                </my-meta>
-            </esc-meta>
-        </MetaData>
-    </Event>
-    <Event>
-        <EventId>c198a02e-126e-4fbb-910c-918abf39a4a6</EventId>
-        <EventType>MyEvent</EventType>
-        <Data>
-            <my-event id="68616d90-cf72-4c2a-b913-32bf6e6506ed" description="Hello, XML!" />
-        </Data>
-        <MetaData>
-            <esc-meta>
-                <data-type>MyEvent</data-type>
-                <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
-                <meta-type>MyMeta</meta-type>
-                <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
-                <my-meta>
-                    <user>abc</user>
-                </my-meta>
-            </esc-meta>
-        </MetaData>
-    </Event>
-</Events>
+<events>
+    <event id="7ab8e400-373b-4f65-96e1-96b78a791a42">
+        <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>
+    </event>
+    <event id="35ae2b63-c820-4cea-8ad6-0d25e4519390">
+        <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+    </event>
+</events>

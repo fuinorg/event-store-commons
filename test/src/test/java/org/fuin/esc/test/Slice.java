@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.spi.Event;
 import org.fuin.objects4j.common.Immutable;
 
 /**

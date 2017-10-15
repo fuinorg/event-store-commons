@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,10 +28,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.spi.EscSpiUtils;
 
 /**
- * Multiple events.
+ * Helper class that allows sending multiple events as XML directly to the event
+ * store. It a wrapper to allow an XML list of events. This class might be
+ * useful for tests. It's not used in the 'esc-spi' code itself
  */
 @XmlRootElement(name = "events")
 public final class Events implements Serializable {
@@ -98,12 +99,13 @@ public final class Events implements Serializable {
      * Returns this object as a list of common event objects.
      * 
      * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass the classes for the content
-     *            here.
+     *            In case the XML JAXB unmarshalling is used, you have to pass
+     *            the classes for the content here.
      * 
      * @return Converted list.
      */
-    public List<CommonEvent> asCommonEvents(final Class<?>... classesToBeBound) {
+    public List<CommonEvent> asCommonEvents(
+            final Class<?>... classesToBeBound) {
         final List<CommonEvent> list = new ArrayList<CommonEvent>();
         for (final Event event : events) {
             list.add(event.asCommonEvent(classesToBeBound));

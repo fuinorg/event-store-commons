@@ -36,7 +36,7 @@ public class EscEventsTest {
     public final void testUnMarshal() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/events.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.xml"));
 
         // TEST
         final EscEvents testee = unmarshal(expectedXml, EscEvents.class, MyMeta.class, MyEvent.class,

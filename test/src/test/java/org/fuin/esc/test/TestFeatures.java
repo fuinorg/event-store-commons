@@ -52,6 +52,7 @@ import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscEvent;
 import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
+import org.fuin.esc.spi.Events;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;

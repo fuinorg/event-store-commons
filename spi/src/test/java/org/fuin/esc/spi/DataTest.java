@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.test;
+package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
@@ -29,8 +29,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.units4j.Units4JUtils;
 import org.junit.After;
 import org.junit.Before;
