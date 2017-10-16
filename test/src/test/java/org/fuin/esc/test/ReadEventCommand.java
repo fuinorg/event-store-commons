@@ -20,6 +20,8 @@ package org.fuin.esc.test;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
@@ -79,8 +81,9 @@ public final class ReadEventCommand implements TestCommand {
      * @param expectedException
      *            The exception that is expected, an empty string or "-".
      */
-    public ReadEventCommand(@NotNull final String streamName, final int eventNumber,
-            final String expectedEventXml, final String expectedException) {
+    public ReadEventCommand(@NotNull final String streamName,
+            final int eventNumber, final String expectedEventXml,
+            final String expectedException) {
         super();
         this.streamName = streamName;
         this.eventNumber = eventNumber;
@@ -89,7 +92,8 @@ public final class ReadEventCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
+    public void init(final String currentEventStoreImplType,
+            final EventStore eventstore) {
         this.es = eventstore;
         this.streamName = currentEventStoreImplType + "_" + streamName;
 
@@ -97,14 +101,15 @@ public final class ReadEventCommand implements TestCommand {
         expectedEventXml = EscTestUtils.emptyAsNull(expectedEventXml);
 
         streamId = new SimpleStreamId(streamName);
-        expectedExceptionClass = EscTestUtils.exceptionForName(expectedException);        
+        expectedExceptionClass = EscTestUtils
+                .exceptionForName(expectedException);
         final Event event;
         if (expectedEventXml == null) {
             event = null;
             expectedEvent = null;
         } else {
             event = unmarshal(expectedEventXml, Event.class);
-            expectedEvent = event.asCommonEvent(BookAddedEvent.class);
+            expectedEvent = event.asCommonEvent(createCtx());
         }
 
     }
@@ -120,7 +125,8 @@ public final class ReadEventCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        if (!EscTestUtils.isExpectedType(expectedExceptionClass, actualException)) {
+        if (!EscTestUtils.isExpectedType(expectedExceptionClass,
+                actualException)) {
             return false;
         }
         return EscTestUtils.sameContent(expectedEvent, actualEvent);
@@ -128,11 +134,13 @@ public final class ReadEventCommand implements TestCommand {
 
     @Override
     public final String getFailureDescription() {
-        if (!EscTestUtils.isExpectedType(expectedExceptionClass, actualException)) {
-            return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass,
-                    actualException);
+        if (!EscTestUtils.isExpectedType(expectedExceptionClass,
+                actualException)) {
+            return EscTestUtils.createExceptionFailureMessage(streamId,
+                    expectedExceptionClass, actualException);
         }
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedEvent, actualEvent);
+        return EscTestUtils.createExceptionFailureMessage(streamId,
+                expectedEvent, actualEvent);
     }
 
     @Override
@@ -144,9 +152,19 @@ public final class ReadEventCommand implements TestCommand {
 
     @Override
     public final String toString() {
-        return "DeleteCommand [streamName=" + streamName + ", eventNumber=" + eventNumber
-                + ", expectedEvent=" + expectedEvent + ", actualEvent=" + actualEvent
-                + ", expectedException=" + expectedException + ", actualException=" + actualException + "]";
+        return "DeleteCommand [streamName=" + streamName + ", eventNumber="
+                + eventNumber + ", expectedEvent=" + expectedEvent
+                + ", actualEvent=" + actualEvent + ", expectedException="
+                + expectedException + ", actualException=" + actualException
+                + "]";
+    }
+
+    private JAXBContext createCtx() {
+        try {
+            return JAXBContext.newInstance(BookAddedEvent.class);
+        } catch (final JAXBException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

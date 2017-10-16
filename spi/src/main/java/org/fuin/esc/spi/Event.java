@@ -20,10 +20,10 @@ package org.fuin.esc.spi;
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
@@ -81,7 +81,7 @@ public final class Event implements Serializable, ValueObject {
     public Event(@NotNull final EventId id, @NotNull final Data data) {
         this(id, data, null);
     }
-    
+
     /**
      * Constructor with XML meta data.
      * 
@@ -140,37 +140,20 @@ public final class Event implements Serializable, ValueObject {
     /**
      * Returns this object as a common event object.
      * 
-     * @param classesToBeBound
+     * @param ctx
      *            In case the XML JAXB unmarshalling is used, you have to pass
-     *            the classes for the content here.
+     *            the JAXB context here.
      * 
      * @return Converted object.
      */
-    public final CommonEvent asCommonEvent(final Class<?>... classesToBeBound) {
-        return asCommonEvent(null, classesToBeBound);
-    }
-
-    /**
-     * Returns this object as a common event object.
-     * 
-     * @param adapters
-     *            In case the XML JAXB unmarshalling is used, you can optionally
-     *            pass some adapters here.
-     * @param classesToBeBound
-     *            In case the XML JAXB unmarshalling is used, you have to pass
-     *            the classes for the content here.
-     * 
-     * @return Converted object.
-     */
-    public final CommonEvent asCommonEvent(final XmlAdapter<?, ?>[] adapters,
-            final Class<?>... classesToBeBound) {
+    public final CommonEvent asCommonEvent(final JAXBContext ctx) {
         final Object m;
         if (getMeta() == null) {
             m = null;
         } else {
-            m = getMeta().unmarshalContent(adapters, classesToBeBound);
+            m = getMeta().unmarshalContent(ctx);
         }
-        final Object d = getData().unmarshalContent(adapters, classesToBeBound);
+        final Object d = getData().unmarshalContent(ctx);
         if (getMeta() == null) {
             return new SimpleCommonEvent(getId(),
                     new TypeName(getData().getType()), d);

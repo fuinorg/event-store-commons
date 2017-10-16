@@ -34,6 +34,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -288,7 +290,7 @@ public class TestFeatures {
             final String eventsXml) {
         final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events
-                .asCommonEvents(BookAddedEvent.class);
+                .asCommonEvents(createCtx());
 
         final TestCommand command = new AppendToStreamCommand(streamName,
                 version, null, commonEvents);
@@ -441,6 +443,14 @@ public class TestFeatures {
                     transaction.commit();
                 }
             }
+        }
+    }
+
+    private JAXBContext createCtx() {
+        try {
+            return JAXBContext.newInstance(BookAddedEvent.class);
+        } catch (final JAXBException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
