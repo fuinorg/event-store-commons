@@ -204,6 +204,7 @@
 					<arguments>
 						<argument>--mem-db=TRUE</argument>
 						<argument>--run-projections=All</argument>
+						<argument>--log=/tmp/log-eventstore</argument>
 					</arguments>
 				</configuration>
 			</plugin>
