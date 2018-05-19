@@ -61,7 +61,7 @@ public class JpaData implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
-    protected JpaData() {
+    protected JpaData() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

@@ -38,7 +38,7 @@ public final class TypeName extends AbstractStringValueObject {
     /**
      * Protected default constructor for deserialization.
      */
-    protected TypeName() {
+    protected TypeName() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

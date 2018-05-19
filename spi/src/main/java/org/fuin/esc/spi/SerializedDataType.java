@@ -38,7 +38,7 @@ public final class SerializedDataType extends AbstractStringValueObject {
     /**
      * Protected default constructor for deserialization.
      */
-    protected SerializedDataType() {
+    protected SerializedDataType() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

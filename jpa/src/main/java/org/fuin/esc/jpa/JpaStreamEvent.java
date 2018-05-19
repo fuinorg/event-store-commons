@@ -45,7 +45,7 @@ public abstract class JpaStreamEvent {
     /**
      * Protected default constructor only required for JPA.
      */
-    protected JpaStreamEvent() {
+    protected JpaStreamEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

@@ -51,7 +51,7 @@ public final class SimpleCommonEvent implements CommonEvent {
     /**
      * Protected constructor for deserialization.
      */
-    protected SimpleCommonEvent() {
+    protected SimpleCommonEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

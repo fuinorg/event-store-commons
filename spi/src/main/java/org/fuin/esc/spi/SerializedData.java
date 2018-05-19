@@ -49,7 +49,7 @@ public class SerializedData implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
-    protected SerializedData() {
+    protected SerializedData() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

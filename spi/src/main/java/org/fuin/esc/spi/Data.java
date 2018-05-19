@@ -70,7 +70,7 @@ public final class Data implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
-    protected Data() {
+    protected Data() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

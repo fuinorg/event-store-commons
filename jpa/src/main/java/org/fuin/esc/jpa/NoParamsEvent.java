@@ -54,7 +54,7 @@ public class NoParamsEvent extends JpaStreamEvent {
     /**
      * Protected default constructor only required for JPA.
      */
-    protected NoParamsEvent() {
+    protected NoParamsEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

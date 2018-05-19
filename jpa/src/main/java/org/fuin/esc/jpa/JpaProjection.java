@@ -43,7 +43,7 @@ public class JpaProjection {
     /**
      * Protected default constructor for JPA.
      */
-    protected JpaProjection() {
+    protected JpaProjection() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

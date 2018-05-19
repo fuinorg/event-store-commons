@@ -64,7 +64,7 @@ public final class Event implements Serializable, ValueObject {
     /**
      * Protected constructor for deserialization.
      */
-    protected Event() {
+    protected Event() { //NOSONAR Ignore uninitialized fields
         super();
     }
 

@@ -80,7 +80,7 @@ public class JpaEvent {
     /**
      * Protected default constructor only required for JPA.
      */
-    protected JpaEvent() {
+    protected JpaEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
 
