@@ -22,7 +22,7 @@ import java.util.Objects;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.StreamId;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

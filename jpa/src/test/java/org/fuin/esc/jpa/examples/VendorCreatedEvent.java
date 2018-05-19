@@ -21,8 +21,6 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.fuin.objects4j.common.NeverNull;
-
 /**
  * A vendor entity was created.
  */
@@ -58,7 +56,7 @@ public final class VendorCreatedEvent {
      * 
      * @return Unique vendor identifier.
      */
-    @NeverNull
+    @NotNull
     public final String getId() {
         return id;
     }

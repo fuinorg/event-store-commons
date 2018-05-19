@@ -33,7 +33,6 @@ import org.fuin.objects4j.common.Contract;
 @Table(name = NoParamsEvent.NO_PARAMS_EVENTS_TABLE)
 @Entity
 @IdClass(NoParamsEventPrimaryKey.class)
-@SuppressWarnings("checkstyle:designforextension")
 public class NoParamsEvent extends JpaStreamEvent {
 
     /** Name of the table. */

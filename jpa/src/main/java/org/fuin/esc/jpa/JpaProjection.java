@@ -30,7 +30,6 @@ import org.fuin.objects4j.common.Contract;
  */
 @Table(name = "PROJECTIONS")
 @Entity
-@SuppressWarnings("checkstyle:designforextension")
 public class JpaProjection {
 
     @Id

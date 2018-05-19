@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 import org.w3c.dom.Node;
 
 /**

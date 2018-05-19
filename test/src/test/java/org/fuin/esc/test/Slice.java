@@ -32,7 +32,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.spi.Event;
-import org.fuin.objects4j.common.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A slice of data from a stream.

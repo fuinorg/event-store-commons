@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Example meta data. .

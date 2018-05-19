@@ -18,7 +18,7 @@
 package org.fuin.esc.jpa;
 
 import org.fuin.esc.api.StreamId;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Package utilities.

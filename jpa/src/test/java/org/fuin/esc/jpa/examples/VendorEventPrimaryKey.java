@@ -22,7 +22,6 @@ import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Primary key for the vendor event table.
@@ -65,7 +64,7 @@ public class VendorEventPrimaryKey implements Serializable {
      * 
      * @return Unique vendor identifier.
      */
-    @NeverNull
+    @NotNull
     public final String getVendorId() {
         return vendorId;
     }
@@ -75,7 +74,7 @@ public class VendorEventPrimaryKey implements Serializable {
      * 
      * @return Order of the event in the stream.
      */
-    @NeverNull
+    @NotNull
     public final Integer getEventNumber() {
         return eventNumber;
     }

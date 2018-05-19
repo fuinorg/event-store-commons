@@ -31,7 +31,6 @@ import org.fuin.objects4j.common.Contract;
  */
 @Table(name = "NO_PARAMS_STREAMS")
 @Entity
-@SuppressWarnings("checkstyle:designforextension")
 public class NoParamsStream extends JpaStream {
 
     @Id

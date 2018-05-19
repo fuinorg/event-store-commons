@@ -20,7 +20,7 @@ package org.fuin.esc.api;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Signals that a an attempt was made to write to a stream that is read only.

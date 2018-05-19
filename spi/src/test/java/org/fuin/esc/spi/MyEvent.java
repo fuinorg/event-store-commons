@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

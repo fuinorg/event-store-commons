@@ -20,7 +20,6 @@ package org.fuin.esc.eshttp;
 import static org.fuin.esc.spi.EscSpiUtils.nodeToString;
 
 import org.apache.commons.codec.binary.Base64;
-import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.Deserializer;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;

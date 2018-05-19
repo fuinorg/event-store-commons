@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.esc.api.EventId;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 import com.migesok.jaxb.adapter.javatime.ZonedDateTimeXmlAdapter;
 
@@ -44,7 +44,6 @@ import com.migesok.jaxb.adapter.javatime.ZonedDateTimeXmlAdapter;
 @Table(name = JpaEvent.TABLE_NAME)
 @Entity
 @SequenceGenerator(name = "EventEntrySequenceGenerator", sequenceName = "EVENTS_SEQ", allocationSize = 1000)
-@SuppressWarnings("checkstyle:designforextension")
 public class JpaEvent {
 
     /** SQL table name. */

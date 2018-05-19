@@ -23,7 +23,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NeverNull;
 
 /**
  * Identifies a stream event based on a stream name and an event number.
@@ -64,7 +63,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
      * 
      * @return Unique stream identifier name.
      */
-    @NeverNull
+    @NotNull
     public final String getStreamName() {
         return streamName;
     }
@@ -74,7 +73,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
      * 
      * @return Order of the event in the stream.
      */
-    @NeverNull
+    @NotNull
     public final Integer getEventNumber() {
         return eventNumber;
     }

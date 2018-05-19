@@ -35,7 +35,7 @@ import org.fuin.esc.spi.SerDeserializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.ToJsonCapable;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

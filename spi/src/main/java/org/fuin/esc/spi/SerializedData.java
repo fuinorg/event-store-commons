@@ -23,8 +23,7 @@ import java.util.Arrays;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
+import javax.annotation.concurrent.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
@@ -82,7 +81,7 @@ public class SerializedData implements ValueObject, Serializable {
      * 
      * @return Unique and never changing type name.
      */
-    @NeverNull
+    @NotNull
     public final SerializedDataType getType() {
         return new SerializedDataType(type);
     }
@@ -92,7 +91,7 @@ public class SerializedData implements ValueObject, Serializable {
      * 
      * @return Mime type.
      */
-    @NeverNull
+    @NotNull
     public final EnhancedMimeType getMimeType() {
         return EnhancedMimeType.create(mimeType);
     }
@@ -102,7 +101,7 @@ public class SerializedData implements ValueObject, Serializable {
      * 
      * @return Raw data.
      */
-    @NeverNull
+    @NotNull
     public final byte[] getRaw() {
         return raw;
     }

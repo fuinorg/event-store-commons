@@ -20,11 +20,11 @@ package org.fuin.esc.api;
 import java.io.Serializable;
 import java.util.UUID;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.UUIDStr;
 import org.fuin.objects4j.vo.UUIDStrValidator;
 import org.fuin.objects4j.vo.ValueObjectWithBaseType;

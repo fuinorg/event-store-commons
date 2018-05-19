@@ -28,7 +28,6 @@ import org.fuin.esc.api.StreamState;
  * Base class for all concrete streams.
  */
 @MappedSuperclass
-@SuppressWarnings("checkstyle:designforextension")
 public abstract class JpaStream {
 
     @Column(name = "STATE", nullable = false)

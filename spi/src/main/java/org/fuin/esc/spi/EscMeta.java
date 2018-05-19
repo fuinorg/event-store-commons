@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * A structure that contains the user's meta data and the system's meta

@@ -28,7 +28,6 @@ import org.fuin.objects4j.common.Contract;
  * Connects the stream with the event entries.
  */
 @MappedSuperclass
-@SuppressWarnings("checkstyle:designforextension")
 public abstract class JpaStreamEvent {
 
     /** SQL EVENT ID column name. */

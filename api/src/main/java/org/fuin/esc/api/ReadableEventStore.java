@@ -17,8 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 /**

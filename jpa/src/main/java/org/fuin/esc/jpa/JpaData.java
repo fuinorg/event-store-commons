@@ -30,8 +30,7 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.NeverNull;
+import javax.annotation.concurrent.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**
@@ -110,7 +109,7 @@ public class JpaData implements ValueObject, Serializable {
      * 
      * @return Unique and never changing type name.
      */
-    @NeverNull
+    @NotNull
     public final TypeName getTypeName() {
         return new TypeName(type);
     }
@@ -120,7 +119,7 @@ public class JpaData implements ValueObject, Serializable {
      * 
      * @return Mime type.
      */
-    @NeverNull
+    @NotNull
     public final EnhancedMimeType getMimeType() {
         return EnhancedMimeType.create(mimeType);
     }
@@ -130,7 +129,7 @@ public class JpaData implements ValueObject, Serializable {
      * 
      * @return Raw data.
      */
-    @NeverNull
+    @NotNull
     public final byte[] getRaw() {
         return raw;
     }

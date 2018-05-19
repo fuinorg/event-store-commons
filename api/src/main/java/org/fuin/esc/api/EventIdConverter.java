@@ -19,7 +19,7 @@ package org.fuin.esc.api;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * XML Converter for event IDs.

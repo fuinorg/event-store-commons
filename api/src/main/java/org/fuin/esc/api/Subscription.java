@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Result of subscribing to a stream. The sub classes will contain

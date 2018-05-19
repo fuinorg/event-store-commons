@@ -25,8 +25,8 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.Nullable;
+import javax.annotation.concurrent.Immutable;
+import javax.annotation.Nullable;
 
 /**
  *
