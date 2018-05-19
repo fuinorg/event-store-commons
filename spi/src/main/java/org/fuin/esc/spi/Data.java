@@ -26,6 +26,7 @@ import java.io.StringReader;
 import javax.activation.MimeTypeParseException;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -181,8 +182,9 @@ public final class Data implements ValueObject, Serializable {
         // We can only handle JSON...
         if (isJson()) {
             try {
-                return (T) Json.createReader(new StringReader(content))
-                        .readObject();
+        	try (final JsonReader reader = Json.createReader(new StringReader(content))) {
+        	    return (T) reader.readObject();
+        	}
             } catch (final RuntimeException ex) {
                 throw new RuntimeException(
                         "Error parsing json content: '" + content + "'", ex);
