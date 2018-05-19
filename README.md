@@ -2,7 +2,7 @@
 Defines a common event store Java interface and provides some adapters (like for Greg Young's [event store](https://www.geteventstore.com/)) and implementations (like in-memory or file-based).
 
 [![Build Status](https://fuin-org.ci.cloudbees.com/job/event-store-commons/badge/icon)](https://fuin-org.ci.cloudbees.com/job/event-store-commons/)
-[![Coverage Status](https://coveralls.io/repos/fuinorg/event-store-commons/badge.svg)](https://coveralls.io/r/fuinorg/event-store-commons)
+[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=org.fuin.esc%3Aevent-store-commons&metric=coverage)](https://sonarcloud.io/dashboard?id=org.fuin.esc%3Aevent-store-commons)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fuin.esc/esc-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fuin.esc/esc-parent/)
 [![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
 [![Java Development Kit 1.8](https://img.shields.io/badge/JDK-1.8-green.svg)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
