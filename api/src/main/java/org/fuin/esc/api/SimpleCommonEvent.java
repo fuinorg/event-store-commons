@@ -89,7 +89,7 @@ public final class SimpleCommonEvent implements CommonEvent {
      * 
      */
     public SimpleCommonEvent(@NotNull final EventId id, @NotNull final TypeName dataType,
-            @NotNull final Object data, @Nullable final TypeName metaType, @Nullable final Object meta) {
+            @NotNull final Object data, @Nullable final TypeName metaType, @Nullable final Object meta) {//NOSONAR 
         super();
 
         Contract.requireArgNotNull("id", id);

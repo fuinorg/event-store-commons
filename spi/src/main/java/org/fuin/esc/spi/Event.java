@@ -95,7 +95,7 @@ public final class Event implements Serializable, ValueObject {
      * 
      */
     public Event(@NotNull final EventId id, @NotNull final Data data,
-            @Nullable final Data meta) {
+            @Nullable final Data meta) {//NOSONAR 
         super();
 
         Contract.requireArgNotNull("id", id);
