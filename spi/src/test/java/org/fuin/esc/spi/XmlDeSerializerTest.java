@@ -21,7 +21,7 @@ import org.fuin.units4j.TestOmitted;
 
 // CHECKSTYLE:OFF Test code
 @TestOmitted("Class will be moved later to utility library")
-public class XmlDeSerializerTest {
+public class XmlDeSerializerTest { //NOSONAR
 
 }
 // CHECKSTYLE:ON
