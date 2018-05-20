@@ -135,9 +135,11 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         }
         for (int i = 0; i < toAppend.size(); i++) {
             final JpaEvent eventEntry = asJpaEvent(toAppend.get(i));
-            getEm().persist(eventEntry);
-            final JpaStreamEvent streamEvent = stream.createEvent(streamId, eventEntry);
-            getEm().persist(streamEvent);
+            if (eventEntry != null) {
+                getEm().persist(eventEntry);
+                final JpaStreamEvent streamEvent = stream.createEvent(streamId, eventEntry);
+                getEm().persist(streamEvent);
+            }
         }
         return stream.getVersion();
 
