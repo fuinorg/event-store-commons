@@ -12,7 +12,7 @@ import com.github.msemys.esjc.EventStoreBuilder;
 import com.github.msemys.esjc.ExpectedVersion;
 import com.github.msemys.esjc.StreamMetadataResult;
 
-public class NativeDeleteTest {
+public class NativeDeleteExampleApp {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
 
