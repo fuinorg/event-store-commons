@@ -21,7 +21,7 @@ import org.fuin.units4j.TestOmitted;
 
 // CHECKSTYLE:OFF Test
 @TestOmitted("Tested with JpaEventStoreTest and 'esc-test' project")
-public class ReadableJpaEventStoreTest {
+public class ReadableJpaEventStoreTest { //NOSONAR
 
 }
 // CHECKSTYLE:ON
