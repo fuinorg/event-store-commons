@@ -41,7 +41,7 @@ public class NoParamsStream extends JpaStream {
     /**
      * Protected default constructor for JPA.
      */
-    protected NoParamsStream() {
+    protected NoParamsStream() { //NOSONAR Ignore uninitialized fields
         super();
     }
 
