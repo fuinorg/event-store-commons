@@ -184,7 +184,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
                 throw new StreamDeletedException(streamId);
             }
             throw new RuntimeException("Error executing append", ex);
-        } catch (InterruptedException ex) {
+        } catch (InterruptedException ex) { //NOSONAR
             throw new RuntimeException("Error waiting for append result", ex);
         }
 
@@ -219,7 +219,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
                 throw new StreamDeletedException(streamId);
             }
             throw new RuntimeException("Error executing delete", ex);
-        } catch (final InterruptedException ex) {
+        } catch (final InterruptedException ex) { //NOSONAR
             throw new RuntimeException("Error waiting for delete result", ex);
         }
 
