@@ -35,7 +35,7 @@ Defines a common event store Java interface and provides some adapters (like for
 ### Major changes
 
 | Version | Description |
-| ------- | ----------- |
+|:------- |:----------- |
 | 0.3.1-SNAPSHOT | Type of the event version changed from `int` to `long` |
 
 ### Snapshots
