@@ -23,6 +23,6 @@ import org.fuin.units4j.TestOmitted;
  * Test for {@link EscApiUtils}.
  */
 @TestOmitted("Just constants for now")
-public class EscApiUtilsTest {
+public class EscApiUtilsTest { //NOSONAR
 
 }
