@@ -129,15 +129,15 @@ public final class ESJCEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
+    public final long appendToStream(final StreamId streamId,
             final CommonEvent... events) throws StreamNotFoundException,
             StreamDeletedException, StreamReadOnlyException {
         return appendToStream(streamId, -2, EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events)
+    public final long appendToStream(final StreamId streamId,
+            final long expectedVersion, final CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException,
             WrongExpectedVersionException, StreamReadOnlyException {
         return appendToStream(streamId, expectedVersion,
@@ -145,19 +145,19 @@ public final class ESJCEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public int appendToStream(final StreamId streamId,
+    public long appendToStream(final StreamId streamId,
             final List<CommonEvent> events) throws StreamNotFoundException,
             StreamDeletedException, StreamReadOnlyException {
         return appendToStream(streamId, -2, events);
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> commonEvents)
+    public final long appendToStream(final StreamId streamId,
+            final long expectedVersion, final List<CommonEvent> commonEvents)
             throws StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException {
 
-        Contract.requireArgNotNull("streamId", streamId);
+        Contract.requireArgNotNull("streamId", streamId);        
         Contract.requireArgMin("expectedVersion", expectedVersion,
                 ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
@@ -169,8 +169,8 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
         try {
             final Iterable<EventData> eventDataIt = asEventData(commonEvents);
-            final WriteResult result = es.appendToStream(streamId.asString(),
-                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
+            final WriteResult result = es.appendToStream(streamId.asString(), 
+        	    expectedVersion,
                     eventDataIt).get();
             return result.nextExpectedVersion;
         } catch (final ExecutionException ex) {
@@ -192,7 +192,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
     @Override
     public final void deleteStream(final StreamId streamId,
-            final int expectedVersion, final boolean hardDelete)
+            final long expectedVersion, final boolean hardDelete)
             throws StreamDeletedException, WrongExpectedVersionException {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -206,7 +206,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
         try {
             es.deleteStream(streamId.asString(),
-                    com.github.msemys.esjc.ExpectedVersion.of(expectedVersion),
+                    expectedVersion,
                     hardDelete).get();
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof com.github.msemys.esjc.operation.WrongExpectedVersionException) {
@@ -236,7 +236,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
     @Override
     public final StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -267,7 +267,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
     @Override
     public final StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -286,7 +286,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
                 throw new StreamNotFoundException(streamId);
             }
             final List<CommonEvent> events = asCommonEvents(slice.events);
-            int nextEventNumber = slice.nextEventNumber;
+            long nextEventNumber = slice.nextEventNumber;
             final boolean endOfStream = (start - count < 0);
             if (endOfStream) {
                 nextEventNumber = 0;
@@ -302,7 +302,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore
 
     @Override
     public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) {
+            final long eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);

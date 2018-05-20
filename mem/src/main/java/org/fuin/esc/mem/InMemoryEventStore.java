@@ -124,7 +124,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
 
     @Override
     public final CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) {
+            final long eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
@@ -136,12 +136,12 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
             throw new EventNotFoundException(streamId, eventNumber);
         }
 
-        return events.get(eventNumber);
+        return events.get((int)eventNumber);
     }
 
     @Override
     public final StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -157,11 +157,11 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
         }
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
-        for (int i = start; (i < (start + count)) && (i < events.size()); i++) {
+        for (int i = (int) start; (i < (start + count)) && (i < events.size()); i++) {
             result.add(events.get(i));
         }
-        final int fromEventNumber = start;
-        final int nextEventNumber = (start + result.size());
+        final long fromEventNumber = start;
+        final long nextEventNumber = (start + result.size());
         final boolean endOfStream = (result.size() < count);
 
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber,
@@ -171,7 +171,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
 
     @Override
     public final StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -188,13 +188,13 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
         if (start < events.size()) {
-            for (int i = start; (i > (start - count)) && (i >= 0); i--) {
+            for (int i = (int) start; (i > (start - count)) && (i >= 0); i--) {
                 result.add(events.get(i));
             }
         }
 
-        final int fromEventNumber = start;
-        int nextEventNumber = start - result.size();
+        final long fromEventNumber = start;
+        long nextEventNumber = start - result.size();
         if (nextEventNumber < 0) {
             nextEventNumber = 0;
         }
@@ -205,7 +205,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expected,
+    public final void deleteStream(final StreamId streamId, final long expected,
             final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -260,8 +260,8 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> toAppend) {
+    public final long appendToStream(final StreamId streamId,
+            final long expectedVersion, final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -305,8 +305,8 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final long appendToStream(final StreamId streamId,
+            final long expectedVersion, final CommonEvent... events) {
 
         return appendToStream(streamId, expectedVersion,
                 EscSpiUtils.asList(events));
@@ -314,7 +314,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
+    public final long appendToStream(final StreamId streamId,
             final List<CommonEvent> toAppend) {
 
         return appendToStream(streamId, ExpectedVersion.ANY.getNo(), toAppend);
@@ -322,7 +322,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
+    public final long appendToStream(final StreamId streamId,
             final CommonEvent... events) {
 
         Contract.requireArgNotNull("events", events);
@@ -333,7 +333,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
 
     @Override
     public final Subscription subscribeToStream(final StreamId streamId,
-            final int eventNumber,
+            final long eventNumber,
             final BiConsumer<Subscription, CommonEvent> onEvent,
             final BiConsumer<Subscription, Exception> onDrop) {
 
@@ -344,7 +344,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
 
         final List<CommonEvent> events = getStream(streamId,
                 ExpectedVersion.ANY.getNo()).getEvents();
-        final Integer lastEventNumber = events.size();
+        final long lastEventNumber = events.size();
         final int subscriberId = subscriptions.size();
 
         final InMemorySubscription subscription = new InMemorySubscription(
@@ -414,7 +414,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     private void notifyListeners(final StreamId streamId,
-            final List<CommonEvent> events, final int idx) {
+            final List<CommonEvent> events, final long idx) {
 
         if ((idx > -1) && (idx < events.size())) {
 
@@ -433,8 +433,8 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
                     executor.execute(new Runnable() {
                         @Override
                         public void run() {
-                            for (int i = idx; i < copy.size(); i++) {
-                                eventListener.accept(subscription, copy.get(i));
+                            for (long i = idx; i < copy.size(); i++) {
+                                eventListener.accept(subscription, copy.get((int)i));
                             }
                         }
                     });
@@ -451,7 +451,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
     }
 
     private InternalStream getStream(final StreamId streamId,
-            final int expected) {
+            final long expected) {
         final InternalStream stream = streams.get(streamId);
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
@@ -516,7 +516,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore
          * 
          * @return Version.
          */
-        public final int getVersion() {
+        public final long getVersion() {
             return version;
         }
 

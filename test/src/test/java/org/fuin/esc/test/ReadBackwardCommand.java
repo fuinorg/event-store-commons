@@ -42,13 +42,13 @@ public final class ReadBackwardCommand implements TestCommand {
 
     private String streamName;
 
-    private int start;
+    private long start;
 
     private int count;
 
-    private int resultFrom;
+    private long resultFrom;
 
-    private int resultNext;
+    private long resultNext;
 
     private boolean endOfStream;
 
@@ -109,8 +109,8 @@ public final class ReadBackwardCommand implements TestCommand {
      * @param events
      *            Expected events.
      */
-    public ReadBackwardCommand(@NotNull final String streamName, final int start, final int count,
-            final int fromEventNumber, final int nextEventNumber, final boolean endOfStream,
+    public ReadBackwardCommand(@NotNull final String streamName, final long start, final int count,
+            final long fromEventNumber, final long nextEventNumber, final boolean endOfStream,
             @Nullable final String... events) {
         super();
         this.streamName = streamName;

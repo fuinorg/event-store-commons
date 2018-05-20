@@ -32,7 +32,7 @@ public class VendorEventPrimaryKey implements Serializable {
 
     private String vendorId;
 
-    private Integer eventNumber;
+    private Long eventNumber;
 
     /**
      * Default constructor for JPA. <b><i>CAUTION:</i> DO NOT USE IN APPLICATION
@@ -51,7 +51,7 @@ public class VendorEventPrimaryKey implements Serializable {
      *            Number of the event within the stream.
      */
     public VendorEventPrimaryKey(@NotNull final String vendorId,
-            @NotNull final Integer eventNumber) {
+            @NotNull final Long eventNumber) {
         super();
         Contract.requireArgNotNull("vendorId", vendorId);
         Contract.requireArgNotNull("nueventNumbermber", eventNumber);
@@ -75,7 +75,7 @@ public class VendorEventPrimaryKey implements Serializable {
      * @return Order of the event in the stream.
      */
     @NotNull
-    public final Integer getEventNumber() {
+    public final Long getEventNumber() {
         return eventNumber;
     }
 

@@ -42,7 +42,7 @@ public final class InMemorySubscription extends Subscription implements
      *            Last event seen on the stream.
      */
     public InMemorySubscription(final int subscriberId,
-            final StreamId streamId, final Integer lastEventNumber) {
+            final StreamId streamId, final Long lastEventNumber) {
         super(streamId, lastEventNumber);
         this.subscriberId = subscriberId;
     }

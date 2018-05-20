@@ -46,7 +46,7 @@ public final class DeleteCommand implements TestCommand {
 
     private StreamId streamId;
 
-    private int expectedIntVersion;
+    private long expectedIntVersion;
 
     private Class<? extends Exception> expectedExceptionClass;
 

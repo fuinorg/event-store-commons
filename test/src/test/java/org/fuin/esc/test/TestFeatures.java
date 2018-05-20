@@ -286,7 +286,7 @@ public class TestFeatures {
         whenAppendXmlEvents(streamName, ExpectedVersion.ANY.getNo(), eventsXml);
     }
 
-    private void whenAppendXmlEvents(final String streamName, final int version,
+    private void whenAppendXmlEvents(final String streamName, final long version,
             final String eventsXml) {
         final Events events = unmarshal(eventsXml, Events.class);
         final List<CommonEvent> commonEvents = events
@@ -299,7 +299,7 @@ public class TestFeatures {
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should return the following event$")
-    public void thenReadXmlEvent(final int eventNumber, final String streamName,
+    public void thenReadXmlEvent(final long eventNumber, final String streamName,
             final String expectedEventXml) {
 
         final TestCommand command = new ReadEventCommand(streamName,
@@ -310,7 +310,7 @@ public class TestFeatures {
     }
 
     @Then("^reading event (\\d+) from stream \"(.*?)\" should throw a \"(.*?)\"$")
-    public void thenReadingEventShouldThrow_a(int eventNumber,
+    public void thenReadingEventShouldThrow_a(long eventNumber,
             String streamName, String expectedException) {
         final TestCommand command = new ReadEventCommand(streamName,
                 eventNumber, null, expectedException);
@@ -351,7 +351,7 @@ public class TestFeatures {
 
     @Then("^reading all events from stream \"(.*?)\" starting at position (\\d+) with chunk size (\\d+) should have the following results$")
     public void thenReadingAllEventsFromStream(final String streamName,
-            final int startAtEventNo, final int chunkSize,
+            final long startAtEventNo, final int chunkSize,
             final List<ReadAllForwardChunk> expectedChunks) {
 
         final TestCommand command = new ReadAllForwardCommand(streamName,

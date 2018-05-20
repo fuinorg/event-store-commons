@@ -197,27 +197,27 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
+    public final long appendToStream(final StreamId streamId,
             final CommonEvent... events) {
         return appendToStream(streamId, -2, EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
-            final int expectedVersion, final CommonEvent... events) {
+    public final long appendToStream(final StreamId streamId,
+            final long expectedVersion, final CommonEvent... events) {
         return appendToStream(streamId, expectedVersion,
                 EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId,
+    public final long appendToStream(final StreamId streamId,
             final List<CommonEvent> events) {
         return appendToStream(streamId, -2, events);
     }
 
     @Override
-    public int appendToStream(final StreamId streamId,
-            final int expectedVersion, final List<CommonEvent> commonEvents)
+    public long appendToStream(final StreamId streamId,
+            final long expectedVersion, final List<CommonEvent> commonEvents)
             throws StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException {
 
@@ -256,7 +256,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
     }
 
     private void appendToStream(final StreamId streamId,
-            final int expectedVersion, final EnhancedMimeType mimeType,
+            final long expectedVersion, final EnhancedMimeType mimeType,
             final String content, final int count)
             throws StreamDeletedException, WrongExpectedVersionException {
 
@@ -314,7 +314,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
     }
 
     @Override
-    public void deleteStream(final StreamId streamId, final int expectedVersion,
+    public void deleteStream(final StreamId streamId, final long expectedVersion,
             final boolean hardDelete) throws StreamNotFoundException,
             StreamDeletedException, WrongExpectedVersionException {
 
@@ -383,7 +383,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
 
     @Override
     public StreamEventsSlice readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -406,7 +406,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
 
     @Override
     public StreamEventsSlice readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -428,7 +428,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
 
     @Override
     public CommonEvent readEvent(final StreamId streamId,
-            final int eventNumber) {
+            final long eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
@@ -722,7 +722,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
     }
 
     private StreamEventsSlice readEvents(final StreamId streamId,
-            final boolean forward, final URI uri, final int start,
+            final boolean forward, final URI uri, final long start,
             final int count, final String msg, final boolean reverseOrder)
             throws InterruptedException, ExecutionException, IOException {
         LOG.debug(uri.toString());
@@ -765,7 +765,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
     }
 
     private StreamEventsSlice readEvents(final boolean forward,
-            final int fromEventNumber, final int count, final List<URI> uris,
+            final long fromEventNumber, final int count, final List<URI> uris,
             final boolean reverseOrder) {
         final List<CommonEvent> events = new ArrayList<>();
         if (reverseOrder) {
@@ -779,7 +779,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
                 events.add(readEvent(uri));
             }
         }
-        final int nextEventNumber;
+        final long nextEventNumber;
         final boolean endOfStream;
         if (forward) {
             nextEventNumber = fromEventNumber + events.size();
@@ -882,12 +882,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
         return request;
     }
 
-    private HttpPost createPost(final URI uri, final int expectedVersion,
+    private HttpPost createPost(final URI uri, final long expectedVersion,
             final String content) {
         return createPost(uri, expectedVersion, content, envelopeType);
     }
 
-    private static HttpPost createPost(final URI uri, final int expectedVersion,
+    private static HttpPost createPost(final URI uri, final long expectedVersion,
             final String content, final ESEnvelopeType envelopeType) {
         final HttpPost post = createPost(uri, content, envelopeType);
         post.setHeader("ES-ExpectedVersion", "" + expectedVersion);

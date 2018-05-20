@@ -71,7 +71,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId, int expectedVersion,
+    public CompletableFuture<Long> appendToStream(@NotNull StreamId streamId, long expectedVersion,
             @NotNull CommonEvent... events);
 
     /**
@@ -95,7 +95,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId,
+    public CompletableFuture<Long> appendToStream(@NotNull StreamId streamId,
             @NotNull CommonEvent... events);
 
     /**
@@ -122,7 +122,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId, int expectedVersion,
+    public CompletableFuture<Long> appendToStream(@NotNull StreamId streamId, long expectedVersion,
             @NotNull List<CommonEvent> events);
 
     /**
@@ -145,7 +145,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    public CompletableFuture<Integer> appendToStream(@NotNull StreamId streamId,
+    public CompletableFuture<Long> appendToStream(@NotNull StreamId streamId,
             @NotNull List<CommonEvent> events);
 
     /**
@@ -173,7 +173,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The expected version didn't match the actual version.
      */
     @NotNull
-    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, int expectedVersion,
+    public CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, long expectedVersion,
             boolean hardDelete);
 
     /**

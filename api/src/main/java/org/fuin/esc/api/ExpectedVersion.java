@@ -31,9 +31,9 @@ public enum ExpectedVersion {
     /** This specifies the expectation that target stream does not yet exist or is empty. */
     NO_OR_EMPTY_STREAM(-1);
 
-    private int no;
+    private long no;
 
-    private ExpectedVersion(final int no) {
+    private ExpectedVersion(final long no) {
         this.no = no;
     }
 
@@ -42,7 +42,7 @@ public enum ExpectedVersion {
      * 
      * @return Version value.
      */
-    public final int getNo() {
+    public final long getNo() {
         return no;
     }
 
@@ -75,7 +75,7 @@ public enum ExpectedVersion {
      * 
      * @return Value.
      */
-    public static int no(@Nullable final String name) {
+    public static long no(@Nullable final String name) {
         if (name == null) {
             return ANY.no;
         }

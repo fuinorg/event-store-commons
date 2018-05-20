@@ -34,9 +34,9 @@ import javax.annotation.Nullable;
 @Immutable
 public final class StreamEventsSlice {
 
-    private final int fromEventNumber;
+    private final long fromEventNumber;
 
-    private final int nextEventNumber;
+    private final long nextEventNumber;
 
     private final boolean endOfStream;
 
@@ -56,8 +56,8 @@ public final class StreamEventsSlice {
      * @param endOfStream
      *            Determines whether or not this is the end of the stream.
      */
-    public StreamEventsSlice(final int fromEventNumber,
-            @Nullable final List<CommonEvent> events, final int nextEventNumber,
+    public StreamEventsSlice(final long fromEventNumber,
+            @Nullable final List<CommonEvent> events, final long nextEventNumber,
             final boolean endOfStream) {
 
         this.fromEventNumber = fromEventNumber;
@@ -76,7 +76,7 @@ public final class StreamEventsSlice {
      * 
      * @return Event number.
      */
-    public int getFromEventNumber() {
+    public long getFromEventNumber() {
         return fromEventNumber;
     }
 
@@ -95,7 +95,7 @@ public final class StreamEventsSlice {
      * 
      * @return Next event number.
      */
-    public int getNextEventNumber() {
+    public long getNextEventNumber() {
         return nextEventNumber;
     }
 
@@ -116,8 +116,8 @@ public final class StreamEventsSlice {
         final int prime = 31;
         int result = 1;
         result = prime * result + (endOfStream ? 1231 : 1237);
-        result = prime * result + fromEventNumber;
-        result = prime * result + nextEventNumber;
+	result = prime * result + (int) (fromEventNumber ^ (fromEventNumber >>> 32));
+	result = prime * result + (int) (nextEventNumber ^ (nextEventNumber >>> 32));
         result = prime * result
                 + ((events == null) ? 0 : Arrays.hashCode(events.toArray()));
         return result;

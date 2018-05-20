@@ -84,23 +84,23 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
     
     @Override
-    public final int appendToStream(final StreamId streamId, final CommonEvent... events) {
+    public final long appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, ANY.getNo(), EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+    public final long appendToStream(final StreamId streamId, final long expectedVersion,
             final CommonEvent... events) {
         return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final List<CommonEvent> events) {
+    public final long appendToStream(final StreamId streamId, final List<CommonEvent> events) {
         return appendToStream(streamId, ANY.getNo(), events);
     }
 
     @Override
-    public final int appendToStream(final StreamId streamId, final int expectedVersion,
+    public final long appendToStream(final StreamId streamId, final long expectedVersion,
             final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -151,7 +151,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final int expected, final boolean hardDelete) {
+    public final void deleteStream(final StreamId streamId, final long expected, final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());

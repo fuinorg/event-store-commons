@@ -44,10 +44,10 @@ public final class Slice implements Serializable {
     private static final long serialVersionUID = 1000L;
 
     @XmlAttribute(name = "from-stream-no")
-    private int fromEventNumber;
+    private long fromEventNumber;
 
     @XmlAttribute(name = "next-stream-no")
-    private int nextEventNumber;
+    private long nextEventNumber;
 
     @XmlAttribute(name = "end-of-stream")
     private boolean endOfStream;
@@ -76,8 +76,8 @@ public final class Slice implements Serializable {
      * @param endOfStream
      *            Determines whether or not this is the end of the stream.
      */
-    public Slice(final int fromEventNumber, final List<Event> events,
-            final int nextEventNumber, final boolean endOfStream) {
+    public Slice(final long fromEventNumber, final List<Event> events,
+            final long nextEventNumber, final boolean endOfStream) {
 
         this.fromEventNumber = fromEventNumber;
         if (events == null || events.size() == 0) {
@@ -95,7 +95,7 @@ public final class Slice implements Serializable {
      * 
      * @return Event number.
      */
-    public int getFromEventNumber() {
+    public long getFromEventNumber() {
         return fromEventNumber;
     }
 
@@ -114,7 +114,7 @@ public final class Slice implements Serializable {
      * 
      * @return Next event number.
      */
-    public int getNextEventNumber() {
+    public long getNextEventNumber() {
         return nextEventNumber;
     }
 
@@ -135,8 +135,8 @@ public final class Slice implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + (endOfStream ? 1231 : 1237);
-        result = prime * result + fromEventNumber;
-        result = prime * result + nextEventNumber;
+	result = prime * result + (int) (fromEventNumber ^ (fromEventNumber >>> 32));
+	result = prime * result + (int) (nextEventNumber ^ (nextEventNumber >>> 32));
         result = prime * result
                 + ((events == null) ? 0 : Arrays.hashCode(events.toArray()));
         return result;

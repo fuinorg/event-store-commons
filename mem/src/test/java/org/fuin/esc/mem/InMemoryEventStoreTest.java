@@ -86,7 +86,7 @@ public class InMemoryEventStoreTest {
         final CommonEvent eventThree = event("8885c8c1-6148-4709-b816-018f72111559", "Three");
         final CommonEvent eventFour = event("4028e009-74eb-4a31-905a-3bdffb1046c0", "Four");
         final CommonEvent eventFive = event("9bfb6129-f503-49a7-b2d1-7a2edcefae9c", "Five");
-        final int version = testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
+        final long version = testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
                 eventOne, eventTwo, eventThree, eventFour, eventFive);
 
         // TEST Slice 1

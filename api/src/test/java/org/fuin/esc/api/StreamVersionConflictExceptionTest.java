@@ -33,9 +33,9 @@ public class StreamVersionConflictExceptionTest {
 
     private static final StreamId STREAM_ID = new SimpleStreamId("MyStream");
 
-    private static final int EXPECTED_VERSION = 1;
+    private static final long EXPECTED_VERSION = 1;
 
-    private static final int ACTUAL_VERSION = 2;
+    private static final long ACTUAL_VERSION = 2;
 
     private WrongExpectedVersionException testee;
 

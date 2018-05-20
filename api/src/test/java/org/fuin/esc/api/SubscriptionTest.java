@@ -29,7 +29,7 @@ public final class SubscriptionTest {
         
         // PREPARE
         final StreamId streamId = new SimpleStreamId("stream1");
-        final Integer lastEventNumber = 1;
+        final Long lastEventNumber = 1L;
         
         // TEST
         final Subscription testee = new Subscription(streamId, lastEventNumber) {

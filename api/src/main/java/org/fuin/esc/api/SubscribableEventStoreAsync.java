@@ -46,7 +46,7 @@ public interface SubscribableEventStoreAsync extends EventStoreBasicsAsync {
      * @return Future with subscription result.
      */
     @NotNull
-    public CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, int eventNumber,
+    public CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, long eventNumber,
             @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
             @NotNull BiConsumer<Subscription, Exception> onDrop);
 

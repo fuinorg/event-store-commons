@@ -49,8 +49,8 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<StreamEventsSlice> readEventsForward(@NotNull StreamId streamId, int start,
-            int count);
+    public CompletableFuture<StreamEventsSlice> readEventsForward(@NotNull StreamId streamId, long start,
+	    int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
@@ -74,8 +74,8 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<StreamEventsSlice> readEventsBackward(@NotNull StreamId streamId, int start,
-            int count);
+    public CompletableFuture<StreamEventsSlice> readEventsBackward(@NotNull StreamId streamId, long start,
+	    int count);
 
     /**
      * Reads a single event from a stream.
@@ -97,7 +97,7 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId, int eventNumber);
+    public CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId, long eventNumber);
 
     /**
      * Determines if a stream exists.

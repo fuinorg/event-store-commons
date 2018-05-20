@@ -35,7 +35,7 @@ public final class ReadAllForwardCommand implements TestCommand {
 
     private String streamName;
 
-    private int start;
+    private long start;
 
     private int chunkSize;
 
@@ -66,7 +66,7 @@ public final class ReadAllForwardCommand implements TestCommand {
      *            Expected chunks.
      */
     public ReadAllForwardCommand(@NotNull final String streamName,
-            final int start, final int chunkSize,
+            final long start, final int chunkSize,
             @NotNull final List<ReadAllForwardChunk> chunks) {
         super();
         this.streamName = streamName;

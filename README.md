@@ -32,6 +32,12 @@ Defines a common event store Java interface and provides some adapters (like for
 - [Event store with HTTP interface and JSON](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonExample.java)
 - [Event store with HTTP interface and mixed JSON/XML content](test/src/test/java/org/fuin/esc/test/examples/EsHttpMixedExample.java)
 
+### Major changes
+
+| Version | Description |
+| ------- | ----------- |
+| 0.3.1-SNAPSHOT | Type of the event version changed from `int` to `long` |
+
 ### Snapshots
 
 Snapshots can be found on the [OSS Sonatype Snapshots Repository](https://oss.sonatype.org/content/repositories/snapshots/org/fuin/esc/ "Snapshot Repository"). 

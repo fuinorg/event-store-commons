@@ -39,7 +39,7 @@ public final class NoParamsEventTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("Abc");
-        final Integer eventNumber = 3;
+        final Long eventNumber = 3L;
         final JpaEvent eventEntry = new JpaEvent();
         final NoParamsEvent testee = new NoParamsEvent(streamId, eventNumber, eventEntry);
 

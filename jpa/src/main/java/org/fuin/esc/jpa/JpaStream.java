@@ -34,7 +34,7 @@ public abstract class JpaStream {
     private int state = StreamState.ACTIVE.dbValue();
 
     @Column(name = "VERSION", nullable = false)
-    private int version = -1;
+    private long version = -1;
 
     /**
      * Returns the state of the stream.
@@ -73,7 +73,7 @@ public abstract class JpaStream {
      * 
      * @return Version.
      */
-    public int getVersion() {
+    public long getVersion() {
         return version;
     }
 
@@ -82,7 +82,7 @@ public abstract class JpaStream {
      * 
      * @return New version.
      */
-    public int incVersion() {
+    public long incVersion() {
         return ++version;
     }
 

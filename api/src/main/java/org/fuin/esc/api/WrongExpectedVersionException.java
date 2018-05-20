@@ -33,9 +33,9 @@ public final class WrongExpectedVersionException extends RuntimeException {
 
     private final StreamId streamId;
 
-    private final Integer expected;
+    private final Long expected;
 
-    private final Integer actual;
+    private final Long actual;
 
     /**
      * Constructor with all data.
@@ -48,7 +48,7 @@ public final class WrongExpectedVersionException extends RuntimeException {
      *            Actual version.
      */
     public WrongExpectedVersionException(@NotNull final StreamId streamId,
-            @NotNull final Integer expected, @Nullable final Integer actual) {
+            @NotNull final Long expected, @Nullable final Long actual) {
         // CHECKSTYLE:OFF:AvoidInlineConditionals OK here
         super("Expected version " + expected + " for stream '" + streamId
                 + (actual == null ? "'" : "', but was " + actual));
@@ -76,7 +76,7 @@ public final class WrongExpectedVersionException extends RuntimeException {
      * @return Expected version.
      */
     @NotNull
-    public final Integer getExpected() {
+    public final Long getExpected() {
         return expected;
     }
 
@@ -87,7 +87,7 @@ public final class WrongExpectedVersionException extends RuntimeException {
      *         tell us what version it expected.
      */
     @Nullable
-    public final Integer getActual() {
+    public final Long getActual() {
         return actual;
     }
 

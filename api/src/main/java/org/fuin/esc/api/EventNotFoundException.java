@@ -32,7 +32,7 @@ public final class EventNotFoundException extends RuntimeException {
 
     private final StreamId streamId;
 
-    private final int version;
+    private final long version;
 
     /**
      * Constructor with all data.
@@ -43,7 +43,7 @@ public final class EventNotFoundException extends RuntimeException {
      *            Number of the event that was not found.
      */
     public EventNotFoundException(@NotNull final StreamId streamId,
-            final int eventNumber) {
+            final long eventNumber) {
         super("Version " + eventNumber + " does not exist on stream '"
                 + streamId + "'");
 
@@ -68,7 +68,7 @@ public final class EventNotFoundException extends RuntimeException {
      * 
      * @return Number that was not found.
      */
-    public final int getVersion() {
+    public final long getVersion() {
         return version;
     }
 

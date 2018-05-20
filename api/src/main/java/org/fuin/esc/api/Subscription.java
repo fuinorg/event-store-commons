@@ -33,7 +33,7 @@ public abstract class Subscription implements Serializable {
 
     private final StreamId streamId;
 
-    private final Integer lastEventNumber;
+    private final Long lastEventNumber;
 
     /**
      * Constructor with all mandatory data.
@@ -44,7 +44,7 @@ public abstract class Subscription implements Serializable {
      *            Number of the last event written to the stream.
      */
     public Subscription(@NotNull final StreamId streamId,
-            @Nullable final Integer lastEventNumber) {
+            @Nullable final Long lastEventNumber) {
         this.streamId = streamId;
         this.lastEventNumber = lastEventNumber;
     }
@@ -65,7 +65,7 @@ public abstract class Subscription implements Serializable {
      * @return Event number.
      */
     @Nullable
-    public final Integer getLastEventNumber() {
+    public final Long getLastEventNumber() {
         return lastEventNumber;
     }
 

@@ -34,10 +34,10 @@ public abstract class AbstractReadableEventStore implements ReadableEventStore {
 
     @Override
     public final void readAllEventsForward(final StreamId streamId,
-            final int startingAtEventNumber, final int chunkSize,
+            final long startingAtEventNumber, final int chunkSize,
             final ChunkEventHandler handler) {
 
-        int sliceStart = startingAtEventNumber;
+        long sliceStart = startingAtEventNumber;
         StreamEventsSlice currentSlice;
         do {
             try {

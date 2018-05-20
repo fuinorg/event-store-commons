@@ -142,7 +142,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
         beginTransaction();
         try {
 
-            final int version = eventStore.appendToStream(streamId,
+            final long version = eventStore.appendToStream(streamId,
                     ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);
 
             // VERIFY

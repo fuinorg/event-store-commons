@@ -48,7 +48,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      */
     @NotNull
     public StreamEventsSlice readEventsForward(@NotNull StreamId streamId,
-            int start, int count);
+	    long start, int count);
 
     /**
      * Reads count Events from an Event Stream backwards (e.g. newest to oldest)
@@ -73,7 +73,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      */
     @NotNull
     public StreamEventsSlice readEventsBackward(@NotNull StreamId streamId,
-            int start, int count);
+	    long start, int count);
 
     /**
      * Reads a single event from a stream.
@@ -95,7 +95,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    public CommonEvent readEvent(@NotNull StreamId streamId, int eventNumber);
+    public CommonEvent readEvent(@NotNull StreamId streamId, long eventNumber);
 
     /**
      * Determines if a stream exists.
@@ -145,7 +145,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     public void readAllEventsForward(StreamId streamId,
-            int startingAtEventNumber, int chunkSize,
+	    long startingAtEventNumber, int chunkSize,
             ChunkEventHandler handler);
 
     /**

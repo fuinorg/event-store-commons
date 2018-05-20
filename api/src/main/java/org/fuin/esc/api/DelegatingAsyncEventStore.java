@@ -67,7 +67,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<CommonEvent> readEvent(final StreamId streamId, final int eventNumber) {
+    public final CompletableFuture<CommonEvent> readEvent(final StreamId streamId, final long eventNumber) {
 
         return CompletableFuture.supplyAsync(new Supplier<CommonEvent>() {
             @Override
@@ -80,7 +80,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public final CompletableFuture<StreamEventsSlice> readEventsForward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         return CompletableFuture.supplyAsync(new Supplier<StreamEventsSlice>() {
             @Override
@@ -93,7 +93,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public final CompletableFuture<StreamEventsSlice> readEventsBackward(final StreamId streamId,
-            final int start, final int count) {
+            final long start, final int count) {
 
         return CompletableFuture.supplyAsync(new Supplier<StreamEventsSlice>() {
             @Override
@@ -105,7 +105,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Void> deleteStream(final StreamId streamId, final int expected,
+    public final CompletableFuture<Void> deleteStream(final StreamId streamId, final long expected,
             final boolean hardDelete) {
 
         return CompletableFuture.runAsync(new Runnable() {
@@ -130,12 +130,12 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId, final int expectedVersion,
+    public final CompletableFuture<Long> appendToStream(final StreamId streamId, final long expectedVersion,
             final List<CommonEvent> toAppend) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Integer>() {
+        return CompletableFuture.supplyAsync(new Supplier<Long>() {
             @Override
-            public Integer get() {
+            public Long get() {
                 return delegate.appendToStream(streamId, expectedVersion, toAppend);
             }
         }, executor);
@@ -143,12 +143,12 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId, final int expectedVersion,
+    public final CompletableFuture<Long> appendToStream(final StreamId streamId, final long expectedVersion,
             final CommonEvent... events) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Integer>() {
+        return CompletableFuture.supplyAsync(new Supplier<Long>() {
             @Override
-            public Integer get() {
+            public Long get() {
                 return delegate.appendToStream(streamId, expectedVersion, events);
             }
         }, executor);
@@ -156,12 +156,12 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId,
+    public final CompletableFuture<Long> appendToStream(final StreamId streamId,
             final List<CommonEvent> toAppend) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Integer>() {
+        return CompletableFuture.supplyAsync(new Supplier<Long>() {
             @Override
-            public Integer get() {
+            public Long get() {
                 return delegate.appendToStream(streamId, toAppend);
             }
         }, executor);
@@ -169,12 +169,12 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     }
 
     @Override
-    public final CompletableFuture<Integer> appendToStream(final StreamId streamId,
+    public final CompletableFuture<Long> appendToStream(final StreamId streamId,
             final CommonEvent... events) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Integer>() {
+        return CompletableFuture.supplyAsync(new Supplier<Long>() {
             @Override
-            public Integer get() {
+            public Long get() {
                 return delegate.appendToStream(streamId, events);
             }
         }, executor);

@@ -52,7 +52,7 @@ public interface SubscribableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    public Subscription subscribeToStream(@NotNull StreamId streamId, int eventNumber,
+    public Subscription subscribeToStream(@NotNull StreamId streamId, long eventNumber,
             @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
             @NotNull BiConsumer<Subscription, Exception> onDrop);
 

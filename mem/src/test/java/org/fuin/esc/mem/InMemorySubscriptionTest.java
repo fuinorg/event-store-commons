@@ -38,7 +38,7 @@ public class InMemorySubscriptionTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
-        final Integer lastEventNumber = 1;
+        final long lastEventNumber = 1;
         final int subscriberId = 4711;
         final InMemorySubscription original = new InMemorySubscription(
                 subscriberId, streamId, lastEventNumber);

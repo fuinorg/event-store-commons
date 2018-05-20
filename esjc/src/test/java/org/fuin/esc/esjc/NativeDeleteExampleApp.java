@@ -25,10 +25,10 @@ public class NativeDeleteExampleApp {
             List<EventData> events = new ArrayList<>();
             events.add(EventData.newBuilder().eventId(UUID.randomUUID()).type("baz").data("dummy content")
                     .build());
-            es.appendToStream(streamId, ExpectedVersion.any(), events).join();
+            es.appendToStream(streamId, ExpectedVersion.ANY, events).join();
 
             // Hard delete
-            es.deleteStream(streamId, ExpectedVersion.any(), true).join();
+            es.deleteStream(streamId, ExpectedVersion.ANY, true).join();
 
             // Get status
             final StreamMetadataResult result = es.getStreamMetadata(streamId).get();

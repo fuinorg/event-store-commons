@@ -44,7 +44,7 @@ public class VendorEvent extends JpaStreamEvent {
     @Id
     @NotNull
     @Column(name = "EVENT_NUMBER")
-    private Integer eventNumber;
+    private Long eventNumber;
 
     /**
      * Protected default constructor only required for JPA.
@@ -64,7 +64,7 @@ public class VendorEvent extends JpaStreamEvent {
      *            Event entry to connect.
      */
     public VendorEvent(@NotNull final String vendorId,
-            @NotNull final Integer version, final JpaEvent eventEntry) {
+            @NotNull final Long version, final JpaEvent eventEntry) {
         super(eventEntry);
         Contract.requireArgNotNull("vendorId", vendorId);
         Contract.requireArgNotNull("version", version);
@@ -86,7 +86,7 @@ public class VendorEvent extends JpaStreamEvent {
      * 
      * @return Number that is unique in combination with the name.
      */
-    public final Integer getEventNumber() {
+    public final Long getEventNumber() {
         return eventNumber;
     }
 

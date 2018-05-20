@@ -100,7 +100,7 @@ public final class NoParamsStreamTest {
         final StreamId streamId = new SimpleStreamId("AnyName");
         final NoParamsStream testee = new NoParamsStream(streamId);
         final JpaEvent eventEntry = new JpaEvent();
-        final int version = testee.getVersion();
+        final long version = testee.getVersion();
         
         // TEST
         final JpaStreamEvent result = testee.createEvent(streamId, eventEntry);

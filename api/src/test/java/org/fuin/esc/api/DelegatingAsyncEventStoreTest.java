@@ -39,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DelegatingAsyncEventStoreTest {
 
-    private static final int ANY_VERSION = ExpectedVersion.ANY.getNo();
+    private static final long ANY_VERSION = ExpectedVersion.ANY.getNo();
 
     private DelegatingAsyncEventStore testee;
 
@@ -85,13 +85,13 @@ public class DelegatingAsyncEventStoreTest {
         final StreamId streamId = new SimpleStreamId("MyStream");
         final CommonEvent eventOne = event("One");
         final CommonEvent eventTwo = event("Two");
-        when(delegate.appendToStream(streamId, ANY_VERSION, eventOne, eventTwo)).thenReturn(1);
+        when(delegate.appendToStream(streamId, ANY_VERSION, eventOne, eventTwo)).thenReturn(1L);
 
         // TEST
-        final int result = testee.appendToStream(streamId, ANY_VERSION, eventOne, eventTwo).get();
+        final long result = testee.appendToStream(streamId, ANY_VERSION, eventOne, eventTwo).get();
 
         // VERIFY
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1L);
         verify(delegate).appendToStream(streamId, ANY_VERSION, eventOne, eventTwo);
 
     }
@@ -103,13 +103,13 @@ public class DelegatingAsyncEventStoreTest {
         final StreamId streamId = new SimpleStreamId("MyStream");
         final CommonEvent eventOne = event("One");
         final CommonEvent eventTwo = event("Two");
-        when(delegate.appendToStream(streamId, eventOne, eventTwo)).thenReturn(1);
+        when(delegate.appendToStream(streamId, eventOne, eventTwo)).thenReturn(1L);
 
         // TEST
-        final int result = testee.appendToStream(streamId, eventOne, eventTwo).get();
+        final long result = testee.appendToStream(streamId, eventOne, eventTwo).get();
 
         // VERIFY
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1L);
         verify(delegate).appendToStream(streamId, eventOne, eventTwo);
 
     }
@@ -201,13 +201,13 @@ public class DelegatingAsyncEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
         final List<CommonEvent> events = new ArrayList<>();
-        when(delegate.appendToStream(streamId, ANY_VERSION, events)).thenReturn(1);
+        when(delegate.appendToStream(streamId, ANY_VERSION, events)).thenReturn(1L);
 
         // TEST
-        final int result = testee.appendToStream(streamId, ANY_VERSION, events).get();
+        final long result = testee.appendToStream(streamId, ANY_VERSION, events).get();
 
         // VERIFY
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1L);
         verify(delegate).appendToStream(streamId, ANY_VERSION, events);
 
     }
@@ -218,13 +218,13 @@ public class DelegatingAsyncEventStoreTest {
         // PREPARE
         final StreamId streamId = new SimpleStreamId("MyStream");
         final List<CommonEvent> events = new ArrayList<>();
-        when(delegate.appendToStream(streamId, events)).thenReturn(1);
+        when(delegate.appendToStream(streamId, events)).thenReturn(1L);
 
         // TEST
-        final int result = testee.appendToStream(streamId, events).get();
+        final long result = testee.appendToStream(streamId, events).get();
 
         // VERIFY
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(1L);
         verify(delegate).appendToStream(streamId, events);
 
     }

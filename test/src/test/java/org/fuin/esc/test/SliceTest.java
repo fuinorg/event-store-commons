@@ -47,9 +47,9 @@ public class SliceTest extends AbstractXmlTest {
 
     private static final EventId ID = new EventId();
 
-    private static final int FROM = 0;
+    private static final long FROM = 0;
 
-    private static final int NEXT = 1;
+    private static final long NEXT = 1;
 
     private static final boolean EOS = true;
 

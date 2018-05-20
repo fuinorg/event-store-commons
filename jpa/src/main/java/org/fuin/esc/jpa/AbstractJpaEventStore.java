@@ -143,7 +143,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     @Override
-    public final CommonEvent readEvent(final StreamId streamId, final int eventNumber) {
+    public final CommonEvent readEvent(final StreamId streamId, final long eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
@@ -169,7 +169,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     @SuppressWarnings("unchecked")
     @Override
-    public final StreamEventsSlice readEventsForward(final StreamId streamId, final int start,
+    public final StreamEventsSlice readEventsForward(final StreamId streamId, final long start,
             final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -208,8 +208,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
-        final int fromEventNumber = start;
-        final int nextEventNumber = (start + events.size());
+        final long fromEventNumber = start;
+        final long nextEventNumber = (start + events.size());
         final boolean endOfStream = (events.size() < count);
 
         return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
@@ -218,7 +218,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     @SuppressWarnings("unchecked")
     @Override
-    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final int start,
+    public final StreamEventsSlice readEventsBackward(final StreamId streamId, final long start,
             final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -257,8 +257,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
-        final int fromEventNumber = start;
-        int nextEventNumber = start - resultList.size();
+        final long fromEventNumber = start;
+        long nextEventNumber = start - resultList.size();
         if (nextEventNumber < 0) {
             nextEventNumber = 0;
         }

@@ -33,7 +33,7 @@ public final class ReadBackwardExceptionCommand implements TestCommand {
 
     private String streamName;
 
-    private int start;
+    private long start;
 
     private int count;
 
@@ -74,7 +74,7 @@ public final class ReadBackwardExceptionCommand implements TestCommand {
      * @param expectedMessage
      *            The exception message that is expected, an empty string or "-".
      */
-    public ReadBackwardExceptionCommand(@NotNull final String streamName, final int start, final int count,
+    public ReadBackwardExceptionCommand(@NotNull final String streamName, final long start, final int count,
             final String expectedException, final String expectedMessage) {
         super();
         this.streamName = streamName;

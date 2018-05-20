@@ -38,7 +38,7 @@ public final class NoParamsEventPrimaryKeyTest {
 
         // PREPARE
         final StreamId streamId = new SimpleStreamId("Abc");
-        final Integer eventNumber = 3;
+        final Long eventNumber = 3L;
         final NoParamsEventPrimaryKey testee = new NoParamsEventPrimaryKey(streamId, eventNumber);
 
         // TEST

@@ -40,7 +40,7 @@ public final class ReadEventCommand implements TestCommand {
 
     private String streamName;
 
-    private int eventNumber;
+    private long eventNumber;
 
     private String expectedException;
 
@@ -82,7 +82,7 @@ public final class ReadEventCommand implements TestCommand {
      *            The exception that is expected, an empty string or "-".
      */
     public ReadEventCommand(@NotNull final String streamName,
-            final int eventNumber, final String expectedEventXml,
+            final long eventNumber, final String expectedEventXml,
             final String expectedException) {
         super();
         this.streamName = streamName;

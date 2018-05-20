@@ -55,7 +55,7 @@ public final class AppendToStreamCommand implements TestCommand {
 
     private StreamId streamId;
 
-    private int expectedIntVersion;
+    private long expectedIntVersion;
 
     private Class<? extends Exception> expectedExceptionClass;
 
@@ -84,7 +84,7 @@ public final class AppendToStreamCommand implements TestCommand {
      * @param events
      *            Events to add.
      */
-    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final int expectedVersion,
+    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
             @Nullable final Class<? extends Exception> expectedExceptionClass,
             @NotNull final CommonEvent... events) {
         this(streamName, expectedVersion, expectedExceptionClass, EscSpiUtils.asList(events));
@@ -102,7 +102,7 @@ public final class AppendToStreamCommand implements TestCommand {
      * @param events
      *            Events to add.
      */
-    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final int expectedVersion,
+    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
             @Nullable final Class<? extends Exception> expectedExceptionClass,
             @NotNull final List<CommonEvent> events) {
         super();

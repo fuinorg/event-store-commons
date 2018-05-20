@@ -77,7 +77,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public int appendToStream(@NotNull StreamId streamId, int expectedVersion, @NotNull CommonEvent... events)
+    public long appendToStream(@NotNull StreamId streamId, long expectedVersion, @NotNull CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException;
 
@@ -101,7 +101,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public int appendToStream(@NotNull StreamId streamId, @NotNull CommonEvent... events)
+    public long appendToStream(@NotNull StreamId streamId, @NotNull CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
@@ -127,7 +127,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public int appendToStream(@NotNull StreamId streamId, int expectedVersion,
+    public long appendToStream(@NotNull StreamId streamId, long expectedVersion,
             @NotNull List<CommonEvent> events) throws StreamNotFoundException, StreamDeletedException,
             WrongExpectedVersionException, StreamReadOnlyException;
 
@@ -150,7 +150,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public int appendToStream(@NotNull StreamId streamId, @NotNull List<CommonEvent> events)
+    public long appendToStream(@NotNull StreamId streamId, @NotNull List<CommonEvent> events)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
@@ -178,7 +178,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    public void deleteStream(@NotNull StreamId streamId, int expectedVersion, boolean hardDelete)
+    public void deleteStream(@NotNull StreamId streamId, long expectedVersion, boolean hardDelete)
             throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException;
 
     /**

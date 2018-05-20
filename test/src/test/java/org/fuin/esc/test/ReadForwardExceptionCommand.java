@@ -33,7 +33,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
 
     private String streamName;
 
-    private int start;
+    private long start;
 
     private int count;
 
@@ -74,7 +74,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
      * @param expectedMessage
      *            The exception message that is expected, an empty string or "-".
      */
-    public ReadForwardExceptionCommand(@NotNull final String streamName, final int start, final int count,
+    public ReadForwardExceptionCommand(@NotNull final String streamName, final long start, final int count,
             final String expectedException, final String expectedMessage) {
         super();
         this.streamName = streamName;

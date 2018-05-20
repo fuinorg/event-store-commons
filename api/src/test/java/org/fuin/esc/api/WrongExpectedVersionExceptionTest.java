@@ -33,9 +33,9 @@ public class WrongExpectedVersionExceptionTest {
 
     private static final StreamId STREAM_ID = new SimpleStreamId("MyStream");
 
-    private static final Integer EXPECTED = 1;
+    private static final Long EXPECTED = 1L;
 
-    private static final Integer ACTUAL = 2;
+    private static final Long ACTUAL = 2L;
 
     private WrongExpectedVersionException testee;
 

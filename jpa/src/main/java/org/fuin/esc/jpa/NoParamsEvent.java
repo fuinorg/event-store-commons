@@ -49,7 +49,7 @@ public class NoParamsEvent extends JpaStreamEvent {
     @Id
     @NotNull
     @Column(name = COLUMN_EVENT_NUMBER)
-    private Integer eventNumber;
+    private Long eventNumber;
 
     /**
      * Protected default constructor only required for JPA.
@@ -68,7 +68,7 @@ public class NoParamsEvent extends JpaStreamEvent {
      * @param jpaEvent
      *            Event to store.
      */
-    public NoParamsEvent(@NotNull final StreamId streamId, @NotNull final Integer version,
+    public NoParamsEvent(@NotNull final StreamId streamId, @NotNull final Long version,
             @NotNull final JpaEvent jpaEvent) {
         super(jpaEvent);
         Contract.requireArgNotNull("streamId", streamId);
@@ -91,7 +91,7 @@ public class NoParamsEvent extends JpaStreamEvent {
      * 
      * @return Number that is unique in combination with the name.
      */
-    public Integer getEventNumber() {
+    public Long getEventNumber() {
         return eventNumber;
     }
 
