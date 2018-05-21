@@ -77,7 +77,7 @@
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>objects4j</artifactId>
-				<version>0.6.8-SNAPSHOT</version>
+				<version>0.6.8</version>
 			</dependency>
 
 			<dependency>
