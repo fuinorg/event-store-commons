@@ -52,7 +52,6 @@ public class EventsTest extends AbstractXmlTest {
 
         // TEST
         final String xml = marshalToStr(testee, createXmlAdapter(), Events.class);
-        System.out.println(xml);
 
         // VERIFY
         final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();

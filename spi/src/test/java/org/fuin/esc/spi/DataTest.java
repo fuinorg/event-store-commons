@@ -133,7 +133,6 @@ public class DataTest extends AbstractXmlTest {
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(),
                 Data.class);
-        System.out.println(xml);
         final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
 
         // VERIFY
@@ -204,8 +203,6 @@ public class DataTest extends AbstractXmlTest {
 
         // TEST
         final Data data = Data.valueOf("BookAddedEvent", event);
-
-        System.out.println(event.toString());
 
         // VERIFY
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
