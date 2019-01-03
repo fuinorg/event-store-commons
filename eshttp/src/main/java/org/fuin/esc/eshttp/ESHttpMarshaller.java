@@ -65,7 +65,7 @@ public final class ESHttpMarshaller {
             eventList.add(createEscEvent(registry, serializer.getMimeType(), commonEvent));
         }
         final EscEvents events = new EscEvents(eventList);
-        final byte[] data = serializer.marshal(events);
+        final byte[] data = serializer.marshal(events, EscEvents.SER_TYPE);
         return new String(data, serializer.getMimeType().getEncoding());
     }
 
@@ -90,7 +90,7 @@ public final class ESHttpMarshaller {
         final Serializer serializer = registry.getSerializer(EscEvent.SER_TYPE);
 
         final EscEvent event = createEscEvent(registry, serializer.getMimeType(), commonEvent);
-        final byte[] data = serializer.marshal(event);
+        final byte[] data = serializer.marshal(event, EscEvent.SER_TYPE);
         return new String(data, serializer.getMimeType().getEncoding());
     }
 
@@ -123,7 +123,7 @@ public final class ESHttpMarshaller {
                     new DataWrapper(commonEvent.getData()), new DataWrapper(meta));
         }
 
-        final byte[] serData = dataSerializer.marshal(commonEvent.getData());
+        final byte[] serData = dataSerializer.marshal(commonEvent.getData(), serDataType);
         return new EscEvent(commonEvent.getId().asBaseType(), dataType,
                 new DataWrapper(new Base64Data(serData)), new DataWrapper(meta));
 

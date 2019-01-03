@@ -63,7 +63,7 @@ public final class JsonDeSerializer implements SerDeserializer {
     }
 
     @Override
-    public final byte[] marshal(final Object obj) {
+    public final byte[] marshal(final Object obj, final SerializedDataType type) {
 
         final JsonStructure struct;
         if (obj instanceof ToJsonCapable) {
@@ -89,7 +89,7 @@ public final class JsonDeSerializer implements SerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final Object data, final EnhancedMimeType mimeType) {
+    public final <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
 
         if (data instanceof byte[]) {
             final Reader reader = new InputStreamReader(new ByteArrayInputStream((byte[]) data),

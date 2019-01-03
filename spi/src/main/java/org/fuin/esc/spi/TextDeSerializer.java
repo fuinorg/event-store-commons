@@ -50,7 +50,7 @@ public final class TextDeSerializer implements SerDeserializer {
     }
 
     @Override
-    public final byte[] marshal(final Object obj) {
+    public final byte[] marshal(final Object obj, final SerializedDataType type) {
         if (!(obj instanceof String)) {
             throw new IllegalArgumentException("Can only handle instances of type 'String', but not: "
                     + obj.getClass());
@@ -61,7 +61,7 @@ public final class TextDeSerializer implements SerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final Object data, final EnhancedMimeType mimeType) {
+    public final <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
 
         if (data instanceof byte[]) {
             return (T) new String((byte[]) data, mimeType.getEncoding());

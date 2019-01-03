@@ -36,6 +36,8 @@ public interface Serializer {
      * 
      * @param obj
      *            Object to serialize.
+     * @param type
+     *            Type of event.
      * 
      * @return Serialized object.
      * 
@@ -43,6 +45,6 @@ public interface Serializer {
      *            Type the data is converted into.
      */
     @NotNull
-    public <T> byte[] marshal(@NotNull T obj);
+    public <T> byte[] marshal(@NotNull T obj, @NotNull SerializedDataType type);
 
 }

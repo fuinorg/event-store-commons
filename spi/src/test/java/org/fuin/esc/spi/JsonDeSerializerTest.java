@@ -49,13 +49,12 @@ public class JsonDeSerializerTest {
     public void testMarshalUnmarshal() {
 
         // PREPARE
-        final JsonObject original = Json.createObjectBuilder()
-                .add("name", "Peter").add("age", 21).build();
+        final SerializedDataType type = new SerializedDataType("Person");
+        final JsonObject original = Json.createObjectBuilder().add("name", "Peter").add("age", 21).build();
 
         // TEST
-        final byte[] data = testee.marshal(original);
-        final JsonObject copy = testee.unmarshal(data,
-                EnhancedMimeType.create("application/json; encoding=utf-8"));
+        final byte[] data = testee.marshal(original, type);
+        final JsonObject copy = testee.unmarshal(data, type, EnhancedMimeType.create("application/json; encoding=utf-8"));
 
         // VERIFY
         assertThat(copy.keySet()).contains("name", "age");

@@ -48,13 +48,13 @@ public final class ESHttpXmlUnmarshaller implements ESHttpUnmarshaller {
         if (transferEncodingData == null) {
             final Node childNode = findLastChildElement(node);
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-            return deSer.unmarshal(childNode, mimeType);
+            return deSer.unmarshal(childNode, dataType, mimeType);
         }
         final Node childNode = findLastChildElement(node);
         final String base64str = childNode.getTextContent();
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-        return deSer.unmarshal(bytes, mimeType);
+        return deSer.unmarshal(bytes, dataType, mimeType);
 
     }
 

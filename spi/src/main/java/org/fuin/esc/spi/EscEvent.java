@@ -204,14 +204,14 @@ public final class EscEvent implements ToJsonCapable {
         }
 
         @Override
-        public final <T> byte[] marshal(final T obj) {
-            return jsonDeSer.marshal(obj);
+        public final <T> byte[] marshal(final T obj, final SerializedDataType type) {
+            return jsonDeSer.marshal(obj, type);
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public final EscEvent unmarshal(final Object data, final EnhancedMimeType mimeType) {
-            final JsonObject jsonObj = jsonDeSer.unmarshal(data, mimeType);
+        public final EscEvent unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
+            final JsonObject jsonObj = jsonDeSer.unmarshal(data, type, mimeType);
             return EscEvent.create(jsonObj);
         }
 

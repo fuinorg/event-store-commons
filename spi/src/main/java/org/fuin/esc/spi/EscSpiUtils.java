@@ -72,7 +72,7 @@ public final class EscSpiUtils {
         Contract.requireArgNotNull("type", type);
 
         final Serializer serializer = registry.getSerializer(type);
-        return new SerializedData(type, serializer.getMimeType(), serializer.marshal(data));
+        return new SerializedData(type, serializer.getMimeType(), serializer.marshal(data, type));
     }
 
     /**
@@ -94,7 +94,7 @@ public final class EscSpiUtils {
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("data", data);
         final Deserializer deserializer = registry.getDeserializer(data.getType(), data.getMimeType());
-        return deserializer.unmarshal(data.getRaw(), data.getMimeType());
+        return deserializer.unmarshal(data.getRaw(), data.getType(), data.getMimeType());
 
     }
 
@@ -220,13 +220,14 @@ public final class EscSpiUtils {
         }
 
         final String metaType = commonEvent.getMetaType().asBaseType();
-        final Serializer metaSerializer = registry.getSerializer(new SerializedDataType(metaType));
+        final SerializedDataType serDataType = new SerializedDataType(metaType);
+        final Serializer metaSerializer = registry.getSerializer(serDataType);
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
             return new EscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(),
                     commonEvent.getMeta());
         }
 
-        final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta());
+        final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta(), serDataType);
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
         return new EscMeta(dataType, dataContentType, metaType, metaContentType, new Base64Data(serMeta));
 

@@ -49,21 +49,21 @@ public class EscMetaJsonDeSerializerTest {
     public void testMarshalUnmarshal() {
 
         // PREPARE
-        String dataType = "MyData";
+        final SerializedDataType dataType = new SerializedDataType("MyData");
         EnhancedMimeType dataContentType = EnhancedMimeType.create("application", "xml");
-        String metaType = "MyMeta";
+        final SerializedDataType metaType = new SerializedDataType("MyMeta");
         EnhancedMimeType metaContentType = EnhancedMimeType.create("application", "json");
         final JsonObject meta = Json.createObjectBuilder().add("user", "peter").add("ip", "127.0.0.1").build();
-        final EscMeta escMeta = new EscMeta(dataType, dataContentType, metaType, metaContentType, meta);
+        final EscMeta escMeta = new EscMeta(dataType.asBaseType(), dataContentType, metaType.asBaseType(), metaContentType, meta);
 
         // TEST
-        final byte[] data = testee.marshal(escMeta);
-        final EscMeta copy = testee.unmarshal(data, EnhancedMimeType.create("application/json; encoding=utf-8"));
+        final byte[] data = testee.marshal(escMeta, metaType);
+        final EscMeta copy = testee.unmarshal(data, dataType, EnhancedMimeType.create("application/json; encoding=utf-8"));
 
         // VERIFY
-        assertThat(copy.getDataType()).isEqualTo(dataType);
+        assertThat(copy.getDataType()).isEqualTo(dataType.asBaseType());
         assertThat(copy.getDataContentType()).isEqualTo(dataContentType);
-        assertThat(copy.getMetaType()).isEqualTo(metaType);
+        assertThat(copy.getMetaType()).isEqualTo(metaType.asBaseType());
         assertThat(copy.getMetaContentType()).isEqualTo(metaContentType);
         assertThat(copy.getMeta()).isInstanceOf(JsonObject.class);
         final JsonObject jsonObj = (JsonObject) copy.getMeta();

@@ -155,7 +155,7 @@ public final class XmlDeSerializer implements SerDeserializer {
     }
 
     @Override
-    public final byte[] marshal(final Object obj) {
+    public final byte[] marshal(final Object obj, final SerializedDataType type) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
             final Writer writer = new OutputStreamWriter(bos, mimeType.getEncoding());
@@ -168,7 +168,7 @@ public final class XmlDeSerializer implements SerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public final <T> T unmarshal(final Object data, final EnhancedMimeType mimeType) {
+    public final <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
         try {
 
             if (data instanceof byte[]) {

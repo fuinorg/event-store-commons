@@ -88,20 +88,21 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
         final String dataType = commonEvent.getDataType().asBaseType();
         final SerializedDataType serUserDataType = new SerializedDataType(dataType);
         final Serializer userDataSerializer = serRegistry.getSerializer(serUserDataType);
-        final byte[] serUserData = userDataSerializer.marshal(commonEvent.getData());
+        final byte[] serUserData = userDataSerializer.marshal(commonEvent.getData(), serUserDataType);
         final byte[] serData;
         if (userDataSerializer.getMimeType().matchEncoding(targetContentType)) {
             serData = serUserData;
         } else {
             final Base64Data base64data = new Base64Data(serUserData);
             final Serializer base64Serializer = serRegistry.getSerializer(Base64Data.SER_TYPE);
-            serData = base64Serializer.marshal(base64data);
+            serData = base64Serializer.marshal(base64data, Base64Data.SER_TYPE);
         }
 
         // EscMeta
         final EscMeta escMeta = EscSpiUtils.createEscMeta(serRegistry, targetContentType, commonEvent);
-        final Serializer escMetaSerializer = getSerializer(EscMeta.TYPE);
-        final byte[] escSerMeta = escMetaSerializer.marshal(escMeta);
+        final SerializedDataType escMetaType = new SerializedDataType(EscMeta.TYPE.asBaseType());
+        final Serializer escMetaSerializer = getSerializer(escMetaType);
+        final byte[] escSerMeta = escMetaSerializer.marshal(escMeta, escMetaType);
 
         // Create event data
         final EventData.Builder builder = EventData.newBuilder().eventId(commonEvent.getId().asBaseType())
@@ -117,8 +118,7 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
 
     }
 
-    private Serializer getSerializer(final TypeName typeName) {
-        final SerializedDataType serDataType = new SerializedDataType(typeName.asBaseType());
+    private Serializer getSerializer(final SerializedDataType serDataType) {
         final Serializer serializer = serRegistry.getSerializer(serDataType);
         if (!serializer.getMimeType().matchEncoding(targetContentType)) {
             throw new IllegalArgumentException("Target content type is '" + targetContentType

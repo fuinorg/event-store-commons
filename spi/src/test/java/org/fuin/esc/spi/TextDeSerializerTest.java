@@ -51,12 +51,12 @@ public class TextDeSerializerTest {
     public void testMarshalUnmarshal() {
 
         // PREPARE
+        final SerializedDataType type = new SerializedDataType("AType");
         final String original = "Whatever";
 
         // TEST
-        final byte[] data = testee.marshal(original);
-        final String copy = testee
-                .unmarshal(data, EnhancedMimeType.create("text/plain; encoding=" + CHARSET));
+        final byte[] data = testee.marshal(original, type);
+        final String copy = testee.unmarshal(data, type, EnhancedMimeType.create("text/plain; encoding=" + CHARSET));
 
         // VERIFY
         assertThat(copy).isEqualTo(original);
@@ -67,11 +67,11 @@ public class TextDeSerializerTest {
     public void testUnmarshalString() {
 
         // PREPARE
+        final SerializedDataType type = new SerializedDataType("AType");
         final String original = "Whatever";
 
         // TEST
-        final String copy = testee.unmarshal(original,
-                EnhancedMimeType.create("text/plain; encoding=" + CHARSET));
+        final String copy = testee.unmarshal(original, type, EnhancedMimeType.create("text/plain; encoding=" + CHARSET));
 
         // VERIFY
         assertThat(copy).isEqualTo(original);
@@ -83,8 +83,7 @@ public class TextDeSerializerTest {
 
         // TEST & VERIFY
         assertThat(testee.getMimeType()).isEqualTo(EnhancedMimeType.create("text", "plain", CHARSET));
-        assertThat(new TextDeSerializer().getMimeType()).isEqualTo(
-                EnhancedMimeType.create("text", "plain", Charset.forName("utf-8")));
+        assertThat(new TextDeSerializer().getMimeType()).isEqualTo(EnhancedMimeType.create("text", "plain", Charset.forName("utf-8")));
 
     }
 

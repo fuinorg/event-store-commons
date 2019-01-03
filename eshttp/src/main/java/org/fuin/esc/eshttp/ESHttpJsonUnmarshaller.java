@@ -48,12 +48,12 @@ public final class ESHttpJsonUnmarshaller implements ESHttpUnmarshaller {
         if (transferEncodingData == null) {
             // JSON Object or Array
             final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-            return deSer.unmarshal(jsonObj, mimeType);
+            return deSer.unmarshal(jsonObj, dataType, mimeType);
         }
         final String base64str = jsonObj.getString(Base64Data.EL_ROOT_NAME);
         final byte[] bytes = Base64.decodeBase64(base64str);
         final Deserializer deSer = registry.getDeserializer(dataType, mimeType);
-        return deSer.unmarshal(bytes, mimeType);
+        return deSer.unmarshal(bytes, dataType, mimeType);
 
     }
 

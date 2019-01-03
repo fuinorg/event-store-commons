@@ -208,14 +208,14 @@ public final class MyEvent implements Serializable, ToJsonCapable {
         }
 
         @Override
-        public final <T> byte[] marshal(final T obj) {
-            return jsonDeSer.marshal(obj);
+        public final <T> byte[] marshal(final T obj, final SerializedDataType type) {
+            return jsonDeSer.marshal(obj, type);
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public final MyEvent unmarshal(final Object data, final EnhancedMimeType mimeType) {
-            final JsonObject jsonObj = jsonDeSer.unmarshal(data, mimeType);
+        public final MyEvent unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
+            final JsonObject jsonObj = jsonDeSer.unmarshal(data, type, mimeType);
             return MyEvent.create(jsonObj);
         }
 

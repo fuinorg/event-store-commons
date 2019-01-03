@@ -342,7 +342,7 @@ public class EscSpiUtilsTest {
     private Serializer dummySerializer(final String baseType) {
         return new Serializer() {
             @Override
-            public <T> byte[] marshal(T obj) {
+            public <T> byte[] marshal(T obj, SerializedDataType type) {
                 if (obj == null) {
                     return null;
                 }
@@ -360,7 +360,7 @@ public class EscSpiUtilsTest {
         return new Deserializer() {
             @SuppressWarnings("unchecked")
             @Override
-            public <T> T unmarshal(Object data, EnhancedMimeType mimeType) {
+            public <T> T unmarshal(Object data, SerializedDataType type, EnhancedMimeType mimeType) {
                 if (data instanceof byte[]) {
                     return (T) new String((byte[]) data);
                 }
