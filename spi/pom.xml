@@ -56,6 +56,16 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.json.bind</groupId>
+            <artifactId>javax.json.bind-api</artifactId>
+        </dependency>
+
 		<!-- test -->
 
 		<dependency>
@@ -132,6 +142,13 @@
 			<artifactId>gson</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 
