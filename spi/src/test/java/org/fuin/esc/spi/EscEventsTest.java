@@ -41,18 +41,17 @@ import org.xmlunit.diff.Diff;
 /**
  * Test for {@link EscEvents} class.
  */
-//CHECKSTYLE:OFF Test
+// CHECKSTYLE:OFF Test
 public class EscEventsTest {
 
     @Test
-    public final void testUnMarshal() throws Exception {
+    public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
         final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.xml"));
 
         // TEST
-        final EscEvents testee = unmarshal(expectedXml, EscEvents.class, MyMeta.class, MyEvent.class,
-                Base64Data.class);
+        final EscEvents testee = unmarshal(expectedXml, EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class);
 
         // VERIFY
         assertThat(testee).isNotNull();
@@ -71,14 +70,18 @@ public class EscEventsTest {
     }
 
     @Test
-    public void testJsonbSerializer() throws Exception {
+    public void testMarshalJsonB() throws Exception {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
 
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyEvent.SER_TYPE, MyEvent.class);
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+
         final EscEvents events = new EscEvents(createEvent1(), createEvent2());
-        
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers())
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
         final Jsonb jsonb = JsonbBuilder.create(config);
 
@@ -87,6 +90,31 @@ public class EscEventsTest {
 
         // VERIFY
         assertThatJson(currentJson).isEqualTo(expectedJson);
+
+    }
+
+    @Test
+    public final void testUnmarshalJsonB() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
+
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyEvent.SER_TYPE, MyEvent.class);
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        final Jsonb jsonb = JsonbBuilder.create(config);
+
+        // TEST
+        final EscEvents testee = jsonb.fromJson(expectedJson, EscEvents.class);
+
+        // VERIFY
+        assertThat(testee.getList()).hasSize(2);
+        assertThat(testee.getList().get(0).getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+        assertThat(testee.getList().get(1).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
 
     }
     
@@ -103,8 +131,9 @@ public class EscEventsTest {
 
     private EscEvent createEvent2() throws MimeTypeParseException {
         final UUID eventId = UUID.fromString("68616d90-cf72-4c2a-b913-32bf6e6506ed");
-        final Base64Data data = new Base64Data("eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9");
-        
+        final Base64Data data = new Base64Data(
+                "eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9");
+
         final MyMeta myMeta = new MyMeta("abc");
 
         final Map<String, String> params = new HashMap<>();
@@ -115,6 +144,6 @@ public class EscEventsTest {
                 myMeta);
         return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(data), new DataWrapper(escMeta));
     }
-    
+
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON

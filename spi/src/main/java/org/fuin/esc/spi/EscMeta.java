@@ -17,6 +17,9 @@
  */
 package org.fuin.esc.spi;
 
+import java.lang.reflect.Type;
+
+import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -35,13 +38,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 
-import java.lang.reflect.Type;
-
-import javax.annotation.Nullable;
-
 /**
- * A structure that contains the user's meta data and the system's meta
- * information.
+ * A structure that contains the user's meta data and the system's meta information.
  */
 @XmlRootElement(name = EscMeta.EL_ROOT_NAME)
 public final class EscMeta implements ToJsonCapable {
@@ -117,9 +115,8 @@ public final class EscMeta implements ToJsonCapable {
      * @param meta
      *            Meta data object if available.
      */
-    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType,
-            @Nullable final String metaType, @Nullable final EnhancedMimeType metaContentType,
-            @Nullable final Object meta) {
+    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType, @Nullable final String metaType,
+            @Nullable final EnhancedMimeType metaContentType, @Nullable final Object meta) {
         super();
         Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("dataContentType", dataContentType);
@@ -230,14 +227,12 @@ public final class EscMeta implements ToJsonCapable {
      */
     public static EscMeta create(final JsonObject jsonObj) {
         final String dataType = jsonObj.getString(EL_DATA_TYPE);
-        final EnhancedMimeType dataContentType = EnhancedMimeType
-                .create(jsonObj.getString(EL_DATA_CONTENT_TYPE));
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create(jsonObj.getString(EL_DATA_CONTENT_TYPE));
         if (!jsonObj.containsKey(EL_META_TYPE)) {
             return new EscMeta(jsonObj.getString(EL_DATA_TYPE), dataContentType);
         }
         final String metaType = jsonObj.getString(EL_META_TYPE);
-        final EnhancedMimeType metaContentType = EnhancedMimeType
-                .create(jsonObj.getString(EL_META_CONTENT_TYPE));
+        final EnhancedMimeType metaContentType = EnhancedMimeType.create(jsonObj.getString(EL_META_CONTENT_TYPE));
         final String transferEncoding = metaContentType.getParameter("transfer-encoding");
         if (transferEncoding == null) {
             return new EscMeta(dataType, dataContentType, metaType, metaContentType, jsonObj.get(metaType));
@@ -252,10 +247,48 @@ public final class EscMeta implements ToJsonCapable {
      */
     public static final class JsonbDeSer implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta> {
 
+        private final SerializedDataTypeRegistry registry;
+
+        /**
+         * Constructor with mandatory data.
+         * 
+         * @param registry
+         *            Registry for type lookup.
+         */
+        public JsonbDeSer(final SerializedDataTypeRegistry registry) {
+            super();
+            this.registry = registry;
+        }
+
         @Override
-        public EscMeta deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-            // TODO Auto-generated method stub
-            return null;
+        public EscMeta deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+            final EscMeta escMeta = new EscMeta();
+            while (parser.hasNext()) {
+                final JsonParser.Event event = parser.next();
+                if (event == JsonParser.Event.KEY_NAME) {
+                    final String field = parser.getString();
+                    switch (field) {
+                    case EL_DATA_TYPE:
+                        escMeta.dataType = ctx.deserialize(String.class, parser);
+                        break;
+                    case EL_DATA_CONTENT_TYPE:
+                        escMeta.dataContentType = EnhancedMimeType.create(ctx.deserialize(String.class, parser));
+                        break;
+                    case EL_META_TYPE:
+                        escMeta.metaType = ctx.deserialize(String.class, parser);
+                        break;
+                    case EL_META_CONTENT_TYPE:
+                        escMeta.metaContentType = EnhancedMimeType.create(ctx.deserialize(String.class, parser));
+                        break;
+                    default:
+                        // meta
+                        final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.metaType));
+                        escMeta.meta = ctx.deserialize(clasz, parser);
+                        break;
+                    }
+                }
+            }
+            return escMeta;
         }
 
         @Override
@@ -275,9 +308,9 @@ public final class EscMeta implements ToJsonCapable {
                 }
             }
             generator.writeEnd();
-            
+
         }
 
     }
-    
+
 }

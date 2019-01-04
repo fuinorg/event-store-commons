@@ -229,10 +229,46 @@ public final class EscEvent implements ToJsonCapable {
      */
     public static final class JsonbDeSer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent> {
 
+        private final SerializedDataTypeRegistry registry;
+        
+        /**
+         * Constructor with mandatory data.
+         * 
+         * @param registry Registry for type lookup.
+         */
+        public JsonbDeSer(final SerializedDataTypeRegistry registry) {
+            super();
+            this.registry = registry;
+        }
+        
         @Override
         public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-            // TODO Auto-generated method stub
-            return null;
+            final EscEvent escEvent = new EscEvent();
+            while (parser.hasNext()) {
+                final JsonParser.Event event = parser.next();
+                if (event == JsonParser.Event.KEY_NAME) {
+                    final String field = parser.getString();
+                    switch (field) {
+                    case EL_EVENT_ID:
+                        escEvent.eventId = ctx.deserialize(String.class, parser);
+                        break;
+                    case EL_EVENT_TYPE:
+                        escEvent.eventType = ctx.deserialize(String.class, parser);
+                        break;
+                    case EL_META_DATA:
+                        escEvent.meta = new DataWrapper(ctx.deserialize(EscMeta.class, parser));
+                        break;
+                    case EL_DATA:
+                        final Class<?> clasz = registry.findClass(new SerializedDataType(escEvent.eventType));
+                        escEvent.data = new DataWrapper(ctx.deserialize(clasz, parser));
+                        break;
+                    default:
+                        // ignore
+                        break;
+                    }
+                }
+            }
+            return escEvent;
         }
 
         @Override

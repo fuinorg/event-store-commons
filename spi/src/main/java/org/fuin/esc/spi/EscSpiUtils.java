@@ -18,10 +18,12 @@
 package org.fuin.esc.spi;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.validation.constraints.NotNull;
 import javax.xml.transform.OutputKeys;
@@ -253,10 +255,12 @@ public final class EscSpiUtils {
     /**
      * Creates all available JSON-B serializers necessary for the ESC implementation.
      * 
+     * @param registry Registry used by some of the implementations.
+     * 
      * @return New array with serializers.
      */
-    public static JsonbSerializer<?>[] createEscJsonbSerializers() {
-        return new JsonbSerializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(), new EscMeta.JsonbDeSer() };
+    public static JsonbSerializer<?>[] createEscJsonbSerializers(final SerializedDataTypeRegistry registry) {
+        return new JsonbSerializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(registry), new EscMeta.JsonbDeSer(registry) };
     }
 
     /**
@@ -264,7 +268,8 @@ public final class EscSpiUtils {
      * 
      * @return New array with serializers.
      */
-    public static JsonbSerializer<?>[] joinJsonbSerializers(final JsonbSerializer<?>[] serializersA, final JsonbSerializer<?>... serializersB) {
+    public static JsonbSerializer<?>[] joinJsonbSerializers(final JsonbSerializer<?>[] serializersA,
+            final JsonbSerializer<?>... serializersB) {
         return joinJsonbSerializerArrays(serializersA, serializersB);
     }
 
@@ -274,16 +279,52 @@ public final class EscSpiUtils {
      * @return New array with serializers.
      */
     public static JsonbSerializer<?>[] joinJsonbSerializerArrays(final JsonbSerializer<?>[]... serializerArrays) {
-        int size = 0;
-        for (final JsonbSerializer<?>[] serialzerArray : serializerArrays) {
-            size = size + serialzerArray.length;
-        }
-        final JsonbSerializer<?>[] all = new JsonbSerializer<?>[size];
-        int i = 0;
-        for (final JsonbSerializer<?>[] serialzerArray : serializerArrays) {
-            for (int j = 0; j < serialzerArray.length; j++) {
-                all[i] = serialzerArray[j];
-                i++;
+        final List<JsonbSerializer<?>> all = joinArrays(serializerArrays);
+        return all.toArray(new JsonbSerializer<?>[all.size()]);
+    }
+
+    /**
+     * Creates all available JSON-B deserializers necessary for the ESC implementation.
+     * 
+     * @param registry Registry used by some of the implementations.
+     * 
+     * @return New array with deserializers.
+     */
+    public static JsonbDeserializer<?>[] createEscJsonbDeserializers(final SerializedDataTypeRegistry registry) {
+        return new JsonbDeserializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(registry), new EscMeta.JsonbDeSer(registry) };
+    }
+
+    /**
+     * Creates all available JSON-B deserializers necessary for the ESC implementation.
+     * 
+     * @return New array with deserializers.
+     */
+    public static JsonbDeserializer<?>[] joinJsonbDeserializers(final JsonbDeserializer<?>[] deserializersA,
+            final JsonbDeserializer<?>... deserializersB) {
+        return joinJsonbDeserializerArrays(deserializersA, deserializersB);
+    }
+
+    /**
+     * Creates all available JSON-B deserializers necessary for the ESC implementation.
+     * 
+     * @return New array with deserializers.
+     */
+    public static JsonbDeserializer<?>[] joinJsonbDeserializerArrays(final JsonbDeserializer<?>[]... deserializerArrays) {
+        final List<JsonbDeserializer<?>> all = joinArrays(deserializerArrays);
+        return all.toArray(new JsonbDeserializer<?>[all.size()]);
+    }
+
+    /**
+     * Creates all available JSON-B serializers necessary for the ESC implementation.
+     * 
+     * @return New array with serializers.
+     */
+    @SafeVarargs
+    static <T> List<T> joinArrays(final T[]... arrays) {
+        final List<T> all = new ArrayList<>();
+        for (final T[] array : arrays) {
+            for (int j = 0; j < array.length; j++) {
+                all.add(array[j]);
             }
         }
         return all;

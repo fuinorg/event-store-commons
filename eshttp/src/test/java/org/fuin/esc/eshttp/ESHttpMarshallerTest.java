@@ -214,13 +214,14 @@ public class ESHttpMarshallerTest {
     private SerDeserializerRegistry createJsonbRegistry() {
         
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class); 
-        typeRegistry.add(EscEvent.SER_TYPE, EscEvent.class); 
-        typeRegistry.add(EscEvents.SER_TYPE, EscEvents.class); 
+        typeRegistry.add(EscEvents.SER_TYPE, EscEvents.class);
+        typeRegistry.add(EscEvent.SER_TYPE, EscEvent.class);
+        typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
         final JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers(typeRegistry))
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(typeRegistry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
         final JsonbDeSerializer jsonbDeSer = new JsonbDeSerializer(config, Charset.forName("utf-8"), typeRegistry);
         

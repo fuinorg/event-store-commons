@@ -46,7 +46,7 @@ import org.xmlunit.diff.Diff;
 public class EscMetaTest {
 
     @Test
-    public final void testUnMarshal() throws Exception {
+    public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
         final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.xml"));
@@ -79,7 +79,7 @@ public class EscMetaTest {
     }
 
     @Test
-    public final void testJsonB() throws Exception {
+    public final void testMarshalJsonB() throws Exception {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
@@ -93,7 +93,7 @@ public class EscMetaTest {
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers())
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
         final Jsonb jsonb = JsonbBuilder.create(config);
 
@@ -105,5 +105,39 @@ public class EscMetaTest {
 
     }
 
+    @Test
+    public final void testUnmarshalJsonB() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
+
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+        
+        final Map<String, String> params = new HashMap<>();
+        params.put("transfer-encoding", "base64");
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", Charset.forName("utf-8"), "1", params);
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        
+        final JsonbConfig config = new JsonbConfig()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        final Jsonb jsonb = JsonbBuilder.create(config);
+
+        // TEST
+        final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);
+
+        // VERIFY
+        assertThat(testee.getDataType()).isEqualTo("MyEvent");
+        assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+        assertThat(testee.getMetaType()).isEqualTo("MyMeta");
+        assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
+        assertThat(testee.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta myMeta = (MyMeta) testee.getMeta();
+        assertThat(myMeta.getUser()).isEqualTo("abc");
+        
+    }    
+    
 }
 // CHECKSTYLE:ON

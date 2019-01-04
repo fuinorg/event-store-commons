@@ -19,15 +19,19 @@ package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.activation.MimeTypeParseException;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -396,6 +400,79 @@ public class EscSpiUtilsTest {
         assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
         assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c, d})).contains(a, b, c, d);
         assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a}, new JsonbSerializer<?>[] {b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
+        
+    }
+
+    @Test
+    public void testJoinJsonbDeserializers() {
+        
+        final JsonbDeserializer<Object> a = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> b = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> c = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> d = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        
+        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {})).isEmpty();;
+        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {}, a)).containsExactly(a);
+        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a}, b)).containsExactly(a, b);
+        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a, b}, c)).containsExactly(a, b, c);
+        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a, b}, c, d)).containsExactly(a, b, c, d);
+        
+    }
+    
+    @Test
+    public void testJoinJsonbDeserializerArrays() {
+        
+        final JsonbDeserializer<Object> a = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> b = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> c = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        final JsonbDeserializer<Object> d = new JsonbDeserializer<Object>() {
+            @Override
+            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+                return null;
+            }
+        };
+        
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {})).isEmpty();;
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {}, new JsonbDeserializer<?>[] {a})).containsExactly(a);
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a}, new JsonbDeserializer<?>[] {b})).contains(a, b);
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a, b}, new JsonbDeserializer<?>[] {c})).contains(a, b, c);
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a, b}, new JsonbDeserializer<?>[] {c, d})).contains(a, b, c, d);
+        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a}, new JsonbDeserializer<?>[] {b}, new JsonbDeserializer<?>[] {c})).contains(a, b, c);
         
     }
 

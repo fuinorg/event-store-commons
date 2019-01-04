@@ -181,8 +181,14 @@ public final class EscEvents implements ToJsonCapable {
 
         @Override
         public EscEvents deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-            // TODO Auto-generated method stub
-            return null;
+            final List<EscEvent> events = new ArrayList<>();
+            while (parser.hasNext()) {
+                final JsonParser.Event event = parser.next();
+                if (event == JsonParser.Event.START_OBJECT) {
+                    events.add(ctx.deserialize(EscEvent.class, parser));
+                }
+            }
+            return new EscEvents(events);
         }
 
         @Override

@@ -24,12 +24,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import javax.annotation.Nullable;
+import javax.json.Json;
+import javax.json.JsonStructure;
+import javax.validation.constraints.NotNull;
 
 /**
  * Example meta data. .
  */
 @XmlRootElement(name = "MyMeta")
-public final class MyMeta implements Serializable {
+public final class MyMeta implements Serializable, ToJsonCapable {
 
     private static final long serialVersionUID = 100L;
 
@@ -108,4 +111,10 @@ public final class MyMeta implements Serializable {
         return "My meta: " + user;
     }
 
+    @Override
+    @NotNull
+    public final JsonStructure toJson() {
+        return Json.createObjectBuilder().add("user", user).build();
+    }
+    
 }

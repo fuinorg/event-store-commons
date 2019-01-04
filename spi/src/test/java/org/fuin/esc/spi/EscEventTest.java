@@ -22,9 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.marshal;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import javax.json.Json;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -42,7 +44,7 @@ import org.xmlunit.diff.Diff;
 public class EscEventTest {
 
     @Test
-    public final void testUnMarshal() throws Exception {
+    public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
         final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.xml"));
@@ -70,10 +72,41 @@ public class EscEventTest {
     }
 
     @Test
-    public void testJsonbSerializer() throws Exception {
+    public final void testToJson() throws Exception {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+        final UUID eventId = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
+        final MyEvent myEvent = new MyEvent(UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47"), "Hello, JSON!");
+        final MyMeta myMeta = new MyMeta("abc");
+
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
+                myMeta);
+        final DataWrapper dataWrapper = new DataWrapper(myEvent);
+        final DataWrapper metaWrapper = new DataWrapper(escMeta);
+        final EscEvent event = new EscEvent(eventId, MyEvent.TYPE.asBaseType(), dataWrapper, metaWrapper);
+
+        // TEST
+        final StringWriter sw = new StringWriter();
+        Json.createWriter(sw).writeObject(event.toJson());
+        final String actualJson = sw.toString();
+
+        // VERIFY
+        assertThatJson(expectedJson).isEqualTo(actualJson);
+
+    }
+
+    @Test
+    public void testMarshalJsonB() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyEvent.SER_TYPE, MyEvent.class);
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
 
         final UUID eventId = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
         final MyEvent myEvent = new MyEvent(UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47"), "Hello, JSON!");
@@ -87,7 +120,7 @@ public class EscEventTest {
         final DataWrapper metaWrapper = new DataWrapper(escMeta);
         final EscEvent event = new EscEvent(eventId, MyEvent.TYPE.asBaseType(), dataWrapper, metaWrapper);
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers())
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
         final Jsonb jsonb = JsonbBuilder.create(config);
 
@@ -96,6 +129,46 @@ public class EscEventTest {
 
         // VERIFY
         assertThatJson(currentJson).isEqualTo(expectedJson);
+
+    }
+
+    @Test
+    public final void testUnmarshalJsonB() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyEvent.SER_TYPE, MyEvent.class);
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        final Jsonb jsonb = JsonbBuilder.create(config);
+
+        // TEST
+        final EscEvent testee = jsonb.fromJson(expectedJson, EscEvent.class);
+
+        // VERIFY
+        assertThat(testee.getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+        assertThat(testee.getEventType()).isEqualTo("MyEvent");
+        assertThat(testee.getData().getObj()).isInstanceOf(MyEvent.class);
+        final MyEvent myEvent = (MyEvent) testee.getData().getObj();
+        assertThat(myEvent.getId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+        assertThat(myEvent.getDescription()).isEqualTo("Hello, JSON!");
+        assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
+        final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
+        assertThat(escMeta.getDataType()).isEqualTo("MyEvent");
+        assertThat(escMeta.getDataContentType()).isEqualTo(dataContentType);
+        assertThat(escMeta.getMetaType()).isEqualTo("MyMeta");
+        assertThat(escMeta.getMetaContentType()).isEqualTo(metaContentType);
+        assertThat(escMeta.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta myMeta = (MyMeta) escMeta.getMeta();
+        assertThat(myMeta.getUser()).isEqualTo("abc");
 
     }
 

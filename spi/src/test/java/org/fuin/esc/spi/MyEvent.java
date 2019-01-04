@@ -26,19 +26,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+
+import javax.json.Json;
+import javax.json.JsonStructure;
 import javax.validation.constraints.NotEmpty;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.
  */
 @XmlRootElement(name = "MyEvent")
-public final class MyEvent implements Serializable {
+public final class MyEvent implements Serializable, ToJsonCapable {
 
     private static final long serialVersionUID = 100L;
 
     /** Unique name of the event. */
     public static final TypeName TYPE = new TypeName("MyEvent");
-    
+
     /** Unique name of the serialized event. */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
@@ -141,6 +144,12 @@ public final class MyEvent implements Serializable {
     @Override
     public final String toString() {
         return "My event: " + description;
+    }
+
+    @Override
+    @NotNull
+    public final JsonStructure toJson() {
+        return Json.createObjectBuilder().add("id", id).add("description", description).build();
     }
 
 }
