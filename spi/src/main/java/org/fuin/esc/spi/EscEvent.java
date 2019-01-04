@@ -19,11 +19,13 @@ package org.fuin.esc.spi;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
@@ -34,8 +36,10 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.eclipse.yasson.internal.Unmarshaller;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.jboss.weld.exceptions.IllegalStateException;
 
 /**
  * An event structure.
@@ -89,8 +93,7 @@ public final class EscEvent implements ToJsonCapable {
      * @param data
      *            The data.
      */
-    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, 
-            @NotNull final DataWrapper data) {
+    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, @NotNull final DataWrapper data) {
         this(eventId, eventType, data, null);
     }
 
@@ -106,8 +109,7 @@ public final class EscEvent implements ToJsonCapable {
      * @param meta
      *            The meta data if available.
      */
-    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, 
-            @NotNull final DataWrapper data,
+    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, @NotNull final DataWrapper data,
             @Nullable final DataWrapper meta) {
         super();
         Contract.requireArgNotNull("eventId", eventId);
@@ -157,8 +159,8 @@ public final class EscEvent implements ToJsonCapable {
 
     @Override
     public final JsonObject toJson() {
-        return Json.createObjectBuilder().add(EL_EVENT_ID, eventId).add(EL_EVENT_TYPE, eventType)
-                .add(EL_DATA, data.toJson()).add(EL_META_DATA, meta.toJson()).build();
+        return Json.createObjectBuilder().add(EL_EVENT_ID, eventId).add(EL_EVENT_TYPE, eventType).add(EL_DATA, data.toJson())
+                .add(EL_META_DATA, meta.toJson()).build();
     }
 
     /**
@@ -174,13 +176,11 @@ public final class EscEvent implements ToJsonCapable {
         final String eventType = jsonObj.getString(EL_EVENT_TYPE);
         final JsonObject jsonData = jsonObj.getJsonObject(EL_DATA);
         final JsonObject jsonMeta = jsonObj.getJsonObject(EL_META_DATA);
-        return new EscEvent(UUID.fromString(eventId), eventType, new DataWrapper(jsonData), 
-                new DataWrapper(jsonMeta));
+        return new EscEvent(UUID.fromString(eventId), eventType, new DataWrapper(jsonData), new DataWrapper(jsonMeta));
     }
 
     /**
-     * Serializes and deserializes a {@link EscEvent} object as JSON. The content
-     * type for serialization is always "application/json".
+     * Serializes and deserializes a {@link EscEvent} object as JSON. The content type for serialization is always "application/json".
      */
     public static class EscEventJsonDeSerializer implements SerDeserializer {
 
@@ -230,17 +230,38 @@ public final class EscEvent implements ToJsonCapable {
     public static final class JsonbDeSer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent> {
 
         private final SerializedDataTypeRegistry registry;
-        
+
         /**
          * Constructor with mandatory data.
          * 
-         * @param registry Registry for type lookup.
+         * @param registry
+         *            Registry for finding the deserializer for the content.
          */
         public JsonbDeSer(final SerializedDataTypeRegistry registry) {
             super();
             this.registry = registry;
         }
-        
+
+        private EscJsonb getJsonb(final DeserializationContext ctx) {
+            if (!(ctx instanceof Unmarshaller)) {
+                throw new IllegalStateException(
+                        "Context is expected to be type '" + Unmarshaller.class.getName() + "', but was: " + ctx.getClass().getName());
+            }
+            final Unmarshaller unmarshaller = (Unmarshaller) ctx;
+            final JsonbConfig cfg = unmarshaller.getJsonbContext().getConfig();
+            final Optional<Object> obj = cfg.getProperty(EscJsonb.CONFIG_KEY);
+            if (!obj.isPresent()) {
+                throw new IllegalStateException(
+                        "Context is expected to be type '" + Unmarshaller.class.getName() + "', but was: " + ctx.getClass().getName());
+            }
+            final Object jsonb = obj.get();
+            if (!(jsonb instanceof EscJsonb)) {
+                throw new IllegalStateException("Jsonb implementation is expected to be type '" + EscJsonb.class.getName() + "', but was: "
+                        + jsonb.getClass().getName());
+            }
+            return (EscJsonb) jsonb;
+        }
+
         @Override
         public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
             final EscEvent escEvent = new EscEvent();
@@ -259,8 +280,13 @@ public final class EscEvent implements ToJsonCapable {
                         escEvent.meta = new DataWrapper(ctx.deserialize(EscMeta.class, parser));
                         break;
                     case EL_DATA:
-                        final Class<?> clasz = registry.findClass(new SerializedDataType(escEvent.eventType));
-                        escEvent.data = new DataWrapper(ctx.deserialize(clasz, parser));
+                        final EscJsonb jsonb = getJsonb(ctx);
+                        if (jsonb.peek("\"Base64\"")) {
+                            escEvent.data = new DataWrapper(new Base64Data(ctx.deserialize(String.class, parser)));
+                        } else {
+                            final Class<?> clasz = registry.findClass(new SerializedDataType(escEvent.eventType));
+                            escEvent.data = new DataWrapper(ctx.deserialize(clasz, parser));
+                        }
                         break;
                     default:
                         // ignore
@@ -268,6 +294,7 @@ public final class EscEvent implements ToJsonCapable {
                     }
                 }
             }
+
             return escEvent;
         }
 

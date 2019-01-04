@@ -282,8 +282,12 @@ public final class EscMeta implements ToJsonCapable {
                         break;
                     default:
                         // meta
-                        final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.metaType));
-                        escMeta.meta = ctx.deserialize(clasz, parser);
+                        if (field.equals("Base64")) {
+                            escMeta.meta = new Base64Data(ctx.deserialize(String.class, parser));
+                        } else {
+                            final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.metaType));
+                            escMeta.meta = ctx.deserialize(clasz, parser);
+                        }
                         break;
                     }
                 }
@@ -302,7 +306,7 @@ public final class EscMeta implements ToJsonCapable {
                 generator.write(EL_META_CONTENT_TYPE, obj.metaContentTypeStr);
                 if (obj.meta instanceof Base64Data) {
                     final Base64Data base64data = (Base64Data) obj.meta;
-                    generator.write(obj.metaType, base64data.getEncoded());
+                    generator.write(Base64Data.EL_ROOT_NAME, base64data.getEncoded());
                 } else {
                     ctx.serialize(obj.metaType, obj.meta, generator);
                 }

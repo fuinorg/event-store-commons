@@ -66,6 +66,11 @@
             <artifactId>javax.json.bind-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+        </dependency>
+
 		<!-- test -->
 
 		<dependency>
@@ -142,12 +147,6 @@
 			<artifactId>gson</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-        <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>yasson</artifactId>
-            <scope>test</scope>
-        </dependency>
 
 	</dependencies>
 

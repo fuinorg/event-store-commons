@@ -29,7 +29,6 @@ import java.util.UUID;
 
 import javax.activation.MimeTypeParseException;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
@@ -83,14 +82,16 @@ public class EscEventsTest {
 
         final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        final Jsonb jsonb = JsonbBuilder.create(config);
+        try (final Jsonb jsonb = new EscJsonb(config)) {
 
-        // TEST
-        final String currentJson = jsonb.toJson(events);
+            // TEST
+            final String currentJson = jsonb.toJson(events);
+    
+            // VERIFY
+            assertThatJson(currentJson).isEqualTo(expectedJson);
 
-        // VERIFY
-        assertThatJson(currentJson).isEqualTo(expectedJson);
-
+        }
+        
     }
 
     @Test
@@ -106,16 +107,18 @@ public class EscEventsTest {
         final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
                 .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        final Jsonb jsonb = JsonbBuilder.create(config);
+        try (final Jsonb jsonb = new EscJsonb(config)) {
 
-        // TEST
-        final EscEvents testee = jsonb.fromJson(expectedJson, EscEvents.class);
+            // TEST
+            final EscEvents testee = jsonb.fromJson(expectedJson, EscEvents.class);
+    
+            // VERIFY
+            assertThat(testee.getList()).hasSize(2);
+            assertThat(testee.getList().get(0).getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+            assertThat(testee.getList().get(1).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
 
-        // VERIFY
-        assertThat(testee.getList()).hasSize(2);
-        assertThat(testee.getList().get(0).getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
-        assertThat(testee.getList().get(1).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
-
+        }
+        
     }
     
     private EscEvent createEvent1() throws MimeTypeParseException {

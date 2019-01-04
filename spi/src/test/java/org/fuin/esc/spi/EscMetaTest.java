@@ -30,7 +30,6 @@ import java.util.Map;
 
 import javax.json.Json;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
@@ -93,15 +92,18 @@ public class EscMetaTest {
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
+        final JsonbConfig config = new JsonbConfig()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        final Jsonb jsonb = JsonbBuilder.create(config);
+        try (final Jsonb jsonb = new EscJsonb(config)) {
 
-        // TEST
-        final String currentJson = jsonb.toJson(escMeta);
+            // TEST
+            final String currentJson = jsonb.toJson(escMeta);
 
-        // VERIFY
-        assertThatJson(currentJson).isEqualTo(expectedJson);
+            // VERIFY
+            assertThatJson(currentJson).isEqualTo(expectedJson);
+
+        }
 
     }
 
@@ -113,31 +115,93 @@ public class EscMetaTest {
 
         final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
         registry.add(MyMeta.SER_TYPE, MyMeta.class);
-        
+
         final Map<String, String> params = new HashMap<>();
         params.put("transfer-encoding", "base64");
         final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", Charset.forName("utf-8"), "1", params);
         final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
-        
-        final JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
                 .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        final Jsonb jsonb = JsonbBuilder.create(config);
+        try (final Jsonb jsonb = new EscJsonb(config)) {
 
-        // TEST
-        final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);
+            // TEST
+            final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);
 
-        // VERIFY
-        assertThat(testee.getDataType()).isEqualTo("MyEvent");
-        assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
-        assertThat(testee.getMetaType()).isEqualTo("MyMeta");
-        assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
-        assertThat(testee.getMeta()).isInstanceOf(MyMeta.class);
-        final MyMeta myMeta = (MyMeta) testee.getMeta();
-        assertThat(myMeta.getUser()).isEqualTo("abc");
-        
-    }    
-    
+            // VERIFY
+            assertThat(testee.getDataType()).isEqualTo("MyEvent");
+            assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+            assertThat(testee.getMetaType()).isEqualTo("MyMeta");
+            assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
+            assertThat(testee.getMeta()).isInstanceOf(MyMeta.class);
+            final MyMeta myMeta = (MyMeta) testee.getMeta();
+            assertThat(myMeta.getUser()).isEqualTo("abc");
+
+        }
+
+    }
+
+    @Test
+    public final void testMarshalJsonBBase64() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"));
+
+        final Base64Data base64Data = new Base64Data("PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+");
+
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml; encoding=UTF-8");
+        final EnhancedMimeType metaContentType = EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8");
+        final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
+                base64Data);
+
+        final JsonbConfig config = new JsonbConfig()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        try (final Jsonb jsonb = new EscJsonb(config)) {
+
+            // TEST
+            final String currentJson = jsonb.toJson(escMeta);
+
+            // VERIFY
+            assertThatJson(currentJson).isEqualTo(expectedJson);
+
+        }
+
+    }
+
+    @Test
+    public final void testUnmarshalJsonBBase64() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"));
+
+        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
+        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml; encoding=UTF-8");
+        final EnhancedMimeType metaContentType = EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8");
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        try (final Jsonb jsonb = new EscJsonb(config)) {
+
+            // TEST
+            final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);
+
+            // VERIFY
+            assertThat(testee.getDataType()).isEqualTo("MyEvent");
+            assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+            assertThat(testee.getMetaType()).isEqualTo("MyMeta");
+            assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
+            assertThat(testee.getMeta()).isInstanceOf(Base64Data.class);
+            final Base64Data base64Data = (Base64Data) testee.getMeta();
+            assertThat(base64Data.getEncoded()).isEqualTo("PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+");
+
+        }
+
+    }
+
 }
 // CHECKSTYLE:ON

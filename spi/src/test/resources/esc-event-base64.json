@@ -1,0 +1,16 @@
+{
+	"EventId": "68616d90-cf72-4c2a-b913-32bf6e6506ed",
+	"EventType": "MyEvent",
+	"Data": {
+		"Base64": "eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9"
+	},
+	"MetaData": {
+		"data-type": "MyEvent",
+		"data-content-type": "application/json; version=1; transfer-encoding=base64; encoding=UTF-8",
+		"meta-type": "MyMeta",
+		"meta-content-type": "application/json; version=1; encoding=UTF-8",
+		"MyMeta": {
+			"user": "abc"
+		}
+	}
+}

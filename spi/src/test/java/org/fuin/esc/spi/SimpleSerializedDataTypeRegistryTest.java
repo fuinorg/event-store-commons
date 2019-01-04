@@ -20,13 +20,6 @@ package org.fuin.esc.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import javax.activation.MimeTypeParseException;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-
-import org.fuin.esc.spi.JsonbDeSerializerTest.Person;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**

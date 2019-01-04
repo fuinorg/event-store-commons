@@ -19,14 +19,14 @@ package org.fuin.esc.spi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 
@@ -35,11 +35,11 @@ import javax.json.bind.JsonbException;
  * implementation supports only <code>byte[]</code> for marshalling/unmarshalling content. Trying to unmarshal anything else will simply
  * return the input without any change.
  */
-public final class JsonbDeSerializer implements SerDeserializer {
+public final class JsonbDeSerializer implements SerDeserializer, Closeable {
 
     private final EnhancedMimeType mimeType;
 
-    private final Jsonb jsonb;
+    private final EscJsonb jsonb;
 
     private final SerializedDataTypeRegistry registry;
 
@@ -67,7 +67,7 @@ public final class JsonbDeSerializer implements SerDeserializer {
      */
     public JsonbDeSerializer(final JsonbConfig config, final Charset encoding, final SerializedDataTypeRegistry registry) {
         super();
-        this.jsonb = JsonbBuilder.create(config);
+        this.jsonb = new EscJsonb(config);
         this.mimeType = EnhancedMimeType.create("application", "json", encoding);
         this.registry = registry;
     }
@@ -109,6 +109,15 @@ public final class JsonbDeSerializer implements SerDeserializer {
 
         } catch (final JsonbException ex) {
             throw new RuntimeException("Error de-serializing data", ex);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            jsonb.close();
+        } catch (final Exception ex) {
+            throw new IOException("Failed to clode JSONB instance", ex);
         }
     }
 
