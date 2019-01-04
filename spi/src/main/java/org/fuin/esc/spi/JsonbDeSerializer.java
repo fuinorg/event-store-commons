@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.json.JsonStructure;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -43,8 +44,8 @@ import javax.json.bind.serializer.JsonbSerializer;
 
 /**
  * Serializes and deserializes an object from/to JSON using JSON-B. The content type for serialization is always "application/json". This
- * implementation supports only <code>byte[]</code> for marshalling/unmarshalling content. Trying to unmarshal anything else will simply
- * return the input without any change.
+ * implementation supports only <code>byte[]</code> and {@link JsonStructure} for unmarshalling content. Trying to use something else will
+ * result in an exception.
  */
 public final class JsonbDeSerializer implements SerDeserializer, Closeable {
 
@@ -57,7 +58,7 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
     private final List<JsonbDeserializer<?>> deserializers;
 
     private SerializedDataTypeRegistry typeRegistry;
-    
+
     private boolean initialized;
 
     /**
@@ -109,13 +110,20 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
     public final <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
         ensureInitialized();
         try {
-
+            final Class<?> clasz = typeRegistry.findClass(type);
+            if (data instanceof JsonStructure) {
+                // TODO Remove workaround - Figure out how to serialize JsonStructure with JSON-B
+                // See https://github.com/fuinorg/event-store-commons/issues/12
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+                jsonb.toJson(data, bos);
+                final Reader reader = new InputStreamReader(new ByteArrayInputStream(bos.toByteArray()), mimeType.getEncoding());
+                return (T) jsonb.fromJson(reader, clasz);
+            }
             if (data instanceof byte[]) {
-                final Class<?> clasz = typeRegistry.findClass(type);
                 final Reader reader = new InputStreamReader(new ByteArrayInputStream((byte[]) data), mimeType.getEncoding());
                 return (T) jsonb.fromJson(reader, clasz);
             }
-            return (T) data;
+            throw new IllegalArgumentException("Expected data to be of type byte[], but was: " + data.getClass().getName());
 
         } catch (final JsonbException ex) {
             throw new RuntimeException("Error de-serializing data", ex);
@@ -187,6 +195,9 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
      */
     public void init(final SerializedDataTypeRegistry typeRegistry, final DeserializerRegistry deserRegistry,
             final SerializerRegistry serRegistry) {
+        if (initialized) {
+            throw new IllegalStateException("Instance already initialized - Don't call the init methods more than once");
+        }
         this.typeRegistry = typeRegistry;
         for (final JsonbDeserializer<?> deserializer : deserializers) {
             if (deserializer instanceof DeserializerRegistryRequired) {

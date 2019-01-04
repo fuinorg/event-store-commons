@@ -114,7 +114,7 @@ public class EscEventsTest {
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
                 .withEncoding(Charset.forName("utf-8"))
                 .build();
-        jsonbDeSer.init(typeRegistry);
+        initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
@@ -157,5 +157,31 @@ public class EscEventsTest {
         return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(data), new DataWrapper(escMeta));
     }
 
+    /**
+     * Creates a registry that connects the type with the appropriate serializer and de-serializer.
+     * 
+     * @param typeRegistry
+     *            Type registry (Mapping from type name to class).
+     * @param jsonbDeSer 
+     *            JSON-B serializer/deserializer to use.
+     */
+    private static void initSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry, 
+            JsonbDeSerializer jsonbDeSer) {
+        
+        SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+
+        // Base types always needed
+        registry.add(EscEvents.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(EscEvent.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(EscMeta.SER_TYPE, "application/json", jsonbDeSer);
+        
+        // User defined types
+        registry.add(MyMeta.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(MyEvent.SER_TYPE, "application/json", jsonbDeSer);
+        
+        jsonbDeSer.init(typeRegistry, registry, registry);
+        
+    }
+    
 }
 // CHECKSTYLE:ON

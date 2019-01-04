@@ -146,9 +146,6 @@ public class EscEventTest {
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
 
-        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/json; version=1; encoding=UTF-8");
-        final EnhancedMimeType metaContentType = EnhancedMimeType.create("application/json; version=1; encoding=UTF-8");
-
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
@@ -159,7 +156,7 @@ public class EscEventTest {
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
                 .withEncoding(Charset.forName("utf-8"))
                 .build();
-        jsonbDeSer.init(typeRegistry);
+        initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
             
@@ -176,9 +173,9 @@ public class EscEventTest {
             assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
             final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
             assertThat(escMeta.getDataType()).isEqualTo("MyEvent");
-            assertThat(escMeta.getDataContentType()).isEqualTo(dataContentType);
+            assertThat(escMeta.getDataContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
             assertThat(escMeta.getMetaType()).isEqualTo("MyMeta");
-            assertThat(escMeta.getMetaContentType()).isEqualTo(metaContentType);
+            assertThat(escMeta.getMetaContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
             assertThat(escMeta.getMeta()).isInstanceOf(MyMeta.class);
             final MyMeta myMeta = (MyMeta) escMeta.getMeta();
             assertThat(myMeta.getUser()).isEqualTo("abc");
@@ -204,7 +201,7 @@ public class EscEventTest {
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
                 .withEncoding(Charset.forName("utf-8"))
                 .build();
-        jsonbDeSer.init(typeRegistry);
+        initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
@@ -236,7 +233,7 @@ public class EscEventTest {
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
                 .withEncoding(Charset.forName("utf-8"))
                 .build();
-        jsonbDeSer.init(typeRegistry);
+        initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
@@ -281,5 +278,31 @@ public class EscEventTest {
         return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(data), new DataWrapper(escMeta));
     }
 
+    /**
+     * Creates a registry that connects the type with the appropriate serializer and de-serializer.
+     * 
+     * @param typeRegistry
+     *            Type registry (Mapping from type name to class).
+     * @param jsonbDeSer 
+     *            JSON-B serializer/deserializer to use.
+     */
+    private static void initSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry, 
+            JsonbDeSerializer jsonbDeSer) {
+        
+        SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+
+        // Base types always needed
+        registry.add(EscEvents.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(EscEvent.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(EscMeta.SER_TYPE, "application/json", jsonbDeSer);
+        
+        // User defined types
+        registry.add(MyMeta.SER_TYPE, "application/json", jsonbDeSer);
+        registry.add(MyEvent.SER_TYPE, "application/json", jsonbDeSer);
+        
+        jsonbDeSer.init(typeRegistry, registry, registry);
+        
+    }
+    
 }
 // CHECKSTYLE:ON
