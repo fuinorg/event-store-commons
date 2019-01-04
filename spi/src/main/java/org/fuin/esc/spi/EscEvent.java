@@ -19,13 +19,11 @@ package org.fuin.esc.spi;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.bind.JsonbConfig;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
@@ -36,7 +34,6 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.eclipse.yasson.internal.Unmarshaller;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.jboss.weld.exceptions.IllegalStateException;
@@ -227,44 +224,14 @@ public final class EscEvent implements ToJsonCapable {
     /**
      * Adapter to use for JSON-B.
      */
-    public static final class JsonbDeSer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent> {
+    public static final class JsonbDeSer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent>, DeserializerRegistryRequired {
 
-        private final SerializedDataTypeRegistry registry;
-
-        /**
-         * Constructor with mandatory data.
-         * 
-         * @param registry
-         *            Registry for finding the deserializer for the content.
-         */
-        public JsonbDeSer(final SerializedDataTypeRegistry registry) {
-            super();
-            this.registry = registry;
-        }
-
-        private EscJsonb getJsonb(final DeserializationContext ctx) {
-            if (!(ctx instanceof Unmarshaller)) {
-                throw new IllegalStateException(
-                        "Context is expected to be type '" + Unmarshaller.class.getName() + "', but was: " + ctx.getClass().getName());
-            }
-            final Unmarshaller unmarshaller = (Unmarshaller) ctx;
-            final JsonbConfig cfg = unmarshaller.getJsonbContext().getConfig();
-            final Optional<Object> obj = cfg.getProperty(EscJsonb.CONFIG_KEY);
-            if (!obj.isPresent()) {
-                throw new IllegalStateException(
-                        "Context is expected to be type '" + Unmarshaller.class.getName() + "', but was: " + ctx.getClass().getName());
-            }
-            final Object jsonb = obj.get();
-            if (!(jsonb instanceof EscJsonb)) {
-                throw new IllegalStateException("Jsonb implementation is expected to be type '" + EscJsonb.class.getName() + "', but was: "
-                        + jsonb.getClass().getName());
-            }
-            return (EscJsonb) jsonb;
-        }
+        private DeserializerRegistry registry;
 
         @Override
         public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
             final EscEvent escEvent = new EscEvent();
+            JsonObject content = null;
             while (parser.hasNext()) {
                 final JsonParser.Event event = parser.next();
                 if (event == JsonParser.Event.KEY_NAME) {
@@ -280,19 +247,31 @@ public final class EscEvent implements ToJsonCapable {
                         escEvent.meta = new DataWrapper(ctx.deserialize(EscMeta.class, parser));
                         break;
                     case EL_DATA:
-                        final EscJsonb jsonb = getJsonb(ctx);
-                        if (jsonb.peek("\"Base64\"")) {
-                            escEvent.data = new DataWrapper(new Base64Data(ctx.deserialize(String.class, parser)));
-                        } else {
-                            final Class<?> clasz = registry.findClass(new SerializedDataType(escEvent.eventType));
-                            escEvent.data = new DataWrapper(ctx.deserialize(clasz, parser));
-                        }
+                        content = ctx.deserialize(JsonObject.class, parser);
                         break;
                     default:
                         // ignore
                         break;
                     }
                 }
+            }
+
+            // Handle data at the end, because meta data is only safely available at the end of the process
+            if (content == null) {
+                throw new IllegalStateException("Expected content to be set, but was never processed during parse process");
+            }
+            if (content.containsKey(Base64Data.EL_ROOT_NAME)) {
+                escEvent.data = new DataWrapper(new Base64Data(content.getString(Base64Data.EL_ROOT_NAME)));
+            } else {
+                if (!(escEvent.meta.getObj() instanceof EscMeta)) {
+                    throw new IllegalStateException("Expected 'meta.object' to be of type 'EscMeta', but was: " + escEvent.meta.getObj());
+                }
+                final EscMeta escMeta = (EscMeta) escEvent.meta.getObj();
+                final Deserializer deserializer = registry.getDeserializer(new SerializedDataType(escEvent.eventType),
+                        escMeta.getDataContentType());
+                final Object obj = deserializer.unmarshal(content, new SerializedDataType(escEvent.eventType),
+                        escMeta.getDataContentType());
+                escEvent.data = new DataWrapper(obj);
             }
 
             return escEvent;
@@ -315,6 +294,12 @@ public final class EscEvent implements ToJsonCapable {
                 ctx.serialize(EL_META_DATA, obj.getMeta().getObj(), generator);
             }
             generator.writeEnd();
+        }
+
+        @Override
+        public void setRegistry(final DeserializerRegistry registry) {
+            this.registry = registry;
+
         }
 
     }

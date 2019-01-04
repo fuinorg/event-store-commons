@@ -28,7 +28,6 @@ import java.util.UUID;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;
@@ -219,18 +218,25 @@ public class ESHttpMarshallerTest {
         typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
-        final JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(typeRegistry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(typeRegistry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        final JsonbDeSerializer jsonbDeSer = new JsonbDeSerializer(config, Charset.forName("utf-8"), typeRegistry);
-        
+
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonbDeSer);
         registry.add(new SerializedDataType(MyEvent.TYPE.asBaseType()), "application/json", jsonbDeSer);
         registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/json", jsonbDeSer);
         registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/json", jsonbDeSer);
         registry.add(new SerializedDataType(EscEvent.TYPE.asBaseType()), "application/json", jsonbDeSer);
+
+        jsonbDeSer.init(typeRegistry, registry, registry);
+        
+        
+        
         return registry;
     }
     

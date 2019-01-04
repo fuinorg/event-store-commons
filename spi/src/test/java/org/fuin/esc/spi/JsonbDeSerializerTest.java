@@ -22,13 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.charset.Charset;
 
 import javax.activation.MimeTypeParseException;
-import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 
+import org.eclipse.yasson.FieldAccessStrategy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.eclipse.yasson.FieldAccessStrategy;
 
 /**
  * Tests the {@link JsonbDeSerializer} class.
@@ -42,11 +41,14 @@ public class JsonbDeSerializerTest {
 
     @Before
     public void setup() throws MimeTypeParseException {
-        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
-        registry.add(TYPE, Person.class);
-        final JsonbConfig config = new JsonbConfig()
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        testee = new JsonbDeSerializer(config, Charset.forName("utf-8"), registry);
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(TYPE, Person.class);
+        
+        testee = JsonbDeSerializer.builder()
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        testee.init(typeRegistry);
     }
 
     @After

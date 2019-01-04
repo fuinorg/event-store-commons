@@ -255,12 +255,10 @@ public final class EscSpiUtils {
     /**
      * Creates all available JSON-B serializers necessary for the ESC implementation.
      * 
-     * @param registry Registry used by some of the implementations.
-     * 
      * @return New array with serializers.
      */
-    public static JsonbSerializer<?>[] createEscJsonbSerializers(final SerializedDataTypeRegistry registry) {
-        return new JsonbSerializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(registry), new EscMeta.JsonbDeSer(registry) };
+    public static JsonbSerializer<?>[] createEscJsonbSerializers() {
+        return new JsonbSerializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(), new EscMeta.JsonbDeSer() };
     }
 
     /**
@@ -286,12 +284,10 @@ public final class EscSpiUtils {
     /**
      * Creates all available JSON-B deserializers necessary for the ESC implementation.
      * 
-     * @param registry Registry used by some of the implementations.
-     * 
      * @return New array with deserializers.
      */
-    public static JsonbDeserializer<?>[] createEscJsonbDeserializers(final SerializedDataTypeRegistry registry) {
-        return new JsonbDeserializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(registry), new EscMeta.JsonbDeSer(registry) };
+    public static JsonbDeserializer<?>[] createEscJsonbDeserializers() {
+        return new JsonbDeserializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(), new EscMeta.JsonbDeSer() };
     }
 
     /**

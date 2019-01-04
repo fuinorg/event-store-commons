@@ -7,8 +7,6 @@ import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import javax.json.bind.JsonbConfig;
-
 import org.eclipse.yasson.FieldAccessStrategy;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -57,11 +55,15 @@ public final class EsHttpJsonbExample {
     /**
      * Creates a registry that connects the type with the appropriate serializer and de-serializer.
      * 
-     * @param jsonbDeSer JSON-B serializer/deserializer to use.
+     * @param typeRegistry
+     *            Type registry (Mapping from type name to class).
+     * @param jsonbDeSer 
+     *            JSON-B serializer/deserializer to use.
      * 
      * @return New registry instance.
      */
-    private static SerDeserializerRegistry createSerDeserializerRegistry(JsonbDeSerializer jsonbDeSer) {
+    private static SerDeserializerRegistry createSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry, 
+            JsonbDeSerializer jsonbDeSer) {
         
         SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
@@ -74,15 +76,17 @@ public final class EsHttpJsonbExample {
         registry.add(MyMeta.SER_TYPE, "application/json", jsonbDeSer);
         registry.add(BookAddedEvent.SER_TYPE, "application/json", jsonbDeSer);
         
+        jsonbDeSer.init(typeRegistry, registry, registry);
+        
         return registry;
     }
     
-    private static JsonbDeSerializer createJsonbDeSerializer(SerializedDataTypeRegistry typeRegistry) {
-        JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(typeRegistry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(typeRegistry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        return new JsonbDeSerializer(config, Charset.forName("utf-8"), typeRegistry);
+    private static JsonbDeSerializer createJsonbDeSerializer() {
+        return JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8")).build();
     }
     
     /**
@@ -101,10 +105,10 @@ public final class EsHttpJsonbExample {
         SerializedDataTypeRegistry typeRegistry = createTypeRegistry();
 
         // Does the actual marshalling/unmarshalling
-        JsonbDeSerializer jsonbDeSer = createJsonbDeSerializer(typeRegistry);
+        JsonbDeSerializer jsonbDeSer = createJsonbDeSerializer();
         
         // Registry connects the type with the appropriate serializer and de-serializer
-        SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(jsonbDeSer);
+        SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         // Create an event store instance and open it
         EventStore eventStore = new ESHttpEventStore(threadFactory, url, 

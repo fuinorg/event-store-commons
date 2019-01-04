@@ -29,7 +29,6 @@ import java.util.UUID;
 
 import javax.activation.MimeTypeParseException;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;
@@ -74,15 +73,20 @@ public class EscEventsTest {
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
 
-        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
-        registry.add(MyEvent.SER_TYPE, MyEvent.class);
-        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
+        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
         final EscEvents events = new EscEvents(createEvent1(), createEvent2());
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final String currentJson = jsonb.toJson(events);
@@ -100,14 +104,19 @@ public class EscEventsTest {
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
 
-        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
-        registry.add(MyEvent.SER_TYPE, MyEvent.class);
-        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
+        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final EscEvents testee = jsonb.fromJson(expectedJson, EscEvents.class);

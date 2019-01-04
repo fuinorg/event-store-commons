@@ -245,20 +245,10 @@ public final class EscMeta implements ToJsonCapable {
     /**
      * Adapter to use for JSON-B.
      */
-    public static final class JsonbDeSer implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta> {
+    public static final class JsonbDeSer
+            implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta>, SerializedDataTypeRegistryRequired {
 
-        private final SerializedDataTypeRegistry registry;
-
-        /**
-         * Constructor with mandatory data.
-         * 
-         * @param registry
-         *            Registry for type lookup.
-         */
-        public JsonbDeSer(final SerializedDataTypeRegistry registry) {
-            super();
-            this.registry = registry;
-        }
+        private SerializedDataTypeRegistry registry;
 
         @Override
         public EscMeta deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
@@ -313,6 +303,11 @@ public final class EscMeta implements ToJsonCapable {
             }
             generator.writeEnd();
 
+        }
+
+        @Override
+        public void setRegistry(final SerializedDataTypeRegistry registry) {
+            this.registry = registry;
         }
 
     }

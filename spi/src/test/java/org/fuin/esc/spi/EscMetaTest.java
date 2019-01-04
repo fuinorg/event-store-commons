@@ -30,7 +30,6 @@ import java.util.Map;
 
 import javax.json.Json;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;
@@ -92,10 +91,16 @@ public class EscMetaTest {
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
 
-        final JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
+        
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final String currentJson = jsonb.toJson(escMeta);
@@ -113,18 +118,23 @@ public class EscMetaTest {
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
 
-        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
-        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
         final Map<String, String> params = new HashMap<>();
         params.put("transfer-encoding", "base64");
         final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", Charset.forName("utf-8"), "1", params);
         final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(new EscMeta.JsonbDeSer())
+                .withDeserializers(new EscMeta.JsonbDeSer())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);
@@ -155,10 +165,17 @@ public class EscMetaTest {
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 base64Data);
 
-        final JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(new SimpleSerializedDataTypeRegistry()))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
+        
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final String currentJson = jsonb.toJson(escMeta);
@@ -176,16 +193,21 @@ public class EscMetaTest {
         // PREPARE
         final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"));
 
-        final SimpleSerializedDataTypeRegistry registry = new SimpleSerializedDataTypeRegistry();
-        registry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
+        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
         final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml; encoding=UTF-8");
         final EnhancedMimeType metaContentType = EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8");
 
-        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers(registry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(registry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        try (final Jsonb jsonb = new EscJsonb(config)) {
+        final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
+                .withSerializers(new EscMeta.JsonbDeSer())
+                .withDeserializers(new EscMeta.JsonbDeSer())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8"))
+                .build();
+        jsonbDeSer.init(typeRegistry);
+        
+        try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
 
             // TEST
             final EscMeta testee = jsonb.fromJson(expectedJson, EscMeta.class);

@@ -7,8 +7,6 @@ import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import javax.json.bind.JsonbConfig;
-
 import org.eclipse.yasson.FieldAccessStrategy;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -43,28 +41,33 @@ public final class EsHttpMixedExample {
 
         // Contains all types for usage with JSON-B
         SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        
+
         // Base types always needed
-        typeRegistry.add(EscEvent.SER_TYPE, EscEvent.class); 
-        typeRegistry.add(EscEvents.SER_TYPE, EscEvents.class); 
+        typeRegistry.add(EscEvent.SER_TYPE, EscEvent.class);
+        typeRegistry.add(EscEvents.SER_TYPE, EscEvents.class);
         typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
         // User defined types
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
         typeRegistry.add(BookAddedEvent.SER_TYPE, BookAddedEvent.class);
-        
+
         return typeRegistry;
     }
 
     /**
      * Creates a registry that connects the type with the appropriate serializer and de-serializer.
-     * 
-     * @param jsonbDeSer JSON-B serializer/deserializer to use.
-     * @param xmlDeSer JAX-B serializer/deserializer to use.
+     *
+     * @param typeRegistry
+     *            Type registry (Mapping from type name to class).
+     * @param jsonbDeSer
+     *            JSON-B serializer/deserializer to use.
+     * @param xmlDeSer
+     *            JAX-B serializer/deserializer to use.
      * 
      * @return New registry instance.
      */
-    private static SerDeserializerRegistry createSerDeserializerRegistry(JsonbDeSerializer jsonbDeSer, XmlDeSerializer xmlDeSer) {
-        
+    private static SerDeserializerRegistry createSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry,
+            JsonbDeSerializer jsonbDeSer, XmlDeSerializer xmlDeSer) {
+
         SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 
         // Base types always needed (JSON-B)
@@ -75,18 +78,18 @@ public final class EsHttpMixedExample {
         // User defined types (JAX-B)
         registry.add(MyMeta.SER_TYPE, "application/xml", xmlDeSer);
         registry.add(BookAddedEvent.SER_TYPE, "application/xml", xmlDeSer);
-        
+
+        jsonbDeSer.init(typeRegistry, registry, registry);
+
         return registry;
     }
-    
-    private static JsonbDeSerializer createJsonbDeSerializer(SerializedDataTypeRegistry typeRegistry) {
-        JsonbConfig config = new JsonbConfig()
-                .withSerializers(EscSpiUtils.createEscJsonbSerializers(typeRegistry))
-                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers(typeRegistry))
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
-        return new JsonbDeSerializer(config, Charset.forName("utf-8"), typeRegistry);
+
+    private static JsonbDeSerializer createJsonbDeSerializer() {
+        return JsonbDeSerializer.builder().withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withDeserializers(EscSpiUtils.createEscJsonbDeserializers()).withPropertyVisibilityStrategy(new FieldAccessStrategy())
+                .withEncoding(Charset.forName("utf-8")).build();
     }
-    
+
     /**
      * Main method.
      * 
@@ -106,12 +109,11 @@ public final class EsHttpMixedExample {
         XmlDeSerializer jaxbDeSer = new XmlDeSerializer(false, MyMeta.class, BookAddedEvent.class);
 
         // Handles JSON serialization and de-serialization (JAX-B)
-        JsonbDeSerializer jsonbDeSer = createJsonbDeSerializer(typeRegistry);
-        
+        JsonbDeSerializer jsonbDeSer = createJsonbDeSerializer();
+
         // Registry connects the type with the appropriate serializer and de-serializer
-        SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(jsonbDeSer, jaxbDeSer);
-        
-        
+        SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(typeRegistry, jsonbDeSer, jaxbDeSer);
+
         // Create an event store instance and open it
         EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
                 ESEnvelopeType.JSON, // This format will be used to communicate with the event store
