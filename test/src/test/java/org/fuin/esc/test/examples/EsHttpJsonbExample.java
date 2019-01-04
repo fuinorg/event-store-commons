@@ -105,7 +105,6 @@ public final class EsHttpJsonbExample {
         
         // Registry connects the type with the appropriate serializer and de-serializer
         SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(jsonbDeSer);
-
         
         // Create an event store instance and open it
         EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
