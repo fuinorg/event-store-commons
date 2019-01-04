@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.activation.MimeTypeParseException;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -330,6 +333,71 @@ public class EscSpiUtilsTest {
                 "<MyMeta><user>peter</user></MyMeta>");
 
     }
+    
+    @Test
+    public void testJoinJsonbSerializers() {
+        
+        final JsonbSerializer<Object> a = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> b = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> c = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> d = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        
+        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {})).isEmpty();;
+        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {}, a)).containsExactly(a);
+        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a}, b)).containsExactly(a, b);
+        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a, b}, c)).containsExactly(a, b, c);
+        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a, b}, c, d)).containsExactly(a, b, c, d);
+        
+    }
+    
+    @Test
+    public void testJoinJsonbSerializerArrays() {
+        
+        final JsonbSerializer<Object> a = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> b = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> c = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        final JsonbSerializer<Object> d = new JsonbSerializer<Object>() {
+            @Override
+            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            }
+        };
+        
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {})).isEmpty();;
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {}, new JsonbSerializer<?>[] {a})).containsExactly(a);
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a}, new JsonbSerializer<?>[] {b})).contains(a, b);
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c, d})).contains(a, b, c, d);
+        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a}, new JsonbSerializer<?>[] {b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
+        
+    }
 
     private EnhancedMimeType mimeType(String str) {
         try {
@@ -376,6 +444,6 @@ public class EscSpiUtilsTest {
         }
         return list;
     }
-    
+
 }
 // CHECKSTYLE:ON

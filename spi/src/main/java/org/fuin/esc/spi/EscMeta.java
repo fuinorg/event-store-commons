@@ -20,6 +20,12 @@ package org.fuin.esc.spi;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,6 +34,9 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+
+import java.lang.reflect.Type;
+
 import javax.annotation.Nullable;
 
 /**
@@ -238,4 +247,37 @@ public final class EscMeta implements ToJsonCapable {
                 new Base64Data(base64obj.getString(Base64Data.EL_ROOT_NAME)));
     }
 
+    /**
+     * Adapter to use for JSON-B.
+     */
+    public static final class JsonbDeSer implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta> {
+
+        @Override
+        public EscMeta deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void serialize(EscMeta obj, JsonGenerator generator, SerializationContext ctx) {
+
+            generator.writeStartObject();
+            generator.write(EL_DATA_TYPE, obj.dataType);
+            generator.write(EL_DATA_CONTENT_TYPE, obj.dataContentTypeStr);
+            if (obj.meta != null) {
+                generator.write(EL_META_TYPE, obj.metaType);
+                generator.write(EL_META_CONTENT_TYPE, obj.metaContentTypeStr);
+                if (obj.meta instanceof Base64Data) {
+                    final Base64Data base64data = (Base64Data) obj.meta;
+                    generator.write(obj.metaType, base64data.getEncoded());
+                } else {
+                    ctx.serialize(obj.metaType, obj.meta, generator);
+                }
+            }
+            generator.writeEnd();
+            
+        }
+
+    }
+    
 }

@@ -17,18 +17,25 @@
  */
 package org.fuin.esc.spi;
 
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.Nullable;
 
 /**
  * An event structure.
@@ -216,5 +223,37 @@ public final class EscEvent implements ToJsonCapable {
         }
 
     }
-    
+
+    /**
+     * Adapter to use for JSON-B.
+     */
+    public static final class JsonbDeSer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent> {
+
+        @Override
+        public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void serialize(EscEvent obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.writeStartObject();
+            if (obj != null) {
+                generator.write(EL_EVENT_ID, obj.eventId);
+                generator.write(EL_EVENT_TYPE, obj.eventType);
+                if (obj.getData().getObj() instanceof Base64Data) {
+                    final Base64Data base64Data = (Base64Data) obj.getData().getObj();
+                    generator.writeStartObject(EL_DATA);
+                    generator.write(Base64Data.EL_ROOT_NAME, base64Data.getEncoded());
+                    generator.writeEnd();
+                } else {
+                    ctx.serialize(EL_DATA, obj.getData().getObj(), generator);
+                }
+                ctx.serialize(EL_META_DATA, obj.getMeta().getObj(), generator);
+            }
+            generator.writeEnd();
+        }
+
+    }
+
 }

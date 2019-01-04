@@ -158,6 +158,12 @@
 			<scope>test</scope>
 		</dependency>
 
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 	</dependencies>
 
 	<build>
@@ -201,6 +207,7 @@
 					</execution>
 				</executions>
 				<configuration>
+                    <download-os-qualifier>Ubuntu 18</download-os-qualifier>
 					<arguments>
 						<argument>--mem-db=TRUE</argument>
 						<argument>--run-projections=All</argument>

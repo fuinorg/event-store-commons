@@ -1,0 +1,17 @@
+{
+    "EventId":"b2a936ce-d479-414f-b67f-3df4da383d47",
+    "EventType":"MyEvent",
+    "Data":{
+        "id":"b2a936ce-d479-414f-b67f-3df4da383d47",
+        "description":"Hello, JSON!"
+    },
+    "MetaData":{
+        "data-type":"MyEvent",
+        "data-content-type":"application/json; version=1; encoding=UTF-8",
+        "meta-type":"MyMeta",
+        "meta-content-type":"application/json; version=1; encoding=UTF-8",
+        "MyMeta":{
+            "user":"abc"
+        }
+    }
+}

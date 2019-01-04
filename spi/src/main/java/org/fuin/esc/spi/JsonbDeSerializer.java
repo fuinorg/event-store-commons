@@ -46,10 +46,10 @@ public final class JsonbDeSerializer implements SerDeserializer {
     /**
      * Constructor that creates a JAXB context internally and uses UTF-8 encoding.
      * 
-     * @param jaxbFragment
-     *            Generate the XML fragment or not.
-     * @param classesToBeBound
-     *            Classes to use for the JAXB context.
+     * @param config
+     *            JSON-B configuration to use.
+     * @param registry
+     *            Registry with types to serialize/deserialize with JSON-B.
      */
     public JsonbDeSerializer(final JsonbConfig config, final SerializedDataTypeRegistry registry) {
         this(config, Charset.forName("utf-8"), registry);
@@ -58,19 +58,17 @@ public final class JsonbDeSerializer implements SerDeserializer {
     /**
      * Constructor with JAXB context classes.
      * 
+     * @param config
+     *            JSON-B configuration to use.
      * @param encoding
      *            Encoding to use.
-     * @param adapters
-     *            Adapters to associate with the JAXB context or <code>null</code>.
-     * @param jaxbFragment
-     *            Generate the XML fragment or not.
-     * @param classesToBeBound
-     *            Classes to use for the JAXB context.
+     * @param registry
+     *            Registry with types to serialize/deserialize with JSON-B.
      */
     public JsonbDeSerializer(final JsonbConfig config, final Charset encoding, final SerializedDataTypeRegistry registry) {
         super();
         this.jsonb = JsonbBuilder.create(config);
-        this.mimeType = EnhancedMimeType.create("application", "xml", encoding);
+        this.mimeType = EnhancedMimeType.create("application", "json", encoding);
         this.registry = registry;
     }
 
@@ -84,9 +82,13 @@ public final class JsonbDeSerializer implements SerDeserializer {
 
         try {
             final Class<?> clasz = registry.findClass(type);
+            if (!obj.getClass().isAssignableFrom(clasz)) {
+                throw new IllegalStateException("The instance class '" + obj.getClass().getName() + "' is not assignable from '"
+                        + clasz.getName() + "'. The registry returned an incompatible type for '" + type + "'");
+            }
             final ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
             final Writer writer = new OutputStreamWriter(bos, mimeType.getEncoding());
-            jsonb.toJson(obj, clasz, writer);
+            jsonb.toJson(obj, writer);
             return bos.toByteArray();
         } catch (final JsonbException ex) {
             throw new RuntimeException("Error serializing data", ex);

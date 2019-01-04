@@ -25,7 +25,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
+
+import javax.json.bind.annotation.JsonbProperty;
 import javax.validation.constraints.NotEmpty;
 
 /**
@@ -41,10 +44,15 @@ public final class MyEvent implements Serializable {
     
     /** Unique name of the event. */
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
+    
+    /** Unique serialization name of the event. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(EL_ROOT_NAME);
 
+    @JsonbProperty("id")
     @XmlElement(name = "id")
     private String id;
 
+    @JsonbProperty("description")
     @XmlElement(name = "description")
     private String description;
 

@@ -21,6 +21,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Nullable;
+import javax.json.bind.serializer.JsonbSerializer;
 import javax.validation.constraints.NotNull;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -31,7 +33,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.Nullable;
 import org.w3c.dom.Node;
 
 /**
@@ -47,8 +48,7 @@ public final class EscSpiUtils {
     }
 
     /**
-     * Tries to find a serializer for the given type of object and converts it
-     * into a storable data block.
+     * Tries to find a serializer for the given type of object and converts it into a storable data block.
      * 
      * @param registry
      *            Registry with known serializers.
@@ -57,12 +57,11 @@ public final class EscSpiUtils {
      * @param data
      *            Event of the given type.
      * 
-     * @return Event ready to persist or <code>null</code> if the given data was
-     *         <code>null</code>.
+     * @return Event ready to persist or <code>null</code> if the given data was <code>null</code>.
      */
     @Nullable
-    public static SerializedData serialize(@NotNull final SerializerRegistry registry,
-            @NotNull final SerializedDataType type, @Nullable final Object data) {
+    public static SerializedData serialize(@NotNull final SerializerRegistry registry, @NotNull final SerializedDataType type,
+            @Nullable final Object data) {
 
         if (data == null) {
             return null;
@@ -89,8 +88,7 @@ public final class EscSpiUtils {
      *            Expected type of event.
      */
     @NotNull
-    public static <T> T deserialize(@NotNull final DeserializerRegistry registry,
-            @NotNull final SerializedData data) {
+    public static <T> T deserialize(@NotNull final DeserializerRegistry registry, @NotNull final SerializedData data) {
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("data", data);
         final Deserializer deserializer = registry.getDeserializer(data.getType(), data.getMimeType());
@@ -102,24 +100,20 @@ public final class EscSpiUtils {
      * Returns the mime types shared by all events in the list.
      * 
      * @param registry
-     *            Registry used to peek the mime type used to serialize the
-     *            event.
+     *            Registry used to peek the mime type used to serialize the event.
      * @param commonEvents
      *            List to test.
      * 
-     * @return Mime type if all events share the same type or <code>null</code>
-     *         if there are events with different mime types.
+     * @return Mime type if all events share the same type or <code>null</code> if there are events with different mime types.
      */
-    public static EnhancedMimeType mimeType(@NotNull final SerializerRegistry registry,
-            @NotNull final List<CommonEvent> commonEvents) {
+    public static EnhancedMimeType mimeType(@NotNull final SerializerRegistry registry, @NotNull final List<CommonEvent> commonEvents) {
 
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("commonEvents", commonEvents);
 
         EnhancedMimeType mimeType = null;
         for (final CommonEvent commonEvent : commonEvents) {
-            final Serializer serializer = registry
-                    .getSerializer(new SerializedDataType(commonEvent.getDataType().asBaseType()));
+            final Serializer serializer = registry.getSerializer(new SerializedDataType(commonEvent.getDataType().asBaseType()));
             if (mimeType == null) {
                 mimeType = serializer.getMimeType();
             } else {
@@ -157,11 +151,9 @@ public final class EscSpiUtils {
      * @param eventsB
      *            Second event list.
      * 
-     * @return TRUE if both lists have the same size and all event identifiers
-     *         are equal.
+     * @return TRUE if both lists have the same size and all event identifiers are equal.
      */
-    public static boolean eventsEqual(@Nullable final List<CommonEvent> eventsA,
-            @Nullable final List<CommonEvent> eventsB) {
+    public static boolean eventsEqual(@Nullable final List<CommonEvent> eventsA, @Nullable final List<CommonEvent> eventsB) {
         if ((eventsA == null) && (eventsB == null)) {
             return true;
         }
@@ -194,15 +186,14 @@ public final class EscSpiUtils {
      * @param registry
      *            Registry with serializers.
      * @param targetContentType
-     *            Content type that will later be used to serialize the created
-     *            result.
+     *            Content type that will later be used to serialize the created result.
      * @param commonEvent
      *            Event to create meta information for.
      * 
      * @return New meta instance.
      */
-    public static EscMeta createEscMeta(@NotNull final SerializerRegistry registry,
-            @NotNull final EnhancedMimeType targetContentType, @Nullable final CommonEvent commonEvent) {
+    public static EscMeta createEscMeta(@NotNull final SerializerRegistry registry, @NotNull final EnhancedMimeType targetContentType,
+            @Nullable final CommonEvent commonEvent) {
 
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("targetContentType", targetContentType);
@@ -223,8 +214,7 @@ public final class EscSpiUtils {
         final SerializedDataType serDataType = new SerializedDataType(metaType);
         final Serializer metaSerializer = registry.getSerializer(serDataType);
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
-            return new EscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(),
-                    commonEvent.getMeta());
+            return new EscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(), commonEvent.getMeta());
         }
 
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta(), serDataType);
@@ -233,8 +223,7 @@ public final class EscSpiUtils {
 
     }
 
-    private static EnhancedMimeType contentType(final EnhancedMimeType sourceContentType,
-            final EnhancedMimeType targetContentType) {
+    private static EnhancedMimeType contentType(final EnhancedMimeType sourceContentType, final EnhancedMimeType targetContentType) {
         if (sourceContentType.matchEncoding(targetContentType)) {
             return sourceContentType;
         }
@@ -259,6 +248,45 @@ public final class EscSpiUtils {
         } catch (final TransformerException ex) {
             throw new RuntimeException("Failed to render node", ex);
         }
+    }
+
+    /**
+     * Creates all available JSON-B serializers necessary for the ESC implementation.
+     * 
+     * @return New array with serializers.
+     */
+    public static JsonbSerializer<?>[] createEscJsonbSerializers() {
+        return new JsonbSerializer[] { new EscEvents.JsonbDeSer(), new EscEvent.JsonbDeSer(), new EscMeta.JsonbDeSer() };
+    }
+
+    /**
+     * Creates all available JSON-B serializers necessary for the ESC implementation.
+     * 
+     * @return New array with serializers.
+     */
+    public static JsonbSerializer<?>[] joinJsonbSerializers(final JsonbSerializer<?>[] serializersA, final JsonbSerializer<?>... serializersB) {
+        return joinJsonbSerializerArrays(serializersA, serializersB);
+    }
+
+    /**
+     * Creates all available JSON-B serializers necessary for the ESC implementation.
+     * 
+     * @return New array with serializers.
+     */
+    public static JsonbSerializer<?>[] joinJsonbSerializerArrays(final JsonbSerializer<?>[]... serializerArrays) {
+        int size = 0;
+        for (final JsonbSerializer<?>[] serialzerArray : serializerArrays) {
+            size = size + serialzerArray.length;
+        }
+        final JsonbSerializer<?>[] all = new JsonbSerializer<?>[size];
+        int i = 0;
+        for (final JsonbSerializer<?>[] serialzerArray : serializerArrays) {
+            for (int j = 0; j < serialzerArray.length; j++) {
+                all[i] = serialzerArray[j];
+                i++;
+            }
+        }
+        return all;
     }
 
 }

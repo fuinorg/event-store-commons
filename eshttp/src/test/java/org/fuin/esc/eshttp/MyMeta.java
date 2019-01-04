@@ -23,7 +23,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.SerializedDataType;
+
 import javax.annotation.Nullable;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * Example meta data. .
@@ -39,6 +42,10 @@ public final class MyMeta implements Serializable {
     /** Unique name of the event. */
     public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
 
+    /** Unique serialization name of the event. */
+    public static final SerializedDataType SER_TYPE = new SerializedDataType(EL_ROOT_NAME);
+    
+    @JsonbProperty("user")
     @XmlElement(name = "user")
     private String user;
 

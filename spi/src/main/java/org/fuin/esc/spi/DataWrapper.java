@@ -72,9 +72,8 @@ public final class DataWrapper implements ToJsonCapable {
         } else if (obj instanceof JsonStructure) {
             return (JsonStructure) obj;
         }
-        throw new IllegalStateException(
-                "Wrapped object is not an instance of '" + ToJsonCapable.class.getSimpleName()
-                        + "' or 'JsonStructure': " + obj + " [" + obj.getClass().getName() + "]");
+        throw new IllegalStateException("Wrapped object is not an instance of '" + ToJsonCapable.class.getSimpleName()
+                + "' or 'JsonStructure': " + obj + " [" + obj.getClass().getName() + "]");
     }
 
 }

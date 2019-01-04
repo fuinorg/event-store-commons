@@ -24,10 +24,17 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.json.Json;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.yasson.FieldAccessStrategy;
 import org.junit.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -49,8 +56,7 @@ public class EscMetaTest {
         final String actualXml = marshal(testee, EscMeta.class, MyMeta.class, Base64Data.class);
 
         // VERIFY
-        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(actualXml).ignoreWhitespace()
-                .build();
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(actualXml).ignoreWhitespace().build();
         assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
@@ -72,5 +78,32 @@ public class EscMetaTest {
 
     }
 
+    @Test
+    public final void testJsonB() throws Exception {
+
+        // PREPARE
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
+
+        final MyMeta myMeta = new MyMeta("abc");
+
+        final Map<String, String> params = new HashMap<>();
+        params.put("transfer-encoding", "base64");
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", Charset.forName("utf-8"), "1", params);
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
+                myMeta);
+
+        final JsonbConfig config = new JsonbConfig().withSerializers(EscSpiUtils.createEscJsonbSerializers())
+                .withPropertyVisibilityStrategy(new FieldAccessStrategy());
+        final Jsonb jsonb = JsonbBuilder.create(config);
+
+        // TEST
+        final String currentJson = jsonb.toJson(escMeta);
+
+        // VERIFY
+        assertThatJson(currentJson).isEqualTo(expectedJson);
+
+    }
+
 }
-//CHECKSTYLE:ON
+// CHECKSTYLE:ON
