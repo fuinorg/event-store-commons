@@ -306,7 +306,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -369,7 +369,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             }
 
         } catch (final URISyntaxException | ExecutionException
-                | InterruptedException ex) {
+                | InterruptedException ex) { //NOSONAR Ignore InterruptedException warning
             throw new RuntimeException(msg, ex);
         }
 
@@ -397,7 +397,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
                     + streamName(streamId) + "/" + start + "/forward/" + count)
                     .build();
             return readEvents(streamId, true, uri, start, count, msg, false);
-        } catch (final IOException | URISyntaxException | InterruptedException
+        } catch (final IOException | URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -420,7 +420,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
                     + streamName(streamId) + "/" + start + "/backward/" + count)
                     .build();
             return readEvents(streamId, false, uri, start, count, msg, true);
-        } catch (final IOException | URISyntaxException | InterruptedException
+        } catch (final IOException | URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -477,7 +477,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -521,7 +521,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -558,7 +558,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -608,7 +608,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -663,7 +663,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException
+        } catch (final URISyntaxException | InterruptedException //NOSONAR Ignore InterruptedException warning
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
@@ -709,7 +709,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             }
 
         } catch (final URISyntaxException | ExecutionException
-                | InterruptedException ex) {
+                | InterruptedException ex) { //NOSONAR Ignore InterruptedException warning
             throw new RuntimeException(msg, ex);
         }
 
@@ -829,7 +829,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore
             } finally {
                 get.reset();
             }
-        } catch (final InterruptedException | ExecutionException
+        } catch (final InterruptedException | ExecutionException //NOSONAR Ignore InterruptedException warning
                 | UnsupportedOperationException | IOException ex) {
             throw new RuntimeException("Failed to read " + uri, ex);
         }
