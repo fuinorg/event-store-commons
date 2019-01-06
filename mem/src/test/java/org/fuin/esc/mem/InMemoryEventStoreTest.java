@@ -241,7 +241,7 @@ public class InMemoryEventStoreTest {
         while (result.size() != expected && (count < 10)) {
             try {
                 Thread.sleep(100);
-            } catch (final InterruptedException ex) {
+            } catch (final InterruptedException ex) {//NOSONAR
                 throw new RuntimeException(ex);
             }
             count++;

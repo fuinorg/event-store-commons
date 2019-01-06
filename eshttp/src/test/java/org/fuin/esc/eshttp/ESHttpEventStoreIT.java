@@ -261,7 +261,7 @@ public class ESHttpEventStoreIT {
     private static void sleep(final long millis) {
         try {
             Thread.sleep(millis);
-        } catch (final InterruptedException ex) {
+        } catch (final InterruptedException ex) {//NOSONAR
             throw new RuntimeException(ex);
         }
     }
