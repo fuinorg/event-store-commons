@@ -29,11 +29,29 @@
 
     <dependencies>
 
+        <!-- compile -->
+
         <dependency>
             <groupId>org.fuin.esc</groupId>
             <artifactId>esc-api</artifactId>
-            <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fuin</groupId>
+            <artifactId>objects4j</artifactId>
+        </dependency>
+
+        <!-- test -->
 
         <dependency>
             <groupId>org.fuin.esc</groupId>
@@ -66,12 +84,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.fuin</groupId>
-            <artifactId>objects4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <optional>true</optional>
@@ -81,12 +93,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -264,6 +270,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <download-url>https://eventstore.org/downloads/EventStore-OSS-Ubuntu-18.04-v4.1.2.tar.gz</download-url>
                     <download-os-qualifier>Ubuntu 18</download-os-qualifier>
                     <arguments>
                         <argument>--mem-db=TRUE</argument>

@@ -23,11 +23,13 @@ import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Queries a stream state.
  */
-public final class StreamStateCommand implements TestCommand {
+public final class StreamStateCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -80,9 +82,9 @@ public final class StreamStateCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
         expectedState = EscTestUtils.emptyAsNull(expectedState);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
@@ -112,7 +114,7 @@ public final class StreamStateCommand implements TestCommand {
             if (expectedExceptionClass == null) {
                 throw new IllegalStateException("Both, expected state and exception are null");
             }
-            return EscTestUtils.isExpectedType(expectedExceptionClass, actualException);
+            return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
         }
         if (expectedExceptionClass != null) {
             throw new IllegalStateException("Both, expected state and exception are set");

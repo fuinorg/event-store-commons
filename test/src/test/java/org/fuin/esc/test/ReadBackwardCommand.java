@@ -20,6 +20,7 @@ package org.fuin.esc.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -30,12 +31,12 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import javax.annotation.Nullable;
+import org.fuin.units4j.TestCommand;
 
 /**
  * Reads a stream backward.
  */
-public final class ReadBackwardCommand implements TestCommand {
+public final class ReadBackwardCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -130,9 +131,9 @@ public final class ReadBackwardCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
         resultEventId1 = EscTestUtils.emptyAsNull(resultEventId1);
         resultEventId2 = EscTestUtils.emptyAsNull(resultEventId2);

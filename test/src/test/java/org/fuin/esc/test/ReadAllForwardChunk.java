@@ -20,11 +20,12 @@ package org.fuin.esc.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import javax.annotation.Nullable;
 import org.fuin.objects4j.vo.UUIDStrValidator;
 
 /**

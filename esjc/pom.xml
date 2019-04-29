@@ -174,6 +174,7 @@
 					</execution>
 				</executions>
 				<configuration>
+                    <download-url>https://eventstore.org/downloads/EventStore-OSS-Ubuntu-18.04-v4.1.2.tar.gz</download-url>
                     <download-os-qualifier>Ubuntu 18</download-os-qualifier>
 					<arguments>
 						<argument>--mem-db=TRUE</argument>

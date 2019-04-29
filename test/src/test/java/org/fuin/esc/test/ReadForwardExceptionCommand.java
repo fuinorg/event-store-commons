@@ -22,11 +22,13 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Reads a stream forward and expects and exception.
  */
-public final class ReadForwardExceptionCommand implements TestCommand {
+public final class ReadForwardExceptionCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -85,9 +87,9 @@ public final class ReadForwardExceptionCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         expectedMessage = EscTestUtils.emptyAsNull(expectedMessage);
@@ -108,7 +110,7 @@ public final class ReadForwardExceptionCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
+        return Units4JUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
     }
 
     @Override

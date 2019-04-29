@@ -29,11 +29,13 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.Event;
 import org.fuin.esc.test.examples.BookAddedEvent;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Reads a single event from a stream.
  */
-public final class ReadEventCommand implements TestCommand {
+public final class ReadEventCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -92,10 +94,9 @@ public final class ReadEventCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType,
-            final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         expectedEventXml = EscTestUtils.emptyAsNull(expectedEventXml);
@@ -125,7 +126,7 @@ public final class ReadEventCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        if (!EscTestUtils.isExpectedType(expectedExceptionClass,
+        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return false;
         }
@@ -134,7 +135,7 @@ public final class ReadEventCommand implements TestCommand {
 
     @Override
     public final String getFailureDescription() {
-        if (!EscTestUtils.isExpectedType(expectedExceptionClass,
+        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return EscTestUtils.createExceptionFailureMessage(streamId,
                     expectedExceptionClass, actualException);

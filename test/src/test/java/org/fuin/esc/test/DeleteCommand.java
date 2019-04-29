@@ -23,11 +23,13 @@ import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Deletes a stream.
  */
-public final class DeleteCommand implements TestCommand {
+public final class DeleteCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -85,9 +87,9 @@ public final class DeleteCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
         expectedVersion = EscTestUtils.emptyAsNull(expectedVersion);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
@@ -109,7 +111,7 @@ public final class DeleteCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedType(expectedExceptionClass, actualException);
+        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

@@ -27,11 +27,12 @@ import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.units4j.TestCommand;
 
 /**
  * Reads all events forward from a stream.
  */
-public final class ReadAllForwardCommand implements TestCommand {
+public final class ReadAllForwardCommand implements TestCommand<TestContext> {
 
     private String streamName;
 
@@ -81,10 +82,9 @@ public final class ReadAllForwardCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType,
-            final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
         this.streamId = new SimpleStreamId(streamName);
     }
 

@@ -20,6 +20,7 @@ package org.fuin.esc.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -31,12 +32,13 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import javax.annotation.Nullable;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Appends some data to a stream.
  */
-public final class AppendToStreamCommand implements TestCommand {
+public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -117,9 +119,9 @@ public final class AppendToStreamCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
         
         expectedVersion = EscTestUtils.emptyAsNull(expectedVersion);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
@@ -152,7 +154,7 @@ public final class AppendToStreamCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedType(expectedExceptionClass, actualException);
+        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

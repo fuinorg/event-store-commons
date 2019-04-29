@@ -22,11 +22,13 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
+import org.fuin.units4j.TestCommand;
+import org.fuin.units4j.Units4JUtils;
 
 /**
  * Tests for stream existance.
  */
-public final class StreamExistsCommand implements TestCommand {
+public final class StreamExistsCommand implements TestCommand<TestContext> {
 
     // Creation
     // DO NOT CHANGE ORDER OR RENAME VARIABLES!
@@ -69,9 +71,9 @@ public final class StreamExistsCommand implements TestCommand {
     }
 
     @Override
-    public void init(final String currentEventStoreImplType, final EventStore eventstore) {
-        this.es = eventstore;
-        this.streamName = currentEventStoreImplType + "_" + streamName;
+    public void init(final TestContext context) {
+        this.es = context.getEventStore();
+        this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
 
 
         this.streamId = new SimpleStreamId(streamName);
@@ -89,12 +91,12 @@ public final class StreamExistsCommand implements TestCommand {
 
     @Override
     public final boolean isSuccessful() {
-        return EscTestUtils.isExpectedType(null, actualException) && (actuallyExists == shouldExist);
+        return Units4JUtils.isExpectedType(null, actualException) && (actuallyExists == shouldExist);
     }
 
     @Override
     public final String getFailureDescription() {
-        if (!EscTestUtils.isExpectedType(null, actualException)) {
+        if (!Units4JUtils.isExpectedType(null, actualException)) {
             return EscTestUtils.createExceptionFailureMessage(streamId, null, actualException);
         }
         if (shouldExist) {

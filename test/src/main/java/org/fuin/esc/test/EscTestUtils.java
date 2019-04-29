@@ -17,67 +17,23 @@
  */
 package org.fuin.esc.test;
 
-import java.util.Objects;
+import javax.annotation.Nullable;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.StreamId;
-import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utilities for the package.
+ * Utilities that help testing with the event store commons.
  */
-final class EscTestUtils {
+public final class EscTestUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(EscTestUtils.class);
 
     private EscTestUtils() {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Determines if an object has an expected type.
-     * 
-     * @param expectedClass
-     *            Expected type.
-     * @param obj
-     *            Object to test.
-     * 
-     * @return TRUE if the object is exactly of the same class, else FALSE.
-     */
-    public static boolean isExpectedType(final Class<?> expectedClass, final Object obj) {
-        final Class<?> actualClass;
-        if (obj == null) {
-            actualClass = null;
-        } else {
-            actualClass = obj.getClass();
-        }
-        return Objects.equals(expectedClass, actualClass);
-    }
-
-    /**
-     * Determines if an exception has an expected type and message.
-     * 
-     * @param expectedClass
-     *            Expected exception type.
-     * @param expectedMessage
-     *            Expected message.
-     * @param ex
-     *            Exception to test.
-     * 
-     * @return TRUE if the object is exactly of the same class and has the same message, else FALSE.
-     */
-    public static boolean isExpectedException(final Class<? extends Exception> expectedClass,
-            final String expectedMessage, final Exception ex) {
-        if (!isExpectedType(expectedClass, ex)) {
-            return false;
-        }
-        if ((expectedClass != null) && (expectedMessage != null) && (ex != null)) {
-            return Objects.equals(expectedMessage, ex.getMessage());
-        }
-        return true;
     }
 
     /**
@@ -106,8 +62,8 @@ final class EscTestUtils {
      * 
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId,
-            final Class<? extends Exception> expectedExceptionClass, final Exception exception) {
+    public static String createExceptionFailureMessage(final StreamId streamId, final Class<? extends Exception> expectedExceptionClass,
+            final Exception exception) {
         return createExceptionFailureMessage(streamId, expectedExceptionClass, null, exception);
     }
 
@@ -125,32 +81,28 @@ final class EscTestUtils {
      * 
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId,
-            final Class<? extends Exception> expectedExceptionClass, final String expectedExceptionMessage,
-            final Exception exception) {
+    public static String createExceptionFailureMessage(final StreamId streamId, final Class<? extends Exception> expectedExceptionClass,
+            final String expectedExceptionMessage, final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
                 return "[" + streamId + "] OK";
             }
-            final String msg = "[" + streamId + "] expected no exception, but was: "
-                    + nameAndMessage(exception) + " (See log file for exception details)";
+            final String msg = "[" + streamId + "] expected no exception, but was: " + nameAndMessage(exception)
+                    + " (See log file for exception details)";
             LOG.error(msg, exception);
             return msg;
         }
         if (exception == null) {
-            return "[" + streamId + "] expected "
-                    + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
+            return "[" + streamId + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
                     + ", but no exception was thrown";
         }
-        final String msg = "[" + streamId + "] expected "
-                + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
+        final String msg = "[" + streamId + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
                 + nameAndMessage(exception) + " (See log file for exception details)";
         LOG.error(msg, exception);
         return msg;
     }
 
-    private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass,
-            final String expectedExceptionMessage) {
+    private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass, final String expectedExceptionMessage) {
         if (expectedExceptionMessage == null) {
             return expectedExceptionClass.getName();
         }
@@ -181,8 +133,8 @@ final class EscTestUtils {
     }
 
     /**
-     * Creates an exception class from an exception name. If the name is NOT fully qualified (has no '.' in
-     * the name) it's assumed that it's an API exception from package 'org.fuin.esc.api'.
+     * Creates an exception class from an exception name. If the name is NOT fully qualified (has no '.' in the name) it's assumed that it's
+     * an API exception from package 'org.fuin.esc.api'.
      * 
      * @param exceptionName
      *            Fully qualified name or a simple name of a class located in the "org.fuin.esc.api" package.
@@ -215,9 +167,7 @@ final class EscTestUtils {
      * 
      * @return TRUE id the events have the same content.
      */
-    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
-    public static boolean sameContent(@Nullable final CommonEvent eventA, 
-            @Nullable final CommonEvent eventB) {
+    public static boolean sameContent(@Nullable final CommonEvent eventA, @Nullable final CommonEvent eventB) {
         if (eventA == null) {
             if (eventB == null) {
                 return true;
@@ -266,15 +216,17 @@ final class EscTestUtils {
     /**
      * Creates an exception message by pointing out the differences between two events.
      * 
-     * @param streamId Unique stream indentifier.
-     * @param expectedEvent First event.
-     * @param actualEvent Second event.
+     * @param streamId
+     *            Unique stream indentifier.
+     * @param expectedEvent
+     *            First event.
+     * @param actualEvent
+     *            Second event.
      * 
      * @return Exception message.
      */
-    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
-    public static String createExceptionFailureMessage(final StreamId streamId,
-            final CommonEvent expectedEvent, final CommonEvent actualEvent) {
+    public static String createExceptionFailureMessage(final StreamId streamId, final CommonEvent expectedEvent,
+            final CommonEvent actualEvent) {
         if (expectedEvent == null) {
             if (actualEvent == null) {
                 return "[" + streamId + "] OK";
@@ -290,8 +242,7 @@ final class EscTestUtils {
                 return "[" + streamId + "] Expected no event id, but was: " + actualEvent.getId();
             }
         } else if (!expectedEvent.getId().equals(actualEvent.getId())) {
-            return "[" + streamId + "] Expected event id '" + expectedEvent.getId() + "', but was: "
-                    + actualEvent.getId();
+            return "[" + streamId + "] Expected event id '" + expectedEvent.getId() + "', but was: " + actualEvent.getId();
         }
 
         if (expectedEvent.getData() == null) {
@@ -299,8 +250,7 @@ final class EscTestUtils {
                 return "[" + streamId + "] Expected no event data, but was: " + actualEvent.getData();
             }
         } else if (!expectedEvent.getData().equals(actualEvent.getData())) {
-            return "[" + streamId + "] Expected event data '" + expectedEvent.getData() + "', but was: "
-                    + actualEvent.getData();
+            return "[" + streamId + "] Expected event data '" + expectedEvent.getData() + "', but was: " + actualEvent.getData();
         }
 
         if (expectedEvent.getMeta() == null) {
@@ -308,8 +258,7 @@ final class EscTestUtils {
                 return "[" + streamId + "] Expected no event meta, but was: " + actualEvent.getMeta();
             }
         } else if (!expectedEvent.getMeta().equals(actualEvent.getMeta())) {
-            return "[" + streamId + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: "
-                    + actualEvent.getMeta();
+            return "[" + streamId + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: " + actualEvent.getMeta();
         }
 
         if (expectedEvent.getDataType() == null) {
@@ -317,8 +266,7 @@ final class EscTestUtils {
                 return "[" + streamId + "] Expected no event type, but was: " + actualEvent.getDataType();
             }
         } else if (!expectedEvent.getDataType().equals(actualEvent.getDataType())) {
-            return "[" + streamId + "] Expected event type '" + expectedEvent.getDataType() + "', but was: "
-                    + actualEvent.getDataType();
+            return "[" + streamId + "] Expected event type '" + expectedEvent.getDataType() + "', but was: " + actualEvent.getDataType();
         }
 
         return "[" + streamId + "] OK";

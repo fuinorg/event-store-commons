@@ -1,6 +1,16 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.test;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.fuin.esc.spi.EscSpiUtils;
+import org.junit.runner.Description;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.ParentRunner;
+import org.junit.runners.model.InitializationError;
+
 import cucumber.api.CucumberOptions;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
@@ -14,16 +24,6 @@ import cucumber.runtime.junit.FeatureRunner;
 import cucumber.runtime.junit.JUnitOptions;
 import cucumber.runtime.junit.JUnitReporter;
 import cucumber.runtime.model.CucumberFeature;
-
-import org.fuin.esc.spi.EscSpiUtils;
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.ParentRunner;
-import org.junit.runners.model.InitializationError;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Slightly changed version of {@link cucumber.api.junit.Cucumber} that can
