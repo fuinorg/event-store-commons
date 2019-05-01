@@ -97,7 +97,7 @@ public final class StreamExistsCommand implements TestCommand<TestContext> {
     @Override
     public final String getFailureDescription() {
         if (!Units4JUtils.isExpectedType(null, actualException)) {
-            return EscTestUtils.createExceptionFailureMessage(streamId, null, actualException);
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(), null, actualException);
         }
         if (shouldExist) {
             return "[" + streamId + "] The stream should exist, but does not";

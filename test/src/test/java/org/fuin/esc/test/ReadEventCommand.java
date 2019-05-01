@@ -137,10 +137,10 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
     public final String getFailureDescription() {
         if (!Units4JUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
-            return EscTestUtils.createExceptionFailureMessage(streamId,
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(),
                     expectedExceptionClass, actualException);
         }
-        return EscTestUtils.createExceptionFailureMessage(streamId,
+        return EscTestUtils.createExceptionFailureMessage(streamId.asString(),
                 expectedEvent, actualEvent);
     }
 

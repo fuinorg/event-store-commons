@@ -188,7 +188,7 @@ public final class ReadBackwardCommand implements TestCommand<TestContext> {
     @Override
     public final String getFailureDescription() {
         if (actualException != null) {
-            return EscTestUtils.createExceptionFailureMessage(streamId, actualException);
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(), actualException);
         }
         if (actualSlice == null) {
             return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: null";

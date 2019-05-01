@@ -115,7 +115,7 @@ public final class ReadForwardExceptionCommand implements TestCommand<TestContex
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, expectedMessage,
+        return EscTestUtils.createExceptionFailureMessage(streamId.asString(), expectedExceptionClass, expectedMessage,
                 actualException);
     }
 

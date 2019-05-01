@@ -115,7 +115,7 @@ public final class ReadBackwardExceptionCommand implements TestCommand<TestConte
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, expectedMessage,
+        return EscTestUtils.createExceptionFailureMessage(streamId.asString(), expectedExceptionClass, expectedMessage,
                 actualException);
     }
 

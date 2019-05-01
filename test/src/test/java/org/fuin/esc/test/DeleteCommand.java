@@ -116,7 +116,7 @@ public final class DeleteCommand implements TestCommand<TestContext> {
 
     @Override
     public final String getFailureDescription() {
-        return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass, actualException);
+        return EscTestUtils.createExceptionFailureMessage(streamId.asString(), expectedExceptionClass, actualException);
     }
 
     @Override

@@ -129,11 +129,11 @@ public final class StreamStateCommand implements TestCommand<TestContext> {
                 return "[" + streamId + "] expected exception '" + expectedException + "', but got state: "
                         + actualStreamState;
             }
-            return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass,
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(), expectedExceptionClass,
                     actualException);
         }
         if (actualException != null) {
-            return EscTestUtils.createExceptionFailureMessage(streamId, expectedExceptionClass,
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(), expectedExceptionClass,
                     actualException);
         }
         return "[" + streamId + "] expected " + expectedStreamState + ", but was: " + actualStreamState;

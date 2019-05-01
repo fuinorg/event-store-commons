@@ -116,7 +116,7 @@ public final class ReadAllForwardCommand implements TestCommand<TestContext> {
     @Override
     public final String getFailureDescription() {
         if (actualException != null) {
-            return EscTestUtils.createExceptionFailureMessage(streamId,
+            return EscTestUtils.createExceptionFailureMessage(streamId.asString(),
                     actualException);
         }
         return "[" + streamId + "] expected " + expectedChunks + ", but was: "

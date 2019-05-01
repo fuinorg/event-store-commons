@@ -21,7 +21,6 @@ import javax.annotation.Nullable;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
-import org.fuin.esc.api.StreamId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,22 +38,22 @@ public final class EscTestUtils {
     /**
      * Creates a failure message from an exception.
      * 
-     * @param streamId
-     *            Unique stream identifier this failure relates to.
+     * @param identifier
+     *            Unique identifier this failure relates to.
      * @param exception
      *            Current exception.
      * 
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId, final Exception exception) {
-        return createExceptionFailureMessage(streamId, null, null, exception);
+    public static String createExceptionFailureMessage(final String identifier, final Exception exception) {
+        return createExceptionFailureMessage(identifier, null, null, exception);
     }
 
     /**
      * Creates a failure message from an expected type and an exception.
      * 
-     * @param streamId
-     *            Unique stream identifier this failure relates to.
+     * @param identifier
+     *            Unique identifier this failure relates to.
      * @param expectedExceptionClass
      *            Expected exception type.
      * @param exception
@@ -62,16 +61,16 @@ public final class EscTestUtils {
      * 
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId, final Class<? extends Exception> expectedExceptionClass,
+    public static String createExceptionFailureMessage(final String identifier, final Class<? extends Exception> expectedExceptionClass,
             final Exception exception) {
-        return createExceptionFailureMessage(streamId, expectedExceptionClass, null, exception);
+        return createExceptionFailureMessage(identifier, expectedExceptionClass, null, exception);
     }
 
     /**
      * Creates a failure message from an expected type, message and an exception.
      * 
-     * @param streamId
-     *            Unique stream identifier this failure relates to.
+     * @param identifier
+     *            Unique identifier this failure relates to.
      * @param expectedExceptionClass
      *            Expected exception type.
      * @param expectedExceptionMessage
@@ -81,22 +80,22 @@ public final class EscTestUtils {
      * 
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId, final Class<? extends Exception> expectedExceptionClass,
+    public static String createExceptionFailureMessage(final String identifier, final Class<? extends Exception> expectedExceptionClass,
             final String expectedExceptionMessage, final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
-                return "[" + streamId + "] OK";
+                return "[" + identifier + "] OK";
             }
-            final String msg = "[" + streamId + "] expected no exception, but was: " + nameAndMessage(exception)
+            final String msg = "[" + identifier + "] expected no exception, but was: " + nameAndMessage(exception)
                     + " (See log file for exception details)";
             LOG.error(msg, exception);
             return msg;
         }
         if (exception == null) {
-            return "[" + streamId + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
+            return "[" + identifier + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage)
                     + ", but no exception was thrown";
         }
-        final String msg = "[" + streamId + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
+        final String msg = "[" + identifier + "] expected " + nameAndMessage(expectedExceptionClass, expectedExceptionMessage) + ", but was: "
                 + nameAndMessage(exception) + " (See log file for exception details)";
         LOG.error(msg, exception);
         return msg;
@@ -216,8 +215,8 @@ public final class EscTestUtils {
     /**
      * Creates an exception message by pointing out the differences between two events.
      * 
-     * @param streamId
-     *            Unique stream indentifier.
+     * @param identifier
+     *            Unique identifier to use in case of a failure.
      * @param expectedEvent
      *            First event.
      * @param actualEvent
@@ -225,51 +224,51 @@ public final class EscTestUtils {
      * 
      * @return Exception message.
      */
-    public static String createExceptionFailureMessage(final StreamId streamId, final CommonEvent expectedEvent,
+    public static String createExceptionFailureMessage(final String identifier, final CommonEvent expectedEvent,
             final CommonEvent actualEvent) {
         if (expectedEvent == null) {
             if (actualEvent == null) {
-                return "[" + streamId + "] OK";
+                return "[" + identifier + "] OK";
             }
-            return "[" + streamId + "] Expected no event, but got: " + actualEvent;
+            return "[" + identifier + "] Expected no event, but got: " + actualEvent;
         }
         if (actualEvent == null) {
-            return "[" + streamId + "] Got no event, but expected one: " + expectedEvent;
+            return "[" + identifier + "] Got no event, but expected one: " + expectedEvent;
         }
 
         if (expectedEvent.getId() == null) {
             if (actualEvent.getId() != null) {
-                return "[" + streamId + "] Expected no event id, but was: " + actualEvent.getId();
+                return "[" + identifier + "] Expected no event id, but was: " + actualEvent.getId();
             }
         } else if (!expectedEvent.getId().equals(actualEvent.getId())) {
-            return "[" + streamId + "] Expected event id '" + expectedEvent.getId() + "', but was: " + actualEvent.getId();
+            return "[" + identifier + "] Expected event id '" + expectedEvent.getId() + "', but was: " + actualEvent.getId();
         }
 
         if (expectedEvent.getData() == null) {
             if (actualEvent.getData() != null) {
-                return "[" + streamId + "] Expected no event data, but was: " + actualEvent.getData();
+                return "[" + identifier + "] Expected no event data, but was: " + actualEvent.getData();
             }
         } else if (!expectedEvent.getData().equals(actualEvent.getData())) {
-            return "[" + streamId + "] Expected event data '" + expectedEvent.getData() + "', but was: " + actualEvent.getData();
+            return "[" + identifier + "] Expected event data '" + expectedEvent.getData() + "', but was: " + actualEvent.getData();
         }
 
         if (expectedEvent.getMeta() == null) {
             if (actualEvent.getMeta() != null) {
-                return "[" + streamId + "] Expected no event meta, but was: " + actualEvent.getMeta();
+                return "[" + identifier + "] Expected no event meta, but was: " + actualEvent.getMeta();
             }
         } else if (!expectedEvent.getMeta().equals(actualEvent.getMeta())) {
-            return "[" + streamId + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: " + actualEvent.getMeta();
+            return "[" + identifier + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: " + actualEvent.getMeta();
         }
 
         if (expectedEvent.getDataType() == null) {
             if (actualEvent.getDataType() != null) {
-                return "[" + streamId + "] Expected no event type, but was: " + actualEvent.getDataType();
+                return "[" + identifier + "] Expected no event type, but was: " + actualEvent.getDataType();
             }
         } else if (!expectedEvent.getDataType().equals(actualEvent.getDataType())) {
-            return "[" + streamId + "] Expected event type '" + expectedEvent.getDataType() + "', but was: " + actualEvent.getDataType();
+            return "[" + identifier + "] Expected event type '" + expectedEvent.getDataType() + "', but was: " + actualEvent.getDataType();
         }
 
-        return "[" + streamId + "] OK";
+        return "[" + identifier + "] OK";
     }
 
 }
