@@ -112,7 +112,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final InternalStream internalStream = streams.get(streamId.getName());
+        final InternalStream internalStream = streams.get(streamId.asString());
         return (internalStream != null && internalStream.getState() == StreamState.ACTIVE);
 
     }
@@ -204,14 +204,14 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
             throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
 
-        final InternalStream stream = streams.get(streamId.getName());
+        final InternalStream stream = streams.get(streamId.asString());
         if (stream == null) {
             // Stream never existed
             if (expected == ExpectedVersion.ANY.getNo() || expected == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
                 if (hardDelete) {
                     final InternalStream hds = new InternalStream();
                     hds.delete(hardDelete);
-                    streams.put(streamId.getName(), hds);
+                    streams.put(streamId.asString(), hds);
                 }
                 // Ignore
                 return;
@@ -251,10 +251,10 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
             throw new StreamReadOnlyException(streamId);
         }
 
-        InternalStream stream = streams.get(streamId.getName());
+        InternalStream stream = streams.get(streamId.asString());
         if (stream == null) {
             stream = new InternalStream();
-            streams.put(streamId.getName(), stream);
+            streams.put(streamId.asString(), stream);
         }
         if (stream.getState() == StreamState.HARD_DELETED) {
             throw new StreamDeletedException(streamId);
@@ -319,10 +319,10 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         final InMemorySubscription subscription = new InMemorySubscription(subscriberId, streamId, lastEventNumber);
 
-        List<InternalSubscription> list = subscriptions.get(streamId.getName());
+        List<InternalSubscription> list = subscriptions.get(streamId.asString());
         if (list == null) {
             list = new ArrayList<>();
-            subscriptions.put(streamId.getName(), list);
+            subscriptions.put(streamId.asString(), list);
         }
         list.add(new InternalSubscription(subscription, onEvent));
 
@@ -343,7 +343,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         }
         final InMemorySubscription inMemSubscription = (InMemorySubscription) subscription;
 
-        final List<InternalSubscription> list = subscriptions.get(subscription.getStreamId().getName());
+        final List<InternalSubscription> list = subscriptions.get(subscription.getStreamId().asString());
         if (list != null) {
             final int idx = indexOf(list, inMemSubscription);
             if (idx > -1) {
@@ -359,7 +359,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final InternalStream stream = streams.get(streamId.getName());
+        final InternalStream stream = streams.get(streamId.asString());
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
@@ -383,7 +383,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         if ((idx > -1) && (idx < events.size())) {
 
-            final List<InternalSubscription> internalSubscriptions = subscriptions.get(streamId.getName());
+            final List<InternalSubscription> internalSubscriptions = subscriptions.get(streamId.asString());
             if (internalSubscriptions != null) {
                 final Iterator<InternalSubscription> it = internalSubscriptions.iterator();
                 while (it.hasNext()) {
@@ -411,7 +411,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     private InternalStream getStream(final StreamId streamId, final long expected) {
-        final InternalStream stream = streams.get(streamId.getName());
+        final InternalStream stream = streams.get(streamId.asString());
         if (stream == null) {
             throw new StreamNotFoundException(streamId);
         }
