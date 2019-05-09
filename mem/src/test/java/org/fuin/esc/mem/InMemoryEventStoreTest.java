@@ -19,14 +19,19 @@ package org.fuin.esc.mem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+
+import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.vo.KeyValue;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
@@ -57,6 +62,23 @@ public class InMemoryEventStoreTest {
         testee = null;
     }
 
+    @Test
+    public void testSameStreamId() {
+
+        // PREPARE
+        final StreamId streamId = new SimpleStreamId("MySameStream");
+        final StreamId otherId = new SampleStreamId("MySameStream");
+        final CommonEvent eventOne = event("One");
+        testee.createStream(streamId);
+        
+        // TEST
+        testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne);
+
+        // VERIFY
+        assertThat(testee.streamExists(otherId)).isTrue();
+        
+    }    
+    
     @Test
     public void testAppendToStreamArray() {
 
@@ -261,5 +283,76 @@ public class InMemoryEventStoreTest {
         return new SimpleCommonEvent(id, new TypeName("MyEvent"), new MyEvent(name));
     }
 
+    /**
+     * Class to simulate different stream id type.
+     */
+    private static final class SampleStreamId implements StreamId {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String name;
+
+        public SampleStreamId(@NotNull final String name) {
+            Contract.requireArgNotNull("name", name);
+            this.name = name;
+        }
+
+        @Override
+        public final String getName() {
+            return name;
+        }
+
+        @Override
+        public final boolean isProjection() {
+            return false;
+        }
+
+        @Override
+        public final <T> T getSingleParamValue() {
+            throw new UnsupportedOperationException(getClass().getSimpleName() + " has no parameters");
+        }
+
+        @Override
+        public final List<KeyValue> getParameters() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public final String asString() {
+            return name;
+        }
+
+        @Override
+        public final String toString() {
+            return name;
+        }
+
+        @Override
+        public final int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
+            return result;
+        }
+
+        @Override
+        public final boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof SampleStreamId))
+                return false;
+            SampleStreamId other = (SampleStreamId) obj;
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
+                return false;
+            return true;
+        }
+        
+    }
+    
 }
 // CHECKSTYLE:ON

@@ -263,12 +263,16 @@ public final class EscMeta implements ToJsonCapable {
                         break;
                     case EL_DATA_CONTENT_TYPE:
                         escMeta.dataContentType = EnhancedMimeType.create(ctx.deserialize(String.class, parser));
+                        escMeta.dataContentTypeStr = escMeta.dataContentType.toString();
                         break;
                     case EL_META_TYPE:
                         escMeta.metaType = ctx.deserialize(String.class, parser);
                         break;
                     case EL_META_CONTENT_TYPE:
                         escMeta.metaContentType = EnhancedMimeType.create(ctx.deserialize(String.class, parser));
+                        if (escMeta.metaContentType != null) {
+                            escMeta.metaContentTypeStr = escMeta.metaContentType.toString();
+                        }
                         break;
                     default:
                         // meta
