@@ -485,7 +485,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
         final String msg = "projectionExists(" + projectionId + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.getName() + "/state").build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString() + "/state").build();
             LOG.debug(uri.toString());
             final HttpGet get = new HttpGet(uri);
             get.setHeader("Accept", ESEnvelopeType.JSON.getMetaType());
@@ -529,7 +529,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
         final String msg = action + "Projection(" + projectionId + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.getName() + "/command/" + action).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString() + "/command/" + action).build();
             LOG.debug("{}", uri);
             final HttpPost post = createPost(uri, "", ESEnvelopeType.JSON);
             try {
@@ -575,7 +575,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
         final String msg = "createProjection(" + projectionId + "," + enable + type2str(eventTypes) + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous").addParameter("name", projectionId.getName())
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous").addParameter("name", projectionId.asString())
                     .addParameter("emit", "yes").addParameter("checkpoints", "yes").addParameter("enabled", ESHttpUtils.yesNo(enable))
                     .build();
             final String javascript = new ProjectionJavaScriptBuilder(projectionId).types(eventTypes).build();
@@ -611,7 +611,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
         final String msg = "deleteProjection(" + projectionId + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.getName())
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString())
                     .addParameter("deleteCheckpointStream", "yes").addParameter("deleteStateStream", "yes").build();
             final HttpDelete delete = new HttpDelete(uri);
             try {
@@ -622,7 +622,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 LOG.debug(msg + " RESPONSE: {}", response);
                 if (statusLine.getStatusCode() == 204) {
                     // Also delete the event stream
-                    deleteStream(new SimpleStreamId(projectionId.getName()), false);
+                    deleteStream(new SimpleStreamId(projectionId.asString()), false);
                     return;
                 }
                 if (statusLine.getStatusCode() == 404) {
@@ -789,7 +789,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         if (streamId.equals(StreamId.ALL)) {
             return "$all";
         }
-        return streamId.getName();
+        return streamId.asString();
     }
 
     private static HttpGet createHttpGet(final URI uri, final ESEnvelopeType envelopeType) {

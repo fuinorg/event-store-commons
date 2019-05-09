@@ -40,7 +40,7 @@ public final class ProjectionJavaScriptBuilder {
      *            Projection name.
      */
     public ProjectionJavaScriptBuilder(final StreamId projectionId) {
-        this(projectionId.getName());
+        this(projectionId.asString());
     }
     
     /**
@@ -66,7 +66,7 @@ public final class ProjectionJavaScriptBuilder {
      *            Category.
      */
     public ProjectionJavaScriptBuilder(final StreamId projectionId, final StreamId category) {
-        this(projectionId.getName(), category.getName());
+        this(projectionId.asString(), category.asString());
     }
 
     /**
