@@ -112,12 +112,7 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
         try {
             final Class<?> clasz = typeRegistry.findClass(type);
             if (data instanceof JsonStructure) {
-                // TODO Remove workaround - Figure out how to serialize JsonStructure with JSON-B
-                // See https://github.com/fuinorg/event-store-commons/issues/12
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
-                jsonb.toJson(data, bos);
-                final Reader reader = new InputStreamReader(new ByteArrayInputStream(bos.toByteArray()), mimeType.getEncoding());
-                return (T) jsonb.fromJson(reader, clasz);
+                return (T) jsonb.fromJson(data.toString(), clasz);
             }
             if (data instanceof byte[]) {
                 final Reader reader = new InputStreamReader(new ByteArrayInputStream((byte[]) data), mimeType.getEncoding());
