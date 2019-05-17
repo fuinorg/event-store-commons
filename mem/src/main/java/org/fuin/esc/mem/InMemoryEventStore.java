@@ -30,7 +30,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
@@ -39,7 +38,6 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.SubscribableEventStore;
 import org.fuin.esc.api.Subscription;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
@@ -49,7 +47,7 @@ import org.fuin.objects4j.common.Contract;
 /**
  * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
  */
-public final class InMemoryEventStore extends AbstractReadableEventStore implements EventStore, SubscribableEventStore {
+public final class InMemoryEventStore extends AbstractReadableEventStore implements IInMemoryEventStore {
 
     private Executor executor;
 

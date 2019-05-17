@@ -27,7 +27,6 @@ import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamDeletedException;
@@ -55,7 +54,7 @@ import com.github.msemys.esjc.WriteResult;
 /**
  * Implementation that connects to the event store (http://www.geteventstore.com) using the esjc (https://github.com/msemys/esjc) API.
  */
-public final class ESJCEventStore extends AbstractReadableEventStore implements EventStore {
+public final class ESJCEventStore extends AbstractReadableEventStore implements IESJCEventStore {
 
     private final com.github.msemys.esjc.EventStore es;
 
@@ -165,7 +164,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
                 throw new StreamDeletedException(streamId);
             }
             throw new RuntimeException("Error executing append", ex);
-        } catch (InterruptedException ex) { //NOSONAR
+        } catch (InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for append result", ex);
         }
 
@@ -195,7 +194,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
                 throw new StreamDeletedException(streamId);
             }
             throw new RuntimeException("Error executing delete", ex);
-        } catch (final InterruptedException ex) { //NOSONAR
+        } catch (final InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for delete result", ex);
         }
 
@@ -229,7 +228,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
             final List<CommonEvent> events = asCommonEvents(slice.events);
             final boolean endOfStream = count > events.size();
             return new StreamEventsSlice(slice.fromEventNumber, events, slice.nextEventNumber, endOfStream);
-        } catch (InterruptedException | ExecutionException ex) {//NOSONAR
+        } catch (InterruptedException | ExecutionException ex) {// NOSONAR
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
 
@@ -259,7 +258,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
                 nextEventNumber = 0;
             }
             return new StreamEventsSlice(slice.fromEventNumber, events, nextEventNumber, endOfStream);
-        } catch (InterruptedException | ExecutionException ex) {//NOSONAR
+        } catch (InterruptedException | ExecutionException ex) {// NOSONAR
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
 
@@ -284,7 +283,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
                 throw new StreamDeletedException(streamId);
             }
             return asCommonEvent(eventReadResult.event);
-        } catch (InterruptedException | ExecutionException ex) {//NOSONAR
+        } catch (InterruptedException | ExecutionException ex) {// NOSONAR
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
 
@@ -305,7 +304,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
                 return false;
             }
             return true;
-        } catch (InterruptedException | ExecutionException ex) {//NOSONAR
+        } catch (InterruptedException | ExecutionException ex) {// NOSONAR
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
 
@@ -332,7 +331,7 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
             }
             return StreamState.ACTIVE;
 
-        } catch (InterruptedException | ExecutionException ex) {//NOSONAR
+        } catch (InterruptedException | ExecutionException ex) {// NOSONAR
             throw new RuntimeException("Error waiting for read forward result", ex);
         }
 
