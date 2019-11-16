@@ -217,19 +217,11 @@ public final class EscTestUtils {
             return "[" + identifier + "] Got no event, but expected one: " + expectedEvent;
         }
 
-        if (expectedEvent.getId() == null) {
-            if (actualEvent.getId() != null) {
-                return "[" + identifier + "] Expected no event id, but was: " + actualEvent.getId();
-            }
-        } else if (!expectedEvent.getId().equals(actualEvent.getId())) {
+        if (!expectedEvent.getId().equals(actualEvent.getId())) {
             return "[" + identifier + "] Expected event id '" + expectedEvent.getId() + "', but was: " + actualEvent.getId();
         }
 
-        if (expectedEvent.getData() == null) {
-            if (actualEvent.getData() != null) {
-                return "[" + identifier + "] Expected no event data, but was: " + actualEvent.getData();
-            }
-        } else if (!expectedEvent.getData().equals(actualEvent.getData())) {
+        if (!expectedEvent.getData().equals(actualEvent.getData())) {
             return "[" + identifier + "] Expected event data '" + expectedEvent.getData() + "', but was: " + actualEvent.getData();
         }
 
@@ -241,11 +233,7 @@ public final class EscTestUtils {
             return "[" + identifier + "] Expected event meta '" + expectedEvent.getMeta() + "', but was: " + actualEvent.getMeta();
         }
 
-        if (expectedEvent.getDataType() == null) {
-            if (actualEvent.getDataType() != null) {
-                return "[" + identifier + "] Expected no event type, but was: " + actualEvent.getDataType();
-            }
-        } else if (!expectedEvent.getDataType().equals(actualEvent.getDataType())) {
+        if (!expectedEvent.getDataType().equals(actualEvent.getDataType())) {
             return "[" + identifier + "] Expected event type '" + expectedEvent.getDataType() + "', but was: " + actualEvent.getDataType();
         }
 
