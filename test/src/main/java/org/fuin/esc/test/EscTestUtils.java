@@ -143,7 +143,7 @@ public final class EscTestUtils {
     @SuppressWarnings("unchecked")
     public static Class<? extends Exception> exceptionForName(final String exceptionName) {
         String name = emptyAsNull(exceptionName);
-        if (exceptionName == null) {
+        if (name == null) {
             return null;
         }
         if (name.indexOf('.') == -1) {
@@ -168,28 +168,17 @@ public final class EscTestUtils {
      */
     public static boolean sameContent(@Nullable final CommonEvent eventA, @Nullable final CommonEvent eventB) {
         if (eventA == null) {
-            if (eventB == null) {
-                return true;
-            }
-            return false;
+            return (eventB == null);
         }
         if (eventB == null) {
             return false;
         }
 
-        if (eventA.getId() == null) {
-            if (eventB.getId() != null) {
-                return false;
-            }
-        } else if (!eventA.getId().equals(eventB.getId())) {
+        if (!eventA.getId().equals(eventB.getId())) {
             return false;
         }
 
-        if (eventA.getData() == null) {
-            if (eventB.getData() != null) {
-                return false;
-            }
-        } else if (!eventA.getData().equals(eventB.getData())) {
+        if (!eventA.getData().equals(eventB.getData())) {
             return false;
         }
 
@@ -201,15 +190,7 @@ public final class EscTestUtils {
             return false;
         }
 
-        if (eventA.getDataType() == null) {
-            if (eventB.getDataType() != null) {
-                return false;
-            }
-        } else if (!eventA.getDataType().equals(eventB.getDataType())) {
-            return false;
-        }
-
-        return true;
+        return eventA.getDataType().equals(eventB.getDataType());
     }
 
     /**
