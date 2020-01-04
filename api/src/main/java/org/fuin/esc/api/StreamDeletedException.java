@@ -20,7 +20,7 @@ package org.fuin.esc.api;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.Immutable;
 
 /**
  * Signals that a stream with that name previously existed but was deleted.

@@ -19,7 +19,7 @@ package org.fuin.esc.spi;
 
 import javax.validation.constraints.NotNull;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Locates a deserializer for a given type, version and encoding combination.

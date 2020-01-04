@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.esc.api.EventId;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 import com.migesok.jaxb.adapter.javatime.ZonedDateTimeXmlAdapter;
 

@@ -29,7 +29,7 @@ import javax.xml.namespace.NamespaceContext;
 
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.ConstraintViolationException;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Provided a simple namespace context.

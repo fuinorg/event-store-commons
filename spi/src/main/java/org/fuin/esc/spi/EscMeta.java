@@ -19,7 +19,7 @@ package org.fuin.esc.spi;
 
 import java.lang.reflect.Type;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;

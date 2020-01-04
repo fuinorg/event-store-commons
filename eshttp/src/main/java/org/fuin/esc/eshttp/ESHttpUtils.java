@@ -31,7 +31,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

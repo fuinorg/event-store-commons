@@ -206,6 +206,22 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>org.fuin.esc.test</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.21.0</version>
                 <configuration>

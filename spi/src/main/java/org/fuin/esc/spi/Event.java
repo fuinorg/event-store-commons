@@ -31,8 +31,8 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.concurrent.Immutable;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Immutable;
+import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**

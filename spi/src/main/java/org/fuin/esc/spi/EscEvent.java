@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.bind.serializer.DeserializationContext;

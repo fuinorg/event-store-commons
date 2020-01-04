@@ -26,7 +26,7 @@ import java.util.Objects;
 import javax.activation.MimeTypeParseException;
 import javax.validation.constraints.NotNull;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Enhances the {@link javax.activation.MimeType} class with convenience methods for accessing version and

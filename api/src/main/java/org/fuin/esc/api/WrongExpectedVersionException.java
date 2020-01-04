@@ -20,8 +20,8 @@ package org.fuin.esc.api;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.concurrent.Immutable;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Immutable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Signals a conflict between an expected and an actual version.

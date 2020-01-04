@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
 import org.fuin.utils4j.CDataXmlAdapter;
 

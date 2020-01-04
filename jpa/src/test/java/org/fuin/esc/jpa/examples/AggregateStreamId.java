@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.fuin.esc.api.StreamId;
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.KeyValue;
 
 /**

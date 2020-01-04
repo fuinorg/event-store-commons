@@ -20,7 +20,7 @@ package org.fuin.esc.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;

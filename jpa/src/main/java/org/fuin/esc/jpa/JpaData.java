@@ -30,7 +30,7 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
 
 /**

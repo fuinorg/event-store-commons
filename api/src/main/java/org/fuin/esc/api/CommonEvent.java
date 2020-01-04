@@ -19,7 +19,7 @@ package org.fuin.esc.api;
 
 import javax.validation.constraints.NotNull;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the

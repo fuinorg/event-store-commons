@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;

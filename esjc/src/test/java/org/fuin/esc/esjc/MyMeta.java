@@ -32,7 +32,7 @@ import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerDeserializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.ToJsonCapable;
-import javax.annotation.Nullable;
+import org.fuin.objects4j.common.Nullable;
 
 /**
  * Example meta data. .
