@@ -206,6 +206,12 @@
                 <artifactId>httpasyncclient</artifactId>
                 <version>4.1.4</version>
             </dependency>
+            
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>4.4.12</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.github.msemys</groupId>
