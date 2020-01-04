@@ -19,7 +19,6 @@ package org.fuin.esc.eshttp;
 
 import java.io.File;
 
-import org.apache.http.impl.nio.client.ESHttpAsyncClients;
 import org.fuin.units4j.AssertCoverage;
 import org.junit.Test;
 
@@ -32,15 +31,9 @@ public class BaseTest {
     @Test
     public final void testCoverage() {
         // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), new AssertCoverage.ClassFilter() {
-            @Override
-            public boolean isIncludeClass(final Class<?> clasz) {
-                if (clasz == ESHttpAsyncClients.class) {
-                    // Just copied code, not worth to test
-                    return false;
-                }
-                return true;
-            }
+        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), clasz -> {
+            // Add ignored classes here...
+            return true;
         });
     }
 
