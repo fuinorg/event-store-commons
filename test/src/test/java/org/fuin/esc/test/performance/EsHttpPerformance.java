@@ -2,30 +2,7 @@
 package org.fuin.esc.test.performance;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TypeName;
-//import org.fuin.esc.eshttp.ESEnvelopeType;
-//import org.fuin.esc.eshttp.ESHttpEventStore;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 
 /**
  * Performance test for the ESC HTTP Event Store (https://geteventstore.com/) implementation.

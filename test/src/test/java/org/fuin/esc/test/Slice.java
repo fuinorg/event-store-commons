@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.fuin.objects4j.common.Immutable;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -33,6 +32,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.spi.Event;
+import org.fuin.objects4j.common.Immutable;
 
 /**
  * A slice of data from a stream.

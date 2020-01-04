@@ -20,7 +20,6 @@ package org.fuin.esc.test;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fuin.objects4j.common.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
@@ -31,6 +30,7 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.test.examples.BookAddedEvent;
+import org.fuin.objects4j.common.Nullable;
 import org.fuin.units4j.TestCommand;
 
 /**
