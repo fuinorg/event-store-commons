@@ -17,7 +17,7 @@ Here is how the data structure looks like that is sent using the [Event Store Ev
             "author":"Stephen King"
         },
         "MetaData":{
-	        "data-type":"MyEvent",
+	        "data-type":"BookAddedEvent",
             "data-content-type":"application/json; encoding=UTF-8",
 	        "meta-type":"MyMeta",
             "meta-content-type":"application/json; encoding=UTF-8; version=3",
