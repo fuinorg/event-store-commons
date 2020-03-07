@@ -7,7 +7,7 @@ Defines a common event store Java interface and provides some adapters (like for
 [![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
 [![Java Development Kit 11](https://img.shields.io/badge/JDK-11-green.svg)](https://openjdk.java.net/projects/jdk/11/)
 
-**Java 11 for releases >= 0.4.0** / Java 8 <= 0.3.1
+**Java 11 for releases >= 0.4.0** / Java 8 <= 0.3.2
 
 *Caution*: The code coverage value is not correct (it's actually higher than above value) as the 'test' module is not considered correctly (See [Issue #4](https://github.com//fuinorg/event-store-commons/issues/4))
 
