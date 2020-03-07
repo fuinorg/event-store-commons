@@ -32,15 +32,17 @@ public class BaseTest {
     @Test
     public final void testCoverage() {
         // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), new AssertCoverage.ClassFilter() {
-            @Override
-            public boolean isIncludeClass(final Class<?> clasz) {
-                if (clasz == ESHttpAsyncClients.class) {
-                    // Just copied code, not worth to test
-                    return false;
-                }
-                return true;
+        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), clasz -> {
+            if (clasz == BasicCustomScheme.class) {
+                // Almost a 1:1 copy of the Apache code
+                return false;
             }
+            if (clasz == BasicCustomSchemeFactory.class) {
+                // Almost a 1:1 copy of the Apache code
+                return false;
+            }
+            // Add more ignored classes here...
+            return true;
         });
     }
 
