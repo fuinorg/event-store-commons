@@ -37,6 +37,10 @@ import javax.persistence.Persistence;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
@@ -45,8 +49,6 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.esjc.ESJCEventStore;
-//import org.fuin.esc.eshttp.ESEnvelopeType;
-//import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStore;
 import org.fuin.esc.spi.Base64Data;
@@ -91,6 +93,11 @@ public class TestFeatures {
 
     @Before
     public void beforeFeature() throws MalformedURLException {
+
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "changeit");
+        credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+
         // Use the property to select the correct implementation:
         final String currentEventStoreImplType = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
         final EventStore eventStore;
@@ -113,12 +120,13 @@ public class TestFeatures {
             if (currentEventStoreImplType.equals("eshttp")) {
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
-                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry);
+                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry, credentialsProvider);
             } else if (currentEventStoreImplType.equals("jpa")) {
                 setupDb();
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
             } else if (currentEventStoreImplType.equals("esjc")) {
-                final com.github.msemys.esjc.EventStore es = EventStoreBuilder.newBuilder().singleNodeAddress("127.0.0.1", 1113).build();
+                final com.github.msemys.esjc.EventStore es = EventStoreBuilder.newBuilder()
+                        .userCredentials(credentials.getUserName(), credentials.getPassword()).singleNodeAddress("127.0.0.1", 1113).build();
                 eventStore = new ESJCEventStore(es, registry, registry,
                         EnhancedMimeType.create("application", "xml", Charset.forName("utf-8")));
             } else {

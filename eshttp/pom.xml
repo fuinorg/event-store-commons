@@ -239,8 +239,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <download-url>https://eventstore.org/downloads/EventStore-OSS-Ubuntu-18.04-v4.1.2.tar.gz</download-url>
+                    <download-url>https://eventstore.org/downloads/ubuntu/EventStore-OSS-Linux-Ubuntu-18.04-v5.0.6.tar.gz</download-url>
                     <download-os-qualifier>Ubuntu 18</download-os-qualifier>
+                    <version-url>https://raw.githubusercontent.com/EventStore/eventstore.org/master/_data/downloads.json</version-url>
                     <arguments>
                         <argument>--mem-db=TRUE</argument>
                         <argument>--run-projections=All</argument>

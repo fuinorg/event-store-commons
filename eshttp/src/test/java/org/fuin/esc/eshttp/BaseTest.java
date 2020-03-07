@@ -32,7 +32,15 @@ public class BaseTest {
     public final void testCoverage() {
         // Make sure all classes have a test
         AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), clasz -> {
-            // Add ignored classes here...
+            if (clasz == BasicCustomScheme.class) {
+                // Almost a 1:1 copy of the Apache code
+                return false;
+            }
+            if (clasz == BasicCustomSchemeFactory.class) {
+                // Almost a 1:1 copy of the Apache code
+                return false;
+            }
+            // Add more ignored classes here...
             return true;
         });
     }
