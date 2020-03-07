@@ -33,6 +33,9 @@ public class BaseTest {
     public final void testCoverage() {
         // Make sure all classes have a test
         AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), clasz -> {
+            if (clasz == ESHttpAsyncClients.class) {
+                return false;
+            }
             if (clasz == BasicCustomScheme.class) {
                 // Almost a 1:1 copy of the Apache code
                 return false;
