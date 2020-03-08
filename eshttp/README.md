@@ -8,7 +8,7 @@ The [Event Store](https://geteventstore.com/) has only limited support for diffe
 a separate meta data structure. It contains information about content-types, encoding, version, meta type and 
 the meta information provided by the user.
 
-Here is how the data structure looks like that is sent using the [Event Store Events Media Type](http://docs.geteventstore.com/http-api/3.9.0/writing-to-a-stream/):
+Here is how the data structure looks like that is sent using the [Event Store Events Media Type](https://eventstore.com/docs/http-api/creating-writing-a-stream/index.html?tabs=tabid-1%2Ctabid-3%2Ctabid-5%2Ctabid-7%2Ctabid-17%2Ctabid-11%2Ctabid-13%2Ctabid-15#batch-writes):
 ```json
 [
     {
