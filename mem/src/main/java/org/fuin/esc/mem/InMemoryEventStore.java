@@ -74,12 +74,13 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public final void open() {
+    public final InMemoryEventStore open() {
         if (open) {
             // Ignore
-            return;
+            return this;
         }
         this.open = true;
+        return this;
     }
 
     @Override

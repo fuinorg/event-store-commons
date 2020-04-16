@@ -28,8 +28,10 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
 
     /**
      * Opens a connection to the event store.
+     * 
+     * @return Event store instance.
      */
-    public void open();
+    public ProjectionAdminEventStore open();
 
     /**
      * Closes the connection to the event store.

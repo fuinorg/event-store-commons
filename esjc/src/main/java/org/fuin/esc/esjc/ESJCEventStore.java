@@ -120,13 +120,14 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
     }
 
     @Override
-    public final void open() {
+    public final ESJCEventStore open() {
         if (open) {
             // Ignore
-            return;
+            return this;
         }
         es.connect();
         this.open = true;
+        return this;
     }
 
     @Override
@@ -251,7 +252,6 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es.readStreamEventsForward(sid.asString(), start, count, true).get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
@@ -278,7 +278,6 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es.readStreamEventsBackward(sid.asString(), start, count, true).get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
@@ -308,7 +307,6 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-
         try {
             final EventReadResult eventReadResult = es.readEvent(sid.asString(), eventNumber, true).get();
             if (eventReadResult.status == EventReadStatus.NoStream) {
@@ -334,7 +332,6 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-
         try {
             final com.github.msemys.esjc.StreamEventsSlice slice = es.readStreamEventsForward(sid.asString(), 0, 1, false).get();
             if (SliceReadStatus.StreamDeleted == slice.status) {
@@ -357,7 +354,6 @@ public final class ESJCEventStore extends AbstractReadableEventStore implements 
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-
         try {
 
             final com.github.msemys.esjc.StreamEventsSlice slice = es.readStreamEventsForward(sid.asString(), 0, 1, false).get();

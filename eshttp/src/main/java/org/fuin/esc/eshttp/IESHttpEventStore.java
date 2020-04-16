@@ -26,4 +26,7 @@ import org.fuin.esc.api.ProjectionAdminEventStore;
  */
 public interface IESHttpEventStore extends EventStore, ProjectionAdminEventStore {
 
+    @Override
+    public IESHttpEventStore open();
+    
 }

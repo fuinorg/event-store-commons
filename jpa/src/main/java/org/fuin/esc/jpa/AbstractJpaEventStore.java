@@ -125,12 +125,13 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     @Override
-    public final void open() {
+    public final AbstractJpaEventStore open() {
         if (open) {
             // Ignore
-            return;
+            return this;
         }
         this.open = true;
+        return this;
     }
 
     @Override

@@ -25,8 +25,10 @@ public interface EventStoreBasics extends AutoCloseable {
     /**
      * Opens a connection to the event store. Opening an already opened event
      * store is ignored.
+     * 
+     * @return This event store.
      */
-    public void open();
+    public EventStoreBasics open();
 
     /**
      * Closes the connection to the event store. Closing an already closed or

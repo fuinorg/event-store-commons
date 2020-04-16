@@ -188,10 +188,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
     }
 
     @Override
-    public void open() {
+    public ESHttpEventStore open() {
         if (open) {
             // Ignore
-            return;
+            return this;
         }
         final HttpAsyncClientBuilder builder = HttpAsyncClients.custom().setThreadFactory(threadFactory);
         if (credentialsProvider != null) {
@@ -204,6 +204,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         httpclient = builder.build();
         httpclient.start();
         this.open = true;
+        return this;
     }
 
     @Override
@@ -280,13 +281,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         return nextExpectedVersion;
     }
 
-    private void appendToStream(final StreamId streamId, final long expectedVersion, final EnhancedMimeType mimeType, final String content,
+    private void appendToStream(final TenantStreamId streamId, final long expectedVersion, final EnhancedMimeType mimeType, final String content,
             final int count) throws StreamDeletedException, WrongExpectedVersionException {
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
-        final String msg = "appendToStream(" + sid + ", " + expectedVersion + ", " + mimeType + ", " + count + ")";
+        final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
             final HttpPost post = createPost(uri, expectedVersion, content);
             try {
                 LOG.debug(msg + " POST: {}", post);
@@ -307,12 +307,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 }
                 if ((statusLine.getStatusCode() == 400) && !statusLine.getReasonPhrase().contains("request body invalid")) {
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new WrongExpectedVersionException(sid, expectedVersion, currentVersion(response));
+                    throw new WrongExpectedVersionException(streamId, expectedVersion, currentVersion(response));
                 }
                 if (statusLine.getStatusCode() == 410) {
                     // Stream was hard deleted
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new StreamDeletedException(sid);
+                    throw new StreamDeletedException(streamId);
                 }
 
                 LOG.debug(msg + " RESPONSE: {}", response);
@@ -561,24 +561,23 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
     @Override
     public final void enableProjection(final StreamId projectionId) throws StreamNotFoundException {
-        enableDisable(projectionId, "enable");
+        enableDisable(new TenantStreamId(tenantId, projectionId), "enable");
     }
 
     @Override
     public final void disableProjection(final StreamId projectionId) throws StreamNotFoundException {
-        enableDisable(projectionId, "disable");
+        enableDisable(new TenantStreamId(tenantId, projectionId), "disable");
     }
 
-    private void enableDisable(final StreamId projectionId, final String action) {
+    private void enableDisable(final TenantStreamId projectionId, final String action) {
 
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
         ensureOpen();
 
-        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
-        final String msg = action + "Projection(" + pid + ")";
+        final String msg = action + "Projection(" + projectionId + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + pid.asString() + "/command/" + action).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString() + "/command/" + action).build();
             LOG.debug("{}", uri);
             final HttpPost post = createPost(uri, "", ESEnvelopeType.JSON);
             try {
@@ -592,7 +591,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 }
                 if (status.getStatusCode() == 404) {
                     // 404 Not Found
-                    throw new StreamNotFoundException(pid);
+                    throw new StreamNotFoundException(projectionId);
                 }
                 throw new RuntimeException(msg + " [Status=" + status + "]");
             } finally {
@@ -697,10 +696,9 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         }
     }
 
-    private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri, final long start, final int count,
+    private StreamEventsSlice readEvents(final TenantStreamId streamId, final boolean forward, final URI uri, final long start, final int count,
             final String msg, final boolean reverseOrder) throws InterruptedException, ExecutionException, IOException {
         LOG.debug(uri.toString());
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
         final HttpGet get = createHttpGet(uri);
         try {
             final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -724,12 +722,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             if (statusLine.getStatusCode() == 404) {
                 // 404 Not Found
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamNotFoundException(sid);
+                throw new StreamNotFoundException(streamId);
             }
             if (statusLine.getStatusCode() == 410) {
                 // Stream was hard deleted
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamDeletedException(sid);
+                throw new StreamDeletedException(streamId);
             }
             throw new RuntimeException(msg + " [Status=" + statusLine + "]");
         } finally {
