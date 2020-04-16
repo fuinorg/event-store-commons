@@ -49,7 +49,7 @@ public class ProjectionJpaStreamIdTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(ProjectionJpaStreamId.class).suppress(Warning.ALL_FIELDS_SHOULD_BE_USED)
+        EqualsVerifier.forClass(ProjectionJpaStreamId.class).withNonnullFields("entityName").suppress(Warning.ALL_FIELDS_SHOULD_BE_USED)
                 .verify();
     }
 

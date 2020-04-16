@@ -51,8 +51,7 @@ public final class AggregateStreamId implements StreamId {
      * @param aggregateId
      *            Aggregate id.
      */
-    public AggregateStreamId(final String type, final String paramName,
-            final String aggregateId) {
+    public AggregateStreamId(final String type, final String paramName, final String aggregateId) {
         super();
         this.type = type;
         this.paramName = paramName;
@@ -88,6 +87,26 @@ public final class AggregateStreamId implements StreamId {
     @Override
     public final String asString() {
         return type + "-" + aggregateId;
+    }
+
+    @Override
+    public final int hashCode() {
+        return asString().hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AggregateStreamId other = (AggregateStreamId) obj;
+        return asString().equals(other.asString());
     }
 
     @Override

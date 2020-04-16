@@ -25,12 +25,11 @@ import javax.validation.constraints.NotNull;
 import org.fuin.objects4j.vo.KeyValue;
 
 /**
- * Name of a stream that is unique within the event store.
+ * Name of a stream that is unique within the event store.<br>
+ * <br>
+ * CAUTION: Stream identifier should only be compared based on their {@link #asString()} method.
  */
 public interface StreamId extends Serializable {
-
-    /** Uniquely identifies the stream that contains all events. */
-    public StreamId ALL = new SimpleStreamId(StreamId.class.getName() + "ALL");
 
     /**
      * Returns the name of the stream.
@@ -43,16 +42,13 @@ public interface StreamId extends Serializable {
     /**
      * Returns the information if this identifier points to a projection.
      * 
-     * @return TRUE if this is an identifier for a projection, else FALSE
-     *         (stream).
+     * @return TRUE if this is an identifier for a projection, else FALSE (stream).
      */
     public boolean isProjection();
 
     /**
-     * Convenience method that returns the one-and-only parameter value.
-     * CAUTION: This method will throw an exception if there are no parameters,
-     * more than one parameter or the type of the value cannot be casted to the
-     * expected result type.
+     * Convenience method that returns the one-and-only parameter value. CAUTION: This method will throw an exception if there are no
+     * parameters, more than one parameter or the type of the value cannot be casted to the expected result type.
      * 
      * @return Value of the single parameter.
      * 
@@ -63,11 +59,9 @@ public interface StreamId extends Serializable {
     public <T> T getSingleParamValue();
 
     /**
-     * Returns the parameters used in addition to the pure stream name to
-     * identify the stream.
+     * Returns the parameters used in addition to the pure stream name to identify the stream.
      * 
-     * @return Ordered unmodifiable list of parameters - May be empty if no
-     *         parameters exist.
+     * @return Ordered unmodifiable list of parameters - May be empty if no parameters exist.
      */
     @NotNull
     public List<KeyValue> getParameters();

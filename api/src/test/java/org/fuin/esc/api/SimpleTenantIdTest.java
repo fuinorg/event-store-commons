@@ -18,25 +18,25 @@
 package org.fuin.esc.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 /**
- * Tests the {@link SimpleStreamId} class.
+ * Tests the {@link SimpleTenantId} class.
  */
-// CHECKSTYLE:OFF Test
-public class SimpleStreamIdTest {
+public class SimpleTenantIdTest {
 
-    private static final String NAME = "MyStream1";
+    private static final String NAME = "mycompany";
 
-    private SimpleStreamId testee;
+    private SimpleTenantId testee;
 
     @Before
     public void setup() {
-        testee = new SimpleStreamId(NAME);
+        testee = new SimpleTenantId(NAME);
     }
 
     @After
@@ -46,20 +46,12 @@ public class SimpleStreamIdTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(SimpleStreamId.class).withNonnullFields("name").verify();
+        EqualsVerifier.forClass(SimpleTenantId.class).withNonnullFields("name").verify();
     }
 
     @Test
     public void testGetter() {
-        assertThat(testee.getName()).isEqualTo(NAME);
         assertThat(testee.asString()).isEqualTo(NAME);
-        assertThat(testee.isProjection()).isFalse();
-        assertThat(testee.getParameters()).isEmpty();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetSingleParamValue() {
-        testee.getSingleParamValue();
-    }
 }
-// CHECKSTYLE:ON

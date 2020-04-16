@@ -51,8 +51,6 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
     private Executor executor;
 
-    private List<CommonEvent> all;
-
     private Map<String, InternalStream> streams;
 
     private Map<String, List<InternalSubscription>> subscriptions;
@@ -70,7 +68,6 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         Contract.requireArgNotNull("executor", executor);
 
         this.executor = executor;
-        all = new ArrayList<CommonEvent>();
         streams = new HashMap<>();
         subscriptions = new HashMap<>();
         this.open = false;
@@ -138,12 +135,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final List<CommonEvent> events;
-        if (streamId == StreamId.ALL) {
-            events = all;
-        } else {
-            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
-        }
+        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
         for (int i = (int) start; (i < (start + count)) && (i < events.size()); i++) {
@@ -165,12 +157,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final List<CommonEvent> events;
-        if (streamId == StreamId.ALL) {
-            events = all;
-        } else {
-            events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
-        }
+        final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
 
         final List<CommonEvent> result = new ArrayList<CommonEvent>();
         if (start < events.size()) {
@@ -197,9 +184,6 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
-        }
-        if (streamId == StreamId.ALL) {
-            throw new IllegalArgumentException("It's not possible to delete the 'all' stream");
         }
 
         final InternalStream stream = streams.get(streamId.asString());
@@ -270,7 +254,6 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
             throw new WrongExpectedVersionException(streamId, expectedVersion, stream.getVersion());
         }
 
-        all.addAll(toAppend);
         stream.addAll(toAppend);
 
         notifyListeners(streamId, toAppend, 0);

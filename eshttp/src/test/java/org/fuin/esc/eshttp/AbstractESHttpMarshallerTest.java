@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -61,7 +62,7 @@ public abstract class AbstractESHttpMarshallerTest {
     }
 
     protected final String loadJsonResource(final String name) throws IOException {
-        final String json = IOUtils.toString(this.getClass().getResourceAsStream(name));
+        final String json = IOUtils.toString(this.getClass().getResourceAsStream(name), Charset.forName("utf-8"));
         final JsonObject js = Json.createReader(new StringReader(json)).readObject();
         final StringWriter sw = new StringWriter();
         createWriter(sw).writeObject(js);

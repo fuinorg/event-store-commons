@@ -29,14 +29,14 @@ import javax.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.vo.KeyValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -70,15 +70,15 @@ public class InMemoryEventStoreTest {
         final StreamId otherId = new SampleStreamId("MySameStream");
         final CommonEvent eventOne = event("One");
         testee.createStream(streamId);
-        
+
         // TEST
         testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne);
 
         // VERIFY
         assertThat(testee.streamExists(otherId)).isTrue();
-        
-    }    
-    
+
+    }
+
     @Test
     public void testAppendToStreamArray() {
 
@@ -91,7 +91,7 @@ public class InMemoryEventStoreTest {
         testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo);
 
         // VERIFY
-        final StreamEventsSlice slice = testee.readEventsForward(StreamId.ALL, 0, 2);
+        final StreamEventsSlice slice = testee.readEventsForward(streamId, 0, 2);
         assertThat(slice.getEvents()).contains(eventOne, eventTwo);
         assertThat(slice.getFromEventNumber()).isEqualTo(0);
         assertThat(slice.getNextEventNumber()).isEqualTo(2);
@@ -108,11 +108,11 @@ public class InMemoryEventStoreTest {
         final CommonEvent eventThree = event("8885c8c1-6148-4709-b816-018f72111559", "Three");
         final CommonEvent eventFour = event("4028e009-74eb-4a31-905a-3bdffb1046c0", "Four");
         final CommonEvent eventFive = event("9bfb6129-f503-49a7-b2d1-7a2edcefae9c", "Five");
-        final long version = testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
-                eventOne, eventTwo, eventThree, eventFour, eventFive);
+        final long version = testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo, eventThree,
+                eventFour, eventFive);
 
         // TEST Slice 1
-        final StreamEventsSlice slice1 = testee.readEventsBackward(StreamId.ALL, version, 2);
+        final StreamEventsSlice slice1 = testee.readEventsBackward(streamId, version, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventFive, eventFour);
@@ -121,8 +121,7 @@ public class InMemoryEventStoreTest {
         assertThat(slice1.isEndOfStream()).isFalse();
 
         // TEST Slice 2
-        final StreamEventsSlice slice2 = testee.readEventsBackward(StreamId.ALL, slice1.getNextEventNumber(),
-                2);
+        final StreamEventsSlice slice2 = testee.readEventsBackward(streamId, slice1.getNextEventNumber(), 2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree, eventTwo);
@@ -131,8 +130,7 @@ public class InMemoryEventStoreTest {
         assertThat(slice2.isEndOfStream()).isFalse();
 
         // TEST Slice 3
-        final StreamEventsSlice slice3 = testee.readEventsBackward(StreamId.ALL, slice2.getNextEventNumber(),
-                2);
+        final StreamEventsSlice slice3 = testee.readEventsBackward(streamId, slice2.getNextEventNumber(), 2);
 
         // VERIFY Slice 3
         assertThat(slice3.getEvents()).containsExactly(eventOne);
@@ -150,11 +148,10 @@ public class InMemoryEventStoreTest {
         final CommonEvent eventOne = event("One");
         final CommonEvent eventTwo = event("Two");
         final CommonEvent eventThree = event("Three");
-        testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo,
-                eventThree);
+        testee.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), eventOne, eventTwo, eventThree);
 
         // TEST Slice 1
-        final StreamEventsSlice slice1 = testee.readEventsForward(StreamId.ALL, 0, 2);
+        final StreamEventsSlice slice1 = testee.readEventsForward(streamId, 0, 2);
 
         // VERIFY Slice 1
         assertThat(slice1.getEvents()).containsExactly(eventOne, eventTwo);
@@ -163,8 +160,7 @@ public class InMemoryEventStoreTest {
         assertThat(slice1.isEndOfStream()).isFalse();
 
         // TEST Slice 2
-        final StreamEventsSlice slice2 = testee.readEventsForward(StreamId.ALL, slice1.getNextEventNumber(),
-                2);
+        final StreamEventsSlice slice2 = testee.readEventsForward(streamId, slice1.getNextEventNumber(), 2);
 
         // VERIFY Slice 2
         assertThat(slice2.getEvents()).containsExactly(eventThree);
@@ -190,7 +186,7 @@ public class InMemoryEventStoreTest {
             result.add(event);
         }, (subscription, exception) -> {
             // Not used
-            });
+        });
         testee.appendToStream(streamId, eventTwo, eventThree);
         waitForResult(result, 1);
 
@@ -215,7 +211,7 @@ public class InMemoryEventStoreTest {
             result.add(event);
         }, (subscription, exception) -> {
             // Not used
-            });
+        });
         waitForResult(result, 3);
 
         // VERIFY
@@ -241,7 +237,7 @@ public class InMemoryEventStoreTest {
             result.add(event);
         }, (subscription, exception) -> {
             // Not used
-            });
+        });
         testee.appendToStream(streamId, eventThree);
         waitForResult(result, 2);
 
@@ -263,7 +259,7 @@ public class InMemoryEventStoreTest {
         while (result.size() != expected && (count < 10)) {
             try {
                 Thread.sleep(100);
-            } catch (final InterruptedException ex) {//NOSONAR
+            } catch (final InterruptedException ex) {// NOSONAR
                 throw new RuntimeException(ex);
             }
             count++;
@@ -323,36 +319,31 @@ public class InMemoryEventStoreTest {
         }
 
         @Override
+        public final int hashCode() {
+            return name.hashCode();
+        }
+
+        @Override
+        public final boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final SampleStreamId other = (SampleStreamId) obj;
+            return name.equals(other.name);
+        }
+
+        @Override
         public final String toString() {
             return name;
         }
 
-        @Override
-        public final int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((name == null) ? 0 : name.hashCode());
-            return result;
-        }
-
-        @Override
-        public final boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (!(obj instanceof SampleStreamId))
-                return false;
-            SampleStreamId other = (SampleStreamId) obj;
-            if (name == null) {
-                if (other.name != null)
-                    return false;
-            } else if (!name.equals(other.name))
-                return false;
-            return true;
-        }
-        
     }
-    
+
 }
 // CHECKSTYLE:ON

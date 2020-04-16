@@ -111,11 +111,12 @@ public final class EsHttpJsonbExample {
         SerDeserializerRegistry serDeserRegistry = createSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
         // Create an event store instance and open it
-        EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
-                ESEnvelopeType.JSON, // This format will be used to communicate with the event store
-                serDeserRegistry, // Registry used to find a serializer
-                serDeserRegistry // Registry used to find a de-serializer
-        );
+        EventStore eventStore = new ESHttpEventStore.Builder()
+                .threadFactory(threadFactory)
+                .url(url)
+                .envelopeType(ESEnvelopeType.JSON) // This format will be used to communicate with the event store
+                .serDesRegistry(serDeserRegistry) // Registry used to find a serializer and a deserialize
+                .build();
         eventStore.open();
         try {
 

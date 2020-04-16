@@ -46,7 +46,7 @@ public class ProjectionStreamIdTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(ProjectionStreamId.class).verify();
+        EqualsVerifier.forClass(ProjectionStreamId.class).withNonnullFields("name").verify();
     }
 
     @Test

@@ -17,54 +17,30 @@
  */
 package org.fuin.esc.api;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.KeyValue;
 
 /**
- * Projection stream identifier that is based on a name.
+ * Tenant identifier that is based on a name.
  */
 @Immutable
-public final class ProjectionStreamId implements StreamId {
+public final class SimpleTenantId implements TenantId {
 
     private static final long serialVersionUID = 1L;
 
     private final String name;
 
     /**
-     * Constructor for projection.
+     * Constructor with mandatory data.
      * 
      * @param name
      *            Unique name.
      */
-    public ProjectionStreamId(@NotNull final String name) {
+    public SimpleTenantId(@NotNull final String name) {
         Contract.requireArgNotNull("name", name);
         this.name = name;
-    }
-
-    @Override
-    public final String getName() {
-        return name;
-    }
-
-    @Override
-    public final boolean isProjection() {
-        return true;
-    }
-
-    @Override
-    public final <T> T getSingleParamValue() {
-        throw new UnsupportedOperationException(getClass().getSimpleName() + " has no parameters");
-    }
-
-    @Override
-    public final List<KeyValue> getParameters() {
-        return Collections.emptyList();
     }
 
     @Override
@@ -88,7 +64,7 @@ public final class ProjectionStreamId implements StreamId {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final ProjectionStreamId other = (ProjectionStreamId) obj;
+        final SimpleTenantId other = (SimpleTenantId) obj;
         return name.equals(other.name);
     }
 

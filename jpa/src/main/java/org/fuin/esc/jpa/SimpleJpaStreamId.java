@@ -89,37 +89,28 @@ public final class SimpleJpaStreamId implements JpaStreamId {
     }
 
     @Override
+    public final int hashCode() {
+        return entityName.hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SimpleJpaStreamId other = (SimpleJpaStreamId) obj;
+        return entityName.equals(other.entityName);
+    }
+
+    @Override
     public final String toString() {
         return entityName;
     }
-
-    // CHECKSTYLE:OFF Generated code
-
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((entityName == null) ? 0 : entityName.hashCode());
-        return result;
-    }
-
-    @Override
-    public final boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof SimpleJpaStreamId))
-            return false;
-        SimpleJpaStreamId other = (SimpleJpaStreamId) obj;
-        if (entityName == null) {
-            if (other.entityName != null)
-                return false;
-        } else if (!entityName.equals(other.entityName))
-            return false;
-        return true;
-    }
-
-    // CHECKSTYLE:ON
 
 }

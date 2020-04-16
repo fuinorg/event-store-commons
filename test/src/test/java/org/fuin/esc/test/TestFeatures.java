@@ -120,15 +120,16 @@ public class TestFeatures {
             if (currentEventStoreImplType.equals("eshttp")) {
                 final ThreadFactory threadFactory = Executors.defaultThreadFactory();
                 final URL url = new URL("http://127.0.0.1:2113/");
-                eventStore = new ESHttpEventStore(threadFactory, url, ESEnvelopeType.XML, registry, registry, credentialsProvider);
+                eventStore = new ESHttpEventStore.Builder().threadFactory(threadFactory).url(url).envelopeType(ESEnvelopeType.XML)
+                        .serDesRegistry(registry).credentialsProvider(credentialsProvider).build();
             } else if (currentEventStoreImplType.equals("jpa")) {
                 setupDb();
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
             } else if (currentEventStoreImplType.equals("esjc")) {
                 final com.github.msemys.esjc.EventStore es = EventStoreBuilder.newBuilder()
                         .userCredentials(credentials.getUserName(), credentials.getPassword()).singleNodeAddress("127.0.0.1", 1113).build();
-                eventStore = new ESJCEventStore(es, registry, registry,
-                        EnhancedMimeType.create("application", "xml", Charset.forName("utf-8")));
+                eventStore = new ESJCEventStore.Builder().eventStore(es).serDesRegistry(registry)
+                        .targetContentType(EnhancedMimeType.create("application", "xml", Charset.forName("utf-8"))).build();
             } else {
                 throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
             }

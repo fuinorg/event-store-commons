@@ -15,6 +15,7 @@ import org.apache.http.message.BasicStatusLine;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.junit.Test;
 
@@ -28,42 +29,42 @@ public class ESHttpEventStoreTest {
     public void testStreamId() throws URISyntaxException {
 
         try {
-            ESHttpEventStore.streamId(new URI("https://www.fuin.org/"));
+            ESHttpEventStore.streamId(null, new URI("https://www.fuin.org/"));
             fail();
         } catch (final IllegalStateException ex) {
             assertThat(ex.getMessage()).isEqualTo("Failed to extract '/streams/': https://www.fuin.org/");
         }
 
         try {
-            ESHttpEventStore.streamId(new URI("http://127.0.0.1:2113/streams"));
+            ESHttpEventStore.streamId(null, new URI("http://127.0.0.1:2113/streams"));
             fail();
         } catch (final IllegalStateException ex) {
             assertThat(ex.getMessage()).isEqualTo("Failed to extract '/streams/': http://127.0.0.1:2113/streams");
         }
 
         try {
-            ESHttpEventStore.streamId(new URI("http://127.0.0.1:2113/streams/x"));
+            ESHttpEventStore.streamId(null, new URI("http://127.0.0.1:2113/streams/x"));
             fail();
         } catch (final IllegalStateException ex) {
             assertThat(ex.getMessage()).isEqualTo("Failed to extract last '/': http://127.0.0.1:2113/streams/x (p1=21)");
         }
 
         try {
-            ESHttpEventStore.streamId(new URI("http://127.0.0.1:2113/streams/"));
+            ESHttpEventStore.streamId(null, new URI("http://127.0.0.1:2113/streams/"));
             fail();
         } catch (final IllegalStateException ex) {
             assertThat(ex.getMessage()).isEqualTo("Failed to extract last '/': http://127.0.0.1:2113/streams/ (p1=21)");
         }
 
         try {
-            ESHttpEventStore.streamId(new URI("http://127.0.0.1:2113/streams//"));
+            ESHttpEventStore.streamId(null, new URI("http://127.0.0.1:2113/streams//"));
             fail();
         } catch (final IllegalStateException ex) {
             assertThat(ex.getMessage()).isEqualTo("Failed to extract name: http://127.0.0.1:2113/streams// (p1=21, p2=30)");
         }
 
-        assertThat(ESHttpEventStore.streamId(new URI("http://127.0.0.1:2113/streams/append_diff_and_read_stream/2")))
-                .isEqualTo(new SimpleStreamId("append_diff_and_read_stream"));
+        assertThat(ESHttpEventStore.streamId(null, new URI("http://127.0.0.1:2113/streams/append_diff_and_read_stream/2")).asString())
+                .isEqualTo("append_diff_and_read_stream");
 
     }
 

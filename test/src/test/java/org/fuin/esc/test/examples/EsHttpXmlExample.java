@@ -61,11 +61,12 @@ public final class EsHttpXmlExample {
         registry.add(serMetaType, "application/xml", xmlDeSer);
 
         // Create an event store instance and open it
-        EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
-                ESEnvelopeType.XML, // This format will be used to communicate with the event store
-                registry, // Registry used to find a serializer 
-                registry  // Registry used to find a de-serializer
-                );
+        EventStore eventStore = new ESHttpEventStore.Builder()
+                .threadFactory(threadFactory)
+                .url(url)
+                .envelopeType(ESEnvelopeType.XML) // This format will be used to communicate with the event store
+                .serDesRegistry(registry) // Registry used to find a serializer and a deserialize
+                .build();
         eventStore.open();
         try {
 

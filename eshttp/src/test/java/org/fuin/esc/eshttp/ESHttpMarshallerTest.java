@@ -60,7 +60,7 @@ public class ESHttpMarshallerTest {
 
         // PREPARE
         final String expectedXml = IOUtils.toString(
-                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Event.xml"));
+                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Event.xml"), Charset.forName("utf-8"));
         final UUID uuid = UUID.fromString("a07d6a1a-715d-4d8e-98fa-b158e3339303");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(uuid), MyEvent.TYPE,
                 new MyEvent(uuid, "Whatever..."));
@@ -81,7 +81,7 @@ public class ESHttpMarshallerTest {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(
-                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Event.json"));
+                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Event.json"), Charset.forName("utf-8"));
 
         final UUID uuid = UUID.fromString("a07d6a1a-715d-4d8e-98fa-b158e3339303");
         final JsonObject myEvent = Json.createObjectBuilder().add("id", uuid.toString())
@@ -102,7 +102,7 @@ public class ESHttpMarshallerTest {
 
         // PREPARE
         final String expectedXml = IOUtils.toString(
-                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.xml"));
+                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.xml"), Charset.forName("utf-8"));
 
         final UUID uuid1 = UUID.fromString("a07d6a1a-715d-4d8e-98fa-b158e3339303");
         final CommonEvent commonEvent1 = new SimpleCommonEvent(new EventId(uuid1), MyEvent.TYPE,
@@ -133,7 +133,7 @@ public class ESHttpMarshallerTest {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(
-                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.json"));
+                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.json"), Charset.forName("utf-8"));
 
         final UUID uuid1 = UUID.fromString("a07d6a1a-715d-4d8e-98fa-b158e3339303");
         final JsonObject myEvent1 = Json.createObjectBuilder().add("id", uuid1.toString())
@@ -164,7 +164,7 @@ public class ESHttpMarshallerTest {
 
         // PREPARE
         final String expectedJson = IOUtils.toString(
-                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.json"));
+                this.getClass().getResourceAsStream("/" + this.getClass().getSimpleName() + "_Events.json"), Charset.forName("utf-8"));
 
         final UUID uuid1 = UUID.fromString("a07d6a1a-715d-4d8e-98fa-b158e3339303");
         final JsonObject myEvent1 = Json.createObjectBuilder().add("id", uuid1.toString())

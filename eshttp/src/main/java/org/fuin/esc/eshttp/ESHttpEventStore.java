@@ -63,13 +63,16 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
+import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.esc.spi.SerDeserializerRegistry;
 import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
@@ -94,6 +97,8 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
 
     private final CredentialsProvider credentialsProvider;
 
+    private final TenantId tenantId;
+
     private CloseableHttpAsyncClient httpclient;
 
     private boolean open;
@@ -111,10 +116,13 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
      *            Registry used to locate serializers.
      * @param desRegistry
      *            Registry used to locate deserializers.
+     *            
+     * @deprecated Use the Builder in this class instead.
      */
+    @Deprecated
     public ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url, @NotNull final ESEnvelopeType envelopeType,
             @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
-        this(threadFactory, url, envelopeType, serRegistry, desRegistry, null);
+        this(threadFactory, url, envelopeType, serRegistry, desRegistry, null, null);
     }
 
     /**
@@ -132,10 +140,37 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
      *            Registry used to locate deserializers.
      * @param credentialsProvider
      *            Provided authentication information.
+     *            
+     * @deprecated Use the Builder in this class instead.
      */
+    @Deprecated
     public ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url, @NotNull final ESEnvelopeType envelopeType,
             @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
             final CredentialsProvider credentialsProvider) {
+        this(threadFactory, url, envelopeType, serRegistry, desRegistry, credentialsProvider, null);
+    }
+
+    /**
+     * Private constructor with all data used by the builder.
+     * 
+     * @param threadFactory
+     *            Factory used to create the necessary internal threads.
+     * @param url
+     *            Event store base URL like "http://127.0.0.1:2113/".
+     * @param envelopeType
+     *            Envelope type for reading/writing events.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param credentialsProvider
+     *            Provided authentication information.
+     * @param tenantId
+     *            Unique tenant identifier.
+     */
+    private ESHttpEventStore(@NotNull final ThreadFactory threadFactory, @NotNull final URL url, @NotNull final ESEnvelopeType envelopeType,
+            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry,
+            final CredentialsProvider credentialsProvider, final TenantId tenantId) {
         super();
         Contract.requireArgNotNull("threadFactory", threadFactory);
         Contract.requireArgNotNull("url", url);
@@ -147,6 +182,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         this.envelopeType = envelopeType;
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
+        this.tenantId = tenantId;
         this.credentialsProvider = credentialsProvider;
         this.open = false;
     }
@@ -218,8 +254,9 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("commonEvents", commonEvents);
         ensureOpen();
 
-        if (streamId.isProjection()) {
-            throw new StreamReadOnlyException(streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        if (sid.isProjection()) {
+            throw new StreamReadOnlyException(sid);
         }
 
         final ESHttpMarshaller marshaller = envelopeType.getMarshaller();
@@ -232,12 +269,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 final List<CommonEvent> list = new ArrayList<>(1);
                 list.add(commonEvent);
                 final String content = marshaller.marshal(serRegistry, list);
-                appendToStream(streamId, expectedVersion, mimeType, content, 1);
+                appendToStream(sid, expectedVersion, mimeType, content, 1);
             }
         } else {
             // All events are of same type
             final String content = marshaller.marshal(serRegistry, commonEvents);
-            appendToStream(streamId, expectedVersion, mimeType, content, commonEvents.size());
+            appendToStream(sid, expectedVersion, mimeType, content, commonEvents.size());
         }
 
         return nextExpectedVersion;
@@ -246,9 +283,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
     private void appendToStream(final StreamId streamId, final long expectedVersion, final EnhancedMimeType mimeType, final String content,
             final int count) throws StreamDeletedException, WrongExpectedVersionException {
 
-        final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", " + count + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "appendToStream(" + sid + ", " + expectedVersion + ", " + mimeType + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid).build();
             final HttpPost post = createPost(uri, expectedVersion, content);
             try {
                 LOG.debug(msg + " POST: {}", post);
@@ -269,12 +307,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 }
                 if ((statusLine.getStatusCode() == 400) && !statusLine.getReasonPhrase().contains("request body invalid")) {
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new WrongExpectedVersionException(streamId, expectedVersion, currentVersion(response));
+                    throw new WrongExpectedVersionException(sid, expectedVersion, currentVersion(response));
                 }
                 if (statusLine.getStatusCode() == 410) {
                     // Stream was hard deleted
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new StreamDeletedException(streamId);
+                    throw new StreamDeletedException(sid);
                 }
 
                 LOG.debug(msg + " RESPONSE: {}", response);
@@ -298,13 +336,14 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         ensureOpen();
 
-        if (streamId.isProjection()) {
-            throw new StreamReadOnlyException(streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        if (sid.isProjection()) {
+            throw new StreamReadOnlyException(sid);
         }
 
-        final String msg = "deleteStream(" + streamId + ", " + expectedVersion + ", " + hardDelete + ")";
+        final String msg = "deleteStream(" + sid + ", " + expectedVersion + ", " + hardDelete + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamId).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid).build();
             final HttpDelete delete = new HttpDelete(uri);
             try {
                 delete.setHeader("ES-HardDelete", "" + hardDelete);
@@ -322,12 +361,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 if (statusLine.getStatusCode() == 400) {
                     // returns this in header
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new WrongExpectedVersionException(streamId, expectedVersion, currentVersion(response));
+                    throw new WrongExpectedVersionException(sid, expectedVersion, currentVersion(response));
                 }
                 if (statusLine.getStatusCode() == 410) {
                     // 410 GONE - Stream was hard deleted
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new StreamDeletedException(streamId);
+                    throw new StreamDeletedException(sid);
                 }
 
                 LOG.debug(msg + " RESPONSE: {}", response);
@@ -356,11 +395,11 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final String msg = "readEventsForward(" + streamId + ", " + start + ", " + count + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "readEventsForward(" + sid + ", " + start + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId) + "/" + start + "/forward/" + count)
-                    .build();
-            return readEvents(streamId, true, uri, start, count, msg, false);
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString() + "/" + start + "/forward/" + count).build();
+            return readEvents(sid, true, uri, start, count, msg, false);
         } catch (final IOException | URISyntaxException | InterruptedException // NOSONAR
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
@@ -376,11 +415,11 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final String msg = "readEventsBackward(" + streamId + ", " + start + ", " + count + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "readEventsBackward(" + sid + ", " + start + ", " + count + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId) + "/" + start + "/backward/" + count)
-                    .build();
-            return readEvents(streamId, false, uri, start, count, msg, true);
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString() + "/" + start + "/backward/" + count).build();
+            return readEvents(sid, false, uri, start, count, msg, true);
         } catch (final IOException | URISyntaxException | InterruptedException // NOSONAR
                 | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
@@ -394,9 +433,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("eventNumber", eventNumber, 0);
         ensureOpen();
 
-        final String msg = "readEvent(" + streamId + ", " + eventNumber + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "readEvent(" + sid + ", " + eventNumber + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId) + "/" + eventNumber).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString() + "/" + eventNumber).build();
             return readEvent(uri);
         } catch (final URISyntaxException ex) {
             throw new RuntimeException(msg, ex);
@@ -409,9 +449,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final String msg = "streamExists(" + streamId + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "streamExists(" + sid + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString()).build();
             LOG.debug(uri.toString());
             final HttpGet get = createHttpGet(uri);
             try {
@@ -445,9 +486,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final String msg = "streamState(" + streamId + ")";
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final String msg = "streamState(" + sid + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + streamName(streamId)).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString()).build();
             LOG.debug(uri.toString());
             final HttpGet get = createHttpGet(uri);
             try {
@@ -463,7 +505,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                     // TODO Maybe the event store can send something to
                     // distinguish this?
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    throw new StreamNotFoundException(streamId);
+                    throw new StreamNotFoundException(sid);
                 }
                 if (status.getStatusCode() == 410) {
                     // 410 GONE - Stream was hard deleted
@@ -488,9 +530,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         requireProjection(projectionId);
         ensureOpen();
 
-        final String msg = "projectionExists(" + projectionId + ")";
+        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
+        final String msg = "projectionExists(" + pid + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString() + "/state").build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + pid.asString() + "/state").build();
             LOG.debug(uri.toString());
             final HttpGet get = new HttpGet(uri);
             get.setHeader("Accept", ESEnvelopeType.JSON.getMetaType());
@@ -532,9 +575,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         requireProjection(projectionId);
         ensureOpen();
 
-        final String msg = action + "Projection(" + projectionId + ")";
+        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
+        final String msg = action + "Projection(" + pid + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString() + "/command/" + action).build();
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + pid.asString() + "/command/" + action).build();
             LOG.debug("{}", uri);
             final HttpPost post = createPost(uri, "", ESEnvelopeType.JSON);
             try {
@@ -548,7 +592,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 }
                 if (status.getStatusCode() == 404) {
                     // 404 Not Found
-                    throw new StreamNotFoundException(projectionId);
+                    throw new StreamNotFoundException(pid);
                 }
                 throw new RuntimeException(msg + " [Status=" + status + "]");
             } finally {
@@ -578,12 +622,13 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         requireProjection(projectionId);
         ensureOpen();
 
-        final String msg = "createProjection(" + projectionId + "," + enable + type2str(eventTypes) + ")";
+        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
+        final String msg = "createProjection(" + pid + "," + enable + type2str(eventTypes) + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous").addParameter("name", projectionId.asString())
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projections/continuous").addParameter("name", pid.asString())
                     .addParameter("emit", "yes").addParameter("checkpoints", "yes").addParameter("enabled", ESHttpUtils.yesNo(enable))
                     .build();
-            final String javascript = new ProjectionJavaScriptBuilder(projectionId).types(eventTypes).build();
+            final String javascript = new ProjectionJavaScriptBuilder(pid).types(eventTypes).build();
             LOG.debug("{}: {}", uri, javascript);
             final HttpPost post = createPost(uri, javascript, ESEnvelopeType.JSON);
             try {
@@ -614,9 +659,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         requireProjection(projectionId);
         ensureOpen();
 
-        final String msg = "deleteProjection(" + projectionId + ")";
+        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
+        final String msg = "deleteProjection(" + pid + ")";
         try {
-            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + projectionId.asString())
+            final URI uri = new URIBuilder(url.toURI()).setPath("/projection/" + pid.asString())
                     .addParameter("deleteCheckpointStream", "yes").addParameter("deleteStateStream", "yes").build();
             final HttpDelete delete = new HttpDelete(uri);
             try {
@@ -627,11 +673,11 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 LOG.debug(msg + " RESPONSE: {}", response);
                 if (statusLine.getStatusCode() == 204) {
                     // Also delete the event stream
-                    deleteStream(new SimpleStreamId(projectionId.asString()), false);
+                    deleteStream(new SimpleStreamId(pid.asString()), false);
                     return;
                 }
                 if (statusLine.getStatusCode() == 404) {
-                    throw new StreamNotFoundException(projectionId);
+                    throw new StreamNotFoundException(pid);
                 }
                 throw new RuntimeException(msg + " [Status=" + statusLine + "]");
 
@@ -654,6 +700,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
     private StreamEventsSlice readEvents(final StreamId streamId, final boolean forward, final URI uri, final long start, final int count,
             final String msg, final boolean reverseOrder) throws InterruptedException, ExecutionException, IOException {
         LOG.debug(uri.toString());
+        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
         final HttpGet get = createHttpGet(uri);
         try {
             final Future<HttpResponse> future = httpclient.execute(get, null);
@@ -677,12 +724,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             if (statusLine.getStatusCode() == 404) {
                 // 404 Not Found
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamNotFoundException(streamId);
+                throw new StreamNotFoundException(sid);
             }
             if (statusLine.getStatusCode() == 410) {
                 // Stream was hard deleted
                 LOG.debug(msg + " RESPONSE: {}", response);
-                throw new StreamDeletedException(streamId);
+                throw new StreamDeletedException(sid);
             }
             throw new RuntimeException(msg + " [Status=" + statusLine + "]");
         } finally {
@@ -741,7 +788,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 if (statusLine.getStatusCode() == 404) {
                     // 404 Not Found
                     LOG.debug(msg + " RESPONSE: {}", response);
-                    final StreamId streamId = streamId(uri);
+                    final StreamId streamId = streamId(tenantId, uri);
                     final int eventNumber = eventNumber(uri);
                     throw new EventNotFoundException(streamId, eventNumber);
                 }
@@ -776,9 +823,9 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         return url.substring(p1 + 9, p2);
     }
 
-    static StreamId streamId(final URI uri) {
+    static TenantStreamId streamId(final TenantId tenantId, final URI uri) {
         // http://127.0.0.1:2113/streams/append_diff_and_read_stream/2
-        return new SimpleStreamId(streamName(uri));
+        return new TenantStreamId(tenantId, new SimpleStreamId(streamName(uri)));
     }
 
     static int eventNumber(final URI uri) {
@@ -788,13 +835,6 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         final int p = url.indexOf("/" + name + "/");
         final String str = url.substring(p + name.length() + 2);
         return Integer.valueOf(str);
-    }
-
-    private static String streamName(final StreamId streamId) {
-        if (streamId.equals(StreamId.ALL)) {
-            return "$all";
-        }
-        return streamId.asString();
     }
 
     private static HttpGet createHttpGet(final URI uri, final ESEnvelopeType envelopeType) {
@@ -849,6 +889,152 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             return null;
         }
         return Long.valueOf(versionStr);
+    }
+
+    /**
+     * Builder used to create a new instance of the event store.
+     */
+    public static final class Builder {
+
+        private ThreadFactory threadFactory;
+        
+        private URL url;
+        
+        private ESEnvelopeType envelopeType;
+        
+        private SerializerRegistry serRegistry;
+        
+        private DeserializerRegistry desRegistry;
+        
+        private CredentialsProvider credentialsProvider;
+        
+        private TenantId tenantId;
+
+        /**
+         * Sets the thread factory.
+         * 
+         * @param threadFactory
+         *            Factory used to create the necessary internal threads.
+         * 
+         * @return Builder.
+         */
+        public Builder threadFactory(final ThreadFactory threadFactory) {
+            this.threadFactory = threadFactory;
+            return this;
+        }
+
+        /**
+         * Sets the event store base URL.
+         * 
+         * @param url
+         *            Event store base URL like "http://127.0.0.1:2113/".
+         * 
+         * @return Builder.
+         */
+        public Builder url(final URL url) {
+            this.url = url;
+            return this;
+        }
+
+        /**
+         * Sets the envelope type.
+         * 
+         * @param envelopeType
+         *            Envelope type for reading/writing events.
+         * 
+         * @return Builder
+         */
+        public Builder envelopeType(final ESEnvelopeType envelopeType) {
+            this.envelopeType = envelopeType;
+            return this;
+        }
+
+        /**
+         * Sets the serializer registry.
+         * 
+         * @param serRegistry
+         *            Registry used to locate serializers.
+         * 
+         * @return Builder.
+         */
+        public Builder serRegistry(final SerializerRegistry serRegistry) {
+            this.serRegistry = serRegistry;
+            return this;
+        }
+
+        /**
+         * Sets the deserializer registry.
+         * 
+         * @param desRegistry
+         *            Registry used to locate deserializers.
+         * 
+         * @return Builder.
+         */
+        public Builder desRegistry(final DeserializerRegistry desRegistry) {
+            this.desRegistry = desRegistry;
+            return this;
+        }
+        
+        /**
+         * Sets both types of registries in one call.
+         * 
+         * @param registry Serializer/Deserializer registry to set.
+         * 
+         * @return Builder.
+         */
+        public Builder serDesRegistry(final SerDeserializerRegistry registry) {
+            this.serRegistry = registry;
+            this.desRegistry = registry;
+            return this;
+        }
+        
+
+        /**
+         * Returns the credentials provider.
+         * 
+         * @param credentialsProvider
+         *            Provided authentication information.
+         * 
+         * @return Builder.
+         */
+        public Builder credentialsProvider(final CredentialsProvider credentialsProvider) {
+            this.credentialsProvider = credentialsProvider;
+            return this;
+        }
+
+        /**
+         * Sets the tenant identifier.
+         * 
+         * @param tenantId
+         *            Unique tenant identifier.
+         * 
+         * @return Builder
+         */
+        public Builder tenantId(final TenantId tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        private void verifyNotNull(final String name, final Object value) {
+            if (value == null) {
+                throw new IllegalStateException("It is mandatory to set the value of '" + name + "' before calling the 'build()' method");
+            }
+        }
+
+        /**
+         * Creates a new instance of the event store from the attributes set via the builder.
+         * 
+         * @return New event store instance.
+         */
+        public ESHttpEventStore build() {
+            verifyNotNull("threadFactory", threadFactory);
+            verifyNotNull("url", url);
+            verifyNotNull("envelopeType", envelopeType);
+            verifyNotNull("serRegistry", serRegistry);
+            verifyNotNull("desRegistry", desRegistry);
+            return new ESHttpEventStore(threadFactory, url, envelopeType, serRegistry, desRegistry, credentialsProvider, tenantId);
+        }
+
     }
 
 }

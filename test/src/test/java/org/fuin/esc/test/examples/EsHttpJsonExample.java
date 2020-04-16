@@ -63,11 +63,12 @@ public final class EsHttpJsonExample {
         registry.add(serMetaType, "application/json", jsonDeSer);
 
         // Create an event store instance and open it
-        EventStore eventStore = new ESHttpEventStore(threadFactory, url, 
-                ESEnvelopeType.JSON, // This format will be used to communicate with the event store
-                registry, // Registry used to find a serializer 
-                registry  // Registry used to find a de-serializer
-                );
+        EventStore eventStore = new ESHttpEventStore.Builder()
+                .threadFactory(threadFactory)
+                .url(url)
+                .envelopeType(ESEnvelopeType.JSON) // This format will be used to communicate with the event store
+                .serDesRegistry(registry) // Registry used to find a serializer and a deserialize
+                .build();
         eventStore.open();
         try {
 
