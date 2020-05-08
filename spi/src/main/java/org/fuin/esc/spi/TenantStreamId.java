@@ -85,6 +85,7 @@ public final class TenantStreamId implements StreamId {
      * 
      * @return Tenant identifier.
      */
+    @Nullable
     public TenantId getTenantId() {
         return tenantId;
     }
@@ -94,6 +95,7 @@ public final class TenantStreamId implements StreamId {
      * 
      * @return Stream identifier.
      */
+    @NotNull
     public StreamId getDelegate() {
         return delegate;
     }

@@ -19,8 +19,12 @@ package org.fuin.esc.eshttp;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
+import org.fuin.esc.spi.TenantStreamId;
+import org.fuin.objects4j.common.Contract;
 
 /**
  * Builds the JavaScript for a 'fromCategory' projection.
@@ -34,39 +38,58 @@ public final class ProjectionJavaScriptBuilder {
     private StringBuilder sb;
 
     /**
+     * Constructor for building an tenant based projection.
+     * 
+     * @param tenantStreamId
+     *            Tenant ID to use as category and delegate name as projection name.
+     */
+    public ProjectionJavaScriptBuilder(@NotNull final TenantStreamId tenantStreamId) {
+        super();
+        Contract.requireArgNotNull("tenantStreamId", tenantStreamId);
+        if (tenantStreamId.getTenantId() == null) {
+            initAll(tenantStreamId.getDelegate().asString());
+        } else {
+            initCategory(tenantStreamId.getDelegate().asString(), tenantStreamId.getTenantId().asString());
+        }
+    }
+
+    /**
      * Constructor for building an 'all' based projection.
      * 
      * @param projectionId
-     *            Projection name.
+     *            Projection ID to use as projection name.
      */
-    public ProjectionJavaScriptBuilder(final StreamId projectionId) {
-        this(projectionId.asString());
+    public ProjectionJavaScriptBuilder(@NotNull final StreamId projectionId) {
+        super();
+        Contract.requireArgNotNull("projectionId", projectionId);
+        initAll(projectionId.asString());
     }
-    
+
     /**
-     * Constructor for building a 'category' based projection.
+     * Constructor for building an 'all' based projection.
      * 
      * @param projection
      *            Projection name.
      */
-    public ProjectionJavaScriptBuilder(final String projection) {
+    public ProjectionJavaScriptBuilder(@NotNull final String projection) {
         super();
-        count = 0;
-        this.projection = projection;
-        sb = new StringBuilder();
-        sb.append("fromAll().foreachStream().when({");
+        Contract.requireArgNotNull("projection", projection);
+        initAll(projection);
     }
-    
+
     /**
      * Constructor for building a 'category' based projection.
      * 
      * @param projectionId
-     *            Projection name.
+     *            Projection.
      * @param category
      *            Category.
      */
-    public ProjectionJavaScriptBuilder(final StreamId projectionId, final StreamId category) {
-        this(projectionId.asString(), category.asString());
+    public ProjectionJavaScriptBuilder(@NotNull final StreamId projectionId, @NotNull final StreamId categoryId) {
+        super();
+        Contract.requireArgNotNull("projectionId", projectionId);
+        Contract.requireArgNotNull("categoryId", categoryId);
+        initCategory(projectionId.asString(), categoryId.asString());
     }
 
     /**
@@ -75,10 +98,23 @@ public final class ProjectionJavaScriptBuilder {
      * @param projection
      *            Projection name.
      * @param category
-     *            Category.
+     *            Category name.
      */
-    public ProjectionJavaScriptBuilder(final String projection, final String category) {
+    public ProjectionJavaScriptBuilder(@NotNull final String projection, @NotNull final String category) {
         super();
+        Contract.requireArgNotNull("projection", projection);
+        Contract.requireArgNotNull("category", category);
+        initCategory(projection, category);
+    }
+
+    private void initAll(final String projection) {
+        count = 0;
+        this.projection = projection;
+        sb = new StringBuilder();
+        sb.append("fromAll().foreachStream().when({");
+    }
+
+    private void initCategory(final String projection, final String category) {
         count = 0;
         this.projection = projection;
         sb = new StringBuilder();
@@ -103,8 +139,7 @@ public final class ProjectionJavaScriptBuilder {
     }
 
     /**
-     * Adds another type to select. Convenience method to add a {@link TypeName}
-     * instead of a string.
+     * Adds another type to select. Convenience method to add a {@link TypeName} instead of a string.
      * 
      * @param eventType
      *            Unique event type to select from the category of streams.
@@ -116,8 +151,7 @@ public final class ProjectionJavaScriptBuilder {
     }
 
     /**
-     * Adds more types to select. Convenience method to add multiple
-     * {@link TypeName} instead of strings.
+     * Adds more types to select. Convenience method to add multiple {@link TypeName} instead of strings.
      * 
      * @param eventTypes
      *            Unique event type list to select from the category of streams.
@@ -138,8 +172,7 @@ public final class ProjectionJavaScriptBuilder {
      */
     public final String build() {
         if (count == 0) {
-            throw new IllegalStateException(
-                    "No types were added. Use 'type(String)' to add at least one event.");
+            throw new IllegalStateException("No types were added. Use 'type(String)' to add at least one event.");
         }
         sb.append("})");
         return sb.toString();
