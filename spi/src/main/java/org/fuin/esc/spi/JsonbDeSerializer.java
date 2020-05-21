@@ -111,6 +111,9 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
         ensureInitialized();
         try {
             final Class<?> clasz = typeRegistry.findClass(type);
+            if (clasz.isAssignableFrom(data.getClass())) {
+                return (T) data;
+            }
             if (data instanceof JsonStructure) {
                 return (T) jsonb.fromJson(data.toString(), clasz);
             }
