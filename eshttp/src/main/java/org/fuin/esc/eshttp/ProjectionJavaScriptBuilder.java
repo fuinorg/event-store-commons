@@ -82,7 +82,7 @@ public final class ProjectionJavaScriptBuilder {
      * 
      * @param projectionId
      *            Projection.
-     * @param category
+     * @param categoryId
      *            Category.
      */
     public ProjectionJavaScriptBuilder(@NotNull final StreamId projectionId, @NotNull final StreamId categoryId) {

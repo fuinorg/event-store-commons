@@ -46,6 +46,7 @@ public final class BasicCustomSchemeFactory implements AuthSchemeProvider {
     private final Charset charset;
 
     /**
+     * @param charset Charset.
      * @since 4.3
      */
     public BasicCustomSchemeFactory(final Charset charset) {

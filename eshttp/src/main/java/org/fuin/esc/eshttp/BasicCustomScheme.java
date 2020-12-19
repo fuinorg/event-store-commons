@@ -61,6 +61,7 @@ public final class BasicCustomScheme extends RFC2617Scheme {
     private boolean complete;
 
     /**
+     * @param credentialsCharset Charset.
      * @since 4.3
      */
     public BasicCustomScheme(final Charset credentialsCharset) {
@@ -182,6 +183,7 @@ public final class BasicCustomScheme extends RFC2617Scheme {
      *            The credentials to encode.
      * @param charset
      *            The charset to use for encoding the credentials
+     * @param proxy Proxy
      *
      * @return a basic authorization header
      *
