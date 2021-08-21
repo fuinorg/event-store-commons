@@ -20,7 +20,7 @@ package org.fuin.esc.spi;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Contract;
 

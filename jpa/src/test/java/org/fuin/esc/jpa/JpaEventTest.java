@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.TypeName;

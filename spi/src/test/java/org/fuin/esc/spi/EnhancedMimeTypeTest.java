@@ -23,8 +23,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.activation.MimeTypeParameterList;
-import javax.activation.MimeTypeParseException;
+import jakarta.activation.MimeTypeParameterList;
+import jakarta.activation.MimeTypeParseException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;

@@ -20,7 +20,7 @@ package org.fuin.esc.eshttp;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

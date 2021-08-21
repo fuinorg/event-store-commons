@@ -19,14 +19,14 @@ package org.fuin.esc.eshttp;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;
 
 import org.fuin.objects4j.common.Nullable;
-import javax.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbProperty;
 
 /**
  * Example meta data. .

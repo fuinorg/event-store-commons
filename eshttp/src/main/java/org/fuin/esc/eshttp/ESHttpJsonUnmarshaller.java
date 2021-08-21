@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 
 import org.apache.commons.codec.binary.Base64;
 import org.fuin.esc.spi.Base64Data;

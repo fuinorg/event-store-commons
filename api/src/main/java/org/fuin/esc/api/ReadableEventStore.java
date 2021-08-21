@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Interface for reading events from an event store synchronously. Calling any

@@ -181,8 +181,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate-core-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
 

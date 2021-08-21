@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.Charset;
 
-import javax.json.Json;
+import jakarta.json.Json;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;

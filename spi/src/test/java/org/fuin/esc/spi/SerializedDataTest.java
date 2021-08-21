@@ -19,7 +19,7 @@ package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.activation.MimeTypeParseException;
+import jakarta.activation.MimeTypeParseException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 

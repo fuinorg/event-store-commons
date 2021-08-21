@@ -1,8 +1,8 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.spi;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;

@@ -19,14 +19,14 @@ package org.fuin.esc.spi;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Nullable;
-import javax.json.Json;
-import javax.json.JsonStructure;
-import javax.validation.constraints.NotNull;
+import jakarta.json.Json;
+import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Example meta data. .

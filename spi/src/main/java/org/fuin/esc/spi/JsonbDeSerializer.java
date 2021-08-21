@@ -31,16 +31,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.json.JsonStructure;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.bind.adapter.JsonbAdapter;
-import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.config.PropertyVisibilityStrategy;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.bind.serializer.JsonbSerializer;
+import jakarta.json.JsonStructure;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.adapter.JsonbAdapter;
+import jakarta.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
+import jakarta.json.bind.serializer.JsonbDeserializer;
+import jakarta.json.bind.serializer.JsonbSerializer;
 
 /**
  * Serializes and deserializes an object from/to JSON using JSON-B. The content type for serialization is always "application/json". This

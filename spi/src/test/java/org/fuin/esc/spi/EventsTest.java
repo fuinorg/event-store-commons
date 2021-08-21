@@ -20,7 +20,7 @@ package org.fuin.esc.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.io.IOUtils;
 import org.fuin.esc.api.EventId;

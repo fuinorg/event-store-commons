@@ -23,16 +23,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.activation.MimeTypeParseException;
-import javax.validation.constraints.NotNull;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.objects4j.common.Nullable;
 
 /**
- * Enhances the {@link javax.activation.MimeType} class with convenience methods for accessing version and
+ * Enhances the {@link jakarta.activation.MimeType} class with convenience methods for accessing version and
  * encoding parameters. Equals and hash code are base on the {@link #toString()} method.
  */
-public final class EnhancedMimeType extends javax.activation.MimeType {
+public final class EnhancedMimeType extends jakarta.activation.MimeType {
 
     /** Version parameter name. */
     public static final String VERSION = "version";

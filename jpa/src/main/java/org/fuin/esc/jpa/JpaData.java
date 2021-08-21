@@ -20,11 +20,11 @@ package org.fuin.esc.jpa;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Lob;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlInlineBinaryData;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Lob;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlInlineBinaryData;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;

@@ -23,16 +23,16 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import java.io.Serializable;
 import java.io.StringReader;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Contract;

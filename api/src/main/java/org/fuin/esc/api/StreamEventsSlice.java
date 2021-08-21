@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Immutable;

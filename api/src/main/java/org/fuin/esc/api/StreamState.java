@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * State of a stream.

@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Locates a serializer for a given type.

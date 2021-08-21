@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;

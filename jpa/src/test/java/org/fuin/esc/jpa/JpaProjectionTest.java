@@ -31,7 +31,9 @@ public class JpaProjectionTest {
 
     @Test
     public void testEqualsHashCode() {
-        EqualsVerifier.forClass(JpaProjection.class).suppress(Warning.STRICT_INHERITANCE)
+        EqualsVerifier.forClass(JpaProjection.class)
+                .suppress(Warning.STRICT_INHERITANCE)
+                .suppress(Warning.NONFINAL_FIELDS)
                 .suppress(Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 

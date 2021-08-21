@@ -20,16 +20,16 @@ package org.fuin.esc.eshttp;
 import java.io.Serializable;
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
 
-import javax.json.bind.annotation.JsonbProperty;
-import javax.validation.constraints.NotEmpty;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

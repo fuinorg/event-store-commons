@@ -17,10 +17,10 @@
  */
 package org.fuin.esc.spi;
 
-import javax.json.JsonStructure;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.objects4j.common.Contract;
 

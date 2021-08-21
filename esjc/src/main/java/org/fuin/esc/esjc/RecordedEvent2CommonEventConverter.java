@@ -19,7 +19,7 @@ package org.fuin.esc.esjc;
 
 import java.nio.charset.Charset;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;

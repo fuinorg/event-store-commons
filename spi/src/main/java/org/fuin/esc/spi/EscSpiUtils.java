@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.fuin.objects4j.common.Nullable;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.validation.constraints.NotNull;
+import jakarta.json.bind.serializer.JsonbDeserializer;
+import jakarta.json.bind.serializer.JsonbSerializer;
+import jakarta.validation.constraints.NotNull;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;

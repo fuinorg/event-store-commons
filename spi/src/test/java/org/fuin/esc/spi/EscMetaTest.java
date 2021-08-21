@@ -28,8 +28,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.json.Json;
-import javax.json.bind.Jsonb;
+import jakarta.json.Json;
+import jakarta.json.bind.Jsonb;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;

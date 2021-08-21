@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.Charset;
 
-import javax.activation.MimeTypeParseException;
+import jakarta.activation.MimeTypeParseException;
 
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.Test;

@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.jpa;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;

@@ -22,12 +22,12 @@ import static org.fuin.utils4j.JaxbUtils.unmarshal;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;

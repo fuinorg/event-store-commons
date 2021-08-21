@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.json.Json;
-import javax.json.JsonObject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;

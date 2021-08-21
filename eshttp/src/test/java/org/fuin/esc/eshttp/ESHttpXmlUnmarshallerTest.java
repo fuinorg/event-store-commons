@@ -26,8 +26,8 @@ import static org.fuin.esc.eshttp.ESHttpUtils.parseDocument;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.JsonObject;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.JsonObject;
 import javax.xml.xpath.XPath;
 
 import org.fuin.esc.spi.DeserializerRegistry;

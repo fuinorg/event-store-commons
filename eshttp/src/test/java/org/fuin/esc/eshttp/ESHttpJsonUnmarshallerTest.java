@@ -25,10 +25,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;

@@ -19,12 +19,12 @@ package org.fuin.esc.spi;
 
 import java.nio.charset.Charset;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlValue;
 
 import org.apache.commons.codec.binary.Base64;
 import org.fuin.esc.api.TypeName;

@@ -26,12 +26,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.metamodel.EntityType;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;

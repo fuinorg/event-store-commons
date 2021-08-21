@@ -17,11 +17,11 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.jpa.JpaEvent;

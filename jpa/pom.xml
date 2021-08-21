@@ -53,13 +53,6 @@
         </dependency>
 
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -70,8 +63,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.migesok</groupId>
-            <artifactId>jaxb-java-time-adapters</artifactId>
+			<groupId>io.github.threeten-jaxb</groupId>
+			<artifactId>threeten-jaxb-core</artifactId>
         </dependency>
 
         <!-- test -->
@@ -117,8 +110,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate-core-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
 

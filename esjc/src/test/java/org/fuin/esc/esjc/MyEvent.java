@@ -21,12 +21,12 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonStructure;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
@@ -35,7 +35,7 @@ import org.fuin.esc.spi.SerDeserializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.ToJsonCapable;
 import org.fuin.objects4j.common.Contract;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

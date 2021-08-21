@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
-import javax.json.Json;
-import javax.json.JsonObject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;

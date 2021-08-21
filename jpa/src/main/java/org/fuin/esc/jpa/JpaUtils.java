@@ -58,7 +58,7 @@ final class JpaUtils {
      * 
      * @param streamId Unique stream identifier.
      * 
-     * @return Name that is configured in the {@link javax.persistence.Table} JPA annotation.
+     * @return Name that is configured in the {@link jakarta.persistence.Table} JPA annotation.
      */
     public static String nativeEventsTableName(final StreamId streamId) {
         // User defined ID

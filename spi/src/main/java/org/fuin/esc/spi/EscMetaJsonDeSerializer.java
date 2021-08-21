@@ -19,7 +19,7 @@ package org.fuin.esc.spi;
 
 import java.nio.charset.Charset;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 
 /**
  * Serializes and deserializes a {@link EscMeta} object as JSON. The content

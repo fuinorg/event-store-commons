@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.objects4j.common.Nullable;
 

@@ -19,9 +19,9 @@ package org.fuin.esc.test;
 
 import static org.fuin.utils4j.JaxbUtils.unmarshal;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;

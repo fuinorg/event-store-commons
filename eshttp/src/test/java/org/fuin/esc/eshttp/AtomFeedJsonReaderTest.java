@@ -25,7 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.junit.Test;

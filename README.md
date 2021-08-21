@@ -8,8 +8,8 @@ Defines a common event store Java interface and provides some adapters (like for
 [![Java Development Kit 11](https://img.shields.io/badge/JDK-11-green.svg)](https://openjdk.java.net/projects/jdk/11/)
 
 ## Versions
-- (Coming soon) 0.6.x (or later) = **Java 11** with new **jakarta** namespace
-- 0.4.x/0.5.x = **Java 11** before namespace change from 'javax' to 'jakarta'
+- 0.5.x (or later) = **Java 11** with new **jakarta** namespace
+- 0.4.x = **Java 11** before namespace change from 'javax' to 'jakarta'
 - 0.3.2 (or less) = **Java 8**
 
 

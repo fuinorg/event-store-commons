@@ -17,8 +17,8 @@
  */
 package org.fuin.esc.spi;
 
-import javax.json.JsonStructure;
-import javax.validation.constraints.NotNull;
+import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Marks an object that can be converted into a JSON object or array.

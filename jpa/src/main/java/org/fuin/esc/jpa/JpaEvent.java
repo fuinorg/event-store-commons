@@ -19,24 +19,26 @@ package org.fuin.esc.jpa;
 
 import java.time.ZonedDateTime;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.esc.api.EventId;
 import org.fuin.objects4j.common.Nullable;
 
-import com.migesok.jaxb.adapter.javatime.ZonedDateTimeXmlAdapter;
+import io.github.threetenjaxb.core.ZonedDateTimeXmlAdapter;
+
 
 /**
  * Stores an event and it's meta data.

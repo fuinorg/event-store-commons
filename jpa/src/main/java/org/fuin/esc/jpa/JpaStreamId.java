@@ -27,14 +27,14 @@ public interface JpaStreamId extends StreamId {
     /**
      * Returns the name of the entity class.
      * 
-     * @return Name of the entity that has the {@link javax.persistence.Table} JPA annotation.
+     * @return Name of the entity that has the {@link jakarta.persistence.Table} JPA annotation.
      */
     public String getEntityName();
 
     /**
      * Returns the name of the database table to use for the stream.
      * 
-     * @return Name that is configured in the {@link javax.persistence.Table} JPA annotation.
+     * @return Name that is configured in the {@link jakarta.persistence.Table} JPA annotation.
      */
     public String getNativeTableName();
 

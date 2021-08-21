@@ -25,10 +25,10 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.json.JsonStructure;
-import javax.json.JsonWriter;
+import jakarta.json.Json;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonWriter;
 
 /**
  * Serializes and deserializes a JSON object. The content type for serialization is always "application/json".

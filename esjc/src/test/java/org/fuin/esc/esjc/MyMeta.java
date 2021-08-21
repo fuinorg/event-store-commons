@@ -20,11 +20,11 @@ package org.fuin.esc.esjc;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonStructure;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;

@@ -22,9 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.Json;
-import javax.json.JsonObject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
+import jakarta.activation.MimeTypeParseException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 

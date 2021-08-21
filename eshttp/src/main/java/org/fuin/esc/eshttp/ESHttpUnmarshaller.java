@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;

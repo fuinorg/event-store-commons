@@ -17,8 +17,8 @@
  */
 package org.fuin.esc.jpa;
 
-import javax.persistence.EntityManager;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.SerializerRegistry;

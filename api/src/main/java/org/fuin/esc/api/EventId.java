@@ -21,8 +21,8 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import org.fuin.objects4j.common.Immutable;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.vo.UUIDStr;

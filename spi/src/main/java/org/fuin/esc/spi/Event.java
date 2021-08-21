@@ -19,11 +19,11 @@ package org.fuin.esc.spi;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;

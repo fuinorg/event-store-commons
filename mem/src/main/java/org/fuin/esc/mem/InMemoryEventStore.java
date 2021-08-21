@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;

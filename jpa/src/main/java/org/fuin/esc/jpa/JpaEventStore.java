@@ -21,10 +21,10 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.TypedQuery;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.TypedQuery;
+import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;

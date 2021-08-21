@@ -19,9 +19,9 @@ package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.activation.MimeTypeParseException;
-import javax.json.Json;
-import javax.json.JsonObject;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 import org.junit.After;
 import org.junit.Before;

@@ -19,7 +19,7 @@ package org.fuin.esc.api;
 
 import java.util.function.BiConsumer;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * An event store that is capable of handling volatile subscriptions. Calling

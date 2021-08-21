@@ -25,7 +25,7 @@ import static org.fuin.utils4j.Utils4J.serialize;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.Data;

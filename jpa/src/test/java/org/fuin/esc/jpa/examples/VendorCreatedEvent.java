@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * A vendor entity was created.
