@@ -11,11 +11,7 @@ pipeline {
         }
         stage('Build') { 
             steps {
-                withCredentials( [ 
-                        string(credentialsId: 'sonar_login', variable: 'SONAR_LOGIN') 
-                                 ] ) {
-                    sh "./mvnw clean javadoc:jar deploy jacoco:report sonar:sonar -U -B -P sonatype-oss-release -s /private/jenkins/settings.xml -Dsonar.organization=fuinorg -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONAR_LOGIN}"
-                } 
+                sh "./mvnw clean deploy jacoco:report -U -B -P sonatype-oss-release -s /private/jenkins/settings.xml"
             }
         }
     }
