@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +11,7 @@
 
     <groupId>org.fuin.esc</groupId>
     <artifactId>esc-parent</artifactId>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>0.4.1</version>
     <packaging>pom</packaging>
     <name>esc-parent</name>
     <description>Defines a common event store Java interface and provides some adapters (like for Greg Young's event store) and implementations (like in-memory or file-based).</description>
@@ -22,7 +20,8 @@
         <url>https://github.com/fuinorg/event-store-commons/</url>
         <connection>scm:git:git://github.com/fuinorg/event-store-commons.git</connection>
         <developerConnection>scm:git:git@github.com:fuinorg/event-store-commons.git</developerConnection>
-    </scm>
+		<tag>0.4.1</tag>
+	</scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
@@ -232,13 +231,13 @@
             </dependency>
 
             <dependency>
-                <groupId>info.cukes</groupId>
+	            <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-java</artifactId>
                 <version>1.2.6</version>
             </dependency>
 
             <dependency>
-                <groupId>info.cukes</groupId>
+	            <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-junit</artifactId>
                 <version>1.2.6</version>
             </dependency>
