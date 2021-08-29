@@ -262,9 +262,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>hsqldb</groupId>
-				<artifactId>hsqldb</artifactId>
-				<version>1.8.0.10</version>
+			    <groupId>org.hsqldb</groupId>
+			    <artifactId>hsqldb</artifactId>
+			    <version>2.6.0</version>
 			</dependency>
 
 			<dependency>
