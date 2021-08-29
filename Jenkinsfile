@@ -11,7 +11,7 @@ pipeline {
         }
         stage('Build') { 
             steps {
-                sh "./mvnw clean deploy jacoco:report -U -B -P sonatype-oss-release -s /private/jenkins/settings.xml"
+                sh "./mvnw clean javadoc:jar deploy jacoco:report -U -B -P sonatype-oss-release -s /private/jenkins/settings.xml"
             }
         }
     }
