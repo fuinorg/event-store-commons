@@ -6,3 +6,5 @@
 target
 META-INF
 *.log
+pom.xml.releaseBackup
+release.properties
