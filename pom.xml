@@ -11,7 +11,7 @@
 
     <groupId>org.fuin.esc</groupId>
     <artifactId>esc-parent</artifactId>
-    <version>0.4.2-SNAPSHOT</version>
+    <version>0.4.1</version>
     <packaging>pom</packaging>
     <name>esc-parent</name>
     <description>Defines a common event store Java interface and provides some adapters (like for Greg Young's event store) and implementations (like in-memory or file-based).</description>
@@ -20,7 +20,6 @@
         <url>https://github.com/fuinorg/event-store-commons/</url>
         <connection>scm:git:git://github.com/fuinorg/event-store-commons.git</connection>
         <developerConnection>scm:git:git@github.com:fuinorg/event-store-commons.git</developerConnection>
-		<tag>0.4.1</tag>
 	</scm>
 
     <issueManagement>

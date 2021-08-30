@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.fuin.esc</groupId>
         <artifactId>esc-parent</artifactId>
-        <version>0.4.2-SNAPSHOT</version>
+        <version>0.4.1</version>
     </parent>
 
     <artifactId>esc-test</artifactId>
@@ -18,7 +18,6 @@
         <url>https://github.com/fuinorg/event-store-commons/</url>
         <connection>scm:git:git://github.com/fuinorg/event-store-commons.git</connection>
         <developerConnection>scm:git:git@github.com:fuinorg/event-store-commons.git</developerConnection>
-      	<tag>0.4.1</tag>
   	</scm>
 
     <issueManagement>
