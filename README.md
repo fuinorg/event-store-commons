@@ -1,7 +1,7 @@
 # event-store-commons
 Defines a common event store Java interface and provides some adapters (like for Greg Young's [event store](https://www.geteventstore.com/)) and implementations (like in-memory or file-based).
 
-[![Build Status](https://jenkins.fuin.org/job/event-store-commons/badge/icon)](https://jenkins.fuin.org/job/event-store-commons/)
+[![Java Maven Build](https://github.com/fuinorg/event-store-commons/actions/workflows/maven.yml/badge.svg)](https://github.com/fuinorg/event-store-commons/actions/workflows/maven.yml)
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=org.fuin.esc%3Aesc-parent&metric=coverage)](https://sonarcloud.io/dashboard?id=org.fuin.esc%3Aesc-parent)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.fuin.esc/esc-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.fuin.esc/esc-parent/)
 [![LGPLv3 License](http://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl.html)
