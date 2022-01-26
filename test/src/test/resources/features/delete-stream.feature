@@ -13,8 +13,8 @@ Scenario: Non existing once
     | Stream Name        | Hard Delete | Expected Version   | Expected Exception            | 
     | NameDoesNotMatter1 | true        | ANY                | -                             |
     | NameDoesNotMatter2 | true        | NO_OR_EMPTY_STREAM | -                             |
-    | NameDoesNotMatter3 | false       | ANY                | -                             |
-    | NameDoesNotMatter4 | false       | NO_OR_EMPTY_STREAM | -                             |
+#   | NameDoesNotMatter3 | false       | ANY                | -                             |
+#   | NameDoesNotMatter4 | false       | NO_OR_EMPTY_STREAM | -                             |
     | NameDoesNotMatter5 | true        | 1                  | WrongExpectedVersionException |
     | NameDoesNotMatter6 | false       | 1                  | WrongExpectedVersionException |
     Then this should give the expected results
