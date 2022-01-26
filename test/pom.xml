@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,7 +18,7 @@
         <url>https://github.com/fuinorg/event-store-commons/</url>
         <connection>scm:git:git://github.com/fuinorg/event-store-commons.git</connection>
         <developerConnection>scm:git:git@github.com:fuinorg/event-store-commons.git</developerConnection>
-    </scm>
+  	</scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
@@ -262,28 +260,64 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.fuin.esmp</groupId>
-                <artifactId>es-maven-plugin</artifactId>
-                <version>0.5.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>download</goal>
-                            <goal>start</goal>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-			        <download-url>https://github.com/EventStore/Downloads/raw/master/ubuntu/EventStore-OSS-Linux-Ubuntu-18.04-v5.0.9.tar.gz</download-url>
-                    <arguments>
-                        <argument>--mem-db=TRUE</argument>
-                        <argument>--run-projections=All</argument>
-                        <argument>--log=/tmp/log-eventstore</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<configuration>
+
+					<images>
+						<image>
+							<name>eventstore/eventstore:${eventstore.version}</name>
+							<run>
+								<network>
+									<mode>bridge</mode>
+								</network>
+								<ports>
+									<port>1113:1113</port>
+									<port>2113:2113</port>
+								</ports>
+								<env>
+									<EVENTSTORE_MEM_DB>TRUE</EVENTSTORE_MEM_DB>
+									<EVENTSTORE_RUN_PROJECTIONS>All</EVENTSTORE_RUN_PROJECTIONS>
+									<EVENTSTORE_INSECURE>true</EVENTSTORE_INSECURE>
+									<EVENTSTORE_ENABLE_EXTERNAL_TCP>true</EVENTSTORE_ENABLE_EXTERNAL_TCP>
+									<EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP>true</EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP>
+									<EVENTSTORE_LOG>/tmp/log-eventstore</EVENTSTORE_LOG>
+								</env>
+								<log>
+									<enabled>false</enabled>
+								</log>
+								<wait>
+									<http>
+										<url>http://localhost:2113/web/index.html#/</url>
+										<method>GET</method>
+									</http>
+									<time>20000</time>
+								</wait>
+							</run>
+						</image>
+
+					</images>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>start-images</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-images</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+
+			</plugin>
 
         </plugins>
 
