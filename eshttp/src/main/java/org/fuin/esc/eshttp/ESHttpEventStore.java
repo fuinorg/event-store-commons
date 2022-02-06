@@ -116,7 +116,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
      *            Registry used to locate serializers.
      * @param desRegistry
      *            Registry used to locate deserializers.
-     *            
+     * 
      * @deprecated Use the Builder in this class instead.
      */
     @Deprecated
@@ -140,7 +140,7 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
      *            Registry used to locate deserializers.
      * @param credentialsProvider
      *            Provided authentication information.
-     *            
+     * 
      * @deprecated Use the Builder in this class instead.
      */
     @Deprecated
@@ -281,8 +281,8 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         return nextExpectedVersion;
     }
 
-    private void appendToStream(final TenantStreamId streamId, final long expectedVersion, final EnhancedMimeType mimeType, final String content,
-            final int count) throws StreamDeletedException, WrongExpectedVersionException {
+    private void appendToStream(final TenantStreamId streamId, final long expectedVersion, final EnhancedMimeType mimeType,
+            final String content, final int count) throws StreamDeletedException, WrongExpectedVersionException {
 
         final String msg = "appendToStream(" + streamId + ", " + expectedVersion + ", " + mimeType + ", " + count + ")";
         try {
@@ -321,8 +321,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -376,7 +378,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 delete.reset();
             }
 
-        } catch (final URISyntaxException | ExecutionException | InterruptedException ex) { // NOSONAR
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -400,8 +405,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString() + "/" + start + "/forward/" + count).build();
             return readEvents(sid, true, uri, start, count, msg, false);
-        } catch (final IOException | URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final IOException | URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -420,8 +427,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         try {
             final URI uri = new URIBuilder(url.toURI()).setPath("/streams/" + sid.asString() + "/" + start + "/backward/" + count).build();
             return readEvents(sid, false, uri, start, count, msg, true);
-        } catch (final IOException | URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final IOException | URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
     }
@@ -474,8 +483,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -517,8 +528,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
     }
@@ -552,8 +565,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 get.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -597,8 +612,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
     }
@@ -644,8 +661,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 post.reset();
             }
-        } catch (final URISyntaxException | InterruptedException // NOSONAR
-                | ExecutionException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -684,7 +703,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
                 delete.reset();
             }
 
-        } catch (final URISyntaxException | ExecutionException | InterruptedException ex) { // NOSONAR
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(msg, ex);
+        } catch (final URISyntaxException | ExecutionException ex) {
             throw new RuntimeException(msg, ex);
         }
 
@@ -696,8 +718,8 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
         }
     }
 
-    private StreamEventsSlice readEvents(final TenantStreamId streamId, final boolean forward, final URI uri, final long start, final int count,
-            final String msg, final boolean reverseOrder) throws InterruptedException, ExecutionException, IOException {
+    private StreamEventsSlice readEvents(final TenantStreamId streamId, final boolean forward, final URI uri, final long start,
+            final int count, final String msg, final boolean reverseOrder) throws InterruptedException, ExecutionException, IOException {
         LOG.debug(uri.toString());
         final HttpGet get = createHttpGet(uri);
         try {
@@ -794,8 +816,10 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             } finally {
                 get.reset();
             }
-        } catch (final InterruptedException | ExecutionException // NOSONAR
-                | UnsupportedOperationException | IOException ex) {
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Failed to read " + uri, ex);
+        } catch (final ExecutionException | UnsupportedOperationException | IOException ex) {
             throw new RuntimeException("Failed to read " + uri, ex);
         }
     }
@@ -895,17 +919,17 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
     public static final class Builder {
 
         private ThreadFactory threadFactory;
-        
+
         private URL url;
-        
+
         private ESEnvelopeType envelopeType;
-        
+
         private SerializerRegistry serRegistry;
-        
+
         private DeserializerRegistry desRegistry;
-        
+
         private CredentialsProvider credentialsProvider;
-        
+
         private TenantId tenantId;
 
         /**
@@ -972,11 +996,12 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             this.desRegistry = desRegistry;
             return this;
         }
-        
+
         /**
          * Sets both types of registries in one call.
          * 
-         * @param registry Serializer/Deserializer registry to set.
+         * @param registry
+         *            Serializer/Deserializer registry to set.
          * 
          * @return Builder.
          */
@@ -985,7 +1010,6 @@ public final class ESHttpEventStore extends AbstractReadableEventStore implement
             this.desRegistry = registry;
             return this;
         }
-        
 
         /**
          * Returns the credentials provider.
