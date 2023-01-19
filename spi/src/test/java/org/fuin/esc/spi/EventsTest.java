@@ -18,7 +18,7 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

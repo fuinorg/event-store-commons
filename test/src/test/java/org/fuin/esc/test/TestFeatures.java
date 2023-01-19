@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.net.MalformedURLException;
 import java.net.URL;

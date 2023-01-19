@@ -18,7 +18,7 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
 
@@ -27,11 +27,13 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,8 +48,7 @@ public class DataTest extends AbstractXmlTest {
 
     private static final String TYPE = "MyEvent";
 
-    private static final EnhancedMimeType MIME_TYPE = EnhancedMimeType
-            .create("application/xml; version=1; encoding=utf-8");
+    private static final EnhancedMimeType MIME_TYPE = EnhancedMimeType.create("application/xml; version=1; encoding=utf-8");
 
     private static final String CONTENT = "<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>";
 
@@ -87,17 +88,14 @@ public class DataTest extends AbstractXmlTest {
         final Data original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
 
         // VERIFY
         final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">"
-                + "    <![CDATA[" + CONTENT + "]]>" + "</data>";
-        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml)
-                .ignoreWhitespace().build();
-        assertThat(documentDiff.hasDifferences())
-                .describedAs(documentDiff.toString()).isFalse();
+                + "<data type=\"MyEvent\" mime-type=\"application/xml; version=1; encoding=utf-8\">" + "    <![CDATA[" + CONTENT + "]]>"
+                + "</data>";
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
     }
 
@@ -108,9 +106,9 @@ public class DataTest extends AbstractXmlTest {
         final Data original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
-        final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
+        final Data copy = unmarshal(new UnmarshallerBuilder().addClassesToBeBound(Data.class).addAdapters(createXmlAdapter())
+                .withHandler(event -> false).build(), xml);
 
         // VERIFY
         assertThat(copy.getType()).isEqualTo(TYPE);
@@ -125,14 +123,12 @@ public class DataTest extends AbstractXmlTest {
         // PREPARE
         final String type = "Icon";
         final EnhancedMimeType mimeType = EnhancedMimeType.create("image/png");
-        final byte[] png = IOUtils
-                .toByteArray(getClass().getResourceAsStream("/ok.png"));
+        final byte[] png = IOUtils.toByteArray(getClass().getResourceAsStream("/ok.png"));
         final String content = Base64.encodeBase64String(png);
         final Data original = new Data(type, mimeType, content);
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
         final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
 
         // VERIFY
@@ -146,8 +142,7 @@ public class DataTest extends AbstractXmlTest {
     public void testUnmarshalXmlContent() throws JAXBException {
 
         // TEST
-        final BookAddedEvent event = testee.unmarshalContent(
-                JAXBContext.newInstance(BookAddedEvent.class));
+        final BookAddedEvent event = testee.unmarshalContent(JAXBContext.newInstance(BookAddedEvent.class));
 
         // VERIFY
         assertThat(event).isNotNull();
@@ -160,8 +155,7 @@ public class DataTest extends AbstractXmlTest {
     public void testUnmarshalJsonContent() throws MimeTypeParseException {
 
         // PREPARE
-        final Data data = new Data("BookAddedEvent",
-                new EnhancedMimeType("application/json; encoding=utf-8"),
+        final Data data = new Data("BookAddedEvent", new EnhancedMimeType("application/json; encoding=utf-8"),
                 "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
 
         // TEST
@@ -177,18 +171,16 @@ public class DataTest extends AbstractXmlTest {
     public void testValueOfXml() throws MimeTypeParseException {
 
         // PREPARE
-        final BookAddedEvent event = new BookAddedEvent("Shining",
-                "Stephen King");
+        final BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King");
 
         // TEST
         final Data data = Data.valueOf("BookAddedEvent", event);
 
         // VERIFY
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
-        assertThat(data.getMimeType()).isEqualTo(
-                new EnhancedMimeType("application/xml; encoding=utf-8"));
-        assertThat(data.getContent()).isEqualTo(Units4JUtils.XML_PREFIX
-                + "<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>");
+        assertThat(data.getMimeType()).isEqualTo(new EnhancedMimeType("application/xml; encoding=utf-8"));
+        assertThat(data.getContent()).isEqualTo(
+                Units4JUtils.XML_PREFIX + "<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>");
         assertThat(data.isXml()).isTrue();
         assertThat(data.isJson()).isFalse();
 
@@ -198,18 +190,15 @@ public class DataTest extends AbstractXmlTest {
     public void testValueOfJson() throws MimeTypeParseException {
 
         // PREPARE
-        final JsonObject event = Json.createObjectBuilder()
-                .add("name", "Shining").add("author", "Stephen King").build();
+        final JsonObject event = Json.createObjectBuilder().add("name", "Shining").add("author", "Stephen King").build();
 
         // TEST
         final Data data = Data.valueOf("BookAddedEvent", event);
 
         // VERIFY
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
-        assertThat(data.getMimeType()).isEqualTo(
-                new EnhancedMimeType("application/json; encoding=utf-8"));
-        assertThat(data.getContent()).isEqualTo(
-                "{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
+        assertThat(data.getMimeType()).isEqualTo(new EnhancedMimeType("application/json; encoding=utf-8"));
+        assertThat(data.getContent()).isEqualTo("{\"name\":\"Shining\",\"author\":\"Stephen King\"}");
         assertThat(data.isXml()).isFalse();
         assertThat(data.isJson()).isTrue();
 

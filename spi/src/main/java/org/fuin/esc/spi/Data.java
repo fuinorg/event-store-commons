@@ -17,8 +17,8 @@
  */
 package org.fuin.esc.spi;
 
-import static org.fuin.utils4j.JaxbUtils.marshal;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -29,6 +29,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
@@ -38,12 +39,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
-import org.fuin.utils4j.CDataXmlAdapter;
+import org.fuin.utils4j.jaxb.CDataXmlAdapter;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 
 /**
- * Helper class that allows sending the data of an event as XML directly to the
- * event store. Represents a block of data in a serialized form. This class
- * might be useful for tests. It's not used in the 'esc-spi' code itself
+ * Helper class that allows sending the data of an event as XML directly to the event store. Represents a block of data in a serialized
+ * form. This class might be useful for tests. It's not used in the 'esc-spi' code itself
  */
 @Immutable
 @XmlRootElement(name = "data")
@@ -70,7 +71,7 @@ public final class Data implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
-    protected Data() { //NOSONAR Ignore uninitialized fields
+    protected Data() { // NOSONAR Ignore uninitialized fields
         super();
     }
 
@@ -80,14 +81,11 @@ public final class Data implements ValueObject, Serializable {
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
-     *            Internet Media Type with encoding and version that classifies
-     *            the data.
+     *            Internet Media Type with encoding and version that classifies the data.
      * @param content
      *            Content.
      */
-    public Data(@NotNull final String type,
-            @NotNull final EnhancedMimeType mimeType,
-            @NotNull final String content) {
+    public Data(@NotNull final String type, @NotNull final EnhancedMimeType mimeType, @NotNull final String content) {
         super();
 
         Contract.requireArgNotNull("type", type);
@@ -157,14 +155,11 @@ public final class Data implements ValueObject, Serializable {
         return getMimeType().getBaseType().equals("text/plain");
     }
 
-
     /**
-     * Unmarshals the content into an object. Content is required to be
-     * "application/xml", "application/json" or "text/plain".
+     * Unmarshals the content into an object. Content is required to be "application/xml", "application/json" or "text/plain".
      *
      * @param ctx
-     *            In case the XML JAXB unmarshalling is used, you have to pass
-     *            the JAXB context here.
+     *            In case the XML JAXB unmarshalling is used, you have to pass the JAXB context here.
      * 
      * @return Object created from content.
      * 
@@ -174,29 +169,26 @@ public final class Data implements ValueObject, Serializable {
     @SuppressWarnings("unchecked")
     public final <T> T unmarshalContent(final JAXBContext ctx) {
         if (!(isJson() || isXml() || isText())) {
-            throw new IllegalStateException(
-                    "Can only unmarshal JSON, XML or TEXT content, not: "
-                            + mimeType);
+            throw new IllegalStateException("Can only unmarshal JSON, XML or TEXT content, not: " + mimeType);
         }
 
         // We can only handle JSON...
         if (isJson()) {
             try {
-        	try (final JsonReader reader = Json.createReader(new StringReader(content))) {
-        	    return (T) reader.readObject();
-        	}
+                try (final JsonReader reader = Json.createReader(new StringReader(content))) {
+                    return (T) reader.readObject();
+                }
             } catch (final RuntimeException ex) {
-                throw new RuntimeException(
-                        "Error parsing json content: '" + content + "'", ex);
+                throw new RuntimeException("Error parsing json content: '" + content + "'", ex);
             }
         }
         // ...or XML
         if (isXml()) {
             try {
-                return unmarshal(ctx, content, null);
+                final Unmarshaller unmarshaller = new UnmarshallerBuilder().withContext(ctx).withHandler(event -> false).build();
+                return unmarshal(unmarshaller, content);
             } catch (final RuntimeException ex) {
-                throw new RuntimeException(
-                        "Error parsing xml content: '" + content + "'", ex);
+                throw new RuntimeException("Error parsing xml content: '" + content + "'", ex);
             }
         }
         // ...or TEXT
@@ -205,9 +197,7 @@ public final class Data implements ValueObject, Serializable {
 
     @Override
     public final String toString() {
-        return new ToStringBuilder(this).append("type", type)
-                .append("mimeType", mimeType).append("content", content)
-                .toString();
+        return new ToStringBuilder(this).append("type", type).append("mimeType", mimeType).append("content", content).toString();
     }
 
     /**
