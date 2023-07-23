@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.fuin</groupId>
 		<artifactId>pom</artifactId>
-		<version>1.7.1</version>
+		<version>1.8.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.fuin.esc</groupId>
@@ -74,25 +74,25 @@
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>utils4j</artifactId>
-				<version>0.12.0</version>
+				<version>0.12.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>objects4j</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
-				<groupId>org.jboss</groupId>
+				<groupId>io.smallrye</groupId>
 				<artifactId>jandex</artifactId>
-				<version>2.4.0.Final</version>
+				<version>3.1.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.validation</groupId>
 				<artifactId>jakarta.validation-api</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.2</version>
 			</dependency>
 
 			<dependency>
@@ -104,37 +104,37 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.11.0</version>
+				<version>2.13.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.32</version>
+				<version>2.0.7</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.github.threeten-jaxb</groupId>
 				<artifactId>threeten-jaxb-core</artifactId>
-				<version>2.0.0</version>
+				<version>2.1.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.json</groupId>
 				<artifactId>jakarta.json-api</artifactId>
-				<version>2.0.1</version>
+				<version>2.1.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.jayway.jsonpath</groupId>
 				<artifactId>json-path</artifactId>
-				<version>2.6.0</version>
+				<version>2.8.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
-				<version>2.8.8</version>
+				<version>2.10.1</version>
 			</dependency>
 
 			<dependency>
@@ -146,37 +146,37 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.20.2</version>
+				<version>3.24.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>units4j</artifactId>
-				<version>0.10.0</version>
+				<version>0.10.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.hibernate.validator</groupId>
 				<artifactId>hibernate-validator</artifactId>
-				<version>7.0.1.Final</version>
+				<version>8.0.1.Final</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.xmlunit</groupId>
 				<artifactId>xmlunit-core</artifactId>
-				<version>2.8.2</version>
+				<version>2.9.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>nl.jqno.equalsverifier</groupId>
 				<artifactId>equalsverifier</artifactId>
-				<version>3.7.1</version>
+				<version>3.15</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.15</version>
+				<version>1.16.0</version>
 			</dependency>
 
 			<dependency>
@@ -188,49 +188,49 @@
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-fluent</artifactId>
-				<version>2.28.0</version>
+				<version>3.0.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
-				<version>1.10.19</version>
+				<version>2.0.2-beta</version>
 			</dependency>
 
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>1.2.5</version>
+				<version>1.4.8</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpasyncclient</artifactId>
-				<version>4.1.4</version>
+				<version>4.1.5</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore-nio</artifactId>
-				<version>4.4.14</version>
+				<version>4.4.16</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
-				<version>4.4.14</version>
+				<version>4.4.16</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.13</version>
+				<version>4.5.14</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.github.msemys</groupId>
 				<artifactId>esjc</artifactId>
-				<version>2.3.0</version>
+				<version>2.6.0</version>
 			</dependency>
 
 			<dependency>
@@ -254,67 +254,67 @@
 			<dependency>
 				<groupId>org.jboss.logging</groupId>
 				<artifactId>jboss-logging</artifactId>
-				<version>3.4.2.Final</version>
+				<version>3.5.3.Final</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core-jakarta</artifactId>
-				<version>5.5.7.Final</version>
+				<version>5.6.15.Final</version>
 			</dependency>
 
 			<dependency>
 			    <groupId>org.hsqldb</groupId>
 			    <artifactId>hsqldb</artifactId>
-			    <version>2.6.0</version>
+			    <version>2.7.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.json.bind</groupId>
 				<artifactId>jakarta.json.bind-api</artifactId>
-				<version>2.0.0</version>
+				<version>3.0.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.eclipse</groupId>
 				<artifactId>yasson</artifactId>
-				<version>2.0.2</version>
+				<version>3.0.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.enterprise</groupId>
 				<artifactId>jakarta.enterprise.cdi-api</artifactId>
-				<version>3.0.0</version>
+				<version>4.0.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.persistence</groupId>
 				<artifactId>jakarta.persistence-api</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.xml.bind</groupId>
 				<artifactId>jakarta.xml.bind-api</artifactId>
-				<version>3.0.1</version>
+				<version>4.0.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
 				<artifactId>jaxb-runtime</artifactId>
-				<version>3.0.2</version>
+				<version>4.0.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>jakarta.el</groupId>
 				<artifactId>jakarta.el-api</artifactId>
-				<version>4.0.0</version>
+				<version>5.0.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.glassfish</groupId>
 				<artifactId>jakarta.el</artifactId>
-				<version>4.0.1</version>
+				<version>5.0.0-M1</version>
 			</dependency>
 
 		</dependencies>
