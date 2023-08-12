@@ -19,11 +19,12 @@ package org.fuin.esc.spi;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.marshal;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class EscEventTest {
     public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.xml"), StandardCharsets.UTF_8);
 
         // TEST
         final EscEvent testee = unmarshal(expectedXml, EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class);
@@ -76,7 +77,7 @@ public class EscEventTest {
     public final void testToJson() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"), StandardCharsets.UTF_8);
         final UUID eventId = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
         final MyEvent myEvent = new MyEvent(UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47"), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("abc");
@@ -103,7 +104,7 @@ public class EscEventTest {
     public void testMarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
@@ -144,7 +145,7 @@ public class EscEventTest {
     public final void testUnmarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
@@ -187,7 +188,7 @@ public class EscEventTest {
     public void testMarshalJsonBBase64() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event-base64.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event-base64.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
@@ -219,7 +220,7 @@ public class EscEventTest {
     public final void testUnmarshalJsonBBase64() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event-base64.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-event-base64.json"), StandardCharsets.UTF_8);
 
         final EscEvent expectedEvent = createEventBase64();
 

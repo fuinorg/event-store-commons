@@ -18,37 +18,46 @@
 package org.fuin.esc.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.junit.Test;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+
 // CHECKSTYLE:OFF
 public final class NoParamsEventTest {
 
-    @Test
-    public void testEqualsHashCode() {
-        EqualsVerifier.forClass(NoParamsEvent.class).suppress(Warning.NONFINAL_FIELDS,
-                Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
-    }
+	@Test
+	public void testEqualsHashCode() {
+		EqualsVerifier.forClass(NoParamsEvent.class)
+				.withIgnoredAnnotations(Entity.class, Id.class, Embeddable.class, MappedSuperclass.class,
+						Transient.class)
+				.suppress(Warning.NONFINAL_FIELDS, Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED)
+				.verify();
+	}
 
-    @Test
-    public void testGetter() {
+	@Test
+	public void testGetter() {
 
-        // PREPARE
-        final StreamId streamId = new SimpleStreamId("Abc");
-        final Long eventNumber = 3L;
-        final JpaEvent eventEntry = new JpaEvent();
-        final NoParamsEvent testee = new NoParamsEvent(streamId, eventNumber, eventEntry);
+		// PREPARE
+		final StreamId streamId = new SimpleStreamId("Abc");
+		final Long eventNumber = 3L;
+		final JpaEvent eventEntry = new JpaEvent();
+		final NoParamsEvent testee = new NoParamsEvent(streamId, eventNumber, eventEntry);
 
-        // TEST
-        assertThat(testee.getStreamName()).isEqualTo(streamId.getName());
-        assertThat(testee.getEventNumber()).isEqualTo(eventNumber);
-        assertThat(testee.getEvent()).isEqualTo(eventEntry);
+		// TEST
+		assertThat(testee.getStreamName()).isEqualTo(streamId.getName());
+		assertThat(testee.getEventNumber()).isEqualTo(eventNumber);
+		assertThat(testee.getEvent()).isEqualTo(eventEntry);
 
-    }
+	}
 
 }
 // CHECKSTYLE:ON

@@ -116,8 +116,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.json</artifactId>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
             <scope>test</scope>
         </dependency>
 

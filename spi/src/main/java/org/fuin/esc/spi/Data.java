@@ -17,8 +17,8 @@
  */
 package org.fuin.esc.spi;
 
-import static org.fuin.utils4j.JaxbUtils.marshal;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -38,7 +38,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
-import org.fuin.utils4j.CDataXmlAdapter;
+import org.fuin.utils4j.jaxb.CDataXmlAdapter;
 
 /**
  * Helper class that allows sending the data of an event as XML directly to the

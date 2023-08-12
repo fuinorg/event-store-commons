@@ -19,12 +19,13 @@ package org.fuin.esc.spi;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.marshal;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class EscMetaTest {
     public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.xml"), StandardCharsets.UTF_8);
 
         // TEST
         final EscMeta testee = unmarshal(expectedXml, EscMeta.class, MyMeta.class, Base64Data.class);
@@ -63,7 +64,7 @@ public class EscMetaTest {
     public final void testToJson() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"), StandardCharsets.UTF_8);
 
         // TEST
         final EscMeta testee = EscMeta.create(Json.createReader(new StringReader(expectedJson)).readObject());
@@ -80,7 +81,7 @@ public class EscMetaTest {
     public final void testMarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"), StandardCharsets.UTF_8);
 
         final MyMeta myMeta = new MyMeta("abc");
 
@@ -116,7 +117,7 @@ public class EscMetaTest {
     public final void testUnmarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
@@ -156,7 +157,7 @@ public class EscMetaTest {
     public final void testMarshalJsonBBase64() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"), StandardCharsets.UTF_8);
 
         final Base64Data base64Data = new Base64Data("PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+");
 
@@ -191,7 +192,7 @@ public class EscMetaTest {
     public final void testUnmarshalJsonBBase64() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-meta-base64.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);

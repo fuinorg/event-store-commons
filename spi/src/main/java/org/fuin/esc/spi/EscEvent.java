@@ -21,7 +21,10 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Nullable;
+
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.bind.serializer.DeserializationContext;
@@ -33,9 +36,6 @@ import jakarta.json.stream.JsonParser;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
-import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Contract;
 
 /**
  * An event structure.
@@ -243,9 +243,11 @@ public final class EscEvent implements ToJsonCapable {
                         escEvent.eventType = ctx.deserialize(String.class, parser);
                         break;
                     case EL_META_DATA:
+                    	parser.next(); // Skip key and deserialize object
                         escEvent.meta = new DataWrapper(ctx.deserialize(EscMeta.class, parser));
                         break;
                     case EL_DATA:
+                    	parser.next(); // Skip key and deserialize object
                         content = ctx.deserialize(JsonObject.class, parser);
                         break;
                     default:

@@ -18,7 +18,9 @@
 package org.fuin.esc.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
+
+import java.nio.charset.StandardCharsets;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -38,7 +40,7 @@ public class EventsTest extends AbstractXmlTest {
     public final void testUnMarshal() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/events.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/events.xml"), StandardCharsets.UTF_8);
 
         // TEST
         final Events testee = unmarshal(expectedXml, Events.class);

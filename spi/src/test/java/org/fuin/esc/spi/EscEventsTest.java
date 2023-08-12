@@ -19,10 +19,11 @@ package org.fuin.esc.spi;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.JaxbUtils.marshal;
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -46,7 +47,7 @@ public class EscEventsTest {
     public final void testMarshalUnmarshalJaxb() throws Exception {
 
         // PREPARE
-        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.xml"));
+        final String expectedXml = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.xml"), StandardCharsets.UTF_8);
 
         // TEST
         final EscEvents testee = unmarshal(expectedXml, EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class);
@@ -71,7 +72,7 @@ public class EscEventsTest {
     public void testMarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
@@ -102,7 +103,7 @@ public class EscEventsTest {
     public final void testUnmarshalJsonB() throws Exception {
 
         // PREPARE
-        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"));
+        final String expectedJson = IOUtils.toString(this.getClass().getResourceAsStream("/esc-events.json"), StandardCharsets.UTF_8);
 
         final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);

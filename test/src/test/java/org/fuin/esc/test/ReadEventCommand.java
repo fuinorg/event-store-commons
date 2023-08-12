@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import static org.fuin.utils4j.JaxbUtils.unmarshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;

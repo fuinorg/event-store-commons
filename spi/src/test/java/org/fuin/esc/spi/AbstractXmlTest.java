@@ -27,8 +27,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
 import org.fuin.units4j.Units4JUtils;
-import org.fuin.utils4j.CDataXmlStreamWriter;
-import org.fuin.utils4j.JaxbUtils;
+import org.fuin.utils4j.jaxb.CDataXmlStreamWriter;
+import org.fuin.utils4j.jaxb.JaxbUtils;
 
 /**
  * Base class for XML marshal/unmarshal tests.
