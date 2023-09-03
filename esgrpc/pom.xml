@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.fuin.esc</groupId>
+		<artifactId>esc-parent</artifactId>
+		<version>0.5.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>esc-esgrpc</artifactId>
+	<packaging>jar</packaging>
+	<name>esc-esgrpc</name>
+	<description>Event store commons esgrpc adapter for Greg Young's EventStore.</description>
+
+	<scm>
+		<url>https://github.com/fuinorg/event-store-commons/</url>
+		<connection>scm:git:git://github.com/fuinorg/event-store-commons.git</connection>
+		<developerConnection>
+			scm:git:git@github.com:fuinorg/event-store-commons.git</developerConnection>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/fuinorg/event-store-commons/issues</url>
+	</issueManagement>
+
+	<dependencies>
+
+		<!-- compile -->
+
+		<dependency>
+			<groupId>org.fuin.esc</groupId>
+			<artifactId>esc-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fuin.esc</groupId>
+			<artifactId>esc-spi</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fuin</groupId>
+			<artifactId>utils4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fuin</groupId>
+			<artifactId>objects4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.eventstore</groupId>
+			<artifactId>db-client-java</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-api</artifactId>
+			<version>1.53.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.22.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java-util</artifactId>
+			<version>3.22.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>1.53.0</version>
+		</dependency>
+
+		<!-- test -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.fuin</groupId>
+			<artifactId>units4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.json</groupId>
+			<artifactId>jakarta.json-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>yasson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>org.fuin.esc.esjc</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jdeps-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<argLine>${failsafe.argLine}</argLine>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<configuration>
+
+					<images>
+						<image>
+							<name>eventstore/eventstore:${eventstore.version}</name>
+							<run>
+								<network>
+									<mode>bridge</mode>
+								</network>
+								<ports>
+									<port>1113:1113</port>
+									<port>2113:2113</port>
+								</ports>
+								<env>
+									<EVENTSTORE_MEM_DB>TRUE</EVENTSTORE_MEM_DB>
+									<EVENTSTORE_RUN_PROJECTIONS>All</EVENTSTORE_RUN_PROJECTIONS>
+									<EVENTSTORE_INSECURE>true</EVENTSTORE_INSECURE>
+									<EVENTSTORE_ENABLE_EXTERNAL_TCP>true</EVENTSTORE_ENABLE_EXTERNAL_TCP>
+									<EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP>true</EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP>
+									<EVENTSTORE_LOG>/tmp/log-eventstore</EVENTSTORE_LOG>
+								</env>
+								<log>
+									<enabled>false</enabled>
+								</log>
+								<wait>
+									<http>
+										<url>
+											http://localhost:2113/web/index.html#/</url>
+										<method>GET</method>
+									</http>
+									<time>20000</time>
+								</wait>
+							</run>
+						</image>
+
+					</images>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>start-images</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-images</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+</project>

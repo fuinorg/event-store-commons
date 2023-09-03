@@ -24,6 +24,7 @@ Defines a common event store Java interface and provides some adapters (like for
 | [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~92% |
 | [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
 | [esc-esjc](esjc) | [Event Store Java Client](https://github.com/msemys/esjc) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80% |
+| [esc-grpc](grpc) | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80% |
 | [esc-jpa](jpa) | JPA adapter | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~59% |
 | [esc-mem](mem) | In-memory implementation | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60% |
 | [esc-spi](spi) | Helper classes for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~67% |
@@ -42,7 +43,9 @@ Defines a common event store Java interface and provides some adapters (like for
 
 | Version | Description |
 |:------- |:----------- |
-| 0.3.1-SNAPSHOT | Type of the event version changed from `int` to `long` |
+| 0.5.1-SNAPSHOT | Added new GRPC java client implementation |
+| 0.5.0   | Namespace changed from "javax" to "jakarta" |
+| 0.3.1   | Type of the event version changed from `int` to `long` |
 
 ### Snapshots
 

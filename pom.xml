@@ -72,6 +72,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.fuin.esc</groupId>
+				<artifactId>esc-esgrpc</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>utils4j</artifactId>
 				<version>0.12.1-SNAPSHOT</version>
@@ -322,6 +328,7 @@
 		<module>jpa</module>
 		<module>eshttp</module>
 		<module>esjc</module>
+		<module>esgrpc</module>
 		<module>test</module>
 	</modules>
 

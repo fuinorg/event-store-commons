@@ -77,6 +77,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-esgrpc</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <optional>true</optional>
