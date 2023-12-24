@@ -71,31 +71,31 @@
 		<dependency>
 			<groupId>com.eventstore</groupId>
 			<artifactId>db-client-java</artifactId>
-			<version>4.3.0</version>
+			<version>5.2.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-api</artifactId>
-			<version>1.53.0</version>
+			<version>1.59.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.22.0</version>
+			<version>3.22.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java-util</artifactId>
-			<version>3.22.0</version>
+			<version>3.24.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-protobuf</artifactId>
-			<version>1.53.0</version>
+			<version>1.59.0</version>
 		</dependency>
 
 		<!-- test -->

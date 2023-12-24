@@ -6,4 +6,4 @@
 target
 META-INF
 *.log
-/pom.xml.versionsBackup
+pom.xml.versionsBackup
