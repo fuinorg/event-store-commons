@@ -17,17 +17,15 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link SimpleCommonEvent} class.
@@ -47,12 +45,12 @@ public class SimpleCommonEventTest {
 
     private SimpleCommonEvent testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new SimpleCommonEvent(ID, DATA_TYPE, DATA, META_TYPE, META);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

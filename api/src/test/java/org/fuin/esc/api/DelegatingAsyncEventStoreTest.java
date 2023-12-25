@@ -17,26 +17,26 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link DelegatingAsyncEventStore}.
  */
 // CHECKSTYLE:OFF Test
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DelegatingAsyncEventStoreTest {
 
     private static final long ANY_VERSION = ExpectedVersion.ANY.getNo();
@@ -46,12 +46,12 @@ public class DelegatingAsyncEventStoreTest {
     @Mock
     private EventStore delegate;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new DelegatingAsyncEventStore(Executors.newCachedThreadPool(), delegate);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

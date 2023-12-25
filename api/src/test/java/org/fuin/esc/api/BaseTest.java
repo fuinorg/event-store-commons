@@ -17,19 +17,19 @@
  */
 package org.fuin.esc.api;
 
-import static org.fuin.units4j.JandexAssert.assertThat;
-
-import java.io.File;
-import java.util.List;
-
 import org.fuin.objects4j.vo.AbstractStringValueObject;
 import org.fuin.objects4j.vo.ValueObjectWithBaseType;
 import org.fuin.units4j.AssertCoverage;
 import org.fuin.units4j.Units4JUtils;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.List;
+
+import static org.fuin.units4j.JandexAssert.assertThat;
 
 /**
  * General tests for all classes.
@@ -43,7 +43,7 @@ public class BaseTest {
         AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
     }
 
-    @Ignore("TODO Fix failing test with new units4j version")
+    @Disabled("TODO Fix failing test with new units4j version")
     @Test
     public final void testNullability() {
 

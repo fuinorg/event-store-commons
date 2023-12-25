@@ -44,7 +44,7 @@ import org.fuin.esc.spi.SerDeserializerRegistry;
 import org.fuin.esc.spi.SerializerRegistry;
 import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 
 import com.eventstore.dbclient.AppendToStreamOptions;
 import com.eventstore.dbclient.DeleteStreamOptions;

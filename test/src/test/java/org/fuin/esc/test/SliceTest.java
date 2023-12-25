@@ -31,9 +31,9 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.Data;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.Event;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
@@ -57,7 +57,7 @@ public class SliceTest extends AbstractXmlTest {
 
     private Slice testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         events = new ArrayList<Event>();
         events.add(new Event(ID, new Data("MyEvent",
@@ -65,7 +65,7 @@ public class SliceTest extends AbstractXmlTest {
         testee = new Slice(FROM, events, NEXT, EOS);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         events = null;
         testee = null;

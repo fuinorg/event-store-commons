@@ -17,13 +17,13 @@
  */
 package org.fuin.esc.api;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests the {@link WrongExpectedVersionException} class.
@@ -39,13 +39,13 @@ public class StreamVersionConflictExceptionTest {
 
     private WrongExpectedVersionException testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new WrongExpectedVersionException(STREAM_ID,
                 EXPECTED_VERSION, ACTUAL_VERSION);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

@@ -17,15 +17,14 @@
  */
 package org.fuin.esc.spi;
 
-import java.util.List;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.KeyValue;
+
+import java.util.List;
 
 /**
  * Represents a tenant stream identifier.

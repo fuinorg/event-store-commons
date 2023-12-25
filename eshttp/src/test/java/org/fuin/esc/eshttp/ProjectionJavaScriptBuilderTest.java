@@ -18,14 +18,14 @@
 package org.fuin.esc.eshttp;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.TypeName;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link ProjectionJavaScriptBuilder} class.

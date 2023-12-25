@@ -46,9 +46,9 @@ import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link ESHttpEventStore} class.
@@ -64,7 +64,7 @@ public class ESHttpEventStoreIT {
 
     private ESHttpEventStore testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws MalformedURLException {
 
         final ThreadFactory threadFactory = Executors.defaultThreadFactory();
@@ -92,7 +92,7 @@ public class ESHttpEventStoreIT {
 
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee.close();
         testee = null;

@@ -17,13 +17,8 @@
  */
 package org.fuin.esc.jpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
 

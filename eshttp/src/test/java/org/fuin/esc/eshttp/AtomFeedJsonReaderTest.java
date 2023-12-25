@@ -28,7 +28,7 @@ import java.util.List;
 import jakarta.json.JsonObject;
 
 import org.fuin.esc.spi.EnhancedMimeType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link AtomFeedJsonReader} class.

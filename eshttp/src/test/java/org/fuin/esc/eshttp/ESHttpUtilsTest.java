@@ -25,9 +25,9 @@ import java.io.InputStream;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +42,7 @@ public class ESHttpUtilsTest {
 
     private XPath xpath;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         final InputStream in = this.getClass().getResourceAsStream("/atom-feed-stream.xml");
         try {
@@ -53,7 +53,7 @@ public class ESHttpUtilsTest {
         }
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         xpath = null;
         doc = null;

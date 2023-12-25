@@ -32,7 +32,7 @@ import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eventstore.dbclient.EventData;
 

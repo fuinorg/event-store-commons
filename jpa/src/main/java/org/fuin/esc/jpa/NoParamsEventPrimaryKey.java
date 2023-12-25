@@ -17,12 +17,11 @@
  */
 package org.fuin.esc.jpa;
 
-import java.io.Serializable;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
+
+import java.io.Serializable;
 
 /**
  * Identifies a stream event based on a stream name and an event number.

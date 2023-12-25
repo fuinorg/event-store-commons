@@ -17,25 +17,20 @@
  */
 package org.fuin.esc.esjc;
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.UUID;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerDeserializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.ToJsonCapable;
+import org.fuin.esc.spi.*;
 import org.fuin.objects4j.common.Contract;
-import jakarta.validation.constraints.NotEmpty;
+
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.UUID;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

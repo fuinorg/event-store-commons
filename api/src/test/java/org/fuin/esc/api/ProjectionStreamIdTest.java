@@ -17,12 +17,13 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests the {@link ProjectionStreamId} class.
@@ -34,12 +35,12 @@ public class ProjectionStreamIdTest {
 
     private ProjectionStreamId testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new ProjectionStreamId(NAME);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }
@@ -57,9 +58,11 @@ public class ProjectionStreamIdTest {
         assertThat(testee.getParameters()).isEmpty();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetSingleParamValue() {
-        testee.getSingleParamValue();
+        assertThatThrownBy(() -> {
+            testee.getSingleParamValue();
+        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }
 // CHECKSTYLE:ON

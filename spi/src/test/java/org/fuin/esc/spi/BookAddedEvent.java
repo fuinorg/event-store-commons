@@ -3,9 +3,7 @@ package org.fuin.esc.spi;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.SerializedDataType;
 
 /**
  * Example event.

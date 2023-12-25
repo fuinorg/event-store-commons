@@ -17,14 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.UUID;
-
-import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
-
+import jakarta.annotation.Nullable;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.bind.serializer.DeserializationContext;
@@ -36,6 +29,12 @@ import jakarta.json.stream.JsonParser;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.Contract;
+
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.UUID;
 
 /**
  * An event structure.

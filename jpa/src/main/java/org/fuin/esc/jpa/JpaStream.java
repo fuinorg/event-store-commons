@@ -20,7 +20,6 @@ package org.fuin.esc.jpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
 

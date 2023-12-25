@@ -1,16 +1,12 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.esjc;
 
+import com.github.msemys.esjc.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-
-import com.github.msemys.esjc.EventData;
-import com.github.msemys.esjc.EventStore;
-import com.github.msemys.esjc.EventStoreBuilder;
-import com.github.msemys.esjc.ExpectedVersion;
-import com.github.msemys.esjc.StreamMetadataResult;
 
 public class NativeDeleteExampleApp {
 

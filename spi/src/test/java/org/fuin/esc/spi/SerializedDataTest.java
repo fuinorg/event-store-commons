@@ -17,15 +17,13 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.activation.MimeTypeParseException;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link SerializedData} class.
@@ -43,12 +41,12 @@ public class SerializedDataTest {
 
     private SerializedData testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws MimeTypeParseException {
         testee = new SerializedData(TYPE, MIME_TYPE, RAW);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

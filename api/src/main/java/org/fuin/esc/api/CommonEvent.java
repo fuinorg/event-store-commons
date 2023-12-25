@@ -17,9 +17,8 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
-import org.fuin.objects4j.common.Nullable;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the

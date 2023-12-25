@@ -17,13 +17,12 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link SimpleTenantId} class.
@@ -34,12 +33,12 @@ public class SimpleTenantIdTest {
 
     private SimpleTenantId testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new SimpleTenantId(NAME);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

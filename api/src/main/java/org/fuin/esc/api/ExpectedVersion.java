@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Stream version numbers that have a special meaning. This is used for an optimistic concurrency check on the

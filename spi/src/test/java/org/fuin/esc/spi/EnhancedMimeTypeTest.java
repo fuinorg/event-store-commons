@@ -17,21 +17,19 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.activation.MimeTypeParameterList;
+import jakarta.activation.MimeTypeParseException;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.activation.MimeTypeParameterList;
-import jakarta.activation.MimeTypeParseException;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link EnhancedMimeType} class.
@@ -41,13 +39,13 @@ public class EnhancedMimeTypeTest {
 
     private EnhancedMimeType testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws MimeTypeParseException {
         testee = new EnhancedMimeType(
                 "application/xml;version=1.0.2;encoding=utf-8");
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

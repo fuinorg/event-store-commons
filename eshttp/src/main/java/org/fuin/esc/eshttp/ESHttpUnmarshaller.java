@@ -22,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.spi.DeserializerRegistry;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Unmarshals data after reading it from the event store.

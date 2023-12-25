@@ -45,7 +45,7 @@ import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializedDataTypeRegistry;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 

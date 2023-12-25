@@ -17,12 +17,11 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.vo.KeyValue;
+
 import java.io.Serializable;
 import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.objects4j.vo.KeyValue;
 
 /**
  * Name of a stream that is unique within the event store.<br>

@@ -17,13 +17,13 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.KeyValue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Unique name of an aggregate stream.
