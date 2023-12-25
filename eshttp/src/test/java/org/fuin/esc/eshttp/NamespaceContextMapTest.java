@@ -23,9 +23,9 @@ import java.util.Iterator;
 
 import javax.xml.XMLConstants;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Tests the {@link NamespaceContextMap} class.
@@ -35,12 +35,12 @@ public class NamespaceContextMapTest {
 
     private NamespaceContextMap testee;
     
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new NamespaceContextMap("abc", "http://www.fuin.org/abc", "def", "http://www.fuin.org/def");
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

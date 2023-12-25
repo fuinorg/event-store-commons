@@ -17,18 +17,17 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.apache.commons.io.IOUtils;
+import org.fuin.esc.api.EventId;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 import java.nio.charset.StandardCharsets;
 
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
-import org.apache.commons.io.IOUtils;
-import org.fuin.esc.api.EventId;
-import org.junit.Test;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Tests the {@link Events} class.
@@ -48,7 +47,7 @@ public class EventsTest extends AbstractXmlTest {
         // VERIFY
         assertThat(testee).isNotNull();
         assertThat(testee.getEvents()).isNotNull();
-        assertThat(testee.getEvents().size()).isEqualTo(2);
+        assertThat(testee.getEvents()).hasSize(2);
         assertThat(testee.getEvents().get(0).getId()).isEqualTo(new EventId("7ab8e400-373b-4f65-96e1-96b78a791a42"));
         assertThat(testee.getEvents().get(1).getId()).isEqualTo(new EventId("35ae2b63-c820-4cea-8ad6-0d25e4519390"));
 

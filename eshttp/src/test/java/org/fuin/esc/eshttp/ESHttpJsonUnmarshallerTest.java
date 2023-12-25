@@ -36,9 +36,9 @@ import org.fuin.esc.spi.JsonDeSerializer;
 import org.fuin.esc.spi.SerializedDataType;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
-import org.junit.Test;
 
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link ESHttpJsonUnmarshaller} class.

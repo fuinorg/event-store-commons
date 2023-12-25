@@ -17,16 +17,15 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fuin.objects4j.common.Immutable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.Nullable;
 
 /**
  *

@@ -17,8 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import org.fuin.objects4j.common.Nullable;
-
+import jakarta.annotation.Nullable;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.slf4j.Logger;

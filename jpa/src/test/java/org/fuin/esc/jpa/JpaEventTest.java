@@ -17,18 +17,17 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.charset.Charset;
-import java.util.HashMap;
-
 import jakarta.persistence.TypedQuery;
-
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.units4j.AbstractPersistenceTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 // CHECKSTYLE:OFF
 public final class JpaEventTest extends AbstractPersistenceTest {

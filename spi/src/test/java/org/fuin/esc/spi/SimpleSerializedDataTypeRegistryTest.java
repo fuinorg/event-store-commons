@@ -17,10 +17,10 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the {@link SimpleSerializedDataTypeRegistry} class.

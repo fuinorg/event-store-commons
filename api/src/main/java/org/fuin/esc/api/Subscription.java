@@ -17,11 +17,10 @@
  */
 package org.fuin.esc.api;
 
-import java.io.Serializable;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
-import org.fuin.objects4j.common.Nullable;
+import java.io.Serializable;
 
 /**
  * Result of subscribing to a stream. The sub classes will contain

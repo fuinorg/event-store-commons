@@ -17,29 +17,23 @@
  */
 package org.fuin.esc.esjc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.UUID;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.Base64Data.Base64DataJsonDeSerializer;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.EscMetaJsonDeSerializer;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
-import org.fuin.esc.spi.XmlDeSerializer;
-import org.junit.Test;
-
 import com.github.msemys.esjc.EventData;
 import com.github.msemys.esjc.RecordedEvent;
 import com.github.msemys.esjc.proto.EventStoreClientMessages.EventRecord;
 import com.github.msemys.esjc.util.UUIDConverter;
 import com.google.protobuf.ByteString;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.spi.*;
+import org.fuin.esc.spi.Base64Data.Base64DataJsonDeSerializer;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test for {@link RecordedEvent2CommonEventConverter} class.

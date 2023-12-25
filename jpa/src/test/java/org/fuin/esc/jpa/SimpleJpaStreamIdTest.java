@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -17,13 +17,14 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests the {@link SimpleJpaStreamId} class.
@@ -37,12 +38,12 @@ public class SimpleJpaStreamIdTest {
 
     private SimpleJpaStreamId testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new SimpleJpaStreamId(NAME, TABLE_NAME);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }
@@ -61,9 +62,11 @@ public class SimpleJpaStreamIdTest {
         assertThat(testee.getNativeTableName()).isEqualTo(TABLE_NAME);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetSingleParamValue() {
-        testee.getSingleParamValue();
+        assertThatThrownBy(() -> {
+            testee.getSingleParamValue();
+        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }
 // CHECKSTYLE:ON

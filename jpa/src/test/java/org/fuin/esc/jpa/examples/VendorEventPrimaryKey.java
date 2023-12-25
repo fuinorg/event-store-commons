@@ -17,11 +17,10 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import java.io.Serializable;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.objects4j.common.Contract;
+
+import java.io.Serializable;
 
 /**
  * Primary key for the vendor event table.

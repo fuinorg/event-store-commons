@@ -17,10 +17,10 @@
  */
 package org.fuin.esc.mem;
 
-import java.io.File;
-
 import org.fuin.units4j.AssertCoverage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
 
 /**
  * General tests for all classes.

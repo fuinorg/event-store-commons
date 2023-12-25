@@ -17,14 +17,15 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.Utils4J.deserialize;
-import static org.fuin.utils4j.Utils4J.serialize;
+import org.fuin.objects4j.common.ConstraintViolationException;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import org.fuin.objects4j.common.ConstraintViolationException;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
 
 // CHECKSTYLE:OFF Test code
 public final class EventIdTest {
@@ -43,19 +44,25 @@ public final class EventIdTest {
         assertThat(new EventId(uuid).asBaseType()).isEqualTo(uuid);
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public final void testConstructNullString() {
-        new EventId((String) null);
+        assertThatThrownBy(() -> {
+            new EventId((String) null);
+        }).isInstanceOf(ConstraintViolationException.class);        
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public final void testConstructNullUUID() {
-        new EventId((UUID) null);
+        assertThatThrownBy(() -> {
+            new EventId((UUID) null);
+        }).isInstanceOf(ConstraintViolationException.class);
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public final void testConstructInvalidString() {
-        new EventId("x");
+        assertThatThrownBy(() -> {
+            new EventId("x");
+        }).isInstanceOf(ConstraintViolationException.class);
     }
 
 }

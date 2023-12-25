@@ -3,7 +3,6 @@ package org.fuin.esc.test.examples;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;
 

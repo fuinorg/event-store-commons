@@ -17,33 +17,19 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.fuin.esc.api.ExpectedVersion.ANY;
-
-import java.util.List;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import jakarta.validation.constraints.NotNull;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamReadOnlyException;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.WrongExpectedVersionException;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerializedData;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.esc.api.*;
+import org.fuin.esc.spi.*;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 /**
  * JPA Implementation of the event store.

@@ -17,15 +17,15 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.fuin.units4j.JandexAssert.assertThat;
+import org.fuin.units4j.AssertCoverage;
+import org.fuin.units4j.Units4JUtils;
+import org.jboss.jandex.Index;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
 
-import org.fuin.units4j.AssertCoverage;
-import org.fuin.units4j.Units4JUtils;
-import org.jboss.jandex.Index;
-import org.junit.Test;
+import static org.fuin.units4j.JandexAssert.assertThat;
 
 /**
  * General tests for all classes.

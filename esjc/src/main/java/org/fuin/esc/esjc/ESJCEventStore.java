@@ -17,43 +17,20 @@
  */
 package org.fuin.esc.esjc;
 
-import static org.fuin.esc.api.ExpectedVersion.ANY;
+import com.github.msemys.esjc.*;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.api.*;
+import org.fuin.esc.spi.*;
+import org.fuin.objects4j.common.Contract;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamReadOnlyException;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.WrongExpectedVersionException;
-import org.fuin.esc.spi.AbstractReadableEventStore;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerDeserializerRegistry;
-import org.fuin.esc.spi.SerializerRegistry;
-import org.fuin.esc.spi.TenantStreamId;
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Nullable;
-
-import com.github.msemys.esjc.EventData;
-import com.github.msemys.esjc.EventReadResult;
-import com.github.msemys.esjc.EventReadStatus;
-import com.github.msemys.esjc.ResolvedEvent;
-import com.github.msemys.esjc.SliceReadStatus;
-import com.github.msemys.esjc.StreamMetadataResult;
-import com.github.msemys.esjc.WriteResult;
+import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 /**
  * Implementation that connects to the event store (http://www.geteventstore.com) using the esjc (https://github.com/msemys/esjc) API.

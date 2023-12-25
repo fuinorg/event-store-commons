@@ -17,13 +17,13 @@
  */
 package org.fuin.esc.api;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests the {@link StreamNotFoundException} class.
@@ -35,12 +35,12 @@ public class StreamNotFoundExceptionTest {
 
     private StreamNotFoundException testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new StreamNotFoundException(STREAM_ID);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

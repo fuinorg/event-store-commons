@@ -17,25 +17,23 @@
  */
 package org.fuin.esc.spi;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.bind.Jsonb;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.yasson.FieldAccessStrategy;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.activation.MimeTypeParseException;
-import jakarta.json.bind.Jsonb;
-
-import org.apache.commons.io.IOUtils;
-import org.eclipse.yasson.FieldAccessStrategy;
-import org.junit.Test;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Test for {@link EscEvents} class.
@@ -55,7 +53,7 @@ public class EscEventsTest {
         // VERIFY
         assertThat(testee).isNotNull();
         assertThat(testee.getList()).isNotNull();
-        assertThat(testee.getList().size()).isEqualTo(2);
+        assertThat(testee.getList()).hasSize(2);
         assertThat(testee.getList().get(0).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
         assertThat(testee.getList().get(1).getEventId()).isEqualTo("c198a02e-126e-4fbb-910c-918abf39a4a6");
 
@@ -83,7 +81,7 @@ public class EscEventsTest {
         final JsonbDeSerializer jsonbDeSer = JsonbDeSerializer.builder()
                 .withSerializers(EscSpiUtils.createEscJsonbSerializers())
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
-                .withEncoding(Charset.forName("utf-8"))
+                .withEncoding(StandardCharsets.UTF_8)
                 .build();
         jsonbDeSer.init(typeRegistry);
         
@@ -113,7 +111,7 @@ public class EscEventsTest {
                 .withSerializers(EscSpiUtils.createEscJsonbSerializers())
                 .withDeserializers(EscSpiUtils.createEscJsonbDeserializers())
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
-                .withEncoding(Charset.forName("utf-8"))
+                .withEncoding(StandardCharsets.UTF_8)
                 .build();
         initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
         
@@ -135,8 +133,8 @@ public class EscEventsTest {
         final UUID eventId = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
         final MyEvent myEvent = new MyEvent(UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47"), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("abc");
-        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
-        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
         return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(myEvent), new DataWrapper(escMeta));
@@ -151,8 +149,8 @@ public class EscEventsTest {
 
         final Map<String, String> params = new HashMap<>();
         params.put("transfer-encoding", "base64");
-        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1", params);
-        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", Charset.forName("utf-8"), "1");
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1", params);
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
         final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
         return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(data), new DataWrapper(escMeta));

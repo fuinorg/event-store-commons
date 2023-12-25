@@ -17,10 +17,10 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * Interface for writing events to an event store asynchronously. Calling any

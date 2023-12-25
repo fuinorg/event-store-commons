@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.api;
 
-import java.util.concurrent.CompletableFuture;
-
 import jakarta.validation.constraints.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Basic synchronous operations shared by all event store types.

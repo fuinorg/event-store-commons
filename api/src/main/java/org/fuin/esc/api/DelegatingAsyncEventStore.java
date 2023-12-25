@@ -17,14 +17,13 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.Contract;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
-
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.objects4j.common.Contract;
 
 /**
  * Asynchronous event store that uses a synchronous one internally.

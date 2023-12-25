@@ -21,7 +21,6 @@ import jakarta.json.JsonStructure;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.fuin.objects4j.common.Contract;
 
 /**

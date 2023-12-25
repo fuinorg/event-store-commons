@@ -37,7 +37,7 @@ import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscMetaJsonDeSerializer;
 import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.Position;

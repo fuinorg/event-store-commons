@@ -17,15 +17,14 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.activation.MimeTypeParseException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 
-import jakarta.activation.MimeTypeParseException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link TextDeSerializer} class.
@@ -37,12 +36,12 @@ public class TextDeSerializerTest {
 
     private TextDeSerializer testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws MimeTypeParseException {
         testee = new TextDeSerializer(CHARSET);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

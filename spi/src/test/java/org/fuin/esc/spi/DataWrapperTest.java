@@ -17,16 +17,12 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.XML_PREFIX;
-import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 
-import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.DataWrapper;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.jaxb.JaxbUtils.*;
 
 /**
  * Test for {@link DataWrapper} class.

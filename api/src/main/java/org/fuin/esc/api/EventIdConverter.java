@@ -17,9 +17,8 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
-import org.fuin.objects4j.common.Nullable;
 
 /**
  * XML Converter for event IDs.

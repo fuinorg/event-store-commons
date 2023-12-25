@@ -17,22 +17,20 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-import static org.fuin.utils4j.Utils4J.deserialize;
-import static org.fuin.utils4j.Utils4J.serialize;
-
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.fuin.esc.api.EventId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Tests the {@link Event} class.
@@ -62,12 +60,12 @@ public class EventTest extends AbstractXmlTest {
 
     private Event testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new Event(ID, DATA, META);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

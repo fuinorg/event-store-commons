@@ -17,13 +17,14 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests the {@link ProjectionJpaStreamId} class.
@@ -37,12 +38,12 @@ public class ProjectionJpaStreamIdTest {
 
     private ProjectionJpaStreamId testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new ProjectionJpaStreamId(NAME, TABLE_NAME);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }
@@ -62,9 +63,11 @@ public class ProjectionJpaStreamIdTest {
         assertThat(testee.getNativeTableName()).isEqualTo(TABLE_NAME);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetSingleParamValue() {
-        testee.getSingleParamValue();
+        assertThatThrownBy(() -> {
+            testee.getSingleParamValue();
+        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }
 // CHECKSTYLE:ON

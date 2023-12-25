@@ -17,26 +17,25 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-import static org.fuin.utils4j.Utils4J.deserialize;
-import static org.fuin.utils4j.Utils4J.serialize;
-
 import jakarta.activation.MimeTypeParseException;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.fuin.units4j.Units4JUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Tests the {@link Data} class.
@@ -53,12 +52,12 @@ public class DataTest extends AbstractXmlTest {
 
     private Data testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         testee = new Data(TYPE, MIME_TYPE, CONTENT);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

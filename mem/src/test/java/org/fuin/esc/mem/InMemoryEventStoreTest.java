@@ -17,30 +17,21 @@
  */
 package org.fuin.esc.mem;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.vo.KeyValue;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EscApiUtils;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link InMemoryEventStore} class.
@@ -50,13 +41,13 @@ public class InMemoryEventStoreTest {
 
     private InMemoryEventStore testee;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new InMemoryEventStore(Executors.newCachedThreadPool());
         testee.open();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee.close();
         testee = null;
@@ -220,7 +211,7 @@ public class InMemoryEventStoreTest {
     }
 
     // TODO Fix test
-    @Ignore("Unstable - Fails sometimes")
+    @Disabled("Unstable - Fails sometimes")
     @Test
     public void testSubscribeToStreamFromX() {
 

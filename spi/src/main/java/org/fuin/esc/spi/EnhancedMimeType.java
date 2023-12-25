@@ -17,16 +17,15 @@
  */
 package org.fuin.esc.spi;
 
+import jakarta.activation.MimeTypeParseException;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-
-import jakarta.activation.MimeTypeParseException;
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.objects4j.common.Nullable;
 
 /**
  * Enhances the {@link jakarta.activation.MimeType} class with convenience methods for accessing version and

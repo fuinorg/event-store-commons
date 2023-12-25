@@ -17,12 +17,11 @@
  */
 package org.fuin.esc.spi;
 
+import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.Contract;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import jakarta.validation.constraints.NotNull;
-
-import org.fuin.objects4j.common.Contract;
 
 /**
  * Contains all known serializers and deserializers.
