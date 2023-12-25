@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.eshttp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
 import org.junit.jupiter.api.Test;
 
 /**
