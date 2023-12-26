@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.fuin</groupId>
 		<artifactId>pom</artifactId>
-		<version>1.8.0-SNAPSHOT</version>
+		<version>1.9.0</version>
 	</parent>
 
 	<groupId>org.fuin.esc</groupId>
 	<artifactId>esc-parent</artifactId>
-	<version>0.5.1-SNAPSHOT</version>
+	<version>0.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>esc-parent</name>
 	<description>Defines a common event store Java interface and provides some adapters (like for Greg Young's event store) and implementations (like in-memory or file-based).</description>
@@ -29,6 +29,7 @@
 
 	<properties>
 		<eventstore.version>21.10.1-bionic</eventstore.version>
+		<failsafe.argLine>--add-opens java.base/java.util=ALL-UNNAMED</failsafe.argLine>
 	</properties>
 
 	<dependencyManagement>
@@ -80,13 +81,13 @@
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>utils4j</artifactId>
-				<version>0.12.1-SNAPSHOT</version>
+				<version>0.13.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.fuin</groupId>
 				<artifactId>objects4j</artifactId>
-				<version>0.8.1-SNAPSHOT</version>
+				<version>0.9.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -350,12 +351,43 @@
 					<artifactId>docker-maven-plugin</artifactId>
 					<version>0.38.1</version>
 				</plugin>
-				
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.2.3</version>
+					<configuration>
+						<argLine>${failsafe.argLine}</argLine>
+					</configuration>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<goals>
+								<goal>integration-test</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>verify</id>
+							<goals>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
 	    	</plugins>
 	    	
     	</pluginManagement>
 
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<groupId>org.jacoco</groupId>
