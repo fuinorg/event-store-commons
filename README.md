@@ -8,7 +8,8 @@ Defines a common event store Java interface and provides some adapters (like for
 [![Java Development Kit 11](https://img.shields.io/badge/JDK-11-green.svg)](https://openjdk.java.net/projects/jdk/11/)
 
 ## Versions
-- 0.5.x (or later) = **Java 11** with new **jakarta** namespace
+- 0.6.x (or later) = **Java 17**
+- 0.5.0 = **Java 11** with new **jakarta** namespace
 - 0.4.x = **Java 11** before namespace change from 'javax' to 'jakarta'
 - 0.3.2 (or less) = **Java 8**
 
@@ -41,11 +42,12 @@ Defines a common event store Java interface and provides some adapters (like for
 
 ### Major changes
 
-| Version | Description |
-|:------- |:----------- |
-| 0.5.1-SNAPSHOT | Added new GRPC java client implementation |
-| 0.5.0   | Namespace changed from "javax" to "jakarta" |
-| 0.3.1   | Type of the event version changed from `int` to `long` |
+| Version        | Description                                            |
+|:---------------|:-------------------------------------------------------|
+| 0.6.0-SNAPSHOT | Java 17 / Added new GRPC java client implementation    |
+| 0.5.0          | Namespace changed from "javax" to "jakarta"            |
+| 0.4.0          | Java 11                                                |
+| 0.3.1          | Type of the event version changed from `int` to `long` |
 
 ### Snapshots
 
