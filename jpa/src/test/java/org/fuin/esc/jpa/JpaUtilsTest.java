@@ -17,15 +17,15 @@
  */
 package org.fuin.esc.jpa;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.UUID;
-
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.jpa.examples.AggregateStreamId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 // CHECKSTYLE:OFF
 public final class JpaUtilsTest {
@@ -35,7 +35,7 @@ public final class JpaUtilsTest {
     public void testCamelCaseToUnderscore() {
 
         // TEST & VERIFY
-        assertThat(JpaUtils.camel2Underscore(null)).isEqualTo(null);
+        assertThat(JpaUtils.camel2Underscore(null)).isNull();
         assertThat(JpaUtils.camel2Underscore("")).isEqualTo("");
         assertThat(JpaUtils.camel2Underscore("a")).isEqualTo("a");
         assertThat(JpaUtils.camel2Underscore("ab")).isEqualTo("ab");

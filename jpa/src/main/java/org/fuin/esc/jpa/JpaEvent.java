@@ -17,27 +17,14 @@
  */
 package org.fuin.esc.jpa;
 
-import java.time.ZonedDateTime;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.fuin.esc.api.EventId;
-import org.fuin.objects4j.common.Nullable;
-
 import io.github.threetenjaxb.core.ZonedDateTimeXmlAdapter;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.fuin.esc.api.EventId;
+
+import java.time.ZonedDateTime;
 
 
 /**

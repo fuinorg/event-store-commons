@@ -1,7 +1,7 @@
 package org.fuin.esc.eshttp;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,9 +15,8 @@ import org.apache.http.message.BasicStatusLine;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link ESHttpEventStore} class.

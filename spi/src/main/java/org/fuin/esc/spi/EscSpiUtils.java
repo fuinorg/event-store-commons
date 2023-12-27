@@ -17,25 +17,24 @@
  */
 package org.fuin.esc.spi;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.objects4j.common.Contract;
+import org.w3c.dom.Node;
+
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.objects4j.common.Contract;
-import org.w3c.dom.Node;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Utilities to ease the implementation of service provider implementations.

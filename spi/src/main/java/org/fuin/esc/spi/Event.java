@@ -17,14 +17,12 @@
  */
 package org.fuin.esc.spi;
 
-import java.io.Serializable;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
@@ -32,8 +30,9 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.common.Nullable;
 import org.fuin.objects4j.vo.ValueObject;
+
+import java.io.Serializable;
 
 /**
  * Helper class that allows sending an event as XML directly to the event store.

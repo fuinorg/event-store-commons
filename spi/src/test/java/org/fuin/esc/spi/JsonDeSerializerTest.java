@@ -17,15 +17,14 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import jakarta.activation.MimeTypeParseException;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link JsonDeSerializer} class.
@@ -35,12 +34,12 @@ public class JsonDeSerializerTest {
 
     private JsonDeSerializer testee;
 
-    @Before
+    @BeforeEach
     public void setup() throws MimeTypeParseException {
         testee = new JsonDeSerializer();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

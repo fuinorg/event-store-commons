@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.api;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 /**
  * An event store that provides a projection administration API.

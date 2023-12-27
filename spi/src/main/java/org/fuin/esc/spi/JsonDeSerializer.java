@@ -17,18 +17,13 @@
  */
 package org.fuin.esc.spi;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.Charset;
-
 import jakarta.json.Json;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonWriter;
+
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Serializes and deserializes a JSON object. The content type for serialization is always "application/json".

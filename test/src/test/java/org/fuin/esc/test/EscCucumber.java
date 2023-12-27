@@ -3,6 +3,7 @@ package org.fuin.esc.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.fuin.esc.spi.EscSpiUtils;
@@ -106,7 +107,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
 
     @Override
     public List<FeatureRunner> getChildren() {
-        return children;
+        return Collections.unmodifiableList(children);
     }
 
     @Override

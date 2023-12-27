@@ -17,15 +17,15 @@
  */
 package org.fuin.esc.mem;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamId;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamId;
-import org.junit.Test;
 
 /**
  * Tests the class {@link InMemorySubscription}.

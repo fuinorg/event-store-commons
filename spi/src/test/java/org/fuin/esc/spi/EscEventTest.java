@@ -17,10 +17,14 @@
  */
 package org.fuin.esc.spi;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.bind.Jsonb;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.yasson.FieldAccessStrategy;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -29,15 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import jakarta.activation.MimeTypeParseException;
-import jakarta.json.Json;
-import jakarta.json.bind.Jsonb;
-
-import org.apache.commons.io.IOUtils;
-import org.eclipse.yasson.FieldAccessStrategy;
-import org.junit.Test;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.diff.Diff;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Test for {@link EscEvent} class.

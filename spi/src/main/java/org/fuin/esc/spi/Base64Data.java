@@ -17,18 +17,17 @@
  */
 package org.fuin.esc.spi;
 
-import java.nio.charset.Charset;
-
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlValue;
-
 import org.apache.commons.codec.binary.Base64;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+
+import java.nio.charset.Charset;
 
 /**
  * Contains some Base64 encoded data.

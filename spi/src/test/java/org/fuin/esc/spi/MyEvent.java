@@ -17,19 +17,17 @@
  */
 package org.fuin.esc.spi;
 
-import java.io.Serializable;
-import java.util.UUID;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
-import org.fuin.esc.api.TypeName;
-import org.fuin.objects4j.common.Contract;
-
 import jakarta.json.Json;
 import jakarta.json.JsonStructure;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.Contract;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.

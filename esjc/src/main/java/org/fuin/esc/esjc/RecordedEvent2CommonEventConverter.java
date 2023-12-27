@@ -17,24 +17,16 @@
  */
 package org.fuin.esc.esjc;
 
-import java.nio.charset.Charset;
-
+import com.github.msemys.esjc.RecordedEvent;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.Converter;
-import org.fuin.esc.spi.Deserializer;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.spi.*;
 import org.fuin.objects4j.common.Contract;
 
-import com.github.msemys.esjc.RecordedEvent;
+import java.nio.charset.Charset;
 
 /**
  * Converts a {@link RecordedEvent} into {@link CommonEvent}.

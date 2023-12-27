@@ -17,22 +17,19 @@
  */
 package org.fuin.esc.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-
-import jakarta.activation.MimeTypeParseException;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests the {@link StreamEventsSlice} class.
@@ -50,7 +47,7 @@ public class StreamEventsSliceTest {
 
     private StreamEventsSlice testee;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws MimeTypeParseException {
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
@@ -60,12 +57,12 @@ public class StreamEventsSliceTest {
         events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Mary Jane"), metaType, meta));
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         testee = new StreamEventsSlice(FROM, events, NEXT, EOS);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         testee = null;
     }

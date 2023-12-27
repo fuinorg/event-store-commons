@@ -17,21 +17,20 @@
  */
 package org.fuin.esc.jpa;
 
-import java.io.Serializable;
-import java.util.Arrays;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlInlineBinaryData;
-
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
+
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Represents a block of data in a serialized form.

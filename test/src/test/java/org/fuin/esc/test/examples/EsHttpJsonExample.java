@@ -1,29 +1,17 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import org.fuin.esc.api.*;
+import org.fuin.esc.eshttp.ESEnvelopeType;
+import org.fuin.esc.eshttp.ESHttpEventStore;
+import org.fuin.esc.spi.*;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.TypeName;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStore;
-import org.fuin.esc.spi.EscEvents;
-import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
 
 /**
  * Event Store (https://geteventstore.com/) HTTP JSON example.

@@ -17,12 +17,13 @@
  */
 package org.fuin.esc.spi;
 
+import org.fuin.objects4j.common.ConstraintViolationException;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.fuin.utils4j.Utils4J.deserialize;
 import static org.fuin.utils4j.Utils4J.serialize;
-
-import org.fuin.objects4j.common.ConstraintViolationException;
-import org.junit.Test;
 
 // CHECKSTYLE:OFF Test code
 public final class SerializedDataTypeTest {
@@ -42,15 +43,19 @@ public final class SerializedDataTypeTest {
         assertThat(new SerializedDataType(name).length()).isEqualTo(name.length());
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public final void testConstructNullString() {
-        new SerializedDataType(null);
+        assertThatThrownBy(() -> {
+            new SerializedDataType(null);
+        }).isInstanceOf(ConstraintViolationException.class);
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public final void testConstructEmpty() {
-        new SerializedDataType("");
-    }
+        assertThatThrownBy(() -> {
+            new SerializedDataType("");
+        }).isInstanceOf(ConstraintViolationException.class);
+}
 
 }
 // CHECKSTYLE:ON

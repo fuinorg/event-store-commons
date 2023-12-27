@@ -17,9 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import java.lang.reflect.Type;
-
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
@@ -34,9 +32,10 @@ import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+
+import java.lang.reflect.Type;
 
 /**
  * A structure that contains the user's meta data and the system's meta information.

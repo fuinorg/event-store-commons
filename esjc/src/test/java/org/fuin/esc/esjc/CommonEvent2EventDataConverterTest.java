@@ -17,24 +17,18 @@
  */
 package org.fuin.esc.esjc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.charset.Charset;
-
+import com.github.msemys.esjc.EventData;
 import jakarta.json.Json;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
-import org.junit.Test;
+import org.fuin.esc.spi.*;
+import org.junit.jupiter.api.Test;
 
-import com.github.msemys.esjc.EventData;
+import java.nio.charset.Charset;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test for {@link CommonEvent2EventDataConverter} class.

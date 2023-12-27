@@ -25,7 +25,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;
 
-import org.fuin.objects4j.common.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.json.bind.annotation.JsonbProperty;
 
 /**

@@ -1,14 +1,13 @@
 // CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
-import java.io.Serializable;
-
+import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.objects4j.common.Nullable;
+
+import java.io.Serializable;
 
 /**
  * Example meta data.

@@ -17,14 +17,13 @@
  */
 package org.fuin.esc.api;
 
-import java.util.Collections;
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.KeyValue;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Stream identifier that is based on a name.

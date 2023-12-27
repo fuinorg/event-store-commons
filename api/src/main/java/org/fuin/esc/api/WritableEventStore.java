@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.api;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 /**
  * Interface for writing events to an event store synchronously. Calling any

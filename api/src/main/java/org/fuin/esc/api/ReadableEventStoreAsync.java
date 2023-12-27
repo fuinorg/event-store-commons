@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.api;
 
-import java.util.concurrent.CompletableFuture;
-
 import jakarta.validation.constraints.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for reading events from an event store asynchronously. Calling any
