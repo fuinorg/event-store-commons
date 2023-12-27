@@ -11,7 +11,7 @@
 
 	<groupId>org.fuin.esc</groupId>
 	<artifactId>esc-parent</artifactId>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>esc-parent</name>
 	<description>Defines a common event store Java interface and provides some adapters (like for Greg Young's event store) and implementations (like in-memory or file-based).</description>
