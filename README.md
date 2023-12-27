@@ -44,7 +44,7 @@ Defines a common event store Java interface and provides some adapters (like for
 
 | Version        | Description                                            |
 |:---------------|:-------------------------------------------------------|
-| 0.6.0-SNAPSHOT | Java 17 / Added new GRPC java client implementation    |
+| 0.6.0 | Java 17 / Added new GRPC java client implementation    |
 | 0.5.0          | Namespace changed from "javax" to "jakarta"            |
 | 0.4.0          | Java 11                                                |
 | 0.3.1          | Type of the event version changed from `int` to `long` |
