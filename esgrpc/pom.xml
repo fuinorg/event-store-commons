@@ -188,7 +188,7 @@
 					</includes>
 					<archive>
 						<manifestEntries>
-							<Automatic-Module-Name>org.fuin.esc.esjc</Automatic-Module-Name>
+							<Automatic-Module-Name>org.fuin.esc.esgrpc</Automatic-Module-Name>
 						</manifestEntries>
 					</archive>
 				</configuration>
