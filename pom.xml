@@ -332,6 +332,7 @@
 	<modules>
 		<module>api</module>
 		<module>spi</module>
+		<module>admin</module>
 		<module>mem</module>
 		<module>jpa</module>
 		<module>eshttp</module>

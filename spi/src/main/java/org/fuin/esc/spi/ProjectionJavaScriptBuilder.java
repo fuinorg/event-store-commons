@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.eshttp;
+package org.fuin.esc.spi;
 
 import java.util.List;
 
@@ -23,7 +23,6 @@ import jakarta.validation.constraints.NotNull;
 
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.Contract;
 
 /**
