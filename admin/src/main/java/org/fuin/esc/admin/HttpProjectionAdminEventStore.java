@@ -37,11 +37,25 @@ public final class HttpProjectionAdminEventStore implements ProjectionAdminEvent
 
     private final Duration timeout;
 
+    /**
+     * Constructor with mandatory data.
+     *
+     * @param httpClient HTTP client to use.
+     * @param url Eventstore base URL like "http://127.0.0.1:2113".
+     */
     public HttpProjectionAdminEventStore(@NotNull final HttpClient httpClient,
                                          @NotNull final URL url) {
         this(httpClient, url, null, null);
     }
 
+    /**
+     * Constructor with all data.
+     *
+     * @param httpClient HTTP client to use.
+     * @param url Eventstore base URL like "http://127.0.0.1:2113".
+     * @param tenantId Tenant ID or {@literal null}.
+     * @param timeout Timeout to use for connections or {@literal null} (defaults to 10 seconds).
+     */
     public HttpProjectionAdminEventStore(@NotNull final HttpClient httpClient,
                                          @NotNull final URL url,
                                          @Nullable final TenantId tenantId,
@@ -158,6 +172,8 @@ public final class HttpProjectionAdminEventStore implements ProjectionAdminEvent
     public void deleteProjection(StreamId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
+
+        disableProjection(projectionId);
 
         final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
         final String msg = "deleteProjection(" + pid + ")";
