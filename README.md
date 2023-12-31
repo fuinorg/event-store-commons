@@ -8,8 +8,9 @@ Defines a common event store Java interface and provides some adapters (like for
 [![Java Development Kit 17](https://img.shields.io/badge/JDK-17-green.svg)](https://openjdk.java.net/projects/jdk/17/)
 
 ## Versions
-- 0.6.x (or later) = **Java 17**
-- 0.5.0 = **Java 11** with new **jakarta** namespace
+- 0.7.x = New **GRPC** client / Removed **http**/**esjc** modules 
+- 0.6.x = **Java 17** and JUnit5
+- 0.5.x = **Java 11** with new **jakarta** namespace
 - 0.4.x = **Java 11** before namespace change from 'javax' to 'jakarta'
 - 0.3.2 (or less) = **Java 8**
 
@@ -46,15 +47,6 @@ Deprecated modules:
 - [Event store with HTTP interface and XML (JAX-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpXmlExample.java)
 - [Event store with HTTP interface and JSON (JSON-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonbExample.java)
 - [Event store with HTTP interface and mixed JSON/XML content (JAX-B/JSON-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpMixedExample.java)
-
-### Major changes
-
-| Version | Description                                            |
-|:--------|:-------------------------------------------------------|
-| 0.6.0   | Java 17 / Added new GRPC java client implementation    |
-| 0.5.0   | Namespace changed from "javax" to "jakarta"            |
-| 0.4.0   | Java 11                                                |
-| 0.3.1   | Type of the event version changed from `int` to `long` |
 
 ### Snapshots
 
