@@ -17,22 +17,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import static org.fuin.esc.api.ExpectedVersion.ANY;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -52,31 +37,26 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.util.EntityUtils;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamReadOnlyException;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.TypeName;
-import org.fuin.esc.api.WrongExpectedVersionException;
-import org.fuin.esc.spi.AbstractReadableEventStore;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerDeserializerRegistry;
-import org.fuin.esc.spi.SerializerRegistry;
-import org.fuin.esc.spi.TenantStreamId;
+import org.fuin.esc.api.*;
+import org.fuin.esc.spi.*;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+
+import static org.fuin.esc.api.ExpectedVersion.ANY;
 
 /**
  * Implementation that connects to the http://www.geteventstore.com via HTTP API.

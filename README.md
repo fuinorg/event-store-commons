@@ -20,16 +20,23 @@ Defines a common event store Java interface and provides some adapters (like for
 ## Status
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
-| Module | Description | Status | Comment |
-|:-------|:------------|--------|:--------|
-| [esc-api](api) | Defines the event store commons API. | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~92% |
-| [esc-http](eshttp) | HTTP adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~66% |
-| [esc-esjc](esjc) | [Event Store Java Client](https://github.com/msemys/esjc) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80% |
-| [esc-grpc](grpc) | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) adapter for Greg Young's [event store](https://www.geteventstore.com/)| ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80% |
-| [esc-jpa](jpa) | JPA adapter | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~59% |
-| [esc-mem](mem) | In-memory implementation | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60% |
-| [esc-spi](spi) | Helper classes for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~67% |
-| [esc-test](test) | Cucumber tests for adapters and implementations | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Subscriptions not tested yet |
+| Module                  | Description                                                                                                                                            | Status | Comment                      |
+|:------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|--------|:-----------------------------|
+| [esc-api](api)          | Defines the event store commons API.                                                                                                                   | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~92%           |
+| [esc-http-admin](admin) | HTTP projection admin adapter for Greg Young's [event store](https://www.geteventstore.com/)                                                           | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80%           |
+| [esc-grpc](grpc)        | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) adapter for Greg Young's [event store](https://www.geteventstore.com/) | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~80%           |
+| [esc-jpa](jpa)          | JPA adapter                                                                                                                                            | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~59%           |
+| [esc-mem](mem)          | In-memory implementation                                                                                                                               | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~60%           |
+| [esc-spi](spi)          | Helper classes for adapters and implementations                                                                                                        | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Test coverage ~67%           |
+| [esc-test](test)        | Cucumber tests for adapters and implementations                                                                                                        | ![OK](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/ok.png) | Subscriptions not tested yet |
+
+Deprecated modules:
+
+| Module             | Description                                                  | Comment                                               |
+|:-------------------|:-------------------------------------------------------------|:------------------------------------------------------|
+| [esc-http](eshttp) | HTTP adapter for Greg Young's event store                    | No longer supported by event store (use GRPC instead) |
+| [esc-esjc](esjc)   | Event Store Java Client adapter for Greg Young's event store | No longer supported by event store (use GRPC instead) |
+
 
 ## Architecture
 ![Layers](https://raw.github.com/fuinorg/event-store-commons/master/doc/event-store-commons.png)
@@ -42,12 +49,12 @@ Defines a common event store Java interface and provides some adapters (like for
 
 ### Major changes
 
-| Version        | Description                                            |
-|:---------------|:-------------------------------------------------------|
-| 0.6.0 | Java 17 / Added new GRPC java client implementation    |
-| 0.5.0          | Namespace changed from "javax" to "jakarta"            |
-| 0.4.0          | Java 11                                                |
-| 0.3.1          | Type of the event version changed from `int` to `long` |
+| Version | Description                                            |
+|:--------|:-------------------------------------------------------|
+| 0.6.0   | Java 17 / Added new GRPC java client implementation    |
+| 0.5.0   | Namespace changed from "javax" to "jakarta"            |
+| 0.4.0   | Java 11                                                |
+| 0.3.1   | Type of the event version changed from `int` to `long` |
 
 ### Snapshots
 
