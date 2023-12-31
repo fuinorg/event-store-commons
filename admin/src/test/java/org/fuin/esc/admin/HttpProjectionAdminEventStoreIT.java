@@ -42,14 +42,14 @@ class HttpProjectionAdminEventStoreIT {
 
     @Test
     void testProjectionNotExists() {
-        assertThat(testee.projectionExists(new ProjectionStreamId("test-not-existing"))).isFalse();
+        assertThat(testee.projectionExists(new ProjectionStreamId("http-test-not-existing"))).isFalse();
     }
 
     @Test
     void testEnableDisableProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("test-disabled");
+        final ProjectionStreamId projectionId = new ProjectionStreamId("http-test-disabled");
         testee.createProjection(projectionId, false, new TypeName("one"), new TypeName("two"));
 
         // WHEN
@@ -64,7 +64,7 @@ class HttpProjectionAdminEventStoreIT {
     void testCreateAndExistsProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("test-create");
+        final ProjectionStreamId projectionId = new ProjectionStreamId("http-test-create");
         assertThat(testee.projectionExists(projectionId)).isFalse();
 
         // WHEN
@@ -79,7 +79,7 @@ class HttpProjectionAdminEventStoreIT {
     void testDeleteProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("test-delete");
+        final ProjectionStreamId projectionId = new ProjectionStreamId("http-test-delete");
         testee.createProjection(projectionId, false, new TypeName("one"), new TypeName("two"));
         assertThat(testee.projectionExists(projectionId)).isTrue();
 
