@@ -1,5 +1,8 @@
 package org.fuin.esc.api;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
 import java.lang.annotation.*;
 
 /**
@@ -10,7 +13,8 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SerializedDataTypeConstant {
+@Constraint(validatedBy = { HasSerializedDataTypeConstantValidator.class })
+public @interface HasSerializedDataTypeConstant {
 
     /**
      * Returns the name of a public static constant in the annotated class.
@@ -18,5 +22,11 @@ public @interface SerializedDataTypeConstant {
      * @return Name of the public static constant.
      */
     String value() default "SER_TYPE";
+
+    String message() default "Does not define a public static constant with the given name";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 
 }
