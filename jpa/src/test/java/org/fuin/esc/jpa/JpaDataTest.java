@@ -20,7 +20,7 @@ package org.fuin.esc.jpa;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.units4j.AbstractPersistenceTest;
 import org.junit.jupiter.api.Test;
 

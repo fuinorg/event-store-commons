@@ -19,6 +19,9 @@ package org.fuin.esc.spi;
 
 import jakarta.xml.bind.*;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerDeserializer;
+import org.fuin.esc.api.SerializedDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;

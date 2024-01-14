@@ -28,9 +28,9 @@ import org.fuin.esc.eshttp.ESEnvelopeType;
 import org.fuin.esc.eshttp.ESHttpEventStore;
 import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 
 /**
  * Event Store (https://geteventstore.com/) HTTP example with tenants.

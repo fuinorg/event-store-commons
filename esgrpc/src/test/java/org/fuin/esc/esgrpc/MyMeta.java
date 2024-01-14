@@ -27,11 +27,11 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerDeserializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.ToJsonCapable;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerDeserializer;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.ToJsonCapable;
 import jakarta.annotation.Nullable;
 
 /**

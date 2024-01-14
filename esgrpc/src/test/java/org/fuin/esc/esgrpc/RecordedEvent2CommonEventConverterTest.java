@@ -32,10 +32,10 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.Base64Data.Base64DataJsonDeSerializer;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscMetaJsonDeSerializer;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
 import org.junit.jupiter.api.Test;
 

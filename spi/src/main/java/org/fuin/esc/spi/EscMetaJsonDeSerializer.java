@@ -18,6 +18,10 @@
 package org.fuin.esc.spi;
 
 import jakarta.json.JsonObject;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerDeserializer;
+import org.fuin.esc.api.SerializedDataType;
 
 import java.nio.charset.Charset;
 

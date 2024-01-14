@@ -30,11 +30,11 @@ import jakarta.activation.MimeTypeParseException;
 import jakarta.json.JsonObject;
 import javax.xml.xpath.XPath;
 
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

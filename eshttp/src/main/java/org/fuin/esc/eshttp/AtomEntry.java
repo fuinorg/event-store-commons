@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.eshttp;
 
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 
 /**
  * Container for different result types.

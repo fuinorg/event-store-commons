@@ -33,9 +33,9 @@ import jakarta.json.JsonWriter;
 import jakarta.json.stream.JsonGenerator;
 
 import org.apache.commons.io.IOUtils;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.api.SerializedDataType;
 
 /**
  * Base class for {@link ESHttpMarshaller} implementation tests.

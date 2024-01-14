@@ -20,7 +20,7 @@ package org.fuin.esc.jpa;
 import jakarta.persistence.TypedQuery;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.units4j.AbstractPersistenceTest;
 import org.junit.jupiter.api.Test;
 

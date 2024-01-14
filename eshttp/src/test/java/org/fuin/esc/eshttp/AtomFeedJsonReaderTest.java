@@ -27,7 +27,7 @@ import java.util.List;
 
 import jakarta.json.JsonObject;
 
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.junit.jupiter.api.Test;
 
 /**

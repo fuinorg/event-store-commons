@@ -21,7 +21,7 @@ import jakarta.annotation.Nullable;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
 import org.w3c.dom.Node;
 

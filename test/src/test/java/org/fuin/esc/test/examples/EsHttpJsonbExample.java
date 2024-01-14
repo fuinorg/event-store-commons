@@ -21,11 +21,11 @@ import org.fuin.esc.spi.EscEvent;
 import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.JsonbDeSerializer;
-import org.fuin.esc.spi.SerDeserializerRegistry;
-import org.fuin.esc.spi.SerializedDataTypeRegistry;
-import org.fuin.esc.spi.SimpleSerializedDataTypeRegistry;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.JsonbDeSerializer;
+import org.fuin.esc.api.SerDeserializerRegistry;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 
 /**
  * Event Store (https://geteventstore.com/) HTTP JSON-B example.

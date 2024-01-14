@@ -21,13 +21,13 @@ import java.nio.charset.Charset;
 
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.Converter;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.Converter;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.Serializer;
-import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.Serializer;
+import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 
 import com.eventstore.dbclient.EventData;

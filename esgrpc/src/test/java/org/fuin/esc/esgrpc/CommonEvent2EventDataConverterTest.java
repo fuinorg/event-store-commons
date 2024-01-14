@@ -27,11 +27,11 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.JsonDeSerializer;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.junit.jupiter.api.Test;
 
 import com.eventstore.dbclient.EventData;

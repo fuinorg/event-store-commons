@@ -15,11 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 /**
- * Convenience interface that combined a serializer and deserializer.
+ * Convenience interface that combines both registry types.
  */
-public interface SerDeserializer extends Serializer, Deserializer {
+public interface SerDeserializerRegistry extends SerializerRegistry,
+        DeserializerRegistry {
 
 }

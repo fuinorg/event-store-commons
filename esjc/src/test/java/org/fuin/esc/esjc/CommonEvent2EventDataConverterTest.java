@@ -19,10 +19,7 @@ package org.fuin.esc.esjc;
 
 import com.github.msemys.esjc.EventData;
 import jakarta.json.Json;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.*;
 import org.junit.jupiter.api.Test;
 

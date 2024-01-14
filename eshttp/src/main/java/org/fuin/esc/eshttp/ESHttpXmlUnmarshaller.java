@@ -20,10 +20,10 @@ package org.fuin.esc.eshttp;
 import static org.fuin.esc.spi.EscSpiUtils.nodeToString;
 
 import org.apache.commons.codec.binary.Base64;
-import org.fuin.esc.spi.Deserializer;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

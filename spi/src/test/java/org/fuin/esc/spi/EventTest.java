@@ -20,6 +20,7 @@ package org.fuin.esc.spi;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

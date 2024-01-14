@@ -15,31 +15,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.jpa;
+package org.fuin.esc.api;
 
-import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.SerializerRegistry;
 
 /**
- * Read only JPA implementation of the event store.
+ * Locates a serializer for a given type.
  */
-public final class ReadableJpaEventStore extends AbstractJpaEventStore {
+public interface SerializerRegistry {
 
     /**
-     * Constructor with all mandatory data.
+     * Tries to find a serializer for the given type.
      * 
-     * @param em
-     *            Entity manager.
-     * @param serRegistry
-     *            Registry used to locate serializers.
-     * @param desRegistry
-     *            Registry used to locate deserializers.
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return Serializer instance or throws a {@link IllegalArgumentException} if no serializer was found.
      */
-    public ReadableJpaEventStore(@NotNull final EntityManager em,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
-        super(em, serRegistry, desRegistry);
-    }
+    @NotNull
+    public Serializer getSerializer(@NotNull SerializedDataType type);
+
+    /**
+     * Tries to find a serializer for the given type.
+     * 
+     * @param type
+     *            Unique identifier for the type of data.
+     * 
+     * @return TRUE if a serializer was found for the type.
+     */
+    public boolean serializerExists(@NotNull SerializedDataType type);
 
 }

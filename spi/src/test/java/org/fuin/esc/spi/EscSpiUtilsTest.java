@@ -24,10 +24,7 @@ import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;

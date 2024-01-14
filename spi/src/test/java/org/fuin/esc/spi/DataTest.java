@@ -25,6 +25,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.units4j.Units4JUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

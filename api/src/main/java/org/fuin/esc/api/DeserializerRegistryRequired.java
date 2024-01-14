@@ -1,4 +1,4 @@
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 /**
  * Marker for instances that need to have a {@link DeserializerRegistry} to function correctly. Allows late configuration in some rare edge

@@ -15,22 +15,37 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
-
-import jakarta.json.JsonStructure;
-import jakarta.validation.constraints.NotNull;
+package org.fuin.esc.api;
 
 /**
- * Marks an object that can be converted into a JSON object or array.
+ * Converts a type into another one.
+ * 
+ * @param <SOURCE> Source type.
+ * @param <TARGET> Target type.
  */
-public interface ToJsonCapable {
+public interface Converter<SOURCE, TARGET> {
 
     /**
-     * Returns the instance as JSON structure.
+     * Returns the source type.
      * 
-     * @return JSON representation of the instance.
+     * @return Input type.
      */
-    @NotNull
-    public JsonStructure toJson();
+    public Class<SOURCE> getSourceType();
 
+    /**
+     * Returns the target type.
+     * 
+     * @return Output type.
+     */
+    public Class<TARGET> getTargetType();
+    
+    /**
+     * Converts the given source type into the target type.
+     * 
+     * @param source Type to convert.
+     * 
+     * @return Converted type.
+     */
+    public TARGET convert(SOURCE source);
+    
 }

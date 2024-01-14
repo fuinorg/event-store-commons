@@ -15,24 +15,37 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.SerializedDataType;
 
 /**
- * Locates a class for a given type.
+ * Serializes an object.
  */
-public interface SerializedDataTypeRegistry {
+public interface Serializer {
 
     /**
-     * Tries to find a class for the given type.
+     * Returns the mime type used to serialize the object.
      * 
+     * @return Content type information.
+     */
+    public EnhancedMimeType getMimeType();
+
+    /**
+     * Converts the given object into a byte representation.
+     * 
+     * @param obj
+     *            Object to serialize.
      * @param type
-     *            Unique identifier for the type of data.
+     *            Type of event.
      * 
-     * @return Class or throws a {@link IllegalArgumentException} if no class was found for that type.
+     * @return Serialized object.
+     * 
+     * @param <T>
+     *            Type the data is converted into.
      */
     @NotNull
-    public Class<?> findClass(@NotNull SerializedDataType type);
-    
+    public <T> byte[] marshal(@NotNull T obj, @NotNull SerializedDataType type);
+
 }

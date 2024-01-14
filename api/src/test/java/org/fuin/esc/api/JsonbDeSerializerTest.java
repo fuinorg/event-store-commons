@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
+import org.fuin.esc.api.JsonbDeSerializer;
 import org.fuin.units4j.TestOmitted;
 
 /**

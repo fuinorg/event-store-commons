@@ -32,7 +32,7 @@ import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
 
 import java.lang.reflect.Type;

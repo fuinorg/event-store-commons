@@ -15,37 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 /**
- * Converts a type into another one.
- * 
- * @param <SOURCE> Source type.
- * @param <TARGET> Target type.
+ * Convenience interface that combined a serializer and deserializer.
  */
-public interface Converter<SOURCE, TARGET> {
+public interface SerDeserializer extends Serializer, Deserializer {
 
-    /**
-     * Returns the source type.
-     * 
-     * @return Input type.
-     */
-    public Class<SOURCE> getSourceType();
-
-    /**
-     * Returns the target type.
-     * 
-     * @return Output type.
-     */
-    public Class<TARGET> getTargetType();
-    
-    /**
-     * Converts the given source type into the target type.
-     * 
-     * @param source Type to convert.
-     * 
-     * @return Converted type.
-     */
-    public TARGET convert(SOURCE source);
-    
 }

@@ -29,7 +29,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.spi.Data;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.Event;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -21,10 +21,10 @@ import jakarta.json.JsonObject;
 
 import org.apache.commons.codec.binary.Base64;
 import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.Deserializer;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 
 /**
  * Unmarshals data in JSON format after reading it from the event store.

@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
 
 import jakarta.activation.MimeTypeParseException;
 
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -18,6 +18,8 @@
 package org.fuin.esc.spi;
 
 import jakarta.activation.MimeTypeParseException;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

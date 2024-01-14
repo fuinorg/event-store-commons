@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.spi.DeserializerRegistry;
+import org.fuin.esc.api.DeserializerRegistry;
 
 /**
  * Reads and an Atom feed.

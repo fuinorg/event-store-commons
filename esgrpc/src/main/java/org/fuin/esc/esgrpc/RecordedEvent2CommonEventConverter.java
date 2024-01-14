@@ -24,12 +24,12 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.spi.Converter;
-import org.fuin.esc.spi.Deserializer;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.Converter;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
 
 import com.eventstore.dbclient.RecordedEvent;

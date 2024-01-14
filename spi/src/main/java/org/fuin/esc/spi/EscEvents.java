@@ -27,7 +27,7 @@ import jakarta.json.stream.JsonParser;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
 
 import java.lang.reflect.Type;

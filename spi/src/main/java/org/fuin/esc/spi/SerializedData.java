@@ -18,6 +18,8 @@
 package org.fuin.esc.spi;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.vo.ValueObject;
@@ -63,7 +65,7 @@ public class SerializedData implements ValueObject, Serializable {
      *            Raw data block.
      */
     public SerializedData(@NotNull final SerializedDataType type,
-            @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
+                          @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
         Contract.requireArgNotNull("type", type);

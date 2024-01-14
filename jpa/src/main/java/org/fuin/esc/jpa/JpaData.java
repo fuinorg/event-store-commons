@@ -23,7 +23,7 @@ import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlInlineBinaryData;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;

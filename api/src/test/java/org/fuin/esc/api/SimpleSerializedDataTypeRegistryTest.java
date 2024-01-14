@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

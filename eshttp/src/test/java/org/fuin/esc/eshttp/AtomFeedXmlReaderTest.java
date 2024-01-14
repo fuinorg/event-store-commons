@@ -25,7 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;

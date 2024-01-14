@@ -19,9 +19,9 @@ package org.fuin.esc.eshttp;
 
 import jakarta.validation.constraints.NotNull;
 
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.EnhancedMimeType;
-import org.fuin.esc.spi.SerializedDataType;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 import jakarta.annotation.Nullable;
 
 /**

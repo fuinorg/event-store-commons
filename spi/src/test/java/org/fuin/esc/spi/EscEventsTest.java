@@ -21,6 +21,7 @@ import jakarta.activation.MimeTypeParseException;
 import jakarta.json.bind.Jsonb;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.yasson.FieldAccessStrategy;
+import org.fuin.esc.api.*;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -164,8 +165,8 @@ public class EscEventsTest {
      * @param jsonbDeSer 
      *            JSON-B serializer/deserializer to use.
      */
-    private static void initSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry, 
-            JsonbDeSerializer jsonbDeSer) {
+    private static void initSerDeserializerRegistry(SerializedDataTypeRegistry typeRegistry,
+                                                    JsonbDeSerializer jsonbDeSer) {
         
         SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
 

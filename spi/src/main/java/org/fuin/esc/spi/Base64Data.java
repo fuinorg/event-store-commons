@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlValue;
 import org.apache.commons.codec.binary.Base64;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
 
 import java.nio.charset.Charset;

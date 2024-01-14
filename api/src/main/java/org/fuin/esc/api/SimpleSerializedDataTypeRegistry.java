@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.HashMap;

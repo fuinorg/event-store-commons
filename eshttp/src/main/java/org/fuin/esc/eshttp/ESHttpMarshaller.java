@@ -25,14 +25,14 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.spi.Base64Data;
 import org.fuin.esc.spi.DataWrapper;
-import org.fuin.esc.spi.EnhancedMimeType;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.EscEvent;
 import org.fuin.esc.spi.EscEvents;
 import org.fuin.esc.spi.EscMeta;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.SerializedDataType;
-import org.fuin.esc.spi.Serializer;
-import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.Serializer;
+import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.objects4j.common.Contract;
 
 /**

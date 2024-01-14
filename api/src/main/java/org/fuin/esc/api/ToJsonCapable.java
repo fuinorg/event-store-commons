@@ -15,12 +15,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
+
+import jakarta.json.JsonStructure;
+import jakarta.validation.constraints.NotNull;
 
 /**
- * Convenience interface that combines both registry types.
+ * Marks an object that can be converted into a JSON object or array.
  */
-public interface SerDeserializerRegistry extends SerializerRegistry,
-        DeserializerRegistry {
+public interface ToJsonCapable {
+
+    /**
+     * Returns the instance as JSON structure.
+     * 
+     * @return JSON representation of the instance.
+     */
+    @NotNull
+    public JsonStructure toJson();
 
 }

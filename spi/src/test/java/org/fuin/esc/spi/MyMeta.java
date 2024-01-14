@@ -23,6 +23,8 @@ import jakarta.json.JsonStructure;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.ToJsonCapable;
 import org.fuin.esc.api.TypeName;
 
 import java.io.Serializable;

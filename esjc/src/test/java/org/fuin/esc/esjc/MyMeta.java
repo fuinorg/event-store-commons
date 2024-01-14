@@ -23,8 +23,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.*;
+import org.fuin.esc.api.*;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
