@@ -102,7 +102,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void createProjection(StreamId projectionId, boolean enable, @NotNull TypeName... eventType) throws StreamAlreadyExistsException {
+    public void createProjection(StreamId projectionId, boolean enable, TypeName... eventType) throws StreamAlreadyExistsException {
         createProjection(projectionId, enable, Arrays.asList(eventType));
     }
 
