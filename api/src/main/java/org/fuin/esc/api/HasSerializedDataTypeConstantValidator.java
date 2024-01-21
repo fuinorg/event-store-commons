@@ -75,7 +75,7 @@ public class HasSerializedDataTypeConstantValidator implements ConstraintValidat
         if (result.message() == null) {
             return (SerializedDataType) result.value();
         }
-        throw new IllegalArgumentException(result.message());
+        throw new IllegalArgumentException(result.message() + " (" + clasz + ")");
     }
 
 }

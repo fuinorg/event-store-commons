@@ -39,6 +39,7 @@ import java.util.UUID;
 /**
  * An event structure.
  */
+@HasSerializedDataTypeConstant
 @XmlRootElement(name = EscEvent.EL_ROOT_NAME)
 public final class EscEvent implements ToJsonCapable {
 

@@ -40,6 +40,7 @@ import java.util.List;
 /**
  * A list of events.
  */
+@HasSerializedDataTypeConstant
 @XmlRootElement(name = EscEvents.EL_ROOT_NAME)
 public final class EscEvents implements ToJsonCapable {
 

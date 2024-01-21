@@ -40,6 +40,7 @@ import java.lang.reflect.Type;
 /**
  * A structure that contains the user's meta data and the system's meta information.
  */
+@HasSerializedDataTypeConstant
 @XmlRootElement(name = EscMeta.EL_ROOT_NAME)
 public final class EscMeta implements ToJsonCapable {
 

@@ -325,6 +325,12 @@
 				<version>4.0.1</version>
 			</dependency>
 
+			<dependency>
+				<groupId>io.smallrye</groupId>
+				<artifactId>jandex</artifactId>
+				<version>3.1.2</version>
+			</dependency>
+
 		</dependencies>
 
 	</dependencyManagement>

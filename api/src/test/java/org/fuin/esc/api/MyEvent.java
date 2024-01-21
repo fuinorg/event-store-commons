@@ -4,7 +4,10 @@ package org.fuin.esc.api;
 /**
  * Example event.
  */
+@HasSerializedDataTypeConstant
 public class MyEvent {
+
+    public static final SerializedDataType SER_TYPE = new SerializedDataType("MyEvent");
 
     private String name;
 

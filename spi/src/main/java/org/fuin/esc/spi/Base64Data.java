@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 /**
  * Contains some Base64 encoded data.
  */
+@HasSerializedDataTypeConstant
 @XmlRootElement(name = Base64Data.EL_ROOT_NAME)
 public final class Base64Data implements ToJsonCapable {
 
