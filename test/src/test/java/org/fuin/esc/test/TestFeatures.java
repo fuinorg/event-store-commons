@@ -40,9 +40,6 @@ import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.esgrpc.ESGrpcEventStore;
-import org.fuin.esc.eshttp.ESEnvelopeType;
-import org.fuin.esc.eshttp.ESHttpEventStore;
-import org.fuin.esc.esjc.ESJCEventStore;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.mem.InMemoryEventStore;
 import org.fuin.esc.spi.Base64Data;
@@ -120,22 +117,9 @@ public class TestFeatures {
 			registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
 			registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
 			registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
-			if (currentEventStoreImplType.equals("eshttp")) {
-				final ThreadFactory threadFactory = Executors.defaultThreadFactory();
-				final URL url = new URL("http://127.0.0.1:2113/");
-				eventStore = new ESHttpEventStore.Builder().threadFactory(threadFactory).url(url)
-						.envelopeType(ESEnvelopeType.XML).serDesRegistry(registry)
-						.credentialsProvider(credentialsProvider).build();
-			} else if (currentEventStoreImplType.equals("jpa")) {
+			if (currentEventStoreImplType.equals("jpa")) {
 				setupDb();
 				eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
-			} else if (currentEventStoreImplType.equals("esjc")) {
-				final com.github.msemys.esjc.EventStore es = EventStoreBuilder.newBuilder()
-						.userCredentials(credentials.getUserName(), credentials.getPassword())
-						.singleNodeAddress("127.0.0.1", 1113).build();
-				eventStore = new ESJCEventStore.Builder().eventStore(es).serDesRegistry(registry)
-						.targetContentType(EnhancedMimeType.create("application", "xml", Charset.forName("utf-8")))
-						.build();
 			} else if (currentEventStoreImplType.equals("esgrpc")) {
 				final EventStoreDBClientSettings setts = EventStoreDBConnectionString
 						.parseOrThrow("esdb://localhost:2113?tls=false");

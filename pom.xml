@@ -242,13 +242,13 @@
 			</dependency>
 
 			<dependency>
-				<groupId>info.cukes</groupId>
+				<groupId>io.cucumber</groupId>
 				<artifactId>cucumber-java</artifactId>
 				<version>1.2.6</version>
 			</dependency>
 
 			<dependency>
-				<groupId>info.cukes</groupId>
+				<groupId>io.cucumber</groupId>
 				<artifactId>cucumber-junit</artifactId>
 				<version>1.2.6</version>
 			</dependency>
@@ -340,8 +340,6 @@
 		<module>spi</module>
 		<module>mem</module>
 		<module>jpa</module>
-		<module>eshttp</module>
-		<module>esjc</module>
 		<module>esgrpc</module>
 		<module>test</module>
 	</modules>
