@@ -20,7 +20,7 @@ package org.fuin.esc.mem;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

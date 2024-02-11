@@ -27,7 +27,7 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.ValueObject;
+import org.fuin.objects4j.common.ValueObject;
 
 import java.io.Serializable;
 import java.util.Arrays;

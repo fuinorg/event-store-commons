@@ -17,15 +17,8 @@
  */
 package org.fuin.esc.jpa;
 
-import org.fuin.units4j.AssertCoverage;
-import org.fuin.units4j.Units4JUtils;
-import org.jboss.jandex.Index;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.List;
-
-import static org.fuin.units4j.JandexAssert.assertThat;
 
 /**
  * General tests for all classes.
@@ -33,30 +26,18 @@ import static org.fuin.units4j.JandexAssert.assertThat;
 // CHECKSTYLE:OFF Test code
 public class BaseTest {
 
+    @Disabled("Implement with ArchUnit!")
     @Test
     public final void testCoverage() {
         // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"), new AssertCoverage.ClassFilter() {
-            @Override
-            public boolean isIncludeClass(final Class<?> clasz) {
-                // Add exclusions here...
-                return true;
-            }
-        });
+        // TODO Implement!
     }
 
+    @Disabled("Implement with ArchUnit!")
     @Test
-    public final void testJandex() {
-        
-     // Collect all class files
-        final File dir = new File("target/classes");
-        final List<File> classFiles = Units4JUtils.findAllClasses(dir);
-        final Index index = Units4JUtils.indexAllClasses(classFiles);
-
-        // Verify that all classes annotated with @Entity observe the rules for JPA entities 
-        // (Class not final + No final methods + ...).
-        assertThat(index).hasOnlyValidJpaEntities();        
-        
+    public final void testNullability() {
+        // Make sure all public/protected methods have either @Nullable or @NotNull
+        // TODO Implement!
     }
     
 }

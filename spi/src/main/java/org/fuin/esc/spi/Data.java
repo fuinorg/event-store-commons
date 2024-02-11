@@ -31,7 +31,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.ValueObject;
+import org.fuin.objects4j.common.ValueObject;
 import org.fuin.utils4j.jaxb.CDataXmlAdapter;
 
 import java.io.Serializable;

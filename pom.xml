@@ -30,6 +30,7 @@
 	<properties>
 		<eventstore.version>21.10.1-bionic</eventstore.version>
 		<failsafe.argLine>--add-opens java.base/java.util=ALL-UNNAMED</failsafe.argLine>
+		<objects4j.version>0.10.0-SNAPSHOT</objects4j.version>
 	</properties>
 
 	<dependencyManagement>
@@ -85,9 +86,15 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.fuin</groupId>
-				<artifactId>objects4j</artifactId>
-				<version>0.10.0-SNAPSHOT</version>
+				<groupId>org.fuin.objects4j</groupId>
+				<artifactId>objects4j-common</artifactId>
+				<version>${objects4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.fuin.objects4j</groupId>
+				<artifactId>objects4j-core</artifactId>
+				<version>${objects4j.version}</version>
 			</dependency>
 
 			<dependency>
@@ -154,12 +161,6 @@
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
 				<version>3.25.2</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.fuin</groupId>
-				<artifactId>units4j</artifactId>
-				<version>0.12.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>

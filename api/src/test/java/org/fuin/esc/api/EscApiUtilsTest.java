@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import org.fuin.units4j.TestOmitted;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Test for {@link EscApiUtils}.

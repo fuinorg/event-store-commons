@@ -20,7 +20,6 @@ package org.fuin.esc.spi;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import org.fuin.units4j.Units4JUtils;
 import org.fuin.utils4j.jaxb.CDataXmlStreamWriter;
 import org.fuin.utils4j.jaxb.JaxbUtils;
 
@@ -37,10 +36,7 @@ public abstract class AbstractXmlTest {
 
     /**
      * Marshals the given data. A <code>null</code> data argument returns
-     * <code>null</code>. The difference between this and the
-     * {@link Units4JUtils#marshal(Object, XmlAdapter[], Class...)} class is,
-     * that it handles CDATA sections correctly. This should actually be moved
-     * to Units4J as standard.
+     * <code>null</code>. Handles CDATA sections correctly. T
      * 
      * @param data
      *            Data to serialize or <code>null</code>.

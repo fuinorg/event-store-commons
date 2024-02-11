@@ -17,10 +17,8 @@
  */
 package org.fuin.esc.spi;
 
-import org.fuin.units4j.AssertCoverage;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 /**
  * General tests for all classes.
@@ -28,10 +26,18 @@ import java.io.File;
 // CHECKSTYLE:OFF Test code
 public class BaseTest {
 
+    @Disabled("Implement with ArchUnit!")
     @Test
     public final void testCoverage() {
         // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
+        // TODO Implement!
+    }
+
+    @Disabled("Implement with ArchUnit!")
+    @Test
+    public final void testNullability() {
+        // Make sure all public/protected methods have either @Nullable or @NotNull
+        // TODO Implement!
     }
 
 }

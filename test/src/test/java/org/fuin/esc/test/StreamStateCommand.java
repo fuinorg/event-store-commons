@@ -18,13 +18,11 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Queries a stream state.
@@ -114,7 +112,7 @@ public final class StreamStateCommand implements TestCommand<TestContext> {
             if (expectedExceptionClass == null) {
                 throw new IllegalStateException("Both, expected state and exception are null");
             }
-            return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
+            return TestUtils.isExpectedType(expectedExceptionClass, actualException);
         }
         if (expectedExceptionClass != null) {
             throw new IllegalStateException("Both, expected state and exception are set");

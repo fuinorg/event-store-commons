@@ -17,13 +17,12 @@
  */
 package org.fuin.esc.api;
 
-import org.fuin.esc.api.JsonbDeSerializer;
-import org.fuin.units4j.TestOmitted;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Tests the {@link JsonbDeSerializer} class.
  */
-@TestOmitted("Already tested with the other tests") 
+@TestOmitted("Already tested with the other tests")
 public class JsonbDeSerializerTest {
 
     // Nothing to do

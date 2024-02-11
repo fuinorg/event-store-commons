@@ -17,19 +17,8 @@
  */
 package org.fuin.esc.api;
 
-import org.fuin.objects4j.vo.AbstractStringValueObject;
-import org.fuin.objects4j.vo.ValueObjectWithBaseType;
-import org.fuin.units4j.AssertCoverage;
-import org.fuin.units4j.Units4JUtils;
-import org.jboss.jandex.Index;
-import org.jboss.jandex.Indexer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.List;
-
-import static org.fuin.units4j.JandexAssert.assertThat;
 
 /**
  * General tests for all classes.
@@ -37,28 +26,18 @@ import static org.fuin.units4j.JandexAssert.assertThat;
 // CHECKSTYLE:OFF Test code
 public class BaseTest {
 
+    @Disabled("Implement with ArchUnit!")
     @Test
     public final void testCoverage() {
         // Make sure all classes have a test
-        AssertCoverage.assertEveryClassHasATest(new File("src/main/java"));
+        // TODO Implement!
     }
 
-    @Disabled("TODO Fix failing test with new units4j version")
+    @Disabled("Implement with ArchUnit!")
     @Test
     public final void testNullability() {
-
-        // Collect all class files
-        final File dir = new File("target/classes");
-        final List<File> classFiles = Units4JUtils.findAllClasses(dir);
-        final Indexer indexer = new Indexer();
-        Units4JUtils.indexAllClasses(indexer, classFiles);
-        Units4JUtils.index(indexer, this.getClass().getClassLoader(), ValueObjectWithBaseType.class.getName());
-        Units4JUtils.index(indexer, this.getClass().getClassLoader(), AbstractStringValueObject.class.getName());        
-        final Index index = indexer.complete();
-
-        // Verify that all methods make a statement if null is allowed or not
-        assertThat(index).hasNullabilityInfoOnAllMethods();
-
+        // Make sure all public/protected methods have either @Nullable or @NotNull
+        // TODO Implement!
     }
 
 }

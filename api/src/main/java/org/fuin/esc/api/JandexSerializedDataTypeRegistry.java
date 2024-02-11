@@ -1,8 +1,8 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
-import org.fuin.utils4j.JandexIndexFileReader;
-import org.fuin.utils4j.JandexUtils;
+import org.fuin.utils4j.jandex.JandexIndexFileReader;
+import org.fuin.utils4j.jandex.JandexUtils;
 import org.jboss.jandex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

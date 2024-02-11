@@ -25,7 +25,7 @@ import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import jakarta.annotation.Nullable;
-import org.fuin.objects4j.vo.UUIDStrValidator;
+import org.fuin.objects4j.core.UUIDStrValidator;
 
 /**
  * Expected chunk when reading forward all events of a stream.

@@ -31,7 +31,7 @@ import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import jakarta.annotation.Nullable;
-import org.fuin.units4j.TestCommand;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Reads a stream backward.

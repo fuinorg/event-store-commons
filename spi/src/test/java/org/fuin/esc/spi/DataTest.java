@@ -26,7 +26,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.jaxb.JaxbUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -187,7 +187,7 @@ public class DataTest extends AbstractXmlTest {
         assertThat(data.getType()).isEqualTo("BookAddedEvent");
         assertThat(data.getMimeType()).isEqualTo(
                 new EnhancedMimeType("application/xml; encoding=utf-8"));
-        assertThat(data.getContent()).isEqualTo(Units4JUtils.XML_PREFIX
+        assertThat(data.getContent()).isEqualTo(JaxbUtils.XML_PREFIX
                 + "<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>");
         assertThat(data.isXml()).isTrue();
         assertThat(data.isJson()).isFalse();

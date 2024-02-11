@@ -18,12 +18,10 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Reads a stream forward and expects and exception.
@@ -110,7 +108,7 @@ public final class ReadForwardExceptionCommand implements TestCommand<TestContex
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
+        return TestUtils.isExpectedException(expectedExceptionClass, expectedMessage, actualException);
     }
 
     @Override

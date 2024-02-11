@@ -32,8 +32,7 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import jakarta.annotation.Nullable;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Appends some data to a stream.
@@ -154,7 +153,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
+        return TestUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

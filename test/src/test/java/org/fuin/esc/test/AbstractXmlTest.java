@@ -26,7 +26,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
-import org.fuin.units4j.Units4JUtils;
 import org.fuin.utils4j.jaxb.CDataXmlStreamWriter;
 import org.fuin.utils4j.jaxb.JaxbUtils;
 
@@ -38,10 +37,7 @@ public abstract class AbstractXmlTest {
 
     /**
      * Marshals the given data. A <code>null</code> data argument returns
-     * <code>null</code>. The difference between this and the
-     * {@link Units4JUtils#marshal(Object, XmlAdapter[], Class...)} class is,
-     * that it handles CDATA sections correctly. This should actually be moved
-     * to Units4J as standard.
+     * <code>null</code>. Handles CDATA sections correctly.
      * 
      * @param data
      *            Data to serialize or <code>null</code>.

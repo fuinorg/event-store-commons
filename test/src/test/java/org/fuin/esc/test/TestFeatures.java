@@ -17,53 +17,9 @@
  */
 package org.fuin.esc.test;
 
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.esgrpc.ESGrpcEventStore;
-import org.fuin.esc.jpa.JpaEventStore;
-import org.fuin.esc.mem.InMemoryEventStore;
-import org.fuin.esc.spi.Base64Data;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.spi.EscEvent;
-import org.fuin.esc.spi.EscEvents;
-import org.fuin.esc.spi.EscMeta;
-import org.fuin.esc.spi.Events;
-import org.fuin.esc.api.JsonDeSerializer;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
-import org.fuin.esc.spi.TextDeSerializer;
-import org.fuin.esc.spi.XmlDeSerializer;
-import org.fuin.esc.test.examples.BookAddedEvent;
-import org.fuin.esc.test.examples.MyMeta;
-import org.fuin.esc.test.jpa.TestIdStreamFactory;
-import org.fuin.units4j.MultipleCommands;
-import org.fuin.units4j.TestCommand;
-
 import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.EventStoreDBClientSettings;
 import com.eventstore.dbclient.EventStoreDBConnectionString;
-import com.github.msemys.esjc.EventStoreBuilder;
-
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -75,6 +31,45 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.EventStore;
+import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.JsonDeSerializer;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.esgrpc.ESGrpcEventStore;
+import org.fuin.esc.jpa.JpaEventStore;
+import org.fuin.esc.mem.InMemoryEventStore;
+import org.fuin.esc.spi.Base64Data;
+import org.fuin.esc.spi.EscEvent;
+import org.fuin.esc.spi.EscEvents;
+import org.fuin.esc.spi.EscMeta;
+import org.fuin.esc.spi.Events;
+import org.fuin.esc.spi.TextDeSerializer;
+import org.fuin.esc.spi.XmlDeSerializer;
+import org.fuin.esc.test.examples.BookAddedEvent;
+import org.fuin.esc.test.examples.MyMeta;
+import org.fuin.esc.test.jpa.TestIdStreamFactory;
+import org.fuin.utils4j.MultipleCommands;
+import org.fuin.utils4j.TestCommand;
+
+import java.net.MalformedURLException;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 // CHECKSTYLE:OFF Test code
 public class TestFeatures {

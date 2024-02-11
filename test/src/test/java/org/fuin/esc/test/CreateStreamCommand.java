@@ -22,8 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Creates a new stream.
@@ -103,7 +102,7 @@ public final class CreateStreamCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
+        return TestUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

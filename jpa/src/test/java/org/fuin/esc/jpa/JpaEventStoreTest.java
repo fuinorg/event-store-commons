@@ -27,7 +27,6 @@ import org.fuin.esc.api.JsonDeSerializer;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.XmlDeSerializer;
-import org.fuin.units4j.AbstractPersistenceTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

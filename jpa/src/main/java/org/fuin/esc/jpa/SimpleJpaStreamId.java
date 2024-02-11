@@ -20,7 +20,7 @@ package org.fuin.esc.jpa;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 
 import java.util.Collections;
 import java.util.List;

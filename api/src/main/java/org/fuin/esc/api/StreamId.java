@@ -18,7 +18,7 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 
 import java.io.Serializable;
 import java.util.List;

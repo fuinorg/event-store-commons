@@ -22,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 
 import java.util.List;
 

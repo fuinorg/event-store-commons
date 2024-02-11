@@ -17,20 +17,18 @@
  */
 package org.fuin.esc.test;
 
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.Event;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
+
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Reads a single event from a stream.
@@ -126,7 +124,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
+        if (!TestUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return false;
         }
@@ -135,7 +133,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     @Override
     public final String getFailureDescription() {
-        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
+        if (!TestUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return EscTestUtils.createExceptionFailureMessage(streamId.asString(),
                     expectedExceptionClass, actualException);

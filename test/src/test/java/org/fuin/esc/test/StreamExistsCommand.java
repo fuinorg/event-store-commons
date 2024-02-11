@@ -18,12 +18,10 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Tests for stream existance.
@@ -91,12 +89,12 @@ public final class StreamExistsCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedType(null, actualException) && (actuallyExists == shouldExist);
+        return TestUtils.isExpectedType(null, actualException) && (actuallyExists == shouldExist);
     }
 
     @Override
     public final String getFailureDescription() {
-        if (!Units4JUtils.isExpectedType(null, actualException)) {
+        if (!TestUtils.isExpectedType(null, actualException)) {
             return EscTestUtils.createExceptionFailureMessage(streamId.asString(), null, actualException);
         }
         if (shouldExist) {

@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import org.fuin.units4j.TestOmitted;
+import org.fuin.utils4j.TestOmitted;
 
 // CHECKSTYLE:OFF Test code
 @TestOmitted("Class will be moved later to utility library")

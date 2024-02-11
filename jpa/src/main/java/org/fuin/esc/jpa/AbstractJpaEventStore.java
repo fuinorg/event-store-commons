@@ -27,7 +27,7 @@ import org.fuin.esc.api.*;
 import org.fuin.esc.spi.*;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

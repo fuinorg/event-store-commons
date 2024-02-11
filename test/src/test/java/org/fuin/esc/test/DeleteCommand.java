@@ -23,8 +23,7 @@ import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Deletes a stream.
@@ -111,7 +110,7 @@ public final class DeleteCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
+        return TestUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

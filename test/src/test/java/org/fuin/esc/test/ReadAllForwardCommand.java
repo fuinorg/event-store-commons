@@ -27,7 +27,7 @@ import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
+import org.fuin.utils4j.TestCommand;
 
 /**
  * Reads all events forward from a stream.
