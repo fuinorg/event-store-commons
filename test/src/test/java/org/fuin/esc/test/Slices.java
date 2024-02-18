@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -50,7 +50,7 @@ public final class Slices implements Serializable {
 
     /**
      * Constructor with all data.
-     * 
+     *
      * @param slices
      *            The slices read. The list is internally copied to avoid
      */
@@ -61,7 +61,7 @@ public final class Slices implements Serializable {
 
     /**
      * Appends slices to the list.
-     * 
+     *
      * @param slices
      *            Slices to add.
      */
@@ -73,7 +73,7 @@ public final class Slices implements Serializable {
 
     /**
      * Appends slices to the list.
-     * 
+     *
      * @param slices
      *            Slices to add.
      */
@@ -85,7 +85,7 @@ public final class Slices implements Serializable {
 
     /**
      * Returns the slices read.
-     * 
+     *
      * @return Unmodifiable list of slices.
      */
     @NotNull

@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -43,7 +43,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
 
     /**
      * Constructor with all required data.
-     * 
+     *
      * @param streamId
      *            Unique stream identifier.
      * @param eventNumber
@@ -59,27 +59,26 @@ public final class NoParamsEventPrimaryKey implements Serializable {
 
     /**
      * Returns the name of the stream.
-     * 
+     *
      * @return Unique stream identifier name.
      */
     @NotNull
-    public final String getStreamName() {
+    public String getStreamName() {
         return streamName;
     }
 
     /**
      * Returns the number of the event within the stream.
-     * 
+     *
      * @return Order of the event in the stream.
      */
     @NotNull
-    public final Long getEventNumber() {
+    public Long getEventNumber() {
         return eventNumber;
     }
 
-    // CHECKSTYLE:OFF Generated code
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((streamName == null) ? 0 : streamName.hashCode());
@@ -88,7 +87,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -102,17 +101,13 @@ public final class NoParamsEventPrimaryKey implements Serializable {
         } else if (!streamName.equals(other.streamName))
             return false;
         if (eventNumber == null) {
-            if (other.eventNumber != null)
-                return false;
-        } else if (!eventNumber.equals(other.eventNumber))
-            return false;
-        return true;
+            return other.eventNumber == null;
+        } else return eventNumber.equals(other.eventNumber);
     }
 
-    // CHECKSTYLE:ON
 
     @Override
-    public final String toString() {
+    public String toString() {
         return streamName + "-" + eventNumber;
     }
 

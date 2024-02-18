@@ -1,46 +1,44 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
+import org.fuin.objects4j.common.ValueObjectWithBaseType;
 import org.fuin.objects4j.core.UUIDStr;
 import org.fuin.objects4j.core.UUIDStrValidator;
-import org.fuin.objects4j.common.ValueObjectWithBaseType;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents a unique event identifier.
+ * Represents a unique event identifier based on a UUID.
  */
 @Immutable
-@XmlJavaTypeAdapter(EventIdConverter.class)
-public final class EventId implements ValueObjectWithBaseType<UUID>,
-        Comparable<EventId>, Serializable {
+public final class EventId implements ValueObjectWithBaseType<UUID>, Comparable<EventId>, Serializable {
 
     private static final long serialVersionUID = 1000L;
 
-    private long mostSigBits;
+    private final long mostSigBits;
 
-    private long leastSigBits;
+    private final long leastSigBits;
 
     // Do not access this variable directly inside this class.
     // Use <code>asBaseType()</code> to be sure this is initialized.
@@ -59,7 +57,7 @@ public final class EventId implements ValueObjectWithBaseType<UUID>,
 
     /**
      * Creates a new event ID using the given string.
-     * 
+     *
      * @param value
      *            String that represents a UUID.
      */
@@ -69,7 +67,7 @@ public final class EventId implements ValueObjectWithBaseType<UUID>,
 
     /**
      * Creates a new event ID using the given value.
-     * 
+     *
      * @param value
      *            UUID to use.
      */
@@ -82,12 +80,12 @@ public final class EventId implements ValueObjectWithBaseType<UUID>,
     }
 
     @Override
-    public final Class<UUID> getBaseType() {
+    public Class<UUID> getBaseType() {
         return UUID.class;
     }
 
     @Override
-    public final UUID asBaseType() {
+    public UUID asBaseType() {
         if (uuid == null) {
             uuid = new UUID(mostSigBits, leastSigBits);
         }
@@ -95,7 +93,7 @@ public final class EventId implements ValueObjectWithBaseType<UUID>,
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         if (str == null) {
             str = uuid.toString();
         }
@@ -103,27 +101,20 @@ public final class EventId implements ValueObjectWithBaseType<UUID>,
     }
 
     @Override
-    public final int hashCode() {
-        return asBaseType().hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final EventId eventId = (EventId) o;
+        return mostSigBits == eventId.mostSigBits && leastSigBits == eventId.leastSigBits;
     }
 
     @Override
-    public final boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof EventId)) {
-            return false;
-        }
-        final EventId other = (EventId) obj;
-        return asBaseType().equals(other.asBaseType());
+    public int hashCode() {
+        return Objects.hash(mostSigBits, leastSigBits);
     }
 
     @Override
-    public final int compareTo(final EventId other) {
+    public int compareTo(final EventId other) {
         return asBaseType().compareTo(other.asBaseType());
     }
 

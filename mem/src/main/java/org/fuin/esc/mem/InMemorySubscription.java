@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -33,7 +33,7 @@ public final class InMemorySubscription extends Subscription implements
 
     /**
      * Creates a subscription.
-     * 
+     *
      * @param subscriberId
      *            Uniquely identifies a subscriber.
      * @param streamId
@@ -42,22 +42,22 @@ public final class InMemorySubscription extends Subscription implements
      *            Last event seen on the stream.
      */
     public InMemorySubscription(final int subscriberId,
-            final StreamId streamId, final Long lastEventNumber) {
+                                final StreamId streamId, final Long lastEventNumber) {
         super(streamId, lastEventNumber);
         this.subscriberId = subscriberId;
     }
 
     /**
      * Returns the subscriber ID.
-     * 
+     *
      * @return Uniquely identifies a subscriber.
      */
-    public final int getSubscriberId() {
+    public int getSubscriberId() {
         return subscriberId;
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + subscriberId;
@@ -65,7 +65,7 @@ public final class InMemorySubscription extends Subscription implements
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -80,7 +80,7 @@ public final class InMemorySubscription extends Subscription implements
     }
 
     @Override
-    public final int compareTo(final InMemorySubscription other) {
+    public int compareTo(final InMemorySubscription other) {
         if (subscriberId > other.subscriberId) {
             return 1;
         }
@@ -91,8 +91,8 @@ public final class InMemorySubscription extends Subscription implements
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return this.getClass().getSimpleName() + "#" + subscriberId;
     }
-    
+
 }

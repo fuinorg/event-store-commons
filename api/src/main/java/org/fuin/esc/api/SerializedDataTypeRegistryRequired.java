@@ -8,10 +8,9 @@ public interface SerializedDataTypeRegistryRequired {
 
     /**
      * Sets the registry to use.
-     * 
-     * @param registry
-     *            Actual registry.
+     *
+     * @param registry Actual registry.
      */
-    public void setRegistry(SerializedDataTypeRegistry registry);
+    void setRegistry(SerializedDataTypeRegistry registry);
 
 }

@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -23,8 +23,21 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.*;
-import org.fuin.esc.spi.*;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EventNotFoundException;
+import org.fuin.esc.api.ReadableEventStore;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.StreamDeletedException;
+import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.StreamState;
+import org.fuin.esc.spi.AbstractReadableEventStore;
+import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
@@ -59,7 +72,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param em
      *            Entity manager.
      * @param serRegistry
@@ -68,7 +81,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      *            Registry used to locate deserializers.
      */
     public AbstractJpaEventStore(@NotNull final EntityManager em,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+                                 @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("em", em);
         Contract.requireArgNotNull("serRegistry", serRegistry);
@@ -81,7 +94,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Returns the entity manager.
-     * 
+     *
      * @return Entity manager.
      */
     protected final EntityManager getEm() {
@@ -90,7 +103,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Returns a registry of serializers.
-     * 
+     *
      * @return Registry with known serializers.
      */
     @NotNull
@@ -100,7 +113,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Returns a registry of deserializers.
-     * 
+     *
      * @return Registry with known deserializers.
      */
     @NotNull
@@ -155,7 +168,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     @SuppressWarnings("unchecked")
     @Override
     public final StreamEventsSlice readEventsForward(final StreamId streamId, final long start,
-            final int count) {
+                                                     final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -170,7 +183,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
             }
             if (!projection.isEnabled()) {
                 // The projection does exist, but is not ready yet
-                return new StreamEventsSlice(start, new ArrayList<CommonEvent>(), start, true);
+                return new StreamEventsSlice(start, new ArrayList<>(), start, true);
             }
         } else {
             final JpaStream stream = findStream(streamId);
@@ -204,7 +217,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     @SuppressWarnings("unchecked")
     @Override
     public final StreamEventsSlice readEventsBackward(final StreamId streamId, final long start,
-            final int count) {
+                                                      final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -266,7 +279,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setJpqlParameters(query, streamId);
         final List<JpaStream> streams = query.getResultList();
-        if (streams.size() == 0) {
+        if (streams.isEmpty()) {
             return false;
         }
         if (streams.size() == 1) {
@@ -292,7 +305,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     /**
      * Verifies if a stream entity exists or throws an
      * {@link StreamNotFoundException} otherwise.
-     * 
+     *
      * @param streamId
      *            Stream to test.
      */
@@ -304,10 +317,10 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Returns if a stream entity exists.
-     * 
+     *
      * @param streamId
      *            Stream to test.
-     * 
+     *
      * @return TRUE if the entity is known, else FALSE.
      */
     protected final boolean streamEntityExists(final StreamId streamId) {
@@ -315,11 +328,11 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     /**
-     * Returns if an entity with agiven name exists.
-     * 
+     * Returns if an entity with a given name exists.
+     *
      * @param entityName
      *            Entity to test.
-     * 
+     *
      * @return TRUE if the entity is known, else FALSE.
      */
     protected final boolean entityExists(final String entityName) {
@@ -335,12 +348,12 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     /**
      * Tries to find a serializer for the given type of object and converts it
      * into a storable data block.
-     * 
+     *
      * @param type
      *            Type of event.
      * @param data
      *            Event of the given type.
-     * 
+     *
      * @return Event ready to persist.
      */
     protected final SerializedData serialize(final SerializedDataType type, final Object data) {
@@ -349,12 +362,12 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Tries to find a deserializer for the given data block.
-     * 
+     *
      * @param data
      *            Persisted data.
-     * 
+     *
      * @return Unmarshalled event.
-     * 
+     *
      * @param <T>
      *            Expected type of event.
      */
@@ -364,10 +377,10 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Creates the JPQL to select the stream itself.
-     * 
+     *
      * @param streamId
      *            Unique stream identifier.
-     * 
+     *
      * @return JPQL that selects the stream with the given identifier.
      */
     protected final String createJpqlStreamSelect(final StreamId streamId) {
@@ -377,7 +390,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         }
 
         final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
-        if (params.size() == 0) {
+        if (params.isEmpty()) {
             // NoParamsStream
             params.add(new KeyValue("streamName", streamId.getName()));
         }
@@ -395,10 +408,10 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Reads the stream with the given identifier from the DB and returns it.
-     * 
+     *
      * @param streamId
      *            Stream to load.
-     * 
+     *
      * @return Stream.
      */
     @NotNull
@@ -411,7 +424,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setJpqlParameters(query, streamId);
         final List<JpaStream> streams = query.getResultList();
-        if (streams.size() == 0) {
+        if (streams.isEmpty()) {
             throw new StreamNotFoundException(streamId);
         }
         final JpaStream stream = streams.get(0);
@@ -427,7 +440,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     /**
      * Sets parameters in a query.
-     * 
+     *
      * @param query
      *            Query to set parameters for.
      * @param streamId
@@ -435,27 +448,24 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      */
     protected final void setJpqlParameters(final Query query, final StreamId streamId) {
         final List<KeyValue> params = new ArrayList<>(streamId.getParameters());
-        if (params.size() == 0) {
+        if (params.isEmpty()) {
             params.add(new KeyValue("streamName", streamId.getName()));
         }
-        for (int i = 0; i < params.size(); i++) {
-            final KeyValue param = params.get(i);
+        for (final KeyValue param : params) {
             query.setParameter(param.getKey(), param.getValue());
         }
     }
 
     /**
      * Sets parameters in a query.
-     * 
+     *
      * @param query
      *            Query to set parameters for.
-     * @param streamId
-     *            Unique stream identifier that has the parameter values.
-     * @param additionalConditions
+     * @param conditions
      *            Parameters to add in addition to the ones from the stream
      *            identifier.
      */
-    private final void setNativeSqlParameters(final Query query, final List<NativeSqlCondition> conditions) {
+    private void setNativeSqlParameters(final Query query, final List<NativeSqlCondition> conditions) {
         for (final NativeSqlCondition condition : conditions) {
             query.setParameter(condition.getColumn(), condition.getValue());
         }
@@ -464,17 +474,17 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     /**
      * Creates a native SQL select using the parameters from the stream
      * identifier and optional other arguments.
-     * 
+     *
      * @param streamId
      *            Unique stream identifier that has the parameter values.
      * @param additionalParams
      *            Parameters to add in addition to the ones from the stream
      *            identifier.
-     * 
+     *
      * @return JPQL for selecting the events.
      */
-    private final String createNativeSqlEventSelect(final StreamId streamId,
-            final List<NativeSqlCondition> conditions) {
+    private String createNativeSqlEventSelect(final StreamId streamId,
+                                              final List<NativeSqlCondition> conditions) {
 
         final StringBuilder sb = new StringBuilder("SELECT " + JPA_EVENT_PREFIX + ".* FROM "
                 + JpaEvent.TABLE_NAME + " " + JPA_EVENT_PREFIX + ", " + nativeEventsTableName(streamId) + " "
@@ -499,14 +509,14 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     private List<NativeSqlCondition> createNativeSqlConditions(final StreamId streamId,
-            final NativeSqlCondition... additionalConditions) {
+                                                               final NativeSqlCondition... additionalConditions) {
         final List<NativeSqlCondition> conditions;
         if (additionalConditions == null) {
             conditions = new ArrayList<>();
         } else {
             conditions = new ArrayList<>(Arrays.asList(additionalConditions));
         }
-        if (streamId.getParameters().size() == 0) {
+        if (streamId.getParameters().isEmpty()) {
             conditions.add(new NativeSqlCondition(JPA_STREAM_EVENT_PREFIX, NoParamsEvent.COLUMN_STREAM_NAME,
                     "=", streamId.getName()));
         } else {

@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -21,14 +21,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.XmlInlineBinaryData;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.common.ValueObject;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -54,7 +53,6 @@ public class JpaData implements ValueObject, Serializable {
     /** Raw event data in format defined by the mime type and encoding. */
     @Lob
     @Column(name = "DATA_RAW", nullable = false)
-    @XmlInlineBinaryData
     private byte[] raw;
 
     /**
@@ -66,7 +64,7 @@ public class JpaData implements ValueObject, Serializable {
 
     /**
      * Creates a data object.
-     * 
+     *
      * @param typeName
      *            Unique identifier for the type of data.
      * @param mimeType
@@ -75,7 +73,7 @@ public class JpaData implements ValueObject, Serializable {
      *            Raw data block.
      */
     public JpaData(@NotNull final TypeName typeName,
-            @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
+                   @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
         Contract.requireArgNotNull("type", typeName);
@@ -91,7 +89,7 @@ public class JpaData implements ValueObject, Serializable {
      * Copies a given SPI data object. Caution: To avoid performance problems
      * this will just copy the reference to the by array, means it does not copy
      * the bytes in the array itself.
-     * 
+     *
      * @param data
      *            Data to copy.
      */
@@ -105,7 +103,7 @@ public class JpaData implements ValueObject, Serializable {
 
     /**
      * Returns the unique identifier for the type of data.
-     * 
+     *
      * @return Unique and never changing type name.
      */
     @NotNull
@@ -115,7 +113,7 @@ public class JpaData implements ValueObject, Serializable {
 
     /**
      * Returns the Internet Media Type that classifies the data.
-     * 
+     *
      * @return Mime type.
      */
     @NotNull
@@ -125,7 +123,7 @@ public class JpaData implements ValueObject, Serializable {
 
     /**
      * Returns the raw data block.
-     * 
+     *
      * @return Raw data.
      */
     @NotNull
@@ -133,7 +131,6 @@ public class JpaData implements ValueObject, Serializable {
         return raw;
     }
 
-    // CHECKSTYLE:OFF Generated code
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -151,9 +148,8 @@ public class JpaData implements ValueObject, Serializable {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof JpaData))
+        if (!(obj instanceof JpaData other))
             return false;
-        JpaData other = (JpaData) obj;
         if (mimeType == null) {
             if (other.mimeType != null)
                 return false;
@@ -162,13 +158,9 @@ public class JpaData implements ValueObject, Serializable {
         if (!Arrays.equals(raw, other.raw))
             return false;
         if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
-        return true;
+            return other.type == null;
+        } else return type.equals(other.type);
     }
 
-    // CHECKSTYLE:ON
 
 }

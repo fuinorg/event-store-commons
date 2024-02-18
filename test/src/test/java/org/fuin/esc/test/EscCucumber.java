@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test;
 
 import java.io.IOException;
@@ -72,7 +71,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         } else {
             argList.addAll(EscSpiUtils.asList(args.value()));
         }
-        
+
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
@@ -82,11 +81,11 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
         final JUnitOptions junitOptions = new JUnitOptions(runtimeOptions.getJunitOptions());
         final List<CucumberFeature> cucumberFeatures = runtimeOptions.cucumberFeatures(resourceLoader);
         jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader), runtimeOptions.formatter(classLoader), runtimeOptions.isStrict(), junitOptions);
-        
+
         for (final String arg : argList) {
             addChildren(cucumberFeatures, arg);
         }
-        
+
     }
 
     /**
@@ -97,7 +96,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
      * @param runtimeOptions configuration
      * @return a new runtime
      * @throws InitializationError if a JUnit error occurred
-     * @throws IOException if a class or resource could not be loaded
+     * @throws IOException         if a class or resource could not be loaded
      */
     protected Runtime createRuntime(ResourceLoader resourceLoader, ClassLoader classLoader,
                                     RuntimeOptions runtimeOptions) throws InitializationError, IOException {
@@ -129,7 +128,7 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
     }
 
     private void addChildren(final List<CucumberFeature> cucumberFeatures,
-            final String arg) throws InitializationError {
+                             final String arg) throws InitializationError {
         for (final CucumberFeature cucumberFeature : cucumberFeatures) {
             children.add(new FeatureRunner(cucumberFeature, runtime,
                     jUnitReporter) {
@@ -146,6 +145,6 @@ public class EscCucumber extends ParentRunner<FeatureRunner> {
             });
         }
     }
-    
+
 }
-// CHECKSTYLE:ON
+

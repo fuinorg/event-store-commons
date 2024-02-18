@@ -8,9 +8,9 @@ public interface SerializerRegistryRequired {
 
     /**
      * Sets the registry to use.
-     * 
+     *
      * @param registry Actual registry.
      */
-    public void setRegistry(SerializerRegistry registry);
+    void setRegistry(SerializerRegistry registry);
 
 }

@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -37,8 +37,8 @@ public final class ProjectionJavaScriptBuilder {
     private StringBuilder sb;
 
     /**
-     * Constructor for building an tenant based projection.
-     * 
+     * Constructor for building a tenant based projection.
+     *
      * @param tenantStreamId
      *            Tenant ID to use as category and delegate name as projection name.
      */
@@ -54,7 +54,7 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Constructor for building an 'all' based projection.
-     * 
+     *
      * @param projectionId
      *            Projection ID to use as projection name.
      */
@@ -66,7 +66,7 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Constructor for building an 'all' based projection.
-     * 
+     *
      * @param projection
      *            Projection name.
      */
@@ -78,7 +78,7 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Constructor for building a 'category' based projection.
-     * 
+     *
      * @param projectionId
      *            Projection.
      * @param categoryId
@@ -93,7 +93,7 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Constructor for building a 'category' based projection.
-     * 
+     *
      * @param projection
      *            Projection name.
      * @param category
@@ -122,13 +122,13 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Adds another type to select.
-     * 
+     *
      * @param eventType
      *            Unique event type to select from the category of streams.
-     * 
+     *
      * @return this.
      */
-    public final ProjectionJavaScriptBuilder type(final String eventType) {
+    public ProjectionJavaScriptBuilder type(final String eventType) {
         if (count > 0) {
             sb.append(",");
         }
@@ -139,25 +139,25 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Adds another type to select. Convenience method to add a {@link TypeName} instead of a string.
-     * 
+     *
      * @param eventType
      *            Unique event type to select from the category of streams.
-     * 
+     *
      * @return this.
      */
-    public final ProjectionJavaScriptBuilder type(final TypeName eventType) {
+    public ProjectionJavaScriptBuilder type(final TypeName eventType) {
         return type(eventType.asBaseType());
     }
 
     /**
      * Adds more types to select. Convenience method to add multiple {@link TypeName} instead of strings.
-     * 
+     *
      * @param eventTypes
      *            Unique event type list to select from the category of streams.
-     * 
+     *
      * @return this.
      */
-    public final ProjectionJavaScriptBuilder types(final List<TypeName> eventTypes) {
+    public ProjectionJavaScriptBuilder types(final List<TypeName> eventTypes) {
         for (final TypeName type : eventTypes) {
             type(type.asBaseType());
         }
@@ -166,10 +166,10 @@ public final class ProjectionJavaScriptBuilder {
 
     /**
      * Builds the JavaScript for the projection.
-     * 
+     *
      * @return Projection script.
      */
-    public final String build() {
+    public String build() {
         if (count == 0) {
             throw new IllegalStateException("No types were added. Use 'type(String)' to add at least one event.");
         }

@@ -3,7 +3,12 @@ package org.fuin.esc.api;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * A class that has a public static constant of type {@link SerializedDataType}.
@@ -13,7 +18,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = { HasSerializedDataTypeConstantValidator.class })
+@Constraint(validatedBy = {HasSerializedDataTypeConstantValidator.class})
 public @interface HasSerializedDataTypeConstant {
 
     /**

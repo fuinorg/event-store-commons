@@ -4,13 +4,12 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
  * Determines if the annotated class has a public static constant with the given name and {@link SerializedDataType} type.
  */
-public class HasSerializedDataTypeConstantValidator implements ConstraintValidator<HasSerializedDataTypeConstant, Object> {
+public final class HasSerializedDataTypeConstantValidator implements ConstraintValidator<HasSerializedDataTypeConstant, Object> {
 
     private String name;
 
@@ -66,7 +65,7 @@ public class HasSerializedDataTypeConstantValidator implements ConstraintValidat
      * Returns a constant of type {@link SerializedDataType} in a class. Throws an {@link IllegalArgumentException}
      * in case there is a problem with the field.
      *
-     * @param clasz      Class to inspect.
+     * @param clasz     Class to inspect.
      * @param fieldName Name of the public static field of type {@link SerializedDataType}.
      * @return Value of the constant.
      */

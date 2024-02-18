@@ -3,6 +3,7 @@ package org.fuin.esc.esgrpc;
 import com.eventstore.dbclient.EventStoreDBClientSettings;
 import com.eventstore.dbclient.EventStoreDBConnectionString;
 import com.eventstore.dbclient.EventStoreDBProjectionManagementClient;
+import com.tngtech.archunit.junit.ArchIgnore;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.TypeName;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link GrpcProjectionAdminEventStore} class.
  */
+@ArchIgnore
 class GrpcProjectionAdminEventStoreIT {
 
     private static EventStoreDBProjectionManagementClient client;

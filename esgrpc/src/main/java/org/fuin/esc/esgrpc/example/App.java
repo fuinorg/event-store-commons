@@ -1,9 +1,5 @@
 package org.fuin.esc.esgrpc.example;
 
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
 import com.eventstore.dbclient.DeleteResult;
 import com.eventstore.dbclient.DeleteStreamOptions;
 import com.eventstore.dbclient.EventData;
@@ -15,9 +11,16 @@ import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
 import com.eventstore.dbclient.WriteResult;
 
+import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
 public class App {
 
-    public static void main(String args[]) throws InterruptedException, ExecutionException, IOException {
+    private App() {
+    }
+
+    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
 
         System.out.println("BEGIN");
 
@@ -54,4 +57,5 @@ public class App {
         System.out.println("END");
 
     }
+
 }

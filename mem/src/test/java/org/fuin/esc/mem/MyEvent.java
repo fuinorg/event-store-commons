@@ -1,9 +1,11 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.mem;
+
+import com.tngtech.archunit.junit.ArchIgnore;
 
 /**
  * Example event.
  */
+@ArchIgnore
 public class MyEvent {
 
     private String name;
@@ -47,4 +49,4 @@ public class MyEvent {
     }
 
 }
-// CHECKSTYLE:ON
+

@@ -30,13 +30,9 @@ public final class TestUtils {
     /**
      * Determines if an exception has an expected type and message in a null-safe way.
      *
-     * @param expectedClass
-     *            Expected exception type.
-     * @param expectedMessage
-     *            Expected message.
-     * @param ex
-     *            Exception to test.
-     *
+     * @param expectedClass   Expected exception type.
+     * @param expectedMessage Expected message.
+     * @param ex              Exception to test.
      * @return TRUE if the object is exactly of the same class and has the same message, else FALSE.
      */
     public static boolean isExpectedException(final Class<? extends Exception> expectedClass,

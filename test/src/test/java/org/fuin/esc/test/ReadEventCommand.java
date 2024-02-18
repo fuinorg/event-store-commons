@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -24,7 +24,6 @@ import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.spi.Event;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.utils4j.TestCommand;
 
@@ -71,7 +70,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to read.
      * @param eventNumber
@@ -82,8 +81,8 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
      *            The exception that is expected, an empty string or "-".
      */
     public ReadEventCommand(@NotNull final String streamName,
-            final long eventNumber, final String expectedEventXml,
-            final String expectedException) {
+                            final long eventNumber, final String expectedEventXml,
+                            final String expectedException) {
         super();
         this.streamName = streamName;
         this.eventNumber = eventNumber;

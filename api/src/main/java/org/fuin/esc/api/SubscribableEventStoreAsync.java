@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -30,7 +30,7 @@ public interface SubscribableEventStoreAsync extends EventStoreBasicsAsync {
 
     /**
      * Subscribe a stream starting with a given event number.
-     * 
+     *
      * @param streamId
      *            Unique stream identifier.
      * @param eventNumber
@@ -42,23 +42,23 @@ public interface SubscribableEventStoreAsync extends EventStoreBasicsAsync {
      * @param onDrop
      *            Will be called when the subscription was exceptionally
      *            dropped.
-     * 
+     *
      * @return Future with subscription result.
      */
     @NotNull
-    public CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, long eventNumber,
-            @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
-            @NotNull BiConsumer<Subscription, Exception> onDrop);
+    CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, long eventNumber,
+                                                      @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
+                                                      @NotNull BiConsumer<Subscription, Exception> onDrop);
 
     /**
      * Unsubscribe from a stream.
-     * 
+     *
      * @param subscription
      *            to be terminated.
-     * 
+     *
      * @return Future with no result.
      */
     @NotNull
-    public CompletableFuture<Void> unsubscribeFromStream(@NotNull Subscription subscription);
+    CompletableFuture<Void> unsubscribeFromStream(@NotNull Subscription subscription);
 
 }

@@ -1,27 +1,35 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.jpa;
 
-import io.github.threetenjaxb.core.ZonedDateTimeXmlAdapter;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.fuin.esc.api.EventId;
 
 import java.time.ZonedDateTime;
@@ -52,7 +60,6 @@ public class JpaEvent {
     @Column(name = COLUMN_EVENT_ID, length = 36, nullable = false, columnDefinition = "VARCHAR(36)")
     private String eventId;
 
-    @XmlJavaTypeAdapter(ZonedDateTimeXmlAdapter.class)
     @Column(name = "created", nullable = false)
     private ZonedDateTime created;
 
@@ -61,9 +68,9 @@ public class JpaEvent {
     private JpaData data;
 
     @Embedded
-    @AttributeOverrides({ @AttributeOverride(name = "type", column = @Column(name = "META_TYPE")),
+    @AttributeOverrides({@AttributeOverride(name = "type", column = @Column(name = "META_TYPE")),
             @AttributeOverride(name = "mimeType", column = @Column(name = "META_MIME_TYPE")),
-            @AttributeOverride(name = "raw", column = @Column(name = "META_RAW")) })
+            @AttributeOverride(name = "raw", column = @Column(name = "META_RAW"))})
     private JpaData meta;
 
     /**
@@ -74,8 +81,8 @@ public class JpaEvent {
     }
 
     /**
-     * Constructor without meta data.
-     * 
+     * Constructor without metadata.
+     *
      * @param eventId
      *            Unique identifier of the event. Generated on the client and
      *            used to achieve idempotence when trying to append the same
@@ -89,7 +96,7 @@ public class JpaEvent {
 
     /**
      * Constructor with all data.
-     * 
+     *
      * @param eventId
      *            Unique identifier of the event. Generated on the client and
      *            used to achieve idempotence when trying to append the same
@@ -100,7 +107,7 @@ public class JpaEvent {
      *            Meta data (Optional).
      */
     public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data,
-            @Nullable final JpaData meta) {
+                    @Nullable final JpaData meta) {
         super();
         this.eventId = eventId.asBaseType().toString();
         this.data = data;
@@ -109,7 +116,7 @@ public class JpaEvent {
 
     /**
      * Returns the unique identifier of the entry.
-     * 
+     *
      * @return Unique entry ID.
      */
     public Long getId() {
@@ -120,7 +127,7 @@ public class JpaEvent {
      * Returns the unique identifier of the event. Generated on the client and
      * used to achieve idempotence when trying to append the same event multiple
      * times.
-     * 
+     *
      * @return Unique event ID.
      */
     @NotNull
@@ -130,7 +137,7 @@ public class JpaEvent {
 
     /**
      * Returns the time when the event was created.
-     * 
+     *
      * @return Date, time and zone of event's creation.
      */
     @NotNull
@@ -140,7 +147,7 @@ public class JpaEvent {
 
     /**
      * Returns the data of the event.
-     * 
+     *
      * @return The event.
      */
     @NotNull
@@ -149,9 +156,9 @@ public class JpaEvent {
     }
 
     /**
-     * Returns the meta data of the event (Optional).
-     * 
-     * @return The event's meta data or NULL.
+     * Returns the metadata of the event (Optional).
+     *
+     * @return The event's metadata or NULL.
      */
     public JpaData getMeta() {
         return meta;

@@ -1,35 +1,41 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.spi;
 
 import jakarta.activation.MimeTypeParseException;
-import jakarta.json.bind.serializer.DeserializationContext;
-import jakarta.json.bind.serializer.JsonbDeserializer;
-import jakarta.json.bind.serializer.JsonbSerializer;
-import jakarta.json.bind.serializer.SerializationContext;
-import jakarta.json.stream.JsonGenerator;
-import jakarta.json.stream.JsonParser;
-import org.fuin.esc.api.*;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.IBaseTypeFactory;
+import org.fuin.esc.api.IEscMeta;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.Serializer;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.TypeName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +44,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link EscSpiUtils} class.
  */
-// CHECKSTYLE:OFF Test
 public class EscSpiUtilsTest {
 
     @Test
@@ -62,10 +67,10 @@ public class EscSpiUtilsTest {
         assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventAa))).isTrue();
         assertThat(EscSpiUtils.eventsEqual(asList(eventA), asList(eventA, eventB))).isFalse();
         assertThat(EscSpiUtils.eventsEqual(asList(eventA, eventB), asList(eventB))).isFalse();
-        
+
     }
-    
-    
+
+
     @Test
     public void testSerializeNull() {
 
@@ -194,7 +199,6 @@ public class EscSpiUtilsTest {
         events.add(new SimpleCommonEvent(new EventId(), eventTypeB, "<Other/>"));
 
         // TEST
-        // TEST
         final EnhancedMimeType mimeType = EscSpiUtils.mimeType(registry, events);
 
         // VERIFY
@@ -207,269 +211,15 @@ public class EscSpiUtilsTest {
 
         // PREPARE
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final IBaseTypeFactory baseTypeFactory = Mockito.mock(IBaseTypeFactory.class);
 
         // TEST
-        final EscMeta result = EscSpiUtils.createEscMeta(registry,
+        final IEscMeta result = EscSpiUtils.createEscMeta(registry, baseTypeFactory,
                 EnhancedMimeType.create("application/xml"), null);
 
         // VERIFY
         assertThat(result).isNull();
 
-    }
-
-    @Test
-    public void testCreateEscMetaTargetXmlDataXmlMetaNull() {
-
-        // PREPARE
-        final String description = "Whatever";
-        final UUID uuid = UUID.randomUUID();
-        final MyEvent myEvent = new MyEvent(uuid, description);
-        final EventId eventId = new EventId();
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
-
-        // TEST
-        final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/xml; encoding=UTF-8"), commonEvent);
-
-        // VERIFY
-        assertThat(result).isNotNull();
-        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-        assertThat(result.getDataContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMetaType()).isNull();
-        assertThat(result.getMetaContentType()).isNull();
-        assertThat(result.getMeta()).isNull();
-
-    }
-
-    @Test
-    public void testCreateEscMetaTargetJsonDataXmlMetaNull() {
-
-        // PREPARE
-        final String description = "Whatever";
-        final UUID uuid = UUID.randomUUID();
-        final MyEvent myEvent = new MyEvent(uuid, description);
-        final EventId eventId = new EventId();
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
-
-        // TEST
-        final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/json"), commonEvent);
-
-        // VERIFY
-        assertThat(result).isNotNull();
-        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-        assertThat(result.getDataContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMetaType()).isNull();
-        assertThat(result.getMetaContentType()).isNull();
-        assertThat(result.getMeta()).isNull();
-
-    }
-
-    @Test
-    public void testCreateEscMetaTargetXmlDataXmlMetaXml() {
-
-        // PREPARE
-        final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Whatever");
-        final EventId eventId = new EventId();
-        final MyMeta myMeta = new MyMeta("peter");
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                myMeta);
-
-        // TEST
-        final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/xml; encoding=UTF-8"), commonEvent);
-
-        // VERIFY
-        assertThat(result).isNotNull();
-        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-        assertThat(result.getDataContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
-        assertThat(result.getMetaContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; encoding=UTF-8"));
-        assertThat(result.getMeta()).isEqualTo(myMeta);
-
-    }
-
-    @Test
-    public void testCreateEscMetaTargetJsonDataXmlMetaXml() {
-
-        // PREPARE
-        final String description = "Whatever";
-        final UUID uuid = UUID.randomUUID();
-        final MyEvent myEvent = new MyEvent(uuid, description);
-        final EventId eventId = new EventId();
-        final MyMeta myMeta = new MyMeta("peter");
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                myMeta);
-
-        // TEST
-        final EscMeta result = EscSpiUtils.createEscMeta(registry,
-                EnhancedMimeType.create("application/json"), commonEvent);
-
-        // VERIFY
-        assertThat(result).isNotNull();
-        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-        assertThat(result.getDataContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
-        assertThat(result.getMetaContentType()).isEqualTo(
-                EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8"));
-        assertThat(result.getMeta()).isInstanceOf(Base64Data.class);
-        final Base64Data base64Meta = (Base64Data) result.getMeta();
-        assertThat(new String(base64Meta.getDecoded(), Charset.forName("utf-8"))).isEqualTo(
-                "<MyMeta><user>peter</user></MyMeta>");
-
-    }
-    
-    @Test
-    public void testJoinJsonbSerializers() {
-        
-        final JsonbSerializer<Object> a = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> b = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> c = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> d = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        
-        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {})).isEmpty();;
-        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {}, a)).containsExactly(a);
-        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a}, b)).containsExactly(a, b);
-        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a, b}, c)).containsExactly(a, b, c);
-        assertThat(EscSpiUtils.joinJsonbSerializers(new JsonbSerializer<?>[] {a, b}, c, d)).containsExactly(a, b, c, d);
-        
-    }
-    
-    @Test
-    public void testJoinJsonbSerializerArrays() {
-        
-        final JsonbSerializer<Object> a = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> b = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> c = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        final JsonbSerializer<Object> d = new JsonbSerializer<Object>() {
-            @Override
-            public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
-            }
-        };
-        
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {})).isEmpty();;
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {}, new JsonbSerializer<?>[] {a})).containsExactly(a);
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a}, new JsonbSerializer<?>[] {b})).contains(a, b);
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a, b}, new JsonbSerializer<?>[] {c, d})).contains(a, b, c, d);
-        assertThat(EscSpiUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[] {a}, new JsonbSerializer<?>[] {b}, new JsonbSerializer<?>[] {c})).contains(a, b, c);
-        
-    }
-
-    @Test
-    public void testJoinJsonbDeserializers() {
-        
-        final JsonbDeserializer<Object> a = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> b = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> c = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> d = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        
-        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {})).isEmpty();;
-        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {}, a)).containsExactly(a);
-        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a}, b)).containsExactly(a, b);
-        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a, b}, c)).containsExactly(a, b, c);
-        assertThat(EscSpiUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[] {a, b}, c, d)).containsExactly(a, b, c, d);
-        
-    }
-    
-    @Test
-    public void testJoinJsonbDeserializerArrays() {
-        
-        final JsonbDeserializer<Object> a = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> b = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> c = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        final JsonbDeserializer<Object> d = new JsonbDeserializer<Object>() {
-            @Override
-            public Object deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
-                return null;
-            }
-        };
-        
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {})).isEmpty();;
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {}, new JsonbDeserializer<?>[] {a})).containsExactly(a);
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a}, new JsonbDeserializer<?>[] {b})).contains(a, b);
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a, b}, new JsonbDeserializer<?>[] {c})).contains(a, b, c);
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a, b}, new JsonbDeserializer<?>[] {c, d})).contains(a, b, c, d);
-        assertThat(EscSpiUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[] {a}, new JsonbDeserializer<?>[] {b}, new JsonbDeserializer<?>[] {c})).contains(a, b, c);
-        
     }
 
     private EnhancedMimeType mimeType(String str) {
@@ -510,13 +260,8 @@ public class EscSpiUtilsTest {
         };
     }
 
-    private List<CommonEvent> asList(CommonEvent...events) {
-        final List<CommonEvent> list = new ArrayList<>();
-        for (final CommonEvent event : events) {
-            list.add(event);
-        }
-        return list;
+    private List<CommonEvent> asList(CommonEvent... events) {
+        return new ArrayList<>(Arrays.asList(events));
     }
 
 }
-// CHECKSTYLE:ON

@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
 import jakarta.xml.bind.annotation.XmlElement;
@@ -12,10 +11,14 @@ import org.fuin.esc.api.SerializedDataType;
 @XmlRootElement(name = "book-added-event")
 public class BookAddedEvent {
 
-    /** Never changing unique event type name. */
+    /**
+     * Never changing unique event type name.
+     */
     public static final TypeName TYPE = new TypeName("BookAddedEvent");
-    
-    /** Unique name of the serialized type. */
+
+    /**
+     * Unique name of the serialized type.
+     */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlElement
@@ -33,11 +36,9 @@ public class BookAddedEvent {
 
     /**
      * Constructor with name and author.
-     * 
-     * @param name
-     *            Name.
-     * @param author
-     *            Author.
+     *
+     * @param name   Name.
+     * @param author Author.
      */
     public BookAddedEvent(final String name, final String author) {
         super();
@@ -103,4 +104,4 @@ public class BookAddedEvent {
     }
 
 }
-// CHECKSTYLE:ON
+

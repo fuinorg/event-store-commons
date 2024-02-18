@@ -1,24 +1,22 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.api;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.AfterEach;
@@ -30,18 +28,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link SimpleCommonEvent} class.
  */
-// CHECKSTYLE:OFF Test
 public class SimpleCommonEventTest {
 
     private static final EventId ID = new EventId();
 
     private static final TypeName DATA_TYPE = new TypeName("MyEvent");
 
-    private static MyEvent DATA = new MyEvent("Peter");
+    private static final MyEvent DATA = new MyEvent("Peter");
 
     private static final TypeName META_TYPE = new TypeName("MyMeta");
 
-    private static JsonObject META = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
+    private static final String META = " { \"ip\" : \"127.0.0.1\" }";
 
     private SimpleCommonEvent testee;
 
@@ -70,4 +67,4 @@ public class SimpleCommonEventTest {
     }
 
 }
-// CHECKSTYLE:ON
+

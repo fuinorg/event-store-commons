@@ -1,9 +1,11 @@
-// CHECKSTYLE:OFF Test
 package org.fuin.esc.api;
+
+import com.tngtech.archunit.junit.ArchIgnore;
 
 /**
  * Example event.
  */
+@ArchIgnore
 @HasSerializedDataTypeConstant
 public class MyEvent {
 
@@ -45,4 +47,3 @@ public class MyEvent {
     }
 
 }
-// CHECKSTYLE:ON

@@ -1,25 +1,23 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.api;
 
 import jakarta.activation.MimeTypeParseException;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link StreamEventsSlice} class.
  */
-// CHECKSTYLE:OFF Test
 public class StreamEventsSliceTest {
 
     private static final int FROM = 0;
@@ -51,7 +48,7 @@ public class StreamEventsSliceTest {
     public static void beforeClass() throws MimeTypeParseException {
         final TypeName dataType = new TypeName("MyEvent");
         final TypeName metaType = new TypeName("MyMeta");
-        final JsonObject meta = Json.createObjectBuilder().add("ip", "127.0.0.1").build();
+        final String meta = "{ \"ip\" : \"127.0.0.1\" }";
         events = new ArrayList<CommonEvent>();
         events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Peter"), metaType, meta));
         events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Mary Jane"), metaType, meta));
@@ -71,7 +68,7 @@ public class StreamEventsSliceTest {
     public void testNullList() {
         assertThat(new StreamEventsSlice(FROM, null, NEXT, EOS).getEvents()).isEmpty();
     }
-    
+
     @Test
     public void testEqualsHashCode() {
         EqualsVerifier.forClass(StreamEventsSlice.class).verify();
@@ -87,4 +84,4 @@ public class StreamEventsSliceTest {
     }
 
 }
-// CHECKSTYLE:ON
+

@@ -1,23 +1,27 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.jpa;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
@@ -55,7 +59,7 @@ public class NoParamsEvent extends JpaStreamEvent {
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param streamId
      *            Unique identifier of the stream.
      * @param version
@@ -64,7 +68,7 @@ public class NoParamsEvent extends JpaStreamEvent {
      *            Event to store.
      */
     public NoParamsEvent(@NotNull final StreamId streamId, @NotNull final Long version,
-            @NotNull final JpaEvent jpaEvent) {
+                         @NotNull final JpaEvent jpaEvent) {
         super(jpaEvent);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("version", version);
@@ -74,7 +78,7 @@ public class NoParamsEvent extends JpaStreamEvent {
 
     /**
      * Returns the name of the stream.
-     * 
+     *
      * @return Unique identifier name of the stream.
      */
     public String getStreamName() {
@@ -83,14 +87,13 @@ public class NoParamsEvent extends JpaStreamEvent {
 
     /**
      * Returns the number of the stream.
-     * 
+     *
      * @return Number that is unique in combination with the name.
      */
     public Long getEventNumber() {
         return eventNumber;
     }
 
-    // CHECKSTYLE:OFF Generated code
 
     @Override
     public int hashCode() {
@@ -121,16 +124,10 @@ public class NoParamsEvent extends JpaStreamEvent {
             return false;
         }
         if (eventNumber == null) {
-            if (other.eventNumber != null) {
-                return false;
-            }
-        } else if (!eventNumber.equals(other.eventNumber)) {
-            return false;
-        }
-        return true;
+            return other.eventNumber == null;
+        } else return eventNumber.equals(other.eventNumber);
     }
 
-    // CHECKSTYLE:ON
 
     @Override
     public String toString() {

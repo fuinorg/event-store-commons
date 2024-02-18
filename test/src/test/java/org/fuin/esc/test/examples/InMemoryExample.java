@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
 import org.fuin.esc.api.*;
@@ -17,9 +16,8 @@ public final class InMemoryExample {
 
     /**
      * Main method.
-     * 
-     * @param args
-     *            Not used.
+     *
+     * @param args Not used.
      */
     public static void main(final String[] args) {
 
@@ -35,7 +33,7 @@ public final class InMemoryExample {
             TypeName eventType = new TypeName("BookAddedEvent");// Define unique event type (name of the event)
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
             CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event); // Combines user and general data
-            
+
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);
 

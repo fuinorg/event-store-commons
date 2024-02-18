@@ -1,22 +1,23 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.jpa.examples;
 
+import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.jpa.JpaEvent;
@@ -26,6 +27,7 @@ import org.fuin.objects4j.common.Contract;
 /**
  * Database table for an event of the vendor aggregate.
  */
+@ArchIgnore
 @Table(name = "VENDOR_EVENTS")
 @Entity
 @IdClass(VendorEventPrimaryKey.class)
@@ -50,7 +52,7 @@ public class VendorEvent extends JpaStreamEvent {
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param vendorId
      *            Unique vendor identifier.
      * @param version
@@ -59,7 +61,7 @@ public class VendorEvent extends JpaStreamEvent {
      *            Event entry to connect.
      */
     public VendorEvent(@NotNull final String vendorId,
-            @NotNull final Long version, final JpaEvent eventEntry) {
+                       @NotNull final Long version, final JpaEvent eventEntry) {
         super(eventEntry);
         Contract.requireArgNotNull("vendorId", vendorId);
         Contract.requireArgNotNull("version", version);
@@ -69,7 +71,7 @@ public class VendorEvent extends JpaStreamEvent {
 
     /**
      * Returns the unique vendor identifier.
-     * 
+     *
      * @return Vendor identifier.
      */
     public final String getVendorId() {
@@ -78,14 +80,13 @@ public class VendorEvent extends JpaStreamEvent {
 
     /**
      * Returns the number of the stream.
-     * 
+     *
      * @return Number that is unique in combination with the name.
      */
     public final Long getEventNumber() {
         return eventNumber;
     }
 
-    // CHECKSTYLE:OFF Generated code
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -119,7 +120,6 @@ public class VendorEvent extends JpaStreamEvent {
         return true;
     }
 
-    // CHECKSTYLE:ON
 
     @Override
     public final String toString() {

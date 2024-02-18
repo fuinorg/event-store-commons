@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -31,11 +31,11 @@ public abstract class JpaStreamEvent {
 
     /** SQL EVENT ID column name. */
     public static final String COLUMN_EVENTS_ID = "events_id";
-    
-    /** Column event number - Defined in sub classes as part of the composite identifier. */
+
+    /** Column event number - Defined in subclasses as part of the composite identifier. */
     public static final String COLUMN_EVENT_NUMBER = "event_number";
-    
-    
+
+
     @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = COLUMN_EVENTS_ID, nullable = false, updatable = false)
@@ -50,7 +50,7 @@ public abstract class JpaStreamEvent {
 
     /**
      * Constructs a stream event.
-     * 
+     *
      * @param event
      *            Event to be connected with this event stream.
      */
@@ -62,7 +62,7 @@ public abstract class JpaStreamEvent {
 
     /**
      * Returns the actual event.
-     * 
+     *
      * @return Event connected with this stream
      */
     @NotNull

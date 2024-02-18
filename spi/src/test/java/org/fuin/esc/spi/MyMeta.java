@@ -1,30 +1,25 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.spi;
 
+import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.annotation.Nullable;
-import jakarta.json.Json;
-import jakarta.json.JsonStructure;
-import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.ToJsonCapable;
 import org.fuin.esc.api.TypeName;
 
 import java.io.Serializable;
@@ -32,18 +27,21 @@ import java.io.Serializable;
 /**
  * Example meta data. .
  */
-@XmlRootElement(name = "MyMeta")
-public final class MyMeta implements Serializable, ToJsonCapable {
+@ArchIgnore
+public final class MyMeta implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    /** Unique name of the meta type. */
+    /**
+     * Unique name of the meta type.
+     */
     public static final TypeName TYPE = new TypeName("MyMeta");
 
-    /** Unique name of the serialized meta type. */
+    /**
+     * Unique name of the serialized meta type.
+     */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
-    
-    @XmlElement(name = "user")
+
     private String user;
 
     /**
@@ -55,9 +53,8 @@ public final class MyMeta implements Serializable, ToJsonCapable {
 
     /**
      * Constructor with all mandatory data.
-     * 
-     * @param user
-     *            User ID.
+     *
+     * @param user User ID.
      */
     public MyMeta(@Nullable final String user) {
         super();
@@ -66,14 +63,13 @@ public final class MyMeta implements Serializable, ToJsonCapable {
 
     /**
      * Returns the user.
-     * 
+     *
      * @return User ID.
      */
     public final String getUser() {
         return user;
     }
 
-    // CHECKSTYLE:OFF Generated code
 
     @Override
     public int hashCode() {
@@ -105,17 +101,10 @@ public final class MyMeta implements Serializable, ToJsonCapable {
         return true;
     }
 
-    // CHECKSTYLE:ON
 
     @Override
     public final String toString() {
         return "My meta: " + user;
     }
 
-    @Override
-    @NotNull
-    public final JsonStructure toJson() {
-        return Json.createObjectBuilder().add("user", user).build();
-    }
-    
 }

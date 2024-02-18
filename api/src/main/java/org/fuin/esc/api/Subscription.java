@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -23,7 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * Result of subscribing to a stream. The sub classes will contain
+ * Result of subscribing to a stream. The subclasses will contain
  * implementation specific data that is required to handle unsubscribe requests.
  */
 public abstract class Subscription implements Serializable {
@@ -36,21 +36,21 @@ public abstract class Subscription implements Serializable {
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param streamId
      *            Unique stream identifier.
      * @param lastEventNumber
      *            Number of the last event written to the stream.
      */
     public Subscription(@NotNull final StreamId streamId,
-            @Nullable final Long lastEventNumber) {
+                        @Nullable final Long lastEventNumber) {
         this.streamId = streamId;
         this.lastEventNumber = lastEventNumber;
     }
 
     /**
      * Returns the unique stream identifier.
-     * 
+     *
      * @return Stream ID.
      */
     @NotNull
@@ -60,7 +60,7 @@ public abstract class Subscription implements Serializable {
 
     /**
      * Returns the number of the last event written to the stream.
-     * 
+     *
      * @return Event number.
      */
     @Nullable

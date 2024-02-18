@@ -26,6 +26,6 @@ class AccountCreated {
     public String toString() {
         return "AccountCreated [id=" + id + ", login=" + login + "]";
     }
-    
-    
+
+
 }   
