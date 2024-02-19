@@ -11,31 +11,28 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 
 ## Versions
 
-- 0.8.x = Refactoring if the module structure (Incompatible!)
+- 0.8.x = Refactoring of the module structure (![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) Incompatible!)
 - 0.7.x = New **GRPC** client / Removed **http**/**esjc** modules
 - 0.6.x = **Java 17** and JUnit5
 - 0.5.x = **Java 11** with new **jakarta** namespace
 - 0.4.x = **Java 11** before namespace change from 'javax' to 'jakarta'
 - 0.3.2 (or less) = **Java 8**
 
-*Caution*: The code coverage value is not correct (it's actually higher than above value) as the 'test' module is not
-considered correctly (See [Issue #4](https://github.com//fuinorg/event-store-commons/issues/4))
-
 ## Status
 
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in
 progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
-| Module             | Description                                                                                                                                            |
-|:-------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [esc-api](api)     | Defines the event store commons API.                                                                                                                   |
-| [esc-grpc](grpc)   | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) adapter for Greg Young's [event store](https://www.geteventstore.com/) |
-| [esc-jaxb](jaxb)   | JAX-B serialization support                                                                                                                            |
-| [esc-jpa](jpa)     | JPA adapter                                                                                                                                            |
-| [esc-jsonb](jsonb) | JSON-B serialization support                                                                                                                           |
-| [esc-mem](mem)     | In-memory implementation                                                                                                                               |
-| [esc-spi](spi)     | Helper classes for adapters and implementations                                                                                                        |
-| [esc-test](test)   | Cucumber tests for adapters and implementations                                                                                                        |
+| Module             | Description                                                                                                                                                         |
+|:-------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [esc-api](api)     | Defines the event store commons API.                                                                                                                                |
+| [esc-grpc](grpc)   | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) based implementation for Greg Young's [event store](https://www.geteventstore.com/) |
+| [esc-jaxb](jaxb)   | JAX-B serialization support                                                                                                                                         |
+| [esc-jpa](jpa)     | JPA based implementation (events are stored in a relational database)                                                                                               |
+| [esc-jsonb](jsonb) | JSON-B serialization support                                                                                                                                        |
+| [esc-mem](mem)     | In-memory implementation (events are not persisted)                                                                                                                 |
+| [esc-spi](spi)     | Helper classes for adapters and implementations                                                                                                                     |
+| [esc-test](test)   | Cucumber tests for adapters and implementations                                                                                                                     |
 
 ## Architecture
 
@@ -44,9 +41,7 @@ progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-comm
 ## Examples
 
 - [Simple in-memory example](test/src/test/java/org/fuin/esc/test/examples/InMemoryExample.java)
-- [Event store with HTTP interface and XML (JAX-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpXmlExample.java)
-- [Event store with HTTP interface and JSON (JSON-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpJsonbExample.java)
-- [Event store with HTTP interface and mixed JSON/XML content (JAX-B/JSON-B)](test/src/test/java/org/fuin/esc/test/examples/EsHttpMixedExample.java)
+- [Event store with GRPC interface and JSON (JSON-B)](test/src/test/java/org/fuin/esc/test/examples/EsGrpcJsonbExample.java)
 
 ### Snapshots
 
