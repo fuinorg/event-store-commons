@@ -59,7 +59,7 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
         if (content.containsKey(Base64Data.EL_ROOT_NAME)) {
             escEvent.setData(new DataWrapper(new Base64Data(content.getString(Base64Data.EL_ROOT_NAME))));
         } else {
-            if (escEvent.getMeta() == null) {
+            if (escEvent.getMeta() == null) { //NOSONAR Can unfortunately be null because it's not set above...
                 throw new IllegalStateException("Expected 'meta' to be set, but was never processed during parse process");
             }
             if (!(escEvent.getMeta().getObj() instanceof EscMeta escMeta)) {

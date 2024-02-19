@@ -104,7 +104,7 @@ public final class EscMeta implements IEscMeta {
      *
      * @return Data type.
      */
-    @Nullable
+    @NotNull
     public String getDataType() {
         return dataType;
     }

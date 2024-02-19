@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Test for the {@link EscEventsJsonbSerializerDeserializer} class.
  */
 @TestOmitted("Already tested along with the other tests in this package")
+@SuppressWarnings("java:S2187")
 public class EscEventsJsonbSerializerDeserializerTest {
 
     // Nothing to test in addition

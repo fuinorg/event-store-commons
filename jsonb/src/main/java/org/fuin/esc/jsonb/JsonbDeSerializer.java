@@ -179,7 +179,7 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
      * @param serRegistry
      *            Mapping from type name to serializers.
      */
-    public void init(@Nullable final SerializedDataTypeRegistry typeRegistry, @Nullable final SerializerRegistry serRegistry) {
+    public void init(@NotNull final SerializedDataTypeRegistry typeRegistry, @Nullable final SerializerRegistry serRegistry) {
         init(typeRegistry, null, serRegistry);
     }
 
@@ -191,7 +191,7 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
      * @param deserRegistry
      *            Mapping from type name to deserializers.
      */
-    public void init(@Nullable final SerializedDataTypeRegistry typeRegistry, @Nullable final DeserializerRegistry deserRegistry) {
+    public void init(@NotNull final SerializedDataTypeRegistry typeRegistry, @Nullable final DeserializerRegistry deserRegistry) {
         init(typeRegistry, deserRegistry, null);
     }
 
@@ -212,24 +212,12 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
             throw new IllegalStateException("Instance already initialized - Don't call the init methods more than once");
         }
         this.typeRegistry = typeRegistry;
-        for (final JsonbDeserializer<?> deserializer : deserializers) {
-            if (deserializer instanceof DeserializerRegistryRequired des) {
-                if (deserRegistry == null) {
-                    throw new IllegalStateException(
-                            "There is at least one deserializer that requires a 'DeserializerRegistry', but you didn't provide one (deserializer="
-                                    + deserializer.getClass().getName() + ")");
-                }
-                des.setRegistry(deserRegistry);
-            }
-            if (deserializer instanceof SerializedDataTypeRegistryRequired des) {
-                if (typeRegistry == null) {
-                    throw new IllegalStateException(
-                            "There is at least one deserializer that requires a 'SerializedDataTypeRegistry', but you didn't provide one (deserializer="
-                                    + deserializer.getClass().getName() + ")");
-                }
-                des.setRegistry(typeRegistry);
-            }
-        }
+        initDeserializers(typeRegistry, deserRegistry);
+        initSerializers(typeRegistry, serRegistry);
+        initialized = true;
+    }
+
+    private void initSerializers(SerializedDataTypeRegistry typeRegistry, SerializerRegistry serRegistry) {
         for (final JsonbSerializer<?> serializer : serializers) {
             if (serializer instanceof SerializerRegistryRequired ser) {
                 if (serRegistry == null) {
@@ -248,7 +236,27 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
                 ser.setRegistry(typeRegistry);
             }
         }
-        initialized = true;
+    }
+
+    private void initDeserializers(SerializedDataTypeRegistry typeRegistry, DeserializerRegistry deserRegistry) {
+        for (final JsonbDeserializer<?> deserializer : deserializers) {
+            if (deserializer instanceof DeserializerRegistryRequired des) {
+                if (deserRegistry == null) {
+                    throw new IllegalStateException(
+                            "There is at least one deserializer that requires a 'DeserializerRegistry', but you didn't provide one (deserializer="
+                                    + deserializer.getClass().getName() + ")");
+                }
+                des.setRegistry(deserRegistry);
+            }
+            if (deserializer instanceof SerializedDataTypeRegistryRequired des) {
+                if (typeRegistry == null) {
+                    throw new IllegalStateException(
+                            "There is at least one deserializer that requires a 'SerializedDataTypeRegistry', but you didn't provide one (deserializer="
+                                    + deserializer.getClass().getName() + ")");
+                }
+                des.setRegistry(typeRegistry);
+            }
+        }
     }
 
     private void ensureInitialized() {

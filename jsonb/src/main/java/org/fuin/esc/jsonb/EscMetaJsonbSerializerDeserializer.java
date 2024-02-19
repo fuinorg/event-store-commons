@@ -12,6 +12,7 @@ import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * Adapter to use for JSON-B.
@@ -62,9 +63,9 @@ public final class EscMetaJsonbSerializerDeserializer
         generator.writeStartObject();
         generator.write(EscMeta.EL_DATA_TYPE, escMeta.getDataType());
         generator.write(EscMeta.EL_DATA_CONTENT_TYPE, escMeta.getDataContentType().toString());
-        if (escMeta.getMeta() != null) {
+        if (escMeta.getMeta() != null) { //NOSONAR Can unfortunately be null because it's not set above...
             generator.write(EscMeta.EL_META_TYPE, escMeta.getMetaType());
-            generator.write(EscMeta.EL_META_CONTENT_TYPE, escMeta.getMetaContentType().toString());
+            generator.write(EscMeta.EL_META_CONTENT_TYPE, Objects.requireNonNull(escMeta.getMetaContentType()).toString());
             if (escMeta.getMeta() instanceof Base64Data base64data) {
                 generator.write(Base64Data.EL_ROOT_NAME, base64data.getEncoded());
             } else {

@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests the {@link GrpcProjectionAdminEventStore} class.
  */
 @ArchIgnore
+@SuppressWarnings("java:S2187")
 class GrpcProjectionAdminEventStoreIT {
 
     private static EventStoreDBProjectionManagementClient client;

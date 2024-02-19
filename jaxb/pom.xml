@@ -9,6 +9,7 @@
         <groupId>org.fuin.esc</groupId>
         <artifactId>esc-parent</artifactId>
         <version>0.8.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>esc-jaxb</artifactId>
@@ -145,6 +146,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
 
             <plugin>

@@ -291,7 +291,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
     @NotNull
     public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
                                           final Charset encoding, final String version) {
-        return create(primary, sub, encoding, version, new HashMap<String, String>());
+        return create(primary, sub, encoding, version, new HashMap<>());
     }
 
     /**
