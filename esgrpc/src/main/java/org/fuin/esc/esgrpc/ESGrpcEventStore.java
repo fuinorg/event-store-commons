@@ -476,10 +476,10 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         /**
          * Sets the base type factory.
          *
-         * @param baseTypeFactory Fcatory used to create base types.
+         * @param baseTypeFactory Factory used to create base types.
          * @return Builder.
          */
-        public Builder desRegistry(final IBaseTypeFactory baseTypeFactory) {
+        public Builder baseTypeFactory(final IBaseTypeFactory baseTypeFactory) {
             this.baseTypeFactory = baseTypeFactory;
             return this;
         }
