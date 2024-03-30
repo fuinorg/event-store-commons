@@ -17,19 +17,19 @@
  */
 package org.fuin.esc.esgrpc;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.Serializable;
 
 /**
  * Example meta data. .
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @XmlRootElement(name = "MyMeta")
 public final class MyMeta implements Serializable {
 

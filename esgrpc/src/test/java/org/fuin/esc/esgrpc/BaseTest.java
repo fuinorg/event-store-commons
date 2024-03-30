@@ -17,31 +17,16 @@
  */
 package org.fuin.esc.esgrpc;
 
-import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static org.fuin.units4j.archunit.AllTopLevelClassesHaveATestCondition.haveACorrespondingClassEndingWith;
+import org.fuin.units4j.archunit.Units4JConditions;
 
 @AnalyzeClasses(packagesOf = BaseTest.class)
 class BaseTest {
 
     @ArchTest
-    static final ArchRule all_classes_should_have_tests =
-            classes()
-                    .that()
-                    .areTopLevelClasses()
-                    .and().areNotInterfaces()
-                    .and().areNotRecords()
-                    .and().areNotEnums()
-                    .and().doNotHaveModifier(JavaModifier.ABSTRACT)
-                    .and().areNotAnnotatedWith(ArchIgnore.class)
-                    .and().doNotHaveFullyQualifiedName("org.fuin.esc.esgrpc.example.AccountCreated")
-                    .and().doNotHaveFullyQualifiedName("org.fuin.esc.esgrpc.example.App")
-                    .should(haveACorrespondingClassEndingWith("Test"));
+    static final ArchRule all_classes_should_have_tests = Units4JConditions.ALL_CLASSES_SHOULD_HAVE_TESTS;
 
 }
 

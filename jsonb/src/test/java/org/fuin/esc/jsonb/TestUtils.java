@@ -1,18 +1,18 @@
 package org.fuin.esc.jsonb;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.validation.constraints.NotNull;
 import org.eclipse.yasson.FieldAccessStrategy;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.nio.charset.StandardCharsets;
 
 /**
  * Helper methods for the test package.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 final class TestUtils {
 
     private TestUtils() {

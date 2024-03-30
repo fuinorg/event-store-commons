@@ -17,16 +17,16 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.Serializable;
 
 /**
  * Primary key for the vendor event table.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public class VendorEventPrimaryKey implements Serializable {
 
     private static final long serialVersionUID = 1000L;

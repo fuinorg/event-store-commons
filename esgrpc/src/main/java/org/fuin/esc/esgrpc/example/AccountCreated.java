@@ -1,7 +1,10 @@
 package org.fuin.esc.esgrpc.example;
 
+import org.fuin.utils4j.TestOmitted;
+
 import java.util.UUID;
 
+@TestOmitted("Example class")
 class AccountCreated {
     private UUID id;
     private String login;

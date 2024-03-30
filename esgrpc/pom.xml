@@ -71,6 +71,11 @@
             <artifactId>objects4j-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.fuin</groupId>
+            <artifactId>utils4j</artifactId>
+        </dependency>
+
         <!-- test -->
 
         <dependency>
@@ -160,12 +165,6 @@
         <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.fuin</groupId>
-            <artifactId>utils4j</artifactId>
             <scope>test</scope>
         </dependency>
 

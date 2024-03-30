@@ -17,17 +17,21 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import com.tngtech.archunit.junit.ArchIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.jpa.JpaEvent;
 import org.fuin.esc.jpa.JpaStreamEvent;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Database table for an event of the vendor aggregate.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @Table(name = "VENDOR_EVENTS")
 @Entity
 @IdClass(VendorEventPrimaryKey.class)

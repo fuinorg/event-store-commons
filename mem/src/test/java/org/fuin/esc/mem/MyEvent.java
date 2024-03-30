@@ -1,11 +1,11 @@
 package org.fuin.esc.mem;
 
-import com.tngtech.archunit.junit.ArchIgnore;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public class MyEvent {
 
     private String name;

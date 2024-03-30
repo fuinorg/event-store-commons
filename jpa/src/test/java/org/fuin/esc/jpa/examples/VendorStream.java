@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,13 +27,14 @@ import org.fuin.esc.jpa.JpaEvent;
 import org.fuin.esc.jpa.JpaStream;
 import org.fuin.esc.jpa.JpaStreamEvent;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Vendor stream.
  */
 @Table(name = "VENDOR_STREAMS")
 @Entity
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public class VendorStream extends JpaStream {
 
     @Id

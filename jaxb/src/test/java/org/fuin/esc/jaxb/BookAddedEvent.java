@@ -1,15 +1,15 @@
 package org.fuin.esc.jaxb;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @XmlRootElement(name = "book-added-event")
 public class BookAddedEvent {
 

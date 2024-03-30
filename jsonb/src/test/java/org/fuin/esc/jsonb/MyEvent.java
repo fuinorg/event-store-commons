@@ -17,13 +17,13 @@
  */
 package org.fuin.esc.jsonb;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * Something interesting happened. Equals and hash code are based on the UUID.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public final class MyEvent implements Serializable {
 
     private static final long serialVersionUID = 100L;

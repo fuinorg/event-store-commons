@@ -137,6 +137,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.fuin</groupId>
+            <artifactId>utils4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

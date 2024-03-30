@@ -1,11 +1,11 @@
 package org.fuin.esc.api;
 
-import com.tngtech.archunit.junit.ArchIgnore;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @HasSerializedDataTypeConstant
 public class MyEvent {
 

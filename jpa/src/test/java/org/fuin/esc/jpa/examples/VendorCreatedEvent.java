@@ -17,15 +17,15 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import com.tngtech.archunit.junit.ArchIgnore;
+import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.validation.constraints.NotNull;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * A vendor entity was created.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @XmlRootElement(name = "vendor-created-event")
 public final class VendorCreatedEvent {
 

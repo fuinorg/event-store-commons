@@ -10,11 +10,13 @@ import com.eventstore.dbclient.ReadResult;
 import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
 import com.eventstore.dbclient.WriteResult;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+@TestOmitted("Example class")
 public class App {
 
     private App() {

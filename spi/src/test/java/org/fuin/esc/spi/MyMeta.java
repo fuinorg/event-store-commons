@@ -17,17 +17,17 @@
  */
 package org.fuin.esc.spi;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.annotation.Nullable;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.Serializable;
 
 /**
  * Example meta data. .
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public final class MyMeta implements Serializable {
 
     private static final long serialVersionUID = 100L;

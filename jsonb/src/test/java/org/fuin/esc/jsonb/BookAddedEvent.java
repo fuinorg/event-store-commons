@@ -1,14 +1,14 @@
 package org.fuin.esc.jsonb;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.json.bind.annotation.JsonbProperty;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public class BookAddedEvent {
 
     /**

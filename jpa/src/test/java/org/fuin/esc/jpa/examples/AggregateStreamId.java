@@ -17,13 +17,11 @@
  */
 package org.fuin.esc.jpa.examples;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.core.KeyValue;
+import org.fuin.utils4j.TestOmitted;
 
 import javax.annotation.concurrent.Immutable;
-
-import org.fuin.objects4j.core.KeyValue;
-
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +30,7 @@ import java.util.List;
 /**
  * Unique name of an aggregate stream.
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 @Immutable
 public final class AggregateStreamId implements StreamId {
 

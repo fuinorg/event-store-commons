@@ -17,11 +17,11 @@
  */
 package org.fuin.esc.jsonb;
 
-import com.tngtech.archunit.junit.ArchIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.json.bind.annotation.JsonbProperty;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * Example meta data. .
  */
-@ArchIgnore
+@TestOmitted("This is only a test class")
 public final class MyMeta implements Serializable {
 
     @Serial
