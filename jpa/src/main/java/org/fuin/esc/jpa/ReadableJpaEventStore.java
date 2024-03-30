@@ -21,10 +21,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Read only JPA implementation of the event store.
  */
+@TestOmitted("Tested with JpaEventStoreTest and 'esc-test' project")
 public final class ReadableJpaEventStore extends AbstractJpaEventStore {
 
     /**

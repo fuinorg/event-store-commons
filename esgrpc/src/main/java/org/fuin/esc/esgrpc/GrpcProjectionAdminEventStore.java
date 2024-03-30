@@ -15,6 +15,7 @@ import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
 import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * GRPC based eventstore projection admin implementation.
  */
+@TestOmitted("Tested in the 'test' project")
 public final class GrpcProjectionAdminEventStore implements ProjectionAdminEventStore {
 
     private final EventStoreDBProjectionManagementClient es;

@@ -17,9 +17,12 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.utils4j.TestOmitted;
+
 /**
  * Common event store API constants.
  */
+@TestOmitted("Just constants for now")
 public final class EscApiUtils {
 
     /**

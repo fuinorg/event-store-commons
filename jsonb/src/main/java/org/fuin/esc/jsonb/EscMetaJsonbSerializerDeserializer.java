@@ -10,6 +10,7 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
+import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import java.util.Objects;
 /**
  * Adapter to use for JSON-B.
  */
+@TestOmitted("Already tested along with the other tests in this package")
 public final class EscMetaJsonbSerializerDeserializer
         implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta>, SerializedDataTypeRegistryRequired {
 

@@ -11,12 +11,14 @@ import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.DeserializerRegistryRequired;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
 
 /**
  * Adapter to use for JSON-B.
  */
+@TestOmitted("Already tested along with the other tests in this package")
 public final class EscEventJsonbSerializerDeserializer implements JsonbSerializer<EscEvent>,
         JsonbDeserializer<EscEvent>, DeserializerRegistryRequired {
 

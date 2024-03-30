@@ -51,6 +51,7 @@ import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,6 +63,7 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
 /**
  * Implementation that connects to the event store (<a href="http://www.geteventstore.com">Eventstore</a>) using the GRPC API.
  */
+@TestOmitted("Tested in the 'test' project")
 public final class ESGrpcEventStore extends AbstractReadableEventStore implements IESGrpcEventStore {
 
     private final EventStoreDBClient es;

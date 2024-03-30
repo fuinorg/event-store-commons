@@ -54,7 +54,8 @@ class ArchitectureTest {
                     "org.fuin.objects4j.core..",
                     "org.slf4j..",
                     "jakarta.json..",
-                    "org.apache.commons.lang3.."
+                    "org.apache.commons.lang3..",
+                    "org.fuin.utils4j.."
             );
 
 

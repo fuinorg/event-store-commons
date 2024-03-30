@@ -53,7 +53,8 @@ class ArchitectureTest {
                     "javax.annotation.concurrent..",
                     "org.fuin.objects4j.common..",
                     "org.fuin.objects4j.core..",
-                    "org.slf4j.."
+                    "org.slf4j..",
+                    "org.fuin.utils4j.."
             );
 
 
