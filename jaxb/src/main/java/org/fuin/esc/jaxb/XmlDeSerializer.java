@@ -19,7 +19,10 @@ package org.fuin.esc.jaxb;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializer;
@@ -29,7 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 

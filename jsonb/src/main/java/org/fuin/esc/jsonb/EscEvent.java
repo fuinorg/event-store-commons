@@ -21,8 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IDataWrapper;
 import org.fuin.esc.api.IEscEvent;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.UUID;
@@ -32,12 +30,6 @@ import java.util.UUID;
  */
 @HasSerializedDataTypeConstant
 public final class EscEvent implements IEscEvent {
-
-    /** Unique name of the type. */
-    public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
-
-    /** Unique name of the serialized type. */
-    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     private String eventId;
 

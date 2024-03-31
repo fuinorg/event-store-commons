@@ -17,18 +17,16 @@
  */
 package org.fuin.esc.test;
 
-import java.io.StringWriter;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import org.fuin.utils4j.jaxb.CDataXmlStreamWriter;
+import org.fuin.utils4j.jaxb.JaxbUtils;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-
-import org.fuin.utils4j.jaxb.CDataXmlStreamWriter;
-import org.fuin.utils4j.jaxb.JaxbUtils;
+import java.io.StringWriter;
 
 /**
  * Base class for XML marshal/unmarshal tests.

@@ -17,13 +17,12 @@
  */
 package org.fuin.esc.spi;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+
+import java.util.List;
 
 /**
  * Builds the JavaScript for a 'fromCategory' projection.

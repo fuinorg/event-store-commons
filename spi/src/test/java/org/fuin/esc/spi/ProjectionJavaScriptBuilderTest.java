@@ -17,16 +17,15 @@
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.TypeName;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the {@link ProjectionJavaScriptBuilder} class.

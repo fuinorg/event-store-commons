@@ -17,9 +17,8 @@
  */
 package org.fuin.esc.test;
 
-import org.junit.runner.RunWith;
-
 import cucumber.api.CucumberOptions;
+import org.junit.runner.RunWith;
 
 /**
  * Locates all cucumber files and starts them as unit tests.

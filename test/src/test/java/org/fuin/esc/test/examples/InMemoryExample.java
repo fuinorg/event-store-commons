@@ -1,6 +1,13 @@
 package org.fuin.esc.test.examples;
 
-import org.fuin.esc.api.*;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.EventStore;
+import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.mem.InMemoryEventStore;
 
 import java.util.concurrent.Executors;

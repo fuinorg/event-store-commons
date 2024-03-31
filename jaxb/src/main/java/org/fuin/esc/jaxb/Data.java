@@ -38,7 +38,7 @@ import java.io.Serializable;
  * might be useful for tests. It's not used in the 'esc-spi' code itself
  */
 @Immutable
-@XmlRootElement(name = Data.EL_ROOT_NAME)
+@XmlRootElement(name = IData.EL_ROOT_NAME)
 public final class Data implements IData, ValueObject, Serializable {
 
     @Serial
@@ -48,14 +48,14 @@ public final class Data implements IData, ValueObject, Serializable {
      * Unique type of the data.
      */
     @NotNull
-    @XmlAttribute(name = EL_TYPE)
+    @XmlAttribute(name = IData.EL_TYPE)
     private String type;
 
     /**
      * Internet Media Type that classifies the raw event data.
      */
     @NotNull
-    @XmlAttribute(name = EL_MIME_TYPE)
+    @XmlAttribute(name = IData.EL_MIME_TYPE)
     private String mimeType;
 
     /**

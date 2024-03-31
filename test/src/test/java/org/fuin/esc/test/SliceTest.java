@@ -17,26 +17,24 @@
  */
 package org.fuin.esc.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-import static org.fuin.utils4j.Utils4J.deserialize;
-import static org.fuin.utils4j.Utils4J.serialize;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.jaxb.Data;
-import org.fuin.esc.api.EnhancedMimeType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.fuin.utils4j.Utils4J.deserialize;
+import static org.fuin.utils4j.Utils4J.serialize;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Tests the {@link Slice} class.

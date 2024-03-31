@@ -35,6 +35,16 @@ public interface IEscEvents extends IBaseType {
     String EL_EVENT = "Event";
 
     /**
+     * Unique name of the type.
+     */
+    TypeName TYPE = new TypeName(EL_ROOT_NAME);
+
+    /**
+     * Unique name of the serialized type.
+     */
+    SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+
+    /**
      * Returns an immutable event list.
      *
      * @return Unmodifiable list of events.

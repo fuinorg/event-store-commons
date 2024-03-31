@@ -22,8 +22,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.objects4j.common.Contract;
 
@@ -33,29 +31,19 @@ import java.util.UUID;
  * An event structure.
  */
 @HasSerializedDataTypeConstant
-@XmlRootElement(name = EscEvent.EL_ROOT_NAME)
+@XmlRootElement(name = IEscEvent.EL_ROOT_NAME)
 public final class EscEvent implements IEscEvent {
 
-    /**
-     * Unique name of the type.
-     */
-    public static final TypeName TYPE = new TypeName(EL_ROOT_NAME);
-
-    /**
-     * Unique name of the serialized type.
-     */
-    public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
-
-    @XmlElement(name = EL_EVENT_ID)
+    @XmlElement(name = IEscEvent.EL_EVENT_ID)
     private String eventId;
 
-    @XmlElement(name = EL_EVENT_TYPE)
+    @XmlElement(name = IEscEvent.EL_EVENT_TYPE)
     private String eventType;
 
-    @XmlElement(name = EL_DATA)
+    @XmlElement(name = IEscEvent.EL_DATA)
     private DataWrapper data;
 
-    @XmlElement(name = EL_META_DATA)
+    @XmlElement(name = IEscEvent.EL_META_DATA)
     private DataWrapper meta;
 
     /**

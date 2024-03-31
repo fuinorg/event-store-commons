@@ -17,11 +17,8 @@
  */
 package org.fuin.esc.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
@@ -31,8 +28,10 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import jakarta.annotation.Nullable;
 import org.fuin.utils4j.TestCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Appends some data to a stream.

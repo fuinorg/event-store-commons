@@ -19,7 +19,6 @@ package org.fuin.esc.test;
 
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.fuin.esc.api.EventId;
 
 /**

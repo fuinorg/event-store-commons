@@ -1,7 +1,6 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 
 /**

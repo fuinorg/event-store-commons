@@ -17,17 +17,16 @@
  */
 package org.fuin.esc.test;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fuin.esc.spi.EscSpiUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.esc.spi.EscSpiUtils;
 
 /**
  * Multiple slice of data from a stream.

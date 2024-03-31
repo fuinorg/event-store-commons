@@ -20,7 +20,6 @@ package org.fuin.esc.test;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -33,17 +32,14 @@ import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.jaxb.Data;
 import org.fuin.objects4j.common.Contract;
-
-import javax.annotation.concurrent.Immutable;
-
 import org.fuin.objects4j.common.ValueObject;
 import org.fuin.utils4j.jaxb.JaxbUtils;
 
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
-
+import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
+
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
 
 /**
  * Helper class that allows sending an event as XML directly to the event store.

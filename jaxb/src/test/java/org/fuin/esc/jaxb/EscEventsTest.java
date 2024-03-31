@@ -18,7 +18,6 @@
 package org.fuin.esc.jaxb;
 
 import jakarta.activation.MimeTypeParseException;
-import org.apache.commons.io.IOUtils;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;

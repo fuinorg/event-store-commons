@@ -18,7 +18,6 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.SimpleStreamId;

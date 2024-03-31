@@ -18,7 +18,15 @@
 package org.fuin.esc.mem;
 
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.*;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EscApiUtils;
+import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.SimpleCommonEvent;
+import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
 import org.junit.jupiter.api.AfterEach;

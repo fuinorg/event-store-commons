@@ -19,8 +19,8 @@ package org.fuin.esc.jpa;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.fuin.esc.api.TypeName;
 import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.TypeName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

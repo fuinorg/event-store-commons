@@ -17,12 +17,9 @@
  */
 package org.fuin.esc.jaxb;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
-
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;

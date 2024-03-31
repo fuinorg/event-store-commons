@@ -40,6 +40,12 @@ public interface IEscEvent extends IBaseType {
     /** XML/JSON name of the {@link #getMeta()} field. */
     String EL_META_DATA = "MetaData";
 
+    /** Unique name of the type. */
+    TypeName TYPE = new TypeName(EL_ROOT_NAME);
+
+    /** Unique name of the serialized type. */
+    SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
+
     /**
      * Returns the unique event identifier.
      *

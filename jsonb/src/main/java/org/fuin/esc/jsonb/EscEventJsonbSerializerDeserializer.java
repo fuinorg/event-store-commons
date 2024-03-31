@@ -10,6 +10,8 @@ import jakarta.json.stream.JsonParser;
 import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.DeserializerRegistryRequired;
+import org.fuin.esc.api.IBase64Data;
+import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.utils4j.TestOmitted;
 
@@ -33,17 +35,17 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
             if (event == JsonParser.Event.KEY_NAME) {
                 final String field = parser.getString();
                 switch (field) {
-                    case EscEvent.EL_EVENT_ID:
+                    case IEscEvent.EL_EVENT_ID:
                         escEvent.setEventId(ctx.deserialize(String.class, parser));
                         break;
-                    case EscEvent.EL_EVENT_TYPE:
+                    case IEscEvent.EL_EVENT_TYPE:
                         escEvent.setEventType(ctx.deserialize(String.class, parser));
                         break;
-                    case EscEvent.EL_META_DATA:
+                    case IEscEvent.EL_META_DATA:
                         parser.next(); // Skip key and deserialize object
                         escEvent.setMeta(new DataWrapper(ctx.deserialize(EscMeta.class, parser)));
                         break;
-                    case EscEvent.EL_DATA:
+                    case IEscEvent.EL_DATA:
                         parser.next(); // Skip key and deserialize object
                         content = ctx.deserialize(JsonObject.class, parser);
                         break;
@@ -58,8 +60,8 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
         if (content == null) {
             throw new IllegalStateException("Expected content to be set, but was never processed during parse process");
         }
-        if (content.containsKey(Base64Data.EL_ROOT_NAME)) {
-            escEvent.setData(new DataWrapper(new Base64Data(content.getString(Base64Data.EL_ROOT_NAME))));
+        if (content.containsKey(IBase64Data.EL_ROOT_NAME)) {
+            escEvent.setData(new DataWrapper(new Base64Data(content.getString(IBase64Data.EL_ROOT_NAME))));
         } else {
             if (escEvent.getMeta() == null) { //NOSONAR Can unfortunately be null because it's not set above...
                 throw new IllegalStateException("Expected 'meta' to be set, but was never processed during parse process");
@@ -81,16 +83,16 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
     public void serialize(EscEvent escEvent, JsonGenerator generator, SerializationContext ctx) {
         generator.writeStartObject();
         if (escEvent != null) {
-            generator.write(EscEvent.EL_EVENT_ID, escEvent.getEventId());
-            generator.write(EscEvent.EL_EVENT_TYPE, escEvent.getEventType());
+            generator.write(IEscEvent.EL_EVENT_ID, escEvent.getEventId());
+            generator.write(IEscEvent.EL_EVENT_TYPE, escEvent.getEventType());
             if (escEvent.getData().getObj() instanceof Base64Data base64Data) {
-                generator.writeStartObject(EscEvent.EL_DATA);
-                generator.write(Base64Data.EL_ROOT_NAME, base64Data.getEncoded());
+                generator.writeStartObject(IEscEvent.EL_DATA);
+                generator.write(IBase64Data.EL_ROOT_NAME, base64Data.getEncoded());
                 generator.writeEnd();
             } else {
-                ctx.serialize(EscEvent.EL_DATA, escEvent.getData().getObj(), generator);
+                ctx.serialize(IEscEvent.EL_DATA, escEvent.getData().getObj(), generator);
             }
-            ctx.serialize(EscEvent.EL_META_DATA, escEvent.getMeta().getObj(), generator);
+            ctx.serialize(IEscEvent.EL_META_DATA, escEvent.getMeta().getObj(), generator);
         }
         generator.writeEnd();
     }

@@ -32,19 +32,19 @@ import org.fuin.objects4j.common.Contract;
  * A structure that contains the user's metadata and the system's meta information.
  */
 @HasSerializedDataTypeConstant
-@XmlRootElement(name = EscMeta.EL_ROOT_NAME)
+@XmlRootElement(name = IEscMeta.EL_ROOT_NAME)
 public final class EscMeta implements IEscMeta {
 
-    @XmlElement(name = EL_DATA_TYPE)
+    @XmlElement(name = IEscMeta.EL_DATA_TYPE)
     private String dataType;
 
-    @XmlElement(name = EL_DATA_CONTENT_TYPE)
+    @XmlElement(name = IEscMeta.EL_DATA_CONTENT_TYPE)
     private String dataContentTypeStr;
 
-    @XmlElement(name = EL_META_TYPE)
+    @XmlElement(name = IEscMeta.EL_META_TYPE)
     private String metaType;
 
-    @XmlElement(name = EL_META_CONTENT_TYPE)
+    @XmlElement(name = IEscMeta.EL_META_CONTENT_TYPE)
     private String metaContentTypeStr;
 
     @XmlAnyElement(lax = true)

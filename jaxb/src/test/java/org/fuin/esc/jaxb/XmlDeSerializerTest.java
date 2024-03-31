@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jaxb;
 
-import org.fuin.utils4j.TestOmitted;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

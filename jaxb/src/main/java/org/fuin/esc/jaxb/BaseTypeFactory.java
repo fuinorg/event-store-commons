@@ -3,8 +3,8 @@ package org.fuin.esc.jaxb;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBaseTypeFactory;
 import org.fuin.esc.api.IBase64Data;
+import org.fuin.esc.api.IBaseTypeFactory;
 import org.fuin.esc.api.IEscMeta;
 
 /**

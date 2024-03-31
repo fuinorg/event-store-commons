@@ -31,7 +31,7 @@ import java.util.Base64;
  * Contains some Base64 encoded data.
  */
 @HasSerializedDataTypeConstant
-@XmlRootElement(name = Base64Data.EL_ROOT_NAME)
+@XmlRootElement(name = IBase64Data.EL_ROOT_NAME)
 public final class Base64Data implements IBase64Data {
 
     @XmlValue

@@ -17,22 +17,20 @@
  */
 package org.fuin.esc.test;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.StreamEventsSlice;
 
 import javax.annotation.concurrent.Immutable;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A slice of data from a stream.
