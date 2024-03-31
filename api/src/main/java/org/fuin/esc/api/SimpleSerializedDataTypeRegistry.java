@@ -41,16 +41,25 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
     /**
      * Adds a new type/class combination to the registry.
      *
-     * @param type
-     *            Type of the data.
-     * @param clasz
-     *            Class for the type.
+     * @param type  Type of the data.
+     * @param clasz Class for the type.
      */
     public void add(@NotNull final SerializedDataType type, final Class<?> clasz) {
         Contract.requireArgNotNull("type", type);
         Contract.requireArgNotNull("clasz", clasz);
         map.put(type, clasz);
     }
+
+    /**
+     * Adds a new type/class combination to the registry.
+     *
+     * @param mapping Type to class mapping.
+     */
+    public void add(@NotNull final SerializedDataType2ClassMapping mapping) {
+        Contract.requireArgNotNull("mapping", mapping);
+        map.put(mapping.type(), mapping.clasz());
+    }
+
 
     @Override
     @NotNull

@@ -31,10 +31,15 @@ public class SimpleSerializedDataTypeRegistryTest {
     public void testFindClass() {
 
         final SimpleSerializedDataTypeRegistry testee = new SimpleSerializedDataTypeRegistry();
-        final SerializedDataType type = new SerializedDataType("String");
-        testee.add(type, String.class);
 
-        assertThat(testee.findClass(type)).isEqualTo(String.class);
+        final SerializedDataType stringType = new SerializedDataType("String");
+        testee.add(stringType, String.class);
+
+        final SerializedDataType integerType = new SerializedDataType("Integer");
+        testee.add(new SerializedDataType2ClassMapping(integerType, Integer.class));
+
+        assertThat(testee.findClass(stringType)).isEqualTo(String.class);
+        assertThat(testee.findClass(integerType)).isEqualTo(Integer.class);
 
         try {
             testee.findClass(new SerializedDataType("NotExists"));
