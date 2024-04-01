@@ -57,6 +57,11 @@
 
         <dependency>
             <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-apt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fuin.esc</groupId>
             <artifactId>esc-test</artifactId>
         </dependency>
 

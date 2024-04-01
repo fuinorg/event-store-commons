@@ -29,7 +29,7 @@ import java.util.List;
  * Registry that is built up by scanning for classes that are annotated with {@link HasSerializedDataTypeConstant}.
  * Inner classes are ignored.
  */
-public class JandexSerializedDataTypeRegistry implements SerializedDataTypeRegistry {
+public final class JandexSerializedDataTypeRegistry implements SerializedDataTypeRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(JandexSerializedDataTypeRegistry.class);
 

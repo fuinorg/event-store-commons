@@ -55,7 +55,8 @@ class ArchitectureTest {
                     "org.slf4j..",
                     "jakarta.json..",
                     "org.apache.commons.lang3..",
-                    "org.fuin.utils4j.."
+                    "org.fuin.utils4j..",
+                    "com.google.auto.service.."
             );
 
 

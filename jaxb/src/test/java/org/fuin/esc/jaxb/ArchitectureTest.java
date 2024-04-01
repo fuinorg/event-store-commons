@@ -57,7 +57,8 @@ class ArchitectureTest {
                     "org.fuin.objects4j.core..",
                     "org.fuin.utils4j..",
                     "org.slf4j..",
-                    "org.w3c.dom.."
+                    "org.w3c.dom..",
+                    "com.google.auto.service.."
             );
 
 
