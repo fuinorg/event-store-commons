@@ -73,7 +73,8 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre) {
-                if (sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
+                if (sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
+                        && sre.getMessage() != null && sre.getMessage().contains("NotFound")) {
                     return false;
                 }
             }
