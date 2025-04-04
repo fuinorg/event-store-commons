@@ -30,7 +30,7 @@
     </issueManagement>
 
     <properties>
-        <eventstore.version>21.10.1-bionic</eventstore.version>
+        <eventstore.version>24.10</eventstore.version>
         <objects4j.version>0.10.0-SNAPSHOT</objects4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
