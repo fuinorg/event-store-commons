@@ -1,0 +1,5 @@
+{
+    "sonarCloudOrganization": "fuinorg",
+    "projectKey": "org.fuin:event-store-commons",
+    "region": "EU"
+}
