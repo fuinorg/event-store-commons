@@ -139,8 +139,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core-jakarta</artifactId>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -232,11 +232,10 @@
                 <configuration>
                     <ignoredUnusedDeclaredDependencies>
                         <ignoredUnusedDeclaredDependency>jakarta.el:jakarta.el-api</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>org.glassfish:jakarta.el</ignoredUnusedDeclaredDependency>
+                        <ignoredUnusedDeclaredDependency>org.glassfish.expressly:expressly</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.hibernate.validator:hibernate-validator</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>ch.qos.logback:logback-classic</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>org.hibernate:hibernate-core-jakarta</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.hibernate.orm:hibernate-core</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.eclipse:yasson</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.hsqldb:hsqldb</ignoredUnusedDeclaredDependency>

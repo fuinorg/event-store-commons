@@ -123,7 +123,7 @@
                 <configuration>
                     <ignoredUnusedDeclaredDependencies>
                         <ignoredUnusedDeclaredDependency>org.hibernate.validator:hibernate-validator</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>org.glassfish:jakarta.el</ignoredUnusedDeclaredDependency>
+                        <ignoredUnusedDeclaredDependency>org.glassfish.expressly:expressly</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>ch.qos.logback:logback-classic</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>com.tngtech.archunit:archunit-junit5</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.junit.jupiter:junit-jupiter</ignoredUnusedDeclaredDependency>

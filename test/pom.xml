@@ -161,8 +161,8 @@
         </dependency>
 
         <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -173,8 +173,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core-jakarta</artifactId>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -363,12 +363,12 @@
                 <configuration>
                     <ignoredUnusedDeclaredDependencies>
                         <ignoredUnusedDeclaredDependency>org.hibernate.validator:hibernate-validator</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>org.glassfish:jakarta.el</ignoredUnusedDeclaredDependency>
+                        <ignoredUnusedDeclaredDependency>org.glassfish.expressly:expressly</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>ch.qos.logback:logback-classic</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>javax.transaction:jta</ignoredUnusedDeclaredDependency>
+                        <ignoredUnusedDeclaredDependency>jakarta.transaction:jakarta.transaction-api</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.jboss.logging:jboss-logging</ignoredUnusedDeclaredDependency>
-                        <ignoredUnusedDeclaredDependency>org.hibernate:hibernate-core-jakarta</ignoredUnusedDeclaredDependency>
+                        <ignoredUnusedDeclaredDependency>org.hibernate.orm:hibernate-core</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.hsqldb:hsqldb</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>org.fuin:units4j</ignoredUnusedDeclaredDependency>
                         <ignoredUnusedDeclaredDependency>com.tngtech.archunit:archunit-junit5</ignoredUnusedDeclaredDependency>
