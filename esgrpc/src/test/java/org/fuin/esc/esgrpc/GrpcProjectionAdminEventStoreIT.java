@@ -4,6 +4,7 @@ import io.kurrent.dbclient.KurrentDBClientSettings;
 import io.kurrent.dbclient.KurrentDBConnectionString;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import org.fuin.esc.api.ProjectionStreamId;
+import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests the {@link GrpcProjectionAdminEventStore} class.
@@ -69,6 +71,20 @@ class GrpcProjectionAdminEventStoreIT {
 
         // THEN
         assertThat(testee.projectionExists(projectionId)).isTrue();
+
+    }
+
+    @Test
+    void testCreateAlreadyExistingProjection() {
+
+        // GIVEN
+        final ProjectionStreamId projectionId = new ProjectionStreamId("grpc-test-create-already-existing");
+        assertThat(testee.projectionExists(projectionId)).isFalse();
+        testee.createProjection(projectionId, true, new TypeName("one"));
+
+        // WHEN - THEN
+        assertThatThrownBy( () -> testee.createProjection(projectionId, true, new TypeName("one")))
+                .isInstanceOf(StreamAlreadyExistsException.class);
 
     }
 

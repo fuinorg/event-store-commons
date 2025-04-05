@@ -119,8 +119,15 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
         final String javascript = new ProjectionJavaScriptBuilder(pid).types(eventTypes).build();
         try {
-            es.create(pid.asString(), javascript, CreateProjectionOptions.get().emitEnabled(false).trackEmittedStreams(true)).get();
+            es.create(pid.asString(), javascript, CreateProjectionOptions.get()
+                    .emitEnabled(false).trackEmittedStreams(true)).get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
+            if (ex.getCause() instanceof StatusRuntimeException sre
+                    // TODO Are there better ways than parsing the text?
+                    && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
+                    && sre.getMessage().contains("Conflict")) {
+                throw new StreamAlreadyExistsException(projectionId);
+            }
             throw new RuntimeException("Error waiting for create(..) result", ex);
         }
         if (enable) {

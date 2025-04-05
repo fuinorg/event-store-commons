@@ -39,7 +39,7 @@ public final class StreamAlreadyExistsException extends RuntimeException {
      *            Unique name of the stream.
      */
     public StreamAlreadyExistsException(@NotNull final StreamId streamId) {
-        super("Stream '" + streamId + "' does not exist");
+        super("Stream '" + streamId + "' already exist");
         Contract.requireArgNotNull("streamId", streamId);
         this.streamId = streamId;
     }
