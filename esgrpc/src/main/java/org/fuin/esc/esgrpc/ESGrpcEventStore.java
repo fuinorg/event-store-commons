@@ -172,7 +172,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         try {
             final Iterator<EventData> eventDataIt = asEventData(commonEvents).iterator();
             final WriteResult result = es.appendToStream(sid.asString(),
-                    AppendToStreamOptions.get().streamRevision(expectedVersion), eventDataIt).get();
+                    AppendToStreamOptions.get().streamState(version2State(expectedVersion)), eventDataIt).get();
             return result.getNextExpectedRevision().toRawLong();
         } catch (final ExecutionException ex) {
             if (ex.getCause() instanceof io.kurrent.dbclient.WrongExpectedVersionException cause) {
@@ -206,7 +206,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         }
 
         try {
-            final DeleteStreamOptions options = DeleteStreamOptions.get().streamRevision(expectedVersion);
+            final DeleteStreamOptions options = DeleteStreamOptions.get()
+                    .streamState(version2State(expectedVersion));
             if (hardDelete) {
                 es.tombstoneStream(sid.asString(), options).get();
             } else {
@@ -403,13 +404,23 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         }
     }
 
-    private boolean statusIsDeleted(ExecutionException ex) {
+    private static boolean statusIsDeleted(ExecutionException ex) {
         if (ex.getCause() instanceof StatusRuntimeException sre) {
             return sre.getStatus().getCode().equals(Status.FAILED_PRECONDITION.getCode())
                     && sre.getStatus().getDescription() != null
                     && sre.getStatus().getDescription().contains("is deleted");
         }
         return ex.getCause() instanceof io.kurrent.dbclient.StreamDeletedException;
+    }
+
+    private static io.kurrent.dbclient.StreamState version2State(long version) {
+        if (version == ANY.getNo()) {
+            return io.kurrent.dbclient.StreamState.any();
+        }
+        if (version == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
+            return io.kurrent.dbclient.StreamState.noStream();
+        }
+        return io.kurrent.dbclient.StreamState.streamRevision(version);
     }
 
     /**
