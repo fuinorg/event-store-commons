@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.RecordedEvent;
+import io.kurrent.dbclient.RecordedEvent;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Converter;

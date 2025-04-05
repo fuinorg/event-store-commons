@@ -1,8 +1,8 @@
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.CreateProjectionOptions;
-import com.eventstore.dbclient.DeleteProjectionOptions;
-import com.eventstore.dbclient.EventStoreDBProjectionManagementClient;
+import io.kurrent.dbclient.CreateProjectionOptions;
+import io.kurrent.dbclient.DeleteProjectionOptions;
+import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.fuin.esc.api.ProjectionAdminEventStore;
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 @TestOmitted("Tested in the 'test' project")
 public final class GrpcProjectionAdminEventStore implements ProjectionAdminEventStore {
 
-    private final EventStoreDBProjectionManagementClient es;
+    private final KurrentDBProjectionManagementClient es;
 
     private final TenantId tenantId;
 
@@ -36,7 +36,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      *
      * @param es Eventstore client to use.
      */
-    public GrpcProjectionAdminEventStore(EventStoreDBProjectionManagementClient es) {
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
         this(es, null);
     }
 
@@ -46,7 +46,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      * @param es       Eventstore client to use.
      * @param tenantId Tenant ID or {@literal null}.
      */
-    public GrpcProjectionAdminEventStore(EventStoreDBProjectionManagementClient es, TenantId tenantId) {
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es, TenantId tenantId) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
         this.tenantId = tenantId;
@@ -73,8 +73,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre) {
-                if (sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
-                        && sre.getMessage() != null && sre.getMessage().contains("NotFound")) {
+                if (sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
                     return false;
                 }
             }
@@ -127,7 +126,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         if (enable) {
             enableProjection(pid);
         } else {
-            // Workaround for https://github.com/EventStore/EventStoreDB-Client-Java/issues/259 (not a perfect one...)
+            // Workaround for https://github.com/EventStore/KurrentDB-Client-Java/issues/259 (not a perfect one...)
             disableProjection(pid);
         }
     }

@@ -17,15 +17,14 @@
  */
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.AppendToStreamOptions;
-import com.eventstore.dbclient.DeleteStreamOptions;
-import com.eventstore.dbclient.EventData;
-import com.eventstore.dbclient.EventStoreDBClient;
-import com.eventstore.dbclient.ExpectedRevision;
-import com.eventstore.dbclient.ReadResult;
-import com.eventstore.dbclient.ReadStreamOptions;
-import com.eventstore.dbclient.ResolvedEvent;
-import com.eventstore.dbclient.WriteResult;
+import io.kurrent.dbclient.AppendToStreamOptions;
+import io.kurrent.dbclient.DeleteStreamOptions;
+import io.kurrent.dbclient.EventData;
+import io.kurrent.dbclient.KurrentDBClient;
+import io.kurrent.dbclient.ReadResult;
+import io.kurrent.dbclient.ReadStreamOptions;
+import io.kurrent.dbclient.ResolvedEvent;
+import io.kurrent.dbclient.WriteResult;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Nullable;
@@ -66,7 +65,7 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
 @TestOmitted("Tested in the 'test' project")
 public final class ESGrpcEventStore extends AbstractReadableEventStore implements IESGrpcEventStore {
 
-    private final EventStoreDBClient es;
+    private final KurrentDBClient es;
 
     private final CommonEvent2EventDataConverter ce2edConv;
 
@@ -87,7 +86,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
      *                          or 'application/json' with 'utf-8' encoding).
      * @param tenantId          Unique tenant identifier.
      */
-    private ESGrpcEventStore(@NotNull final EventStoreDBClient es,
+    private ESGrpcEventStore(@NotNull final KurrentDBClient es,
                              @NotNull final SerializerRegistry serRegistry,
                              @NotNull final DeserializerRegistry desRegistry,
                              @NotNull final IBaseTypeFactory baseTypeFactory,
@@ -173,16 +172,16 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         try {
             final Iterator<EventData> eventDataIt = asEventData(commonEvents).iterator();
             final WriteResult result = es.appendToStream(sid.asString(),
-                    AppendToStreamOptions.get().expectedRevision(ExpectedRevision.fromRawLong(expectedVersion)), eventDataIt).get();
+                    AppendToStreamOptions.get().streamRevision(expectedVersion), eventDataIt).get();
             return result.getNextExpectedRevision().toRawLong();
         } catch (final ExecutionException ex) {
-            if (ex.getCause() instanceof com.eventstore.dbclient.WrongExpectedVersionException cause) {
-                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualVersion().toRawLong());
+            if (ex.getCause() instanceof io.kurrent.dbclient.WrongExpectedVersionException cause) {
+                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualState().toRawLong());
             }
             if (statusIsDeleted(ex)) {
                 throw new StreamDeletedException(sid);
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 throw new StreamNotFoundException(sid);
             }
             throw new RuntimeException("Error executing appendToStream(..)", ex);
@@ -207,20 +206,20 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         }
 
         try {
-            final DeleteStreamOptions options = DeleteStreamOptions.get().expectedRevision(ExpectedRevision.fromRawLong(expectedVersion));
+            final DeleteStreamOptions options = DeleteStreamOptions.get().streamRevision(expectedVersion);
             if (hardDelete) {
                 es.tombstoneStream(sid.asString(), options).get();
             } else {
                 es.deleteStream(sid.asString(), options).get();
             }
         } catch (final ExecutionException ex) {
-            if (ex.getCause() instanceof com.eventstore.dbclient.WrongExpectedVersionException cause) {
-                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualVersion().toRawLong());
+            if (ex.getCause() instanceof io.kurrent.dbclient.WrongExpectedVersionException cause) {
+                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualState().toRawLong());
             }
             if (statusIsDeleted(ex)) {
                 throw new StreamDeletedException(sid);
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 throw new StreamNotFoundException(sid);
             }
             throw new RuntimeException("Error executing deleteStream(..)", ex);
@@ -260,7 +259,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             if (statusIsDeleted(ex)) {
                 throw new StreamDeletedException(sid);
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 throw new StreamNotFoundException(sid);
             }
             throw new RuntimeException("Error executing readEventsForward(..)", ex);
@@ -294,7 +293,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             if (statusIsDeleted(ex)) {
                 throw new StreamDeletedException(sid);
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 throw new StreamNotFoundException(sid);
             }
             throw new RuntimeException("Error executing readEventsBackward(..)", ex);
@@ -328,7 +327,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             if (ex.getCause() instanceof StatusRuntimeException) {
                 return false;
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 return false;
             }
             throw new RuntimeException("Error executing streamExists(..)", ex);
@@ -352,7 +351,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             if (statusIsDeleted(ex)) {
                 return StreamState.HARD_DELETED;
             }
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 return softDeleted(streamId);
             }
             throw new RuntimeException("Error executing streamState(..)", ex);
@@ -364,12 +363,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     private StreamState softDeleted(final StreamId streamId) {
         // Workaround for reading metadata because of:
-        // https://github.com/EventStore/EventStoreDB-Client-Java/issues/240
+        // https://github.com/EventStore/KurrentDB-Client-Java/issues/240
         try {
             es.readStream("$$" + streamId.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
             throw new StreamNotFoundException(streamId);
         } catch (ExecutionException ex) {
-            if (ex.getCause() instanceof com.eventstore.dbclient.StreamNotFoundException) {
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
                 throw new StreamNotFoundException(streamId);
             }
             throw new RuntimeException("Error reading stream meta data", ex);
@@ -410,7 +409,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
                     && sre.getStatus().getDescription() != null
                     && sre.getStatus().getDescription().contains("is deleted");
         }
-        return ex.getCause() instanceof com.eventstore.dbclient.StreamDeletedException;
+        return ex.getCause() instanceof io.kurrent.dbclient.StreamDeletedException;
     }
 
     /**
@@ -418,7 +417,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
      */
     public static final class Builder {
 
-        private com.eventstore.dbclient.EventStoreDBClient eventStore;
+        private io.kurrent.dbclient.KurrentDBClient eventStore;
 
         private SerializerRegistry serRegistry;
 
@@ -436,7 +435,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
          * @param eventStore TCP/IP event store connection.
          * @return Builder.
          */
-        public Builder eventStore(com.eventstore.dbclient.EventStoreDBClient eventStore) {
+        public Builder eventStore(io.kurrent.dbclient.KurrentDBClient eventStore) {
             this.eventStore = eventStore;
             return this;
         }

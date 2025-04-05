@@ -33,28 +33,31 @@ public final class EscMetaJsonbSerializerDeserializer
             final JsonParser.Event event = parser.next();
             if (event == JsonParser.Event.KEY_NAME) {
                 final String field = parser.getString();
-                switch (field) {
-                    case IEscMeta.EL_DATA_TYPE:
-                        escMeta.setDataType(ctx.deserialize(String.class, parser));
-                        break;
-                    case IEscMeta.EL_DATA_CONTENT_TYPE:
-                        escMeta.setDataContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
-                        break;
-                    case IEscMeta.EL_META_TYPE:
-                        escMeta.setMetaType(ctx.deserialize(String.class, parser));
-                        break;
-                    case IEscMeta.EL_META_CONTENT_TYPE:
-                        escMeta.setMetaContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
-                        break;
-                    default:
-                        // meta
-                        if (field.equals(IBase64Data.EL_ROOT_NAME)) {
-                            escMeta.setMeta(new Base64Data(ctx.deserialize(String.class, parser)));
-                        } else {
-                            final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.getMetaType()));
-                            escMeta.setMeta(ctx.deserialize(clasz, parser));
-                        }
-                        break;
+                // Ignore fields like "$traceId" / "$spanId"
+                if (field != null && !field.startsWith("$")) {
+                    switch (field) {
+                        case IEscMeta.EL_DATA_TYPE:
+                            escMeta.setDataType(ctx.deserialize(String.class, parser));
+                            break;
+                        case IEscMeta.EL_DATA_CONTENT_TYPE:
+                            escMeta.setDataContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
+                            break;
+                        case IEscMeta.EL_META_TYPE:
+                            escMeta.setMetaType(ctx.deserialize(String.class, parser));
+                            break;
+                        case IEscMeta.EL_META_CONTENT_TYPE:
+                            escMeta.setMetaContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
+                            break;
+                        default:
+                            // meta
+                            if (field.equals(IBase64Data.EL_ROOT_NAME)) {
+                                escMeta.setMeta(new Base64Data(ctx.deserialize(String.class, parser)));
+                            } else {
+                                final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.getMetaType()));
+                                escMeta.setMeta(ctx.deserialize(clasz, parser));
+                            }
+                            break;
+                    }
                 }
             }
         }

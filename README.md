@@ -26,7 +26,7 @@ progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-comm
 | Module             | Description                                                                                                                                                         |
 |:-------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [esc-api](api)     | Defines the event store commons API.                                                                                                                                |
-| [esc-grpc](grpc)   | [Event Store DB Client](https://github.com/EventStore/EventStoreDB-Client-Java) based implementation for Greg Young's [event store](https://www.geteventstore.com/) |
+| [esc-grpc](grpc)   | [Event Store DB Client](https://github.com/EventStore/KurrentDB-Client-Java) based implementation for Greg Young's [event store](https://www.geteventstore.com/) |
 | [esc-jaxb](jaxb)   | JAX-B serialization support                                                                                                                                         |
 | [esc-jpa](jpa)     | JPA based implementation (events are stored in a relational database)                                                                                               |
 | [esc-jsonb](jsonb) | JSON-B serialization support                                                                                                                                        |

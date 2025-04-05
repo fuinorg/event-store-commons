@@ -1,19 +1,10 @@
 package org.fuin.esc.esgrpc.example;
 
-import com.eventstore.dbclient.DeleteResult;
-import com.eventstore.dbclient.DeleteStreamOptions;
-import com.eventstore.dbclient.EventData;
-import com.eventstore.dbclient.EventStoreDBClient;
-import com.eventstore.dbclient.EventStoreDBClientSettings;
-import com.eventstore.dbclient.EventStoreDBConnectionString;
-import com.eventstore.dbclient.ReadResult;
-import com.eventstore.dbclient.ReadStreamOptions;
-import com.eventstore.dbclient.ResolvedEvent;
-import com.eventstore.dbclient.WriteResult;
+import io.kurrent.dbclient.*;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 @TestOmitted("Example class")
@@ -26,15 +17,17 @@ public class App {
 
         System.out.println("BEGIN");
 
-        EventStoreDBClientSettings setts = EventStoreDBConnectionString.parseOrThrow("esdb://localhost:2113?tls=false");
-        EventStoreDBClient client = EventStoreDBClient.create(setts);
+        KurrentDBClientSettings setts = KurrentDBConnectionString.parseOrThrow("esdb://localhost:2113?tls=false");
+        KurrentDBClient client = KurrentDBClient.create(setts);
 
-        AccountCreated createdEvent = new AccountCreated();
+        String json = """
+                { 
+                    "id" : "3b92d23e-837a-441e-b59e-1733182f741c",
+                    "login" : "ouros" 
+                }
+                """;
 
-        createdEvent.setId(UUID.randomUUID());
-        createdEvent.setLogin("ouros");
-
-        EventData event = EventData.builderAsJson("account-created", createdEvent).build();
+        EventData event = EventData.builderAsJson("account-created", json.getBytes(StandardCharsets.UTF_8)).build();
 
         String streamName = "accounts3";
 
@@ -49,12 +42,11 @@ public class App {
         ResolvedEvent resolvedEvent = readResult.getEvents().get(0);
         System.out.println("resolvedEvent=" + resolvedEvent);
 
-        AccountCreated writtenEvent = resolvedEvent.getOriginalEvent().getEventDataAs(AccountCreated.class);
+        String writtenEvent = new String(resolvedEvent.getOriginalEvent().getEventData(), StandardCharsets.UTF_8);
         System.out.println("writtenEvent=" + writtenEvent);
 
         DeleteResult deleteResult = client.tombstoneStream(streamName, DeleteStreamOptions.get()).get();
         System.out.println("deleteResult=" + deleteResult);
-
 
         System.out.println("END");
 

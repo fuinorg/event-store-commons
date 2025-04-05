@@ -1,8 +1,8 @@
 package org.fuin.esc.test.examples;
 
-import com.eventstore.dbclient.EventStoreDBClient;
-import com.eventstore.dbclient.EventStoreDBClientSettings;
-import com.eventstore.dbclient.EventStoreDBConnectionString;
+import io.kurrent.dbclient.KurrentDBClient;
+import io.kurrent.dbclient.KurrentDBClientSettings;
+import io.kurrent.dbclient.KurrentDBConnectionString;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -21,14 +21,9 @@ import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.esgrpc.ESGrpcEventStore;
-import org.fuin.esc.jsonb.EscEvent;
-import org.fuin.esc.jsonb.EscEvents;
-import org.fuin.esc.jsonb.EscJsonbUtils;
-import org.fuin.esc.jsonb.EscMeta;
-import org.fuin.esc.jsonb.JsonbDeSerializer;
+import org.fuin.esc.jsonb.*;
 
 import java.net.MalformedURLException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -113,14 +108,15 @@ public final class EsGrpcJsonbExample {
         final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "changeit");
         credentialsProvider.setCredentials(AuthScope.ANY, credentials);
 
-        final EventStoreDBClientSettings setts = EventStoreDBConnectionString
+        final KurrentDBClientSettings setts = KurrentDBConnectionString
                 .parseOrThrow("esdb://localhost:2113?tls=false");
-        final EventStoreDBClient client = EventStoreDBClient.create(setts);
-        EventStore eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(serDeserRegistry)
-                .targetContentType(EnhancedMimeType.create("application", "json", Charset.forName("utf-8"))).build();
-
-        eventStore.open();
-        try {
+        final KurrentDBClient client = KurrentDBClient.create(setts);
+        try (final EventStore eventStore = new ESGrpcEventStore.Builder()
+                .baseTypeFactory(new BaseTypeFactory())
+                .eventStore(client)
+                .serDesRegistry(serDeserRegistry)
+                .targetContentType(EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8))
+                .build().open()) {
 
             // Prepare
             StreamId streamId = new SimpleStreamId("books-jsonb-example"); // Unique stream name + NO PROJECTION
@@ -138,9 +134,6 @@ public final class EsGrpcJsonbExample {
             // Prints "BookAddedEvent c8af28d4-5544-4624-99ff-7fcf1a0c8cfe"
             System.out.println(readEvent);
 
-        } finally {
-            // Don't forget to close
-            eventStore.close();
         }
 
     }

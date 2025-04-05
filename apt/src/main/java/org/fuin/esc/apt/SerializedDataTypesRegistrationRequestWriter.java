@@ -15,7 +15,9 @@ public final class SerializedDataTypesRegistrationRequestWriter {
     private SerializedDataTypesRegistrationRequestWriter() {
     }
 
-    public static void write(final ProcessingEnvironment processingEnv, final Set<SerializedDataTypesRegistrationRequestTarget> targets, final Set<SerializedDataTypeResult> results) {
+    public static void write(final ProcessingEnvironment processingEnv,
+                             final Set<SerializedDataTypesRegistrationRequestTarget> targets,
+                             final Set<SerializedDataTypeResult> results) {
         if (targets == null || results == null) {
             return;
         }
@@ -24,9 +26,12 @@ public final class SerializedDataTypesRegistrationRequestWriter {
         }
     }
 
-    public static void write(final ProcessingEnvironment processingEnv, final SerializedDataTypesRegistrationRequestTarget target, final Set<SerializedDataTypeResult> results) {
+    public static void write(final ProcessingEnvironment processingEnv,
+                             final SerializedDataTypesRegistrationRequestTarget target,
+                             final Set<SerializedDataTypeResult> results) {
         try {
-            final JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(target.toString());
+            final JavaFileObject builderFile = processingEnv.getFiler()
+                    .createSourceFile(target.toString());
             try (final PrintWriter out = new PrintWriter(builderFile.openWriter())) {
                 out.write(createSource(target, results));
             }
@@ -35,7 +40,8 @@ public final class SerializedDataTypesRegistrationRequestWriter {
         }
     }
 
-    private static String createSource(final SerializedDataTypesRegistrationRequestTarget target, final Set<SerializedDataTypeResult> results) {
+    private static String createSource(final SerializedDataTypesRegistrationRequestTarget target,
+                                       final Set<SerializedDataTypeResult> results) {
         final StringBuilder sb = new StringBuilder();
         if (target.packageName() != null) {
             sb.append("package ").append(target.packageName()).append(";\n\n");
@@ -50,18 +56,18 @@ public final class SerializedDataTypesRegistrationRequestWriter {
                 import org.fuin.esc.api.SerializedDataType2ClassMapping;
                 import org.fuin.esc.api.SerializedDataTypesRegistrationRequest;
                 import java.util.Set;
-                                
+                
                 /**
                  * Request to register {@link org.fuin.esc.api.SerializedDataType} to class mappings.
                  */
                 @AutoService(SerializedDataTypesRegistrationRequest.class)
                 public class ${className} implements SerializedDataTypesRegistrationRequest, ${interfaceName} {
-                                
+                
                     @Override
                     public Set<SerializedDataType2ClassMapping> getMappingsToRegister() {
                         return Set.of(${entries});
                     }
-                                
+                
                 }
                 """
                 .replace("${className}", target.simpleClassName())

@@ -1,8 +1,8 @@
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.EventStoreDBClientSettings;
-import com.eventstore.dbclient.EventStoreDBConnectionString;
-import com.eventstore.dbclient.EventStoreDBProjectionManagementClient;
+import io.kurrent.dbclient.KurrentDBClientSettings;
+import io.kurrent.dbclient.KurrentDBConnectionString;
+import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
@@ -21,15 +21,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("java:S2187")
 class GrpcProjectionAdminEventStoreIT {
 
-    private static EventStoreDBProjectionManagementClient client;
+    private static KurrentDBProjectionManagementClient client;
 
     private GrpcProjectionAdminEventStore testee;
 
     @BeforeAll
     static void beforeAll() {
-        final EventStoreDBClientSettings setts = EventStoreDBConnectionString
+        final KurrentDBClientSettings setts = KurrentDBConnectionString
                 .parseOrThrow("esdb://localhost:2113?tls=false");
-        client = EventStoreDBProjectionManagementClient.create(setts);
+        client = KurrentDBProjectionManagementClient.create(setts);
     }
 
     @BeforeEach

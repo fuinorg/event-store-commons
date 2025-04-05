@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.EventData;
+import io.kurrent.dbclient.EventData;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;

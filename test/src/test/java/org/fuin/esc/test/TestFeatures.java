@@ -17,9 +17,9 @@
  */
 package org.fuin.esc.test;
 
-import com.eventstore.dbclient.EventStoreDBClient;
-import com.eventstore.dbclient.EventStoreDBClientSettings;
-import com.eventstore.dbclient.EventStoreDBConnectionString;
+import io.kurrent.dbclient.KurrentDBClient;
+import io.kurrent.dbclient.KurrentDBClientSettings;
+import io.kurrent.dbclient.KurrentDBConnectionString;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
@@ -126,9 +126,9 @@ public class TestFeatures {
                     setupDb();
                     eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
                 } else {
-                    final EventStoreDBClientSettings setts = EventStoreDBConnectionString
+                    final KurrentDBClientSettings setts = KurrentDBConnectionString
                             .parseOrThrow("esdb://localhost:2113?tls=false");
-                    final EventStoreDBClient client = EventStoreDBClient.create(setts);
+                    final KurrentDBClient client = KurrentDBClient.create(setts);
                     eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(registry)
                             .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
                             .build();

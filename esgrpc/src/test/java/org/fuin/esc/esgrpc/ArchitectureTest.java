@@ -53,7 +53,7 @@ class ArchitectureTest {
                     "org.fuin.objects4j.common..",
                     "org.fuin.objects4j.core..",
                     "org.slf4j..",
-                    "com.eventstore.dbclient..",
+                    "io.kurrent.dbclient..",
                     "io.grpc..",
                     "org.fuin.utils4j.."
             );

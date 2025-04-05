@@ -30,7 +30,7 @@
     </issueManagement>
 
     <properties>
-        <eventstore.version>21.10.1-bionic</eventstore.version>
+        <eventstore.version>24.10</eventstore.version>
         <objects4j.version>0.10.0-SNAPSHOT</objects4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
@@ -412,7 +412,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.3</version>
                     <configuration>
-                        <argLine>--add-opens java.base/java.util=ALL-UNNAMED ${argLine}</argLine>
+                        <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
                     </configuration>
                     <executions>
                         <execution>
@@ -441,7 +441,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
-                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED ${argLine}</argLine>
+                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
 
