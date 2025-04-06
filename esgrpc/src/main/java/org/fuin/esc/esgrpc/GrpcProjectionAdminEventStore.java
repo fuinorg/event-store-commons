@@ -54,13 +54,16 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     @Override
     public ProjectionAdminEventStore open() {
-        // Do nothing
+        // Do nothing - We assume that the eventstore is already
+        // fully initialized when passed in to constructor
         return this;
     }
 
     @Override
     public void close() {
-        // Do nothing
+         if (!es.isShutdown()) {
+             es.shutdown();
+         }
     }
 
     @Override

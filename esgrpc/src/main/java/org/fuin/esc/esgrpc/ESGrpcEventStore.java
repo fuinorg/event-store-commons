@@ -73,8 +73,6 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     private final TenantId tenantId;
 
-    private boolean open;
-
     /**
      * Private constructor with all data used by the builder.
      *
@@ -102,26 +100,20 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry, baseTypeFactory, targetContentType);
         this.ed2ceConv = new RecordedEvent2CommonEventConverter(desRegistry);
         this.tenantId = tenantId;
-        this.open = false;
     }
 
     @Override
     public ESGrpcEventStore open() {
-        if (open) {
-            // Ignore
-            return this;
-        }
-        this.open = true;
+        // Do nothing - We assume that the eventstore is already
+        // fully initialized when passed in to constructor
         return this;
     }
 
     @Override
     public void close() {
-        if (!open) {
-            // Ignore
-            return;
+        if (!es.isShutdown()) {
+            es.shutdown();
         }
-        this.open = false;
     }
 
     @Override
@@ -399,8 +391,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     }
 
     private void ensureOpen() {
-        if (!open) {
-            open();
+        if (es.isShutdown()) {
+            throw new IllegalStateException("The event store has already been closed");
         }
     }
 

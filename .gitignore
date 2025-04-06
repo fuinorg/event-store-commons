@@ -9,3 +9,4 @@ META-INF
 *.log
 *.iml
 pom.xml.versionsBackup
+dependency-reduced-pom.xml
