@@ -31,7 +31,7 @@
 
     <properties>
         <eventstore.version>24.10</eventstore.version>
-        <objects4j.version>0.10.0-SNAPSHOT</objects4j.version>
+        <objects4j.version>0.10.0</objects4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>utils4j</artifactId>
-                <version>0.14.0-SNAPSHOT</version>
+                <version>0.14.0</version>
             </dependency>
 
             <dependency>
@@ -327,7 +327,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>units4j</artifactId>
-                <version>0.12.0-SNAPSHOT</version>
+                <version>0.12.0</version>
             </dependency>
 
             <dependency>
@@ -374,7 +374,6 @@
         <module>jsonb</module>
         <module>esgrpc</module>
         <module>test</module>
-        <module>apt</module>
         <module>jacoco</module>
     </modules>
 
@@ -441,7 +440,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
-                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                    <argLine>@{argLine} --add-opens java.base/java.util=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
 
