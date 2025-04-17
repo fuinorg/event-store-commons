@@ -52,12 +52,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public CompletableFuture<Void> open() {
-        return CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                delegate.open();
-            }
-        }, executor);
+        return CompletableFuture.runAsync(() -> delegate.open(), executor);
     }
 
     @Override
@@ -68,12 +63,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     @Override
     public CompletableFuture<CommonEvent> readEvent(final StreamId streamId, final long eventNumber) {
 
-        return CompletableFuture.supplyAsync(new Supplier<CommonEvent>() {
-            @Override
-            public CommonEvent get() {
-                return delegate.readEvent(streamId, eventNumber);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.readEvent(streamId, eventNumber), executor);
 
     }
 
@@ -81,12 +71,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<StreamEventsSlice> readEventsForward(final StreamId streamId,
                                                                   final long start, final int count) {
 
-        return CompletableFuture.supplyAsync(new Supplier<StreamEventsSlice>() {
-            @Override
-            public StreamEventsSlice get() {
-                return delegate.readEventsForward(streamId, start, count);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.readEventsForward(streamId, start, count), executor);
 
     }
 
@@ -94,12 +79,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<StreamEventsSlice> readEventsBackward(final StreamId streamId,
                                                                    final long start, final int count) {
 
-        return CompletableFuture.supplyAsync(new Supplier<StreamEventsSlice>() {
-            @Override
-            public StreamEventsSlice get() {
-                return delegate.readEventsBackward(streamId, start, count);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.readEventsBackward(streamId, start, count), executor);
 
     }
 
@@ -107,24 +87,14 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<Void> deleteStream(final StreamId streamId, final long expected,
                                                 final boolean hardDelete) {
 
-        return CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                delegate.deleteStream(streamId, expected, hardDelete);
-            }
-        }, executor);
+        return CompletableFuture.runAsync(() -> delegate.deleteStream(streamId, expected, hardDelete), executor);
 
     }
 
     @Override
     public CompletableFuture<Void> deleteStream(final StreamId streamId, final boolean hardDelete) {
 
-        return CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                delegate.deleteStream(streamId, hardDelete);
-            }
-        }, executor);
+        return CompletableFuture.runAsync(() -> delegate.deleteStream(streamId, hardDelete), executor);
 
     }
 
@@ -132,12 +102,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<Long> appendToStream(final StreamId streamId, final long expectedVersion,
                                                   final List<CommonEvent> toAppend) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Long>() {
-            @Override
-            public Long get() {
-                return delegate.appendToStream(streamId, expectedVersion, toAppend);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.appendToStream(streamId, expectedVersion, toAppend), executor);
 
     }
 
@@ -145,12 +110,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<Long> appendToStream(final StreamId streamId, final long expectedVersion,
                                                   final CommonEvent... events) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Long>() {
-            @Override
-            public Long get() {
-                return delegate.appendToStream(streamId, expectedVersion, events);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.appendToStream(streamId, expectedVersion, events), executor);
 
     }
 
@@ -158,12 +118,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<Long> appendToStream(final StreamId streamId,
                                                   final List<CommonEvent> toAppend) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Long>() {
-            @Override
-            public Long get() {
-                return delegate.appendToStream(streamId, toAppend);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.appendToStream(streamId, toAppend), executor);
 
     }
 
@@ -171,33 +126,18 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     public CompletableFuture<Long> appendToStream(final StreamId streamId,
                                                   final CommonEvent... events) {
 
-        return CompletableFuture.supplyAsync(new Supplier<Long>() {
-            @Override
-            public Long get() {
-                return delegate.appendToStream(streamId, events);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.appendToStream(streamId, events), executor);
 
     }
 
     @Override
     public CompletableFuture<Boolean> streamExists(final StreamId streamId) {
-        return CompletableFuture.supplyAsync(new Supplier<Boolean>() {
-            @Override
-            public Boolean get() {
-                return delegate.streamExists(streamId);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.streamExists(streamId), executor);
     }
 
     @Override
     public CompletableFuture<StreamState> streamState(final StreamId streamId) {
-        return CompletableFuture.supplyAsync(new Supplier<StreamState>() {
-            @Override
-            public StreamState get() {
-                return delegate.streamState(streamId);
-            }
-        }, executor);
+        return CompletableFuture.supplyAsync(() -> delegate.streamState(streamId), executor);
     }
 
     @Override
@@ -208,12 +148,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
     @Override
     public CompletableFuture<Void> createStream(final StreamId streamId) throws StreamAlreadyExistsException {
 
-        return CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                delegate.createStream(streamId);
-            }
-        }, executor);
+        return CompletableFuture.runAsync(() -> delegate.createStream(streamId), executor);
 
     }
 

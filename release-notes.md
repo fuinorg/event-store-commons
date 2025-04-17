@@ -3,6 +3,7 @@
 ## 0.8.0
 
 ### General
+- Dependency updates
 - **Incompatible** refactoring of the module structure
   - Several classes were moved to new modules/packages
   - There are multiple new interfaces extending [IBaseType](api/src/main/java/org/fuin/esc/api/IBaseType.java) to support different serialization libraries like JAX-B, JSON-B or Jackson.

@@ -99,7 +99,7 @@ public class ProjectionJavaScriptBuilderTest {
         list.add(new TypeName("AccountDebited"));
         list.add(new TypeName("AccountCredited"));
         testee.types(list);
-        ;
+
         assertThat(testee.build()).isEqualTo("fromCategory('account').foreachStream().when({"
                 + "'AccountDebited': function(state, ev) { linkTo('AccountsView', ev); },"
                 + "'AccountCredited': function(state, ev) { linkTo('AccountsView', ev); }" + "})");

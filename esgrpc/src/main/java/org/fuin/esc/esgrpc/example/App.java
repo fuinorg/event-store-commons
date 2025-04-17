@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 @TestOmitted("Example class")
+@SuppressWarnings("java:S106")
 public class App {
 
     private App() {

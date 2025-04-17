@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,14 +54,14 @@ public class EnhancedMimeTypeTest {
     public void testConstrcutionPrimarySub() throws MimeTypeParseException {
 
         // PREPARE & TEST
-        final EnhancedMimeType testee = new EnhancedMimeType("application",
+        final EnhancedMimeType testee2 = new EnhancedMimeType("application",
                 "json");
 
         // VERIFY
-        assertThat(testee.getPrimaryType()).isEqualTo("application");
-        assertThat(testee.getSubType()).isEqualTo("json");
-        assertThat(testee.getVersion()).isNull();
-        assertThat(testee.getEncoding()).isNull();
+        assertThat(testee2.getPrimaryType()).isEqualTo("application");
+        assertThat(testee2.getSubType()).isEqualTo("json");
+        assertThat(testee2.getVersion()).isNull();
+        assertThat(testee2.getEncoding()).isNull();
     }
 
     @Test
@@ -69,7 +70,7 @@ public class EnhancedMimeTypeTest {
 
         // PREPARE & TEST
         final EnhancedMimeType testee = new EnhancedMimeType("application",
-                "json", Charset.forName("utf-8"));
+                "json", StandardCharsets.UTF_8);
 
         // VERIFY
         assertThat(testee.getPrimaryType()).isEqualTo("application");

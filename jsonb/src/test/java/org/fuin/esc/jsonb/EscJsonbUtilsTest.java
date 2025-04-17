@@ -41,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests the {@link EscSpiUtils} class together with {@link EscMeta}.
  */
+@SuppressWarnings("java:S1186") // Methods should not be empty is fine here for the test
 public class EscJsonbUtilsTest {
 
     @Test
@@ -68,7 +69,6 @@ public class EscJsonbUtilsTest {
         };
 
         assertThat(EscJsonbUtils.joinJsonbSerializers(new JsonbSerializer<?>[]{})).isEmpty();
-        ;
         assertThat(EscJsonbUtils.joinJsonbSerializers(new JsonbSerializer<?>[]{}, a)).containsExactly(a);
         assertThat(EscJsonbUtils.joinJsonbSerializers(new JsonbSerializer<?>[]{a}, b)).containsExactly(a, b);
         assertThat(EscJsonbUtils.joinJsonbSerializers(new JsonbSerializer<?>[]{a, b}, c)).containsExactly(a, b, c);

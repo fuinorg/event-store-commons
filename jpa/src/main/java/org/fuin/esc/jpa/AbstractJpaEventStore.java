@@ -197,7 +197,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
                 JpaStreamEvent.COLUMN_EVENT_NUMBER, ">=", start);
         final List<NativeSqlCondition> conditions = createNativeSqlConditions(streamId,
                 greaterOrEqualEventNumber);
-        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(streamId, true);
+        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(true);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
         setNativeSqlParameters(query, conditions);
@@ -232,7 +232,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
             }
             if (!projection.isEnabled()) {
                 // The projection does exist, but is not ready yet
-                return new StreamEventsSlice(start, new ArrayList<CommonEvent>(), start, true);
+                return new StreamEventsSlice(start, new ArrayList<>(), start, true);
             }
         } else {
             final JpaStream stream = findStream(streamId);
@@ -246,7 +246,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
                 JpaStreamEvent.COLUMN_EVENT_NUMBER, "<=", start);
         final List<NativeSqlCondition> conditions = createNativeSqlConditions(streamId,
                 greaterOrEqualEventNumber);
-        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(streamId, false);
+        final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(false);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
         setNativeSqlParameters(query, conditions);
@@ -477,7 +477,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      *
      * @param streamId
      *            Unique stream identifier that has the parameter values.
-     * @param additionalParams
+     * @param conditions
      *            Parameters to add in addition to the ones from the stream
      *            identifier.
      *
@@ -497,7 +497,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         return sb.toString();
     }
 
-    private String createOrderBy(final StreamId streamId, final boolean asc) {
+    private String createOrderBy(final boolean asc) {
         final StringBuilder sb = new StringBuilder(" ORDER BY ");
         sb.append(JPA_STREAM_EVENT_PREFIX + "." + JpaStreamEvent.COLUMN_EVENT_NUMBER);
         if (asc) {
@@ -528,7 +528,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     private List<CommonEvent> asCommonEvents(final List<JpaEvent> eventEntries) {
-        final List<CommonEvent> events = new ArrayList<CommonEvent>();
+        final List<CommonEvent> events = new ArrayList<>();
         for (JpaEvent eventEntry : eventEntries) {
             events.add(asCommonEvent(eventEntry));
         }

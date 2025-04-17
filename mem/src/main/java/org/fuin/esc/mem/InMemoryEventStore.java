@@ -137,7 +137,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
 
-        final List<CommonEvent> result = new ArrayList<CommonEvent>();
+        final List<CommonEvent> result = new ArrayList<>();
         for (int i = (int) start; (i < (start + count)) && (i < events.size()); i++) {
             result.add(events.get(i));
         }
@@ -159,7 +159,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
 
-        final List<CommonEvent> result = new ArrayList<CommonEvent>();
+        final List<CommonEvent> result = new ArrayList<>();
         if (start < events.size()) {
             for (int i = (int) start; (i > (start - count)) && (i >= 0); i--) {
                 result.add(events.get(i));
@@ -372,12 +372,9 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
                     final BiConsumer<Subscription, CommonEvent> eventListener = internalSubscription.getEventListener();
                     final InMemorySubscription subscription = internalSubscription.getSubscription();
                     final List<CommonEvent> copy = new ArrayList<>(events);
-                    executor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (long i = idx; i < copy.size(); i++) {
-                                eventListener.accept(subscription, copy.get((int) i));
-                            }
+                    executor.execute(() -> {
+                        for (long i = idx; i < copy.size(); i++) {
+                            eventListener.accept(subscription, copy.get((int) i));
                         }
                     });
                 }

@@ -341,7 +341,7 @@ public class TestFeatures {
             emf = Persistence.createEntityManagerFactory("testPU");
             em = emf.createEntityManager();
             final Map<String, Object> props = emf.getProperties();
-            final boolean shutdown = Boolean.valueOf("" + props.get("esctest.shutdown"));
+            final boolean shutdown = Boolean.parseBoolean("" + props.get("esctest.shutdown"));
             if (shutdown) {
                 final String connUrl = "" + props.get("esctest.url");
                 final String connUsername = "" + props.get("esctest.user");

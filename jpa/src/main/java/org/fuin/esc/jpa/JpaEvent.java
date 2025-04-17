@@ -68,9 +68,9 @@ public class JpaEvent {
     private JpaData data;
 
     @Embedded
-    @AttributeOverrides({@AttributeOverride(name = "type", column = @Column(name = "META_TYPE")),
-            @AttributeOverride(name = "mimeType", column = @Column(name = "META_MIME_TYPE")),
-            @AttributeOverride(name = "raw", column = @Column(name = "META_RAW"))})
+    @AttributeOverride(name = "type", column = @Column(name = "META_TYPE"))
+    @AttributeOverride(name = "mimeType", column = @Column(name = "META_MIME_TYPE"))
+    @AttributeOverride(name = "raw", column = @Column(name = "META_RAW"))
     private JpaData meta;
 
     /**
