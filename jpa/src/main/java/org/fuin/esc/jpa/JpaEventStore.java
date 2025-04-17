@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -21,8 +21,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.*;
-import org.fuin.esc.spi.*;
+import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EventStore;
+import org.fuin.esc.api.ExpectedVersion;
+import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.StreamAlreadyExistsException;
+import org.fuin.esc.api.StreamDeletedException;
+import org.fuin.esc.api.StreamEventsSlice;
+import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamReadOnlyException;
+import org.fuin.esc.api.StreamState;
+import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.spi.EscSpiUtils;
+import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +51,11 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);
 
-    private JpaIdStreamFactory streamFactory;
+    private final JpaIdStreamFactory streamFactory;
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param em
      *            Entity manager.
      * @param streamFactory
@@ -53,41 +66,41 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
      *            Registry used to locate deserializers.
      */
     public JpaEventStore(@NotNull final EntityManager em, @NotNull final JpaIdStreamFactory streamFactory,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+                         @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
         Contract.requireArgNotNull("streamFactory", streamFactory);
         this.streamFactory = streamFactory;
     }
 
     @Override
-    public final void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
+    public void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
         // Do nothing as the operation is not supported
     }
 
     @Override
-    public final boolean isSupportsCreateStream() {
+    public boolean isSupportsCreateStream() {
         return false;
     }
-    
+
     @Override
-    public final long appendToStream(final StreamId streamId, final CommonEvent... events) {
+    public long appendToStream(final StreamId streamId, final CommonEvent... events) {
         return appendToStream(streamId, ANY.getNo(), EscSpiUtils.asList(events));
     }
 
     @Override
-    public final long appendToStream(final StreamId streamId, final long expectedVersion,
-            final CommonEvent... events) {
+    public long appendToStream(final StreamId streamId, final long expectedVersion,
+                               final CommonEvent... events) {
         return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
     }
 
     @Override
-    public final long appendToStream(final StreamId streamId, final List<CommonEvent> events) {
+    public long appendToStream(final StreamId streamId, final List<CommonEvent> events) {
         return appendToStream(streamId, ANY.getNo(), events);
     }
 
     @Override
-    public final long appendToStream(final StreamId streamId, final long expectedVersion,
-            final List<CommonEvent> toAppend) {
+    public long appendToStream(final StreamId streamId, final long expectedVersion,
+                               final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
@@ -97,7 +110,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
-        
+
         JpaStream stream = findAndLockJpaStream(streamId);
         if (stream == null) {
             LOG.debug("Stream '{}' not found, creating it", streamId);
@@ -132,12 +145,12 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final boolean hardDelete) {
+    public void deleteStream(final StreamId streamId, final boolean hardDelete) {
         deleteStream(streamId, ANY.getNo(), hardDelete);
     }
 
     @Override
-    public final void deleteStream(final StreamId streamId, final long expected, final boolean hardDelete) {
+    public void deleteStream(final StreamId streamId, final long expected, final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expected", expected, ExpectedVersion.ANY.getNo());
@@ -146,7 +159,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         if (streamId.isProjection()) {
             throw new StreamReadOnlyException(streamId);
         }
-        
+
         final JpaStream stream = findAndLockJpaStream(streamId);
         if (stream == null) {
             // Stream never existed
@@ -187,7 +200,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         setJpqlParameters(query, streamId);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
         final List<JpaStream> streams = query.getResultList();
-        if (streams.size() == 0) {
+        if (streams.isEmpty()) {
             return null;
         }
         if (streams.size() == 1) {

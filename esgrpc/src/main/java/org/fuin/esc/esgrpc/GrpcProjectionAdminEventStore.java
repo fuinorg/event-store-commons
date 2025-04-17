@@ -1,16 +1,21 @@
 package org.fuin.esc.esgrpc;
 
-import com.eventstore.dbclient.CreateProjectionOptions;
-import com.eventstore.dbclient.DeleteProjectionOptions;
-import com.eventstore.dbclient.EventStoreDBProjectionManagementClient;
+import io.kurrent.dbclient.CreateProjectionOptions;
+import io.kurrent.dbclient.DeleteProjectionOptions;
+import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.*;
+import org.fuin.esc.api.ProjectionAdminEventStore;
+import org.fuin.esc.api.StreamAlreadyExistsException;
+import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.esc.api.TenantId;
+import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
 import org.fuin.esc.spi.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.utils4j.TestOmitted;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +24,10 @@ import java.util.concurrent.ExecutionException;
 /**
  * GRPC based eventstore projection admin implementation.
  */
+@TestOmitted("Tested in the 'test' project")
 public final class GrpcProjectionAdminEventStore implements ProjectionAdminEventStore {
 
-    private final EventStoreDBProjectionManagementClient es;
+    private final KurrentDBProjectionManagementClient es;
 
     private final TenantId tenantId;
 
@@ -30,7 +36,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      *
      * @param es Eventstore client to use.
      */
-    public GrpcProjectionAdminEventStore(EventStoreDBProjectionManagementClient es) {
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
         this(es, null);
     }
 
@@ -40,7 +46,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      * @param es       Eventstore client to use.
      * @param tenantId Tenant ID or {@literal null}.
      */
-    public GrpcProjectionAdminEventStore(EventStoreDBProjectionManagementClient es, TenantId tenantId) {
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es, TenantId tenantId) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
         this.tenantId = tenantId;
@@ -48,13 +54,16 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     @Override
     public ProjectionAdminEventStore open() {
-        // Do nothing
+        // Do nothing - We assume that the eventstore is already
+        // fully initialized when passed in to constructor
         return this;
     }
 
     @Override
     public void close() {
-        // Do nothing
+         if (!es.isShutdown()) {
+             es.shutdown();
+         }
     }
 
     @Override
@@ -67,8 +76,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre) {
-                if (sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
-                        && sre.getMessage() != null && sre.getMessage().contains("NotFound")) {
+                if (sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
                     return false;
                 }
             }
@@ -102,7 +110,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void createProjection(StreamId projectionId, boolean enable, @NotNull TypeName... eventType) throws StreamAlreadyExistsException {
+    public void createProjection(StreamId projectionId, boolean enable, TypeName... eventType) throws StreamAlreadyExistsException {
         createProjection(projectionId, enable, Arrays.asList(eventType));
     }
 
@@ -114,14 +122,21 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
         final String javascript = new ProjectionJavaScriptBuilder(pid).types(eventTypes).build();
         try {
-            es.create(pid.asString(), javascript, CreateProjectionOptions.get().emitEnabled(false).trackEmittedStreams(true)).get();
+            es.create(pid.asString(), javascript, CreateProjectionOptions.get()
+                    .emitEnabled(false).trackEmittedStreams(true)).get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
+            if (ex.getCause() instanceof StatusRuntimeException sre
+                    // TODO Are there better ways than parsing the text?
+                    && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
+                    && sre.getMessage().contains("Conflict")) {
+                throw new StreamAlreadyExistsException(projectionId);
+            }
             throw new RuntimeException("Error waiting for create(..) result", ex);
         }
         if (enable) {
             enableProjection(pid);
         } else {
-            // Workaround for https://github.com/EventStore/EventStoreDB-Client-Java/issues/259 (not a perfect one...)
+            // Workaround for https://github.com/EventStore/KurrentDB-Client-Java/issues/259 (not a perfect one...)
             disableProjection(pid);
         }
     }

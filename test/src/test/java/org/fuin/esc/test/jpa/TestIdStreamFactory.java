@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test.jpa;
 
 import org.fuin.esc.api.StreamId;
@@ -24,4 +23,4 @@ public final class TestIdStreamFactory implements JpaIdStreamFactory {
     }
 
 }
-// CHECKSTYLE:ON
+

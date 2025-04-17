@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -19,9 +19,9 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.KeyValue;
+import org.fuin.objects4j.core.KeyValue;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public final class ProjectionStreamId implements StreamId {
 
     /**
      * Constructor for projection.
-     * 
+     *
      * @param name
      *            Unique name.
      */
@@ -47,37 +47,37 @@ public final class ProjectionStreamId implements StreamId {
     }
 
     @Override
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
     @Override
-    public final boolean isProjection() {
+    public boolean isProjection() {
         return true;
     }
 
     @Override
-    public final <T> T getSingleParamValue() {
+    public <T> T getSingleParamValue() {
         throw new UnsupportedOperationException(getClass().getSimpleName() + " has no parameters");
     }
 
     @Override
-    public final List<KeyValue> getParameters() {
+    public List<KeyValue> getParameters() {
         return Collections.emptyList();
     }
 
     @Override
-    public final String asString() {
+    public String asString() {
         return name;
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return name.hashCode();
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -92,7 +92,7 @@ public final class ProjectionStreamId implements StreamId {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return name;
     }
 

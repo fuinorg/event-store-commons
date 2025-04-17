@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -19,17 +19,19 @@ package org.fuin.esc.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.spi.DeserializerRegistry;
-import org.fuin.esc.spi.SerializerRegistry;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Read only JPA implementation of the event store.
  */
+@TestOmitted("Tested with JpaEventStoreTest and 'esc-test' project")
 public final class ReadableJpaEventStore extends AbstractJpaEventStore {
 
     /**
      * Constructor with all mandatory data.
-     * 
+     *
      * @param em
      *            Entity manager.
      * @param serRegistry
@@ -38,7 +40,7 @@ public final class ReadableJpaEventStore extends AbstractJpaEventStore {
      *            Registry used to locate deserializers.
      */
     public ReadableJpaEventStore(@NotNull final EntityManager em,
-            @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+                                 @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
     }
 

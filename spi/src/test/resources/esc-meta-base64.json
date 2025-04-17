@@ -1,7 +1,0 @@
-{
-	"data-type": "MyEvent",
-	"data-content-type": "application/xml; encoding=UTF-8",
-	"meta-type": "MyMeta",
-	"meta-content-type": "application/xml; transfer-encoding=base64; encoding=UTF-8",
-	"Base64": "PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+"
-}

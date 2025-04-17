@@ -1,7 +1,6 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 
 /**
@@ -17,12 +16,10 @@ public final class TestContext {
 
     /**
      * Constructor with mandatory data.
-     * 
-     * @param currentEventStoreImplType
-     *            Type name of the currently tested event store implementation. Will be used to prefix the stream names to avoid name
-     *            clashes for multiple implementations for the same backend store.
-     * @param eventStore
-     *            Event store to use.
+     *
+     * @param currentEventStoreImplType Type name of the currently tested event store implementation. Will be used to prefix the stream names to avoid name
+     *                                  clashes for multiple implementations for the same backend store.
+     * @param eventStore                Event store to use.
      */
     public TestContext(@NotNull String currentEventStoreImplType, @NotNull EventStore eventStore) {
         super();
@@ -32,8 +29,8 @@ public final class TestContext {
 
     /**
      * Returns the type name of the currently tested event store implementation. Will be used to prefix the stream names to avoid name
-     *            clashes for multiple implementations for the same backend store.
-     *            
+     * clashes for multiple implementations for the same backend store.
+     *
      * @return Type name.
      */
     public final String getCurrentEventStoreImplType() {
@@ -42,13 +39,12 @@ public final class TestContext {
 
     /**
      * Returns the event store to use.
-     * 
+     *
      * @return Event store.
      */
     public final EventStore getEventStore() {
         return eventStore;
     }
 
-    
-    
+
 }

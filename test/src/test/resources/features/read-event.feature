@@ -1,6 +1,6 @@
 Feature: Read a single event
 
-Scenario: Same type append and read 
+  Scenario: Same type append and read
     Given the stream "AppendSameAndRead" does not exist
     When I append the following events to stream "AppendSameAndRead" 
     """
@@ -30,8 +30,8 @@ Scenario: Same type append and read
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
     </event>
     """
- 
- Scenario: Different type append and read 
+
+  Scenario: Different type append and read
     Given the stream "AppendDiffAndRead" does not exist
     When I append the following events to stream "AppendDiffAndRead" 
     """

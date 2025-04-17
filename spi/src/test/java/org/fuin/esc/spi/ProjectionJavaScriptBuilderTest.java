@@ -1,40 +1,38 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.fuin.esc.api.SimpleStreamId;
+import org.fuin.esc.api.TypeName;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests the {@link ProjectionJavaScriptBuilder} class.
  */
-// CHECKSTYLE:OFF Test
 public class ProjectionJavaScriptBuilderTest {
 
-    
+
     @Test
     public void testFromAll() {
 
@@ -44,7 +42,7 @@ public class ProjectionJavaScriptBuilderTest {
                 + "'AccountDebited': function(state, ev) { linkTo('AccountsView', ev); }" + "})");
 
     }
-    
+
     @Test
     public void testNoEventType() {
 
@@ -101,7 +99,7 @@ public class ProjectionJavaScriptBuilderTest {
         list.add(new TypeName("AccountDebited"));
         list.add(new TypeName("AccountCredited"));
         testee.types(list);
-        ;
+
         assertThat(testee.build()).isEqualTo("fromCategory('account').foreachStream().when({"
                 + "'AccountDebited': function(state, ev) { linkTo('AccountsView', ev); },"
                 + "'AccountCredited': function(state, ev) { linkTo('AccountsView', ev); }" + "})");
@@ -109,4 +107,4 @@ public class ProjectionJavaScriptBuilderTest {
     }
 
 }
-// CHECKSTYLE:ON
+

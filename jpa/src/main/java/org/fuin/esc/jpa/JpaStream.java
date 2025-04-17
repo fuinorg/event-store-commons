@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -37,7 +37,7 @@ public abstract class JpaStream {
 
     /**
      * Returns the state of the stream.
-     * 
+     *
      * @return State.
      */
     public StreamState getState() {
@@ -46,7 +46,7 @@ public abstract class JpaStream {
 
     /**
      * Returns the information if the stream was deleted.
-     * 
+     *
      * @return TRUE if soft or hard deleted.
      */
     public boolean isDeleted() {
@@ -55,7 +55,7 @@ public abstract class JpaStream {
 
     /**
      * Marks the stream as deleted.
-     * 
+     *
      * @param hardDelete
      *            Hard or soft deletion.
      */
@@ -69,7 +69,7 @@ public abstract class JpaStream {
 
     /**
      * Returns the current version of the stream.
-     * 
+     *
      * @return Version.
      */
     public long getVersion() {
@@ -78,7 +78,7 @@ public abstract class JpaStream {
 
     /**
      * Increments the version of the stream by one.
-     * 
+     *
      * @return New version.
      */
     public long incVersion() {
@@ -92,7 +92,7 @@ public abstract class JpaStream {
      *            The unique identifier of the stream to create an event for.
      * @param eventEntry
      *            Event entry to convert into a JPA variant.
-     * 
+     *
      * @return JPA entity.
      */
     public abstract JpaStreamEvent createEvent(@NotNull StreamId streamId, @NotNull JpaEvent eventEntry);

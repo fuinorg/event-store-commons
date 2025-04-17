@@ -1,27 +1,30 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.spi;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.Immutable;
-import org.fuin.objects4j.vo.ValueObject;
+import org.fuin.objects4j.common.ValueObject;
 
+import javax.annotation.concurrent.Immutable;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -31,6 +34,7 @@ import java.util.Arrays;
 @Immutable
 public class SerializedData implements ValueObject, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1000L;
 
     /** Unique type of the data. */
@@ -54,7 +58,7 @@ public class SerializedData implements ValueObject, Serializable {
 
     /**
      * Creates a data object.
-     * 
+     *
      * @param type
      *            Unique identifier for the type of data.
      * @param mimeType
@@ -63,7 +67,7 @@ public class SerializedData implements ValueObject, Serializable {
      *            Raw data block.
      */
     public SerializedData(@NotNull final SerializedDataType type,
-            @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
+                          @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
         super();
 
         Contract.requireArgNotNull("type", type);
@@ -77,7 +81,7 @@ public class SerializedData implements ValueObject, Serializable {
 
     /**
      * Returns the unique identifier for the type of data.
-     * 
+     *
      * @return Unique and never changing type name.
      */
     @NotNull
@@ -87,7 +91,7 @@ public class SerializedData implements ValueObject, Serializable {
 
     /**
      * Returns the Internet Media Type that classifies the data.
-     * 
+     *
      * @return Mime type.
      */
     @NotNull
@@ -97,7 +101,7 @@ public class SerializedData implements ValueObject, Serializable {
 
     /**
      * Returns the raw data block.
-     * 
+     *
      * @return Raw data.
      */
     @NotNull
@@ -105,7 +109,6 @@ public class SerializedData implements ValueObject, Serializable {
         return raw;
     }
 
-    // CHECKSTYLE:OFF Generated code
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -134,13 +137,9 @@ public class SerializedData implements ValueObject, Serializable {
         if (!Arrays.equals(raw, other.raw))
             return false;
         if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
-        return true;
+            return other.type == null;
+        } else return type.equals(other.type);
     }
 
-    // CHECKSTYLE:ON
 
 }

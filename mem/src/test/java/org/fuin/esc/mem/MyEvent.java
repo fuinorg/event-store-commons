@@ -1,9 +1,11 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.mem;
+
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
+@TestOmitted("This is only a test class")
 public class MyEvent {
 
     private String name;
@@ -47,4 +49,4 @@ public class MyEvent {
     }
 
 }
-// CHECKSTYLE:ON
+

@@ -1,17 +1,17 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
@@ -36,12 +36,12 @@ public final class EscTestUtils {
 
     /**
      * Creates a failure message from an exception.
-     * 
+     *
      * @param identifier
      *            Unique identifier this failure relates to.
      * @param exception
      *            Current exception.
-     * 
+     *
      * @return Message.
      */
     public static String createExceptionFailureMessage(final String identifier, final Exception exception) {
@@ -50,24 +50,24 @@ public final class EscTestUtils {
 
     /**
      * Creates a failure message from an expected type and an exception.
-     * 
+     *
      * @param identifier
      *            Unique identifier this failure relates to.
      * @param expectedExceptionClass
      *            Expected exception type.
      * @param exception
      *            Current exception.
-     * 
+     *
      * @return Message.
      */
     public static String createExceptionFailureMessage(final String identifier, final Class<? extends Exception> expectedExceptionClass,
-            final Exception exception) {
+                                                       final Exception exception) {
         return createExceptionFailureMessage(identifier, expectedExceptionClass, null, exception);
     }
 
     /**
      * Creates a failure message from an expected type, message and an exception.
-     * 
+     *
      * @param identifier
      *            Unique identifier this failure relates to.
      * @param expectedExceptionClass
@@ -76,11 +76,11 @@ public final class EscTestUtils {
      *            Expected exception message.
      * @param exception
      *            Current exception.
-     * 
+     *
      * @return Message.
      */
     public static String createExceptionFailureMessage(final String identifier, final Class<? extends Exception> expectedExceptionClass,
-            final String expectedExceptionMessage, final Exception exception) {
+                                                       final String expectedExceptionMessage, final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
                 return "[" + identifier + "] OK";
@@ -113,10 +113,10 @@ public final class EscTestUtils {
 
     /**
      * Converts an empty string into <code>null</code>.
-     * 
+     *
      * @param str
      *            String to return.
-     * 
+     *
      * @return String or <code>null</code> if the input string was "" or "-".
      */
     public static String emptyAsNull(@Nullable final String str) {
@@ -124,7 +124,7 @@ public final class EscTestUtils {
             return null;
         }
         final String name = str.trim();
-        if (name.length() == 0 || name.equals("-")) {
+        if (name.isEmpty() || name.equals("-")) {
             return null;
         }
         return str;
@@ -133,10 +133,10 @@ public final class EscTestUtils {
     /**
      * Creates an exception class from an exception name. If the name is NOT fully qualified (has no '.' in the name) it's assumed that it's
      * an API exception from package 'org.fuin.esc.api'.
-     * 
+     *
      * @param exceptionName
      *            Fully qualified name or a simple name of a class located in the "org.fuin.esc.api" package.
-     * 
+     *
      * @return Class.
      */
     @SuppressWarnings("unchecked")
@@ -157,12 +157,12 @@ public final class EscTestUtils {
 
     /**
      * Compares the two events based on their content.
-     * 
+     *
      * @param eventA
      *            First event.
      * @param eventB
      *            Second event.
-     * 
+     *
      * @return TRUE id the events have the same content.
      */
     public static boolean sameContent(@Nullable final CommonEvent eventA, @Nullable final CommonEvent eventB) {
@@ -194,18 +194,18 @@ public final class EscTestUtils {
 
     /**
      * Creates an exception message by pointing out the differences between two events.
-     * 
+     *
      * @param identifier
      *            Unique identifier to use in case of a failure.
      * @param expectedEvent
      *            First event.
      * @param actualEvent
      *            Second event.
-     * 
+     *
      * @return Exception message.
      */
     public static String createExceptionFailureMessage(final String identifier, final CommonEvent expectedEvent,
-            final CommonEvent actualEvent) {
+                                                       final CommonEvent actualEvent) {
         if (expectedEvent == null) {
             if (actualEvent == null) {
                 return "[" + identifier + "] OK";

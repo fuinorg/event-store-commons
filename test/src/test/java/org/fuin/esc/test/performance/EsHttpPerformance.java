@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test.performance;
 
 import java.io.IOException;
@@ -15,10 +14,8 @@ public final class EsHttpPerformance {
 
     /**
      * Main method.
-     * 
-     * @param args
-     *            Not used.
-     *            
+     *
+     * @param args Not used.
      * @throws IOException Error reading console input.
      */
     public static void main(final String[] args) throws IOException {
@@ -140,8 +137,8 @@ public final class EsHttpPerformance {
         while ((char) System.in.read() != 'c') {
             // Do it again
         }
-        
+
     }
 
 }
-// CHECKSTYLE:ON
+

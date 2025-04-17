@@ -1,36 +1,33 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.test;
 
-import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.spi.Event;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
+
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Reads a single event from a stream.
@@ -73,7 +70,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to read.
      * @param eventNumber
@@ -84,8 +81,8 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
      *            The exception that is expected, an empty string or "-".
      */
     public ReadEventCommand(@NotNull final String streamName,
-            final long eventNumber, final String expectedEventXml,
-            final String expectedException) {
+                            final long eventNumber, final String expectedEventXml,
+                            final String expectedException) {
         super();
         this.streamName = streamName;
         this.eventNumber = eventNumber;
@@ -126,7 +123,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
+        if (!TestUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return false;
         }
@@ -135,7 +132,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
 
     @Override
     public final String getFailureDescription() {
-        if (!Units4JUtils.isExpectedType(expectedExceptionClass,
+        if (!TestUtils.isExpectedType(expectedExceptionClass,
                 actualException)) {
             return EscTestUtils.createExceptionFailureMessage(streamId.asString(),
                     expectedExceptionClass, actualException);

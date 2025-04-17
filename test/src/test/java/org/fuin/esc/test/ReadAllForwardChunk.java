@@ -1,31 +1,31 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.annotation.Nullable;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import jakarta.annotation.Nullable;
-import org.fuin.objects4j.vo.UUIDStrValidator;
+import org.fuin.objects4j.core.UUIDStrValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Expected chunk when reading forward all events of a stream.
@@ -66,7 +66,7 @@ public final class ReadAllForwardChunk {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param events
      *            Events.
      */
@@ -82,7 +82,7 @@ public final class ReadAllForwardChunk {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param events
      *            Events.
      */
@@ -96,7 +96,7 @@ public final class ReadAllForwardChunk {
 
     /**
      * Returns a list of expected events.
-     * 
+     *
      * @return Event list.
      */
     public final List<CommonEvent> getEvents() {
@@ -147,7 +147,7 @@ public final class ReadAllForwardChunk {
     }
 
     private static void addEvent(final List<CommonEvent> events,
-            final String eventId) {
+                                 final String eventId) {
         if (eventId != null && UUIDStrValidator.isValid(eventId)) {
             final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId),
                     BookAddedEvent.TYPE, new BookAddedEvent("Any", "John Doe"));

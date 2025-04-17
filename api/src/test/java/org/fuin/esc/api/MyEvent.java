@@ -1,10 +1,15 @@
-// CHECKSTYLE:OFF Test
 package org.fuin.esc.api;
+
+import org.fuin.utils4j.TestOmitted;
 
 /**
  * Example event.
  */
+@TestOmitted("This is only a test class")
+@HasSerializedDataTypeConstant
 public class MyEvent {
+
+    public static final SerializedDataType SER_TYPE = new SerializedDataType("MyEvent");
 
     private String name;
 
@@ -42,4 +47,3 @@ public class MyEvent {
     }
 
 }
-// CHECKSTYLE:ON

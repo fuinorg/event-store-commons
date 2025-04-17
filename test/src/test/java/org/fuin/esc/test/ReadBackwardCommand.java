@@ -1,27 +1,24 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
@@ -30,8 +27,10 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import jakarta.annotation.Nullable;
-import org.fuin.units4j.TestCommand;
+import org.fuin.utils4j.TestCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads a stream backward.
@@ -94,7 +93,7 @@ public final class ReadBackwardCommand implements TestCommand<TestContext> {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to create.
      * @param start
@@ -111,8 +110,8 @@ public final class ReadBackwardCommand implements TestCommand<TestContext> {
      *            Expected events.
      */
     public ReadBackwardCommand(@NotNull final String streamName, final long start, final int count,
-            final long fromEventNumber, final long nextEventNumber, final boolean endOfStream,
-            @Nullable final String... events) {
+                               final long fromEventNumber, final long nextEventNumber, final boolean endOfStream,
+                               @Nullable final String... events) {
         super();
         this.streamName = streamName;
         this.start = start;
@@ -191,10 +190,9 @@ public final class ReadBackwardCommand implements TestCommand<TestContext> {
             return EscTestUtils.createExceptionFailureMessage(streamId.asString(), actualException);
         }
         if (actualSlice == null) {
-            return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: null";
+            return "[" + streamId + "] expected " + expectedSlice + ", but was: null";
         }
-        return "[" + streamId + "] expected " + expectedSlice.toDebugString() + ", but was: "
-                + actualSlice.toDebugString();
+        return "[" + streamId + "] expected " + expectedSlice + ", but was: " + actualSlice;
     }
 
     @Override

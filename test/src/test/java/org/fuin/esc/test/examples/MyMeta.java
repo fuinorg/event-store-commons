@@ -1,11 +1,10 @@
-// CHECKSTYLE:OFF
 package org.fuin.esc.test.examples;
 
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
-import org.fuin.esc.spi.SerializedDataType;
 
 import java.io.Serializable;
 
@@ -17,12 +16,16 @@ public final class MyMeta implements Serializable {
 
     private static final long serialVersionUID = 100L;
 
-    /** Unique name of the event. */
+    /**
+     * Unique name of the event.
+     */
     public static final TypeName TYPE = new TypeName("MyMeta");
 
-    /** Unique name of the serialized type. */
+    /**
+     * Unique name of the serialized type.
+     */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
-    
+
     @XmlElement(name = "user")
     private String user;
 
@@ -35,9 +38,8 @@ public final class MyMeta implements Serializable {
 
     /**
      * Constructor with all mandatory data.
-     * 
-     * @param user
-     *            User ID.
+     *
+     * @param user User ID.
      */
     public MyMeta(@Nullable final String user) {
         super();
@@ -46,7 +48,7 @@ public final class MyMeta implements Serializable {
 
     /**
      * Returns the user.
-     * 
+     *
      * @return User ID.
      */
     public final String getUser() {
@@ -89,4 +91,4 @@ public final class MyMeta implements Serializable {
     }
 
 }
-// CHECKSTYLE:ON
+

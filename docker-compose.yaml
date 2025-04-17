@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
   eventstore:
-    image: eventstore/eventstore:21.10.2-bionic
+    image: eventstore/eventstore:24.10
     container_name: "eventstore-commons-test"
     ports:
       - "1113:1113"
@@ -12,8 +12,6 @@ services:
       EVENTSTORE_MEM_DB: "true"
       EVENTSTORE_RUN_PROJECTIONS: "all"
       EVENTSTORE_INSECURE: "true"
-      EVENTSTORE_ENABLE_EXTERNAL_TCP: "true"
-      EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP: "true"
       EVENTSTORE_LOG: "/tmp/log-eventstore"
     networks:
       - eventstore-commons-test

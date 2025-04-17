@@ -1,27 +1,24 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
@@ -31,9 +28,10 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.test.examples.BookAddedEvent;
-import jakarta.annotation.Nullable;
-import org.fuin.units4j.TestCommand;
-import org.fuin.units4j.Units4JUtils;
+import org.fuin.utils4j.TestCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Appends some data to a stream.
@@ -76,7 +74,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to create.
      * @param expectedVersion
@@ -87,14 +85,14 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
      *            Events to add.
      */
     public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
-            @Nullable final Class<? extends Exception> expectedExceptionClass,
-            @NotNull final CommonEvent... events) {
+                                 @Nullable final Class<? extends Exception> expectedExceptionClass,
+                                 @NotNull final CommonEvent... events) {
         this(streamName, expectedVersion, expectedExceptionClass, EscSpiUtils.asList(events));
     }
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to create.
      * @param expectedVersion
@@ -105,8 +103,8 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
      *            Events to add.
      */
     public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
-            @Nullable final Class<? extends Exception> expectedExceptionClass,
-            @NotNull final List<CommonEvent> events) {
+                                 @Nullable final Class<? extends Exception> expectedExceptionClass,
+                                 @NotNull final List<CommonEvent> events) {
         super();
         this.streamName = streamName;
         this.expectedVersion = "" + expectedVersion;
@@ -122,7 +120,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
     public void init(final TestContext context) {
         this.es = context.getEventStore();
         this.streamName = context.getCurrentEventStoreImplType() + "_" + streamName;
-        
+
         expectedVersion = EscTestUtils.emptyAsNull(expectedVersion);
         expectedException = EscTestUtils.emptyAsNull(expectedException);
         eventId = EscTestUtils.emptyAsNull(eventId);
@@ -154,7 +152,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     @Override
     public final boolean isSuccessful() {
-        return Units4JUtils.isExpectedType(expectedExceptionClass, actualException);
+        return TestUtils.isExpectedType(expectedExceptionClass, actualException);
     }
 
     @Override

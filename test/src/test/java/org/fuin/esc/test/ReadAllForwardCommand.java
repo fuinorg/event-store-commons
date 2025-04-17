@@ -1,33 +1,32 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved. 
+ * Copyright (C) 2015 Michael Schnell. All rights reserved.
  * http://www.fuin.org/
- *
+ * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
 package org.fuin.esc.test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.validation.constraints.NotNull;
-
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
-import org.fuin.units4j.TestCommand;
+import org.fuin.utils4j.TestCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Reads all events forward from a stream.
@@ -56,7 +55,7 @@ public final class ReadAllForwardCommand implements TestCommand<TestContext> {
 
     /**
      * Constructor for manual creation.
-     * 
+     *
      * @param streamName
      *            Uniquely identifies the stream to create.
      * @param start
@@ -67,8 +66,8 @@ public final class ReadAllForwardCommand implements TestCommand<TestContext> {
      *            Expected chunks.
      */
     public ReadAllForwardCommand(@NotNull final String streamName,
-            final long start, final int chunkSize,
-            @NotNull final List<ReadAllForwardChunk> chunks) {
+                                 final long start, final int chunkSize,
+                                 @NotNull final List<ReadAllForwardChunk> chunks) {
         super();
         this.streamName = streamName;
         this.start = start;

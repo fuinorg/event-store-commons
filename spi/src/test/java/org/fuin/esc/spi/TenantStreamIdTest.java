@@ -32,7 +32,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Tests the {@link TenantStreamId} class.
  */
-// CHECKSTYLE:OFF Test
 public class TenantStreamIdTest {
 
     private static final TenantId TENANT_ID = new SimpleTenantId("mycompany");
@@ -77,4 +76,4 @@ public class TenantStreamIdTest {
         }).isInstanceOf(UnsupportedOperationException.class);
     }
 }
-// CHECKSTYLE:ON
+
