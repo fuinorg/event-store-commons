@@ -21,6 +21,7 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,6 +71,13 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
             throw new IllegalArgumentException("No class found for: " + type);
         }
         return clasz;
+    }
+
+    @Override
+    public List<TypeClass> findAll() {
+        return map.entrySet().stream()
+                .map(e -> new TypeClass(e.getKey(), e.getValue()))
+                .toList();
     }
 
 }

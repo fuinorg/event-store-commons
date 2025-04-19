@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.9.0
+- Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
+
 ## 0.8.0
 
 ### General

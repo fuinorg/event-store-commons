@@ -19,6 +19,8 @@ package org.fuin.esc.api;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -49,5 +51,24 @@ public class SimpleSerializedDataTypeRegistryTest {
         }
 
     }
+
+    @Test
+    public void testFindAll() {
+
+        final SimpleSerializedDataTypeRegistry testee = new SimpleSerializedDataTypeRegistry();
+
+        final SerializedDataType stringType = new SerializedDataType("String");
+        testee.add(stringType, String.class);
+
+        final SerializedDataType integerType = new SerializedDataType("Integer");
+        testee.add(new SerializedDataType2ClassMapping(integerType, Integer.class));
+
+        assertThat(testee.findAll()).containsOnly(
+                new SerializedDataTypeRegistry.TypeClass(stringType, String.class),
+                new SerializedDataTypeRegistry.TypeClass(integerType, Integer.class)
+        );
+
+    }
+
 }
 

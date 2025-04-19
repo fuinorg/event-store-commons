@@ -19,6 +19,8 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 /**
  * Locates a class for a given type.
  */
@@ -34,5 +36,22 @@ public interface SerializedDataTypeRegistry {
      */
     @NotNull
     Class<?> findClass(@NotNull SerializedDataType type);
+
+    /**
+     * Returns all known type-class mappings.
+     *
+     * @return Mappings from type to class.
+     */
+    @NotNull
+    List<TypeClass> findAll();
+
+    /**
+     * Helper class for type/class combination.
+     *
+     * @param type Type.
+     * @param clasz Class.
+     */
+    record TypeClass(SerializedDataType type, Class<?> clasz) {
+    }
 
 }

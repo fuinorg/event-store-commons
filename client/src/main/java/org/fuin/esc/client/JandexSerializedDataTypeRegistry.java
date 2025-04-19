@@ -66,6 +66,12 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
         return delegate.findClass(type);
     }
 
+    @Override
+    @NotNull
+    public List<TypeClass> findAll() {
+        return delegate.findAll();
+    }
+
     /**
      * Returns a list of known classes that can be serialized.
      *
@@ -107,7 +113,7 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
         return classes;
     }
 
-    public SerializedDataType serializedDataTypeConstant(Class<?> domainEventClass) {
+    private static SerializedDataType serializedDataTypeConstant(Class<?> domainEventClass) {
         final HasSerializedDataTypeConstant annotation = domainEventClass.getAnnotation(HasSerializedDataTypeConstant.class);
         return HasSerializedDataTypeConstantValidator.extractValue(domainEventClass, annotation.value());
     }
