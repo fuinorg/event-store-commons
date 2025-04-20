@@ -34,7 +34,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     /**
      * Constructor with mandatory data.
      *
-     * @param es Eventstore client to use.
+     * @param es Connection that is maintained outside. Opening/Closing is up to the caller!
      */
     public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
         this(es, null);
@@ -61,9 +61,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     @Override
     public void close() {
-         if (!es.isShutdown()) {
-             es.shutdown();
-         }
+        // Do nothing - Connection is handled outside
     }
 
     @Override

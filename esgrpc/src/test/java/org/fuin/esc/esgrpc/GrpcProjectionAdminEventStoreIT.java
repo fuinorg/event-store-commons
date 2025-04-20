@@ -7,6 +7,7 @@ import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,12 @@ class GrpcProjectionAdminEventStoreIT {
     @BeforeEach
     void beforeEach() throws MalformedURLException {
         testee = new GrpcProjectionAdminEventStore(client, null);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        client.shutdown();
+        client = null;
     }
 
     @Test

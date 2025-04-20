@@ -134,6 +134,8 @@ public final class EsGrpcJsonbExample {
             // Prints "BookAddedEvent c8af28d4-5544-4624-99ff-7fcf1a0c8cfe"
             System.out.println(readEvent);
 
+        } finally {
+            client.shutdown();
         }
 
     }

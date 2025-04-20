@@ -92,6 +92,8 @@ public class TestFeatures {
 
     private EntityManager em;
 
+    private KurrentDBClient client;
+
     private Connection connection;
 
     @Before
@@ -128,7 +130,7 @@ public class TestFeatures {
                 } else {
                     final KurrentDBClientSettings setts = KurrentDBConnectionString
                             .parseOrThrow("esdb://localhost:2113?tls=false");
-                    final KurrentDBClient client = KurrentDBClient.create(setts);
+                    client = KurrentDBClient.create(setts);
                     eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(registry)
                             .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
                             .build();
@@ -359,6 +361,9 @@ public class TestFeatures {
         }
         if (emf != null) {
             emf.close();
+        }
+        if (client != null && !client.isShutdown()) {
+            client.shutdown();
         }
         try {
             if (connection != null) {
