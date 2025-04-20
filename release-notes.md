@@ -2,7 +2,9 @@
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
-- **Incompagible** The [ESGrpcEventStore](esgrpc/src/main/java/org/fuin/esc/esgrpc/ESGrpcEventStore.java) does no longer shutdown the `KurrentDBClient` to allow sharing the client between multiple instances as it is thread-safe.
+- **Incompatible** The [ESGrpcEventStore](esgrpc/src/main/java/org/fuin/esc/esgrpc/ESGrpcEventStore.java) does no longer shutdown the `KurrentDBClient` to allow sharing the client between multiple instances as it is thread-safe.
+- Added new [Jackson](jackson) module
+- Bugfix: Data and meta types that had a different content type were not serialized correctly with JSON-B. 
 
 ## 0.8.0
 

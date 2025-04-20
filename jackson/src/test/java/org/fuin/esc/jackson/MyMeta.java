@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.jsonb;
+package org.fuin.esc.jackson;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
@@ -49,11 +49,11 @@ public final class MyMeta implements Serializable {
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlElement(name = "id")
-    @JsonbProperty
+    @JsonProperty
     private String user;
 
     /**
-     * Protected default constructor for JAXB.
+     * Protected default constructor for Jackson.
      */
     protected MyMeta() {
         super();

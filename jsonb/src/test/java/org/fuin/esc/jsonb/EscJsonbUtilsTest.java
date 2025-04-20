@@ -17,29 +17,20 @@
  */
 package org.fuin.esc.jsonb;
 
-import jakarta.activation.MimeTypeParseException;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.spi.EscSpiUtils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests the {@link EscSpiUtils} class together with {@link EscMeta}.
+ * Tests the {@link EscJsonbUtils} class.
  */
 @SuppressWarnings("java:S1186") // Methods should not be empty is fine here for the test
 public class EscJsonbUtilsTest {
@@ -101,7 +92,6 @@ public class EscJsonbUtilsTest {
         };
 
         assertThat(EscJsonbUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[]{})).isEmpty();
-        ;
         assertThat(EscJsonbUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[]{}, new JsonbSerializer<?>[]{a})).containsExactly(a);
         assertThat(EscJsonbUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[]{a}, new JsonbSerializer<?>[]{b})).contains(a, b);
         assertThat(EscJsonbUtils.joinJsonbSerializerArrays(new JsonbSerializer<?>[]{a, b}, new JsonbSerializer<?>[]{c})).contains(a, b, c);
@@ -176,59 +166,12 @@ public class EscJsonbUtilsTest {
         };
 
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{})).isEmpty();
-        ;
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{}, new JsonbDeserializer<?>[]{a})).containsExactly(a);
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{a}, new JsonbDeserializer<?>[]{b})).contains(a, b);
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{a, b}, new JsonbDeserializer<?>[]{c})).contains(a, b, c);
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{a, b}, new JsonbDeserializer<?>[]{c, d})).contains(a, b, c, d);
         assertThat(EscJsonbUtils.joinJsonbDeserializerArrays(new JsonbDeserializer<?>[]{a}, new JsonbDeserializer<?>[]{b}, new JsonbDeserializer<?>[]{c})).contains(a, b, c);
 
-    }
-
-    private EnhancedMimeType mimeType(String str) {
-        try {
-            return new EnhancedMimeType(str);
-        } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private Serializer dummySerializer(final String baseType) {
-        return new Serializer() {
-            @Override
-            public <T> byte[] marshal(T obj, SerializedDataType type) {
-                if (obj == null) {
-                    return null;
-                }
-                return obj.toString().getBytes();
-            }
-
-            @Override
-            public EnhancedMimeType getMimeType() {
-                return mimeType(baseType);
-            }
-        };
-    }
-
-    private Deserializer dummyDeserializer() {
-        return new Deserializer() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> T unmarshal(Object data, SerializedDataType type, EnhancedMimeType mimeType) {
-                if (data instanceof byte[]) {
-                    return (T) new String((byte[]) data);
-                }
-                throw new IllegalArgumentException("Unknown input type: " + data);
-            }
-        };
-    }
-
-    private List<CommonEvent> asList(CommonEvent... events) {
-        final List<CommonEvent> list = new ArrayList<>();
-        for (final CommonEvent event : events) {
-            list.add(event);
-        }
-        return list;
     }
 
 }

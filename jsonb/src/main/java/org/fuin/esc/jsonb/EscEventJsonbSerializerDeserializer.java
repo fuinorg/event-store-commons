@@ -1,18 +1,23 @@
 package org.fuin.esc.jsonb;
 
 import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
-import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.DeserializerRegistryRequired;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SerializerRegistryRequired;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
@@ -22,14 +27,16 @@ import java.lang.reflect.Type;
  */
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscEventJsonbSerializerDeserializer implements JsonbSerializer<EscEvent>,
-        JsonbDeserializer<EscEvent>, DeserializerRegistryRequired {
+        JsonbDeserializer<EscEvent>, SerializerRegistryRequired, DeserializerRegistryRequired {
 
-    private DeserializerRegistry registry;
+    private SerializerRegistry serializerRegistry;
+
+    private DeserializerRegistry deserializerRegistry;
 
     @Override
     public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
         final EscEvent escEvent = new EscEvent();
-        JsonObject content = null;
+        JsonValue content = null;
         while (parser.hasNext()) {
             final JsonParser.Event event = parser.next();
             if (event == JsonParser.Event.KEY_NAME) {
@@ -47,7 +54,9 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
                         break;
                     case IEscEvent.EL_DATA:
                         parser.next(); // Skip key and deserialize object
-                        content = ctx.deserialize(JsonObject.class, parser);
+                        // We cannot directly deserialize into target type as meta information might not be
+                        // set at this point in time as the order of the tags is undefined.
+                        content = ctx.deserialize(JsonValue.class, parser);
                         break;
                     default:
                         // ignore
@@ -60,8 +69,9 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
         if (content == null) {
             throw new IllegalStateException("Expected content to be set, but was never processed during parse process");
         }
-        if (content.containsKey(IBase64Data.EL_ROOT_NAME)) {
-            escEvent.setData(new DataWrapper(new Base64Data(content.getString(IBase64Data.EL_ROOT_NAME))));
+        if (content.getValueType() == JsonValue.ValueType.OBJECT
+                && ((JsonObject) content).containsKey(IBase64Data.EL_ROOT_NAME)) {
+            escEvent.setData(new DataWrapper(new Base64Data(((JsonObject) content).getString(IBase64Data.EL_ROOT_NAME))));
         } else {
             if (escEvent.getMeta() == null) { //NOSONAR Can unfortunately be null because it's not set above...
                 throw new IllegalStateException("Expected 'meta' to be set, but was never processed during parse process");
@@ -69,11 +79,11 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
             if (!(escEvent.getMeta().getObj() instanceof EscMeta escMeta)) {
                 throw new IllegalStateException("Expected 'meta.object' to be of type 'EscMeta', but was: " + escEvent.getMeta().getObj());
             }
-            final Deserializer deserializer = registry.getDeserializer(new SerializedDataType(escEvent.getEventType()),
-                    escMeta.getDataContentType());
-            final Object obj = deserializer.unmarshal(content, new SerializedDataType(escEvent.getEventType()),
-                    escMeta.getDataContentType());
-            escEvent.setData(new DataWrapper(obj));
+
+            final SerializedDataType dataType = new SerializedDataType(escEvent.getEventType());
+            final EnhancedMimeType dataContentType = escMeta.getDataContentType();
+            final Object data = EscJsonbUtils.deserialize(content, dataType, dataContentType, deserializerRegistry);
+            escEvent.setData(new DataWrapper(data));
         }
 
         return escEvent;
@@ -90,7 +100,9 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
                 generator.write(IBase64Data.EL_ROOT_NAME, base64Data.getEncoded());
                 generator.writeEnd();
             } else {
-                ctx.serialize(IEscEvent.EL_DATA, escEvent.getData().getObj(), generator);
+                final SerializedDataType serDataType = new SerializedDataType(escEvent.getEventType());
+                EscJsonbUtils.serialize(generator, ctx, serializerRegistry,
+                        serDataType, IEscEvent.EL_DATA, escEvent.getData().getObj());
             }
             ctx.serialize(IEscEvent.EL_META_DATA, escEvent.getMeta().getObj(), generator);
         }
@@ -99,8 +111,12 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
 
     @Override
     public void setRegistry(final DeserializerRegistry registry) {
-        this.registry = registry;
+        this.deserializerRegistry = registry;
+    }
 
+    @Override
+    public void setRegistry(final SerializerRegistry registry) {
+        this.serializerRegistry = registry;
     }
 
 }

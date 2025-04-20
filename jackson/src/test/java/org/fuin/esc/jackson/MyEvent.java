@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.jsonb;
+package org.fuin.esc.jackson;
 
-import jakarta.json.bind.annotation.JsonbProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -46,15 +46,15 @@ public final class MyEvent implements Serializable {
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
     @XmlElement(name = "id")
-    @JsonbProperty
+    @JsonProperty
     private String id;
 
     @XmlElement(name = "description")
-    @JsonbProperty
+    @JsonProperty
     private String description;
 
     /**
-     * Protected default constructor for JAXB.
+     * Protected default constructor for Jackson.
      */
     protected MyEvent() {
         super();

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.jsonb;
+package org.fuin.esc.jackson;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.activation.MimeTypeParseException;
-import jakarta.json.bind.Jsonb;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EscEventTest {
 
     @Test
-    public void testMarshalJsonB() throws Exception {
+    public void testMarshalJackson() throws Exception {
 
         // PREPARE
         final String expectedJson = """
@@ -79,27 +79,26 @@ public class EscEventTest {
         final DataWrapper metaWrapper = new DataWrapper(escMeta);
         final EscEvent event = new EscEvent(eventId, MyEvent.TYPE.asBaseType(), dataWrapper, metaWrapper);
 
-        try (final JsonbDeSerializer jsonbDeSer = TestUtils.createJsonbDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
+        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
+            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
 
-            try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
+            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
 
-                // TEST
-                final String currentJson = jsonb.toJson(event);
+            // TEST
+            final String currentJson = objectMapper.writeValueAsString(event);
 
-                // VERIFY
-                assertThatJson(currentJson).isEqualTo(expectedJson);
+            // VERIFY
+            assertThatJson(currentJson).isEqualTo(expectedJson);
 
-            }
         }
 
     }
 
     @Test
-    public final void testUnmarshalJsonB() throws Exception {
+    public final void testUnmarshalJackson() throws Exception {
 
         // PREPARE
-        final String expectedJson = """
+        final String json = """
                 {
                     "EventId":"b2a936ce-d479-414f-b67f-3df4da383d47",
                     "EventType":"MyEvent",
@@ -123,38 +122,36 @@ public class EscEventTest {
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
-        try (final JsonbDeSerializer jsonbDeSer = TestUtils.createJsonbDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
+        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
+            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
 
-            try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
+            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
 
-                // TEST
-                final EscEvent testee = jsonb.fromJson(expectedJson, EscEvent.class);
+            // TEST
+            final EscEvent testee = objectMapper.readValue(json, EscEvent.class);
 
-                // VERIFY
-                assertThat(testee.getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
-                assertThat(testee.getEventType()).isEqualTo("MyEvent");
-                assertThat(testee.getData().getObj()).isInstanceOf(MyEvent.class);
-                final MyEvent myEvent = (MyEvent) testee.getData().getObj();
-                assertThat(myEvent.getId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
-                assertThat(myEvent.getDescription()).isEqualTo("Hello, JSON!");
-                assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
-                final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
-                assertThat(escMeta.getDataType()).isEqualTo("MyEvent");
-                assertThat(escMeta.getDataContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
-                assertThat(escMeta.getMetaType()).isEqualTo("MyMeta");
-                assertThat(escMeta.getMetaContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
-                assertThat(escMeta.getMeta()).isInstanceOf(MyMeta.class);
-                final MyMeta myMeta = (MyMeta) escMeta.getMeta();
-                assertThat(myMeta.getUser()).isEqualTo("abc");
-
-            }
+            // VERIFY
+            assertThat(testee.getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+            assertThat(testee.getEventType()).isEqualTo("MyEvent");
+            assertThat(testee.getData().getObj()).isInstanceOf(MyEvent.class);
+            final MyEvent myEvent = (MyEvent) testee.getData().getObj();
+            assertThat(myEvent.getId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+            assertThat(myEvent.getDescription()).isEqualTo("Hello, JSON!");
+            assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
+            final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
+            assertThat(escMeta.getDataType()).isEqualTo("MyEvent");
+            assertThat(escMeta.getDataContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
+            assertThat(escMeta.getMetaType()).isEqualTo("MyMeta");
+            assertThat(escMeta.getMetaContentType()).isEqualTo(EnhancedMimeType.create("application/json; version=1; encoding=UTF-8"));
+            assertThat(escMeta.getMeta()).isInstanceOf(MyMeta.class);
+            final MyMeta myMeta = (MyMeta) escMeta.getMeta();
+            assertThat(myMeta.getUser()).isEqualTo("abc");
 
         }
     }
 
     @Test
-    public void testMarshalJsonBBase64() throws Exception {
+    public void testMarshalJacksonBase64() throws Exception {
 
         // PREPARE
         final String expectedJson = """
@@ -182,27 +179,26 @@ public class EscEventTest {
 
         final EscEvent event = createEventBase64();
 
-        try (final JsonbDeSerializer jsonbDeSer = TestUtils.createJsonbDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
+        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
+            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
 
-            try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
+            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
 
-                // TEST
-                final String currentJson = jsonb.toJson(event);
+            // TEST
+            final String currentJson = objectMapper.writeValueAsString(event);
 
-                // VERIFY
-                assertThatJson(currentJson).isEqualTo(expectedJson);
+            // VERIFY
+            assertThatJson(currentJson).isEqualTo(expectedJson);
 
-            }
         }
 
     }
 
     @Test
-    public final void testUnmarshalJsonBBase64() throws Exception {
+    public final void testUnmarshalJacksonBase64() throws Exception {
 
         // PREPARE
-        final String expectedJson = """
+        final String json = """
                 {
                 	"EventId": "68616d90-cf72-4c2a-b913-32bf6e6506ed",
                 	"EventType": "MyEvent",
@@ -227,33 +223,32 @@ public class EscEventTest {
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
-        try (final JsonbDeSerializer jsonbDeSer = TestUtils.createJsonbDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jsonbDeSer);
+        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
+            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
 
-            try (final Jsonb jsonb = jsonbDeSer.getJsonb()) {
+            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
 
-                // TEST
-                final EscEvent testee = jsonb.fromJson(expectedJson, EscEvent.class);
+            // TEST
+            final EscEvent testee = objectMapper.readValue(json, EscEvent.class);
 
-                // VERIFY
-                assertThat(testee.getEventId()).isEqualTo(expectedEvent.getEventId());
-                assertThat(testee.getEventType()).isEqualTo(expectedEvent.getEventType());
-                assertThat(testee.getData().getObj()).isInstanceOf(Base64Data.class);
-                final Base64Data base64Data = (Base64Data) testee.getData().getObj();
-                assertThat(base64Data.getEncoded()).isEqualTo(((Base64Data) expectedEvent.getData().getObj()).getEncoded());
-                assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
-                final EscMeta actualEscMeta = (EscMeta) testee.getMeta().getObj();
-                final EscMeta expectedEscMeta = (EscMeta) expectedEvent.getMeta().getObj();
-                assertThat(actualEscMeta.getDataType()).isEqualTo(expectedEscMeta.getDataType());
-                assertThat(actualEscMeta.getDataContentType()).isEqualTo(expectedEscMeta.getDataContentType());
-                assertThat(actualEscMeta.getMetaType()).isEqualTo(expectedEscMeta.getMetaType());
-                assertThat(actualEscMeta.getMetaContentType()).isEqualTo(expectedEscMeta.getMetaContentType());
-                assertThat(actualEscMeta.getMeta()).isInstanceOf(MyMeta.class);
-                final MyMeta actualMyMeta = (MyMeta) actualEscMeta.getMeta();
-                final MyMeta expectedMyMeta = (MyMeta) expectedEscMeta.getMeta();
-                assertThat(actualMyMeta.getUser()).isEqualTo(expectedMyMeta.getUser());
+            // VERIFY
+            assertThat(testee.getEventId()).isEqualTo(expectedEvent.getEventId());
+            assertThat(testee.getEventType()).isEqualTo(expectedEvent.getEventType());
+            assertThat(testee.getData().getObj()).isInstanceOf(Base64Data.class);
+            final Base64Data base64Data = (Base64Data) testee.getData().getObj();
+            assertThat(base64Data.getEncoded()).isEqualTo(((Base64Data) expectedEvent.getData().getObj()).getEncoded());
+            assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
+            final EscMeta actualEscMeta = (EscMeta) testee.getMeta().getObj();
+            final EscMeta expectedEscMeta = (EscMeta) expectedEvent.getMeta().getObj();
+            assertThat(actualEscMeta.getDataType()).isEqualTo(expectedEscMeta.getDataType());
+            assertThat(actualEscMeta.getDataContentType()).isEqualTo(expectedEscMeta.getDataContentType());
+            assertThat(actualEscMeta.getMetaType()).isEqualTo(expectedEscMeta.getMetaType());
+            assertThat(actualEscMeta.getMetaContentType()).isEqualTo(expectedEscMeta.getMetaContentType());
+            assertThat(actualEscMeta.getMeta()).isInstanceOf(MyMeta.class);
+            final MyMeta actualMyMeta = (MyMeta) actualEscMeta.getMeta();
+            final MyMeta expectedMyMeta = (MyMeta) expectedEscMeta.getMeta();
+            assertThat(actualMyMeta.getUser()).isEqualTo(expectedMyMeta.getUser());
 
-            }
         }
 
     }
@@ -291,23 +286,25 @@ public class EscEventTest {
         typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
         typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
 
-        try (final JsonbDeSerializer jsonbDeSer = TestUtils.createJsonbDeSerializer()) {
+        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
+            // Create registry with known types
             final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
             // ESC types are serialized with JSON-B
-            registry.add(EscEvents.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-            registry.add(EscEvent.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-            registry.add(EscMeta.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
+            registry.add(EscEvents.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
+            registry.add(EscEvent.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
+            registry.add(EscMeta.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
             // User types are serialized with JAX-B
             final XmlDeSerializer jaxbDeSer = new XmlDeSerializer(MyEvent.class, MyMeta.class);
             registry.add(MyMeta.SER_TYPE, jaxbDeSer.getMimeType().getBaseType(), jaxbDeSer);
             registry.add(MyEvent.SER_TYPE, jaxbDeSer.getMimeType().getBaseType(), jaxbDeSer);
-            jsonbDeSer.init(typeRegistry, registry, registry);
+            jacksonDeSer.init(typeRegistry, registry, registry);
+            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
 
             // Serialize
-            final String json = jsonbDeSer.getJsonb().toJson(expectedEvent);
+            final String json = objectMapper.writeValueAsString(expectedEvent);
 
             // Deserialize
-            final EscEvent copy = jsonbDeSer.getJsonb().fromJson(json, EscEvent.class);
+            final EscEvent copy = objectMapper.readValue(json, EscEvent.class);
 
             // Verify
             assertThat(copy.getEventId()).isEqualTo(expectedEvent.getEventId());
@@ -329,7 +326,7 @@ public class EscEventTest {
             assertThat(actualMyMeta.getUser()).isEqualTo(expectedMyMeta.getUser());
 
             // Serialize the copy
-            final String currentJson = jsonbDeSer.getJsonb().toJson(copy);
+            final String currentJson = objectMapper.writeValueAsString(copy);
 
             // Should be the same as before
             assertThatJson(currentJson).isEqualTo(expectedJson);
@@ -337,7 +334,6 @@ public class EscEventTest {
         }
 
     }
-
 
     private EscEvent createEventBase64() throws MimeTypeParseException {
         final UUID eventId = UUID.fromString("68616d90-cf72-4c2a-b913-32bf6e6506ed");

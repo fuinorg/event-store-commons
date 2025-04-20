@@ -31,9 +31,12 @@
 
     <properties>
         <eventstore.version>24.10</eventstore.version>
-        <objects4j.version>0.10.0</objects4j.version>
+        <objects4j.version>0.11.0-SNAPSHOT</objects4j.version>
+        <utils4j.version>0.15.0-SNAPSHOT</utils4j.version>
+        <units4j.version>0.12.0</units4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
+        <jackson.version>2.18.2</jackson.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
@@ -104,7 +107,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>utils4j</artifactId>
-                <version>0.14.0</version>
+                <version>${utils4j.version}</version>
             </dependency>
 
             <dependency>
@@ -116,6 +119,12 @@
             <dependency>
                 <groupId>org.fuin.objects4j</groupId>
                 <artifactId>objects4j-core</artifactId>
+                <version>${objects4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.objects4j</groupId>
+                <artifactId>objects4j-jackson</artifactId>
                 <version>${objects4j.version}</version>
             </dependency>
 
@@ -327,7 +336,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>units4j</artifactId>
-                <version>0.12.0</version>
+                <version>${units4j.version}</version>
             </dependency>
 
             <dependency>
@@ -360,6 +369,24 @@
                 <version>1.1.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>
@@ -372,6 +399,7 @@
         <module>jaxb</module>
         <module>jpa</module>
         <module>jsonb</module>
+        <module>jackson</module>
         <module>esgrpc</module>
         <module>test</module>
         <module>jacoco</module>

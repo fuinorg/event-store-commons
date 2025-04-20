@@ -1,17 +1,20 @@
 package org.fuin.esc.jsonb;
 
+import jakarta.json.JsonValue;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.DeserializerRegistryRequired;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SerializerRegistryRequired;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
@@ -21,10 +24,12 @@ import java.util.Objects;
  * Adapter to use for JSON-B.
  */
 @TestOmitted("Already tested along with the other tests in this package")
-public final class EscMetaJsonbSerializerDeserializer
-        implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta>, SerializedDataTypeRegistryRequired {
+public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer<EscMeta>,
+        JsonbDeserializer<EscMeta>, DeserializerRegistryRequired, SerializerRegistryRequired {
 
-    private SerializedDataTypeRegistry registry;
+    private SerializerRegistry serializerRegistry;
+
+    private DeserializerRegistry deserializerRegistry;
 
     @Override
     public EscMeta deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
@@ -53,8 +58,15 @@ public final class EscMetaJsonbSerializerDeserializer
                             if (field.equals(IBase64Data.EL_ROOT_NAME)) {
                                 escMeta.setMeta(new Base64Data(ctx.deserialize(String.class, parser)));
                             } else {
-                                final Class<?> clasz = registry.findClass(new SerializedDataType(escMeta.getMetaType()));
-                                escMeta.setMeta(ctx.deserialize(clasz, parser));
+                                if (escMeta.getMetaContentType() == null) {
+                                    throw new IllegalStateException("Content type for meta is not defined");
+                                }
+                                parser.next();
+                                final JsonValue content = ctx.deserialize(JsonValue.class, parser);
+                                final SerializedDataType metaType = new SerializedDataType(escMeta.getMetaType());
+                                final EnhancedMimeType metaContentType = escMeta.getMetaContentType();
+                                final Object meta = EscJsonbUtils.deserialize(content, metaType, metaContentType, deserializerRegistry);
+                                escMeta.setMeta(meta);
                             }
                             break;
                     }
@@ -76,7 +88,9 @@ public final class EscMetaJsonbSerializerDeserializer
             if (escMeta.getMeta() instanceof Base64Data base64data) {
                 generator.write(IBase64Data.EL_ROOT_NAME, base64data.getEncoded());
             } else {
-                ctx.serialize(escMeta.getMetaType(), escMeta.getMeta(), generator);
+                final SerializedDataType serDataType = new SerializedDataType(escMeta.getMetaType());
+                EscJsonbUtils.serialize(generator, ctx, serializerRegistry,
+                        serDataType, escMeta.getMetaType(), escMeta.getMeta());
             }
         }
         generator.writeEnd();
@@ -84,8 +98,13 @@ public final class EscMetaJsonbSerializerDeserializer
     }
 
     @Override
-    public void setRegistry(final SerializedDataTypeRegistry registry) {
-        this.registry = registry;
+    public void setRegistry(final DeserializerRegistry registry) {
+        this.deserializerRegistry = registry;
+    }
+
+    @Override
+    public void setRegistry(final SerializerRegistry registry) {
+        this.serializerRegistry = registry;
     }
 
 }

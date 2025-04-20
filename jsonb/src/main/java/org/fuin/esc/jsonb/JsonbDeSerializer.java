@@ -38,6 +38,7 @@ import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
 import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.esc.api.SerializerRegistryRequired;
+import org.fuin.utils4j.TestOmitted;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -53,11 +54,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Serializes and deserializes an object from/to JSON using JSON-B. The content type for serialization is always "application/json". This
  * implementation supports only <code>byte[]</code> for unmarshalling content. Trying to use something else will result in an exception.
  */
+@TestOmitted("Test implicitly with other tests")
 public final class JsonbDeSerializer implements SerDeserializer, Closeable {
 
     private final EnhancedMimeType mimeType;
@@ -89,6 +92,11 @@ public final class JsonbDeSerializer implements SerDeserializer, Closeable {
                               @NotNull final List<JsonbSerializer<?>> serializers,
                               @NotNull final List<JsonbDeserializer<?>> deserializers) {
         super();
+        Objects.requireNonNull(config, "config==null");
+        Objects.requireNonNull(encoding, "encoding==null");
+        Objects.requireNonNull(serializers, "serializers==null");
+        Objects.requireNonNull(deserializers, "deserializers==null");
+
         this.jsonb = JsonbBuilder.create(config);
         this.mimeType = EnhancedMimeType.create("application", "json", encoding);
         this.serializers = serializers;

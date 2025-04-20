@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2015 Michael Schnell. All rights reserved.
- * http://www.fuin.org/
+ * Copyright (C) 2013 Future Invent Informationsmanagement GmbH. All rights
+ * reserved. <http://www.fuin.org/>
  * <p>
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,24 +13,20 @@
  * details.
  * <p>
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library. If not, see http://www.gnu.org/licenses/.
+ * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.jsonb;
+package org.fuin.esc.jackson;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
+import org.fuin.units4j.archunit.Units4JConditions;
 
-import static org.junit.jupiter.api.Assertions.fail;
+@AnalyzeClasses(packagesOf = BaseTest.class)
+class BaseTest {
 
-/**
- * Tests the {@link JsonbDeSerializer} class.
- */
-public class JsonbDeSerializerTest {
-
-    @Disabled("TODO Implement!")
-    @Test
-    void testX() {
-        fail("Implement!");
-    }
+    @ArchTest
+    static final ArchRule all_classes_should_have_tests = Units4JConditions.ALL_CLASSES_SHOULD_HAVE_TESTS;
 
 }
+
