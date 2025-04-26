@@ -18,14 +18,14 @@
 package org.fuin.esc.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.Serializer;
 import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.utils4j.TestOmitted;
@@ -53,31 +53,36 @@ public final class EscJacksonUtils {
     }
 
     /**
-     * Creates all available Jackson serializers necessary for the ESC implementation.
+     * Adds the standard ESC types to the registry.
      *
-     * @return New array with serializers.
+     * @param builder Builder to add the standard types to.
+     * @param <T>     Type of the registry.
+     * @param <B>     Type of the registry builder.
+     * @return The builder.
      */
-    public static JsonSerializer<?>[] createEscJacksonSerializers() {
-        return new JsonSerializer[]{
-                new Base64DataJacksonSerializer(),
-                new EscEventsJacksonSerializer(),
-                new EscEventJacksonSerializer(),
-                new EscMetaJacksonSerializer()
-        };
+    public static <T extends SerializedDataTypeRegistry, B extends SerializedDataTypeRegistry.Builder<T, B>> B addEscTypes(B builder) {
+        builder.add(EscEvents.SER_TYPE, EscEvents.class);
+        builder.add(EscEvent.SER_TYPE, EscEvent.class);
+        builder.add(EscMeta.SER_TYPE, EscMeta.class);
+        builder.add(Base64Data.SER_TYPE, Base64Data.class);
+        return builder;
     }
 
     /**
-     * Creates all available JSON-B deserializers necessary for the ESC implementation.
+     * Adds the standard ESC types to the registry.
      *
-     * @return New array with deserializers.
+     * @param builder         Builder to add the standard types to.
+     * @param serDeserializer Serializer/Deserializer to use.
+     * @param <T>             Type of the registry.
+     * @param <B>             Type of the registry builder.
+     * @return The builder.
      */
-    public static JsonDeserializer<?>[] createEscJacksonDeserializers() {
-        return new JsonDeserializer[]{
-                new Base64DataJacksonDeserializer(),
-                new EscEventsJacksonDeserializer(),
-                new EscEventJacksonDeserializer(),
-                new EscMetaJacksonDeserializer()
-        };
+    public static <T extends SerDeserializerRegistry, B extends SerDeserializerRegistry.Builder<T, B>> B addEscSerDeserializer(B builder, JacksonSerDeserializer serDeserializer) {
+        builder.add(EscEvents.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(EscEvent.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(EscMeta.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(Base64Data.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        return builder;
     }
 
     /**

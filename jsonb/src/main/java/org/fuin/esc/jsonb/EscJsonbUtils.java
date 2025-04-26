@@ -19,6 +19,7 @@ package org.fuin.esc.jsonb;
 
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
@@ -26,7 +27,9 @@ import jakarta.json.stream.JsonGenerator;
 import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.Serializer;
 import org.fuin.esc.api.SerializerRegistry;
 
@@ -54,15 +57,64 @@ public final class EscJsonbUtils {
     }
 
     /**
+     * Adds the standard ESC types to the registry.
+     *
+     * @param builder Builder to add the standard types to.
+     * @param <T>     Type of the registry.
+     * @param <B>     Type of the registry builder.
+     * @return The builder.
+     */
+    public static <T extends SerializedDataTypeRegistry, B extends SerializedDataTypeRegistry.Builder<T, B>> B addEscTypes(B builder) {
+        builder.add(EscEvents.SER_TYPE, EscEvents.class);
+        builder.add(EscEvent.SER_TYPE, EscEvent.class);
+        builder.add(EscMeta.SER_TYPE, EscMeta.class);
+        builder.add(Base64Data.SER_TYPE, Base64Data.class);
+        return builder;
+    }
+
+
+    /**
+     * Creates all ESC standard type adapters needed for JSON-B.
+     *
+     * @return Adapters.
+     */
+    public static JsonbAdapter<?, ?>[] createEscJsonbAdapters() {
+        return new JsonbAdapter<?, ?>[]{
+                // Currently we have none
+        };
+    }
+
+    /**
+     * Adds the standard ESC types to the registry.
+     *
+     * @param builder         Builder to add the standard types to.
+     * @param serDeserializer Serializer/Deserializer to use.
+     * @param <T>             Type of the registry.
+     * @param <B>             Type of the registry builder.
+     * @return The builder.
+     */
+    public static <T extends SerDeserializerRegistry, B extends SerDeserializerRegistry.Builder<T, B>> B addEscSerDeserializer(B builder, JsonbSerDeserializer serDeserializer) {
+        builder.add(EscEvents.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(EscEvent.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(EscMeta.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(Base64Data.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        return builder;
+    }
+
+    /**
      * Creates all available JSON-B serializers necessary for the ESC implementation.
      *
+     * @param serializerRegistry   Serializer registry.
+     * @param deserializerRegistry Deserializer registry.
      * @return New array with serializers.
      */
-    public static JsonbSerializer<?>[] createEscJsonbSerializers() {
+    public static JsonbSerializer<?>[] createEscJsonbSerializers(SerializerRegistry serializerRegistry,
+                                                                 DeserializerRegistry deserializerRegistry) {
         return new JsonbSerializer[]{
+                new Base64DataSerializerDeserializer(),
                 new EscEventsJsonbSerializerDeserializer(),
-                new EscEventJsonbSerializerDeserializer(),
-                new EscMetaJsonbSerializerDeserializer()
+                new EscEventJsonbSerializerDeserializer(serializerRegistry, deserializerRegistry),
+                new EscMetaJsonbSerializerDeserializer(serializerRegistry, deserializerRegistry),
         };
     }
 
@@ -89,13 +141,17 @@ public final class EscJsonbUtils {
     /**
      * Creates all available JSON-B deserializers necessary for the ESC implementation.
      *
+     * @param serializerRegistry   Serializer registry.
+     * @param deserializerRegistry Deserializer registry.
      * @return New array with deserializers.
      */
-    public static JsonbDeserializer<?>[] createEscJsonbDeserializers() {
+    public static JsonbDeserializer<?>[] createEscJsonbDeserializers(SerializerRegistry serializerRegistry,
+                                                                     DeserializerRegistry deserializerRegistry) {
         return new JsonbDeserializer[]{
+                new Base64DataSerializerDeserializer(),
                 new EscEventsJsonbSerializerDeserializer(),
-                new EscEventJsonbSerializerDeserializer(),
-                new EscMetaJsonbSerializerDeserializer()
+                new EscEventJsonbSerializerDeserializer(serializerRegistry, deserializerRegistry),
+                new EscMetaJsonbSerializerDeserializer(serializerRegistry, deserializerRegistry)
         };
     }
 

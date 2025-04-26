@@ -18,9 +18,9 @@
 package org.fuin.esc.spi;
 
 import jakarta.activation.MimeTypeParseException;
+import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.IBaseTypeFactory;
@@ -45,6 +45,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests the {@link EscSpiUtils} class.
  */
 public class EscSpiUtilsTest {
+
+    public static final @NotNull EnhancedMimeType DEFAULT_MIME_TYPE = EnhancedMimeType.create("application", "json");
 
     @Test
     public void testEventsEqual() {
@@ -75,7 +77,7 @@ public class EscSpiUtilsTest {
     public void testSerializeNull() {
 
         // PREPARE
-        final SerializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final SerializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE).build();
         final SerializedDataType type = new SerializedDataType("whatever");
 
         // TEST
@@ -90,9 +92,10 @@ public class EscSpiUtilsTest {
     public void testSerializeOK() {
 
         // PREPARE
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         final SerializedDataType type = new SerializedDataType("whatever");
-        registry.addSerializer(type, dummySerializer("text/plain"));
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(type, dummySerializer("text/plain"))
+                .build();
         final String data = "My Data";
 
         // TEST
@@ -108,7 +111,7 @@ public class EscSpiUtilsTest {
     public void testSerializeNoSerializerFound() {
 
         // PREPARE
-        final SerializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE).build();
         final SerializedDataType type = new SerializedDataType("whatever");
         final Object data = "My Data";
 
@@ -126,7 +129,7 @@ public class EscSpiUtilsTest {
     public void testDeserializeNoDeserializerFound() {
 
         // PREPARE
-        final DeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE).build();
         final SerializedDataType type = new SerializedDataType("whatever");
         final SerializedData data = new SerializedData(type, mimeType("text/plain"), "whatever".getBytes());
 
@@ -135,7 +138,7 @@ public class EscSpiUtilsTest {
             EscSpiUtils.deserialize(registry, data);
         } catch (final IllegalArgumentException ex) {
             // VERIFY
-            assertThat(ex.getMessage()).isEqualTo("No deserializer found for: Key [type=whatever, contentType=text/plain]");
+            assertThat(ex.getMessage()).isEqualTo("No deserializer found for: Key [type=whatever, mimeType=text/plain]");
         }
 
     }
@@ -145,10 +148,11 @@ public class EscSpiUtilsTest {
 
         // PREPARE
         final String value = "My Data";
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         final SerializedDataType type = new SerializedDataType("whatever");
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(type, dummyDeserializer(), EnhancedMimeType.create("text", "plain"))
+                .build();
         final SerializedData data = new SerializedData(type, mimeType("text/plain"), value.getBytes());
-        registry.addDeserializer(type, "text/plain", dummyDeserializer());
 
         // TEST
         final Object result = EscSpiUtils.deserialize(registry, data);
@@ -162,11 +166,12 @@ public class EscSpiUtilsTest {
     public void testMimeTypeSame() {
 
         // PREPARE
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
         final String type = "TypeX";
         final SerializedDataType serType = new SerializedDataType(type);
         final TypeName eventType = new TypeName(type);
-        registry.addSerializer(serType, dummySerializer("text/plain"));
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(serType, dummySerializer("text/plain"))
+                .build();
         final List<CommonEvent> events = new ArrayList<>();
         events.add(new SimpleCommonEvent(new EventId(), eventType, "One"));
 
@@ -182,17 +187,18 @@ public class EscSpiUtilsTest {
     public void testMimeTypeDifferent() {
 
         // PREPARE
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-
         final String typeA = "TypeA";
         final SerializedDataType serTypeA = new SerializedDataType(typeA);
         final TypeName eventTypeA = new TypeName(typeA);
-        registry.addSerializer(serTypeA, dummySerializer("text/plain"));
 
         final String typeB = "TypeB";
         final SerializedDataType serTypeB = new SerializedDataType(typeB);
         final TypeName eventTypeB = new TypeName(typeB);
-        registry.addSerializer(serTypeB, dummySerializer("application/xml"));
+
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(serTypeA, dummySerializer("text/plain"))
+                .add(serTypeB, dummySerializer("application/xml"))
+                .build();
 
         final List<CommonEvent> events = new ArrayList<>();
         events.add(new SimpleCommonEvent(new EventId(), eventTypeA, "One"));
@@ -210,7 +216,7 @@ public class EscSpiUtilsTest {
     public void testCreateEscMetaNull() {
 
         // PREPARE
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE).build();
         final IBaseTypeFactory baseTypeFactory = Mockito.mock(IBaseTypeFactory.class);
 
         // TEST

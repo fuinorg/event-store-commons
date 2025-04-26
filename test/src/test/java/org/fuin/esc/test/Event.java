@@ -26,14 +26,16 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.jaxb.Data;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ValueObject;
-import org.fuin.utils4j.jaxb.JaxbUtils;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
@@ -55,6 +57,8 @@ public final class Event implements Serializable, ValueObject {
     private static final long serialVersionUID = 1000L;
 
     private static final EnhancedMimeType MIME_TYPE = EnhancedMimeType.create("application/xml; encoding=utf-8");
+
+    private transient DeserializerRegistry serDeserializerRegistry;
 
     /**
      * The ID of the event, used as part of the idempotent write check.
@@ -160,9 +164,9 @@ public final class Event implements Serializable, ValueObject {
         if (getMeta() == null) {
             m = null;
         } else {
-            m = JaxbUtils.unmarshal(ctx, getMeta().getContent(), null);
+            m = deserialize(getMeta().getType(), getMeta().getMimeType(), meta.getContent());
         }
-        final Object d = JaxbUtils.unmarshal(ctx, getData().getContent(), null);
+        final Object d = deserialize(getData().getType(), getData().getMimeType(), getData().getContent());
         if (getMeta() == null) {
             return new SimpleCommonEvent(getId(),
                     new TypeName(getData().getType()), d);
@@ -171,6 +175,20 @@ public final class Event implements Serializable, ValueObject {
                 d, new TypeName(getMeta().getType()), m);
     }
 
+    /**
+     * Initializes the instance with the test context.
+     *
+     * @param testContext Deserializer registry.
+     */
+    public void init(TestContext testContext) {
+        this.serDeserializerRegistry = testContext.getDeserializerRegistry();
+    }
+
+    private <T> T deserialize(String type, EnhancedMimeType mimeType, String content) {
+        final SerializedDataType serDataType = new SerializedDataType(type);
+        final Deserializer deserializer = serDeserializerRegistry.getDeserializer(serDataType, mimeType);
+        return deserializer.unmarshal(content.getBytes(mimeType.getEncoding()), serDataType, mimeType);
+    }
 
     @Override
     public int hashCode() {

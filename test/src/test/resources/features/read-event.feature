@@ -6,11 +6,11 @@ Feature: Read a single event
     """
     <events>
         <event id="73d2ac98-04cf-4531-bd88-0da46e394a02">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[Anything goes]]></data>
             <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "1" }]]></meta>
         </event>
         <event id="668879c5-7a86-420d-8d7f-e8a66205002e">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
             <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
         </event>
     </events>
@@ -19,14 +19,14 @@ Feature: Read a single event
     And reading event 0 from stream "AppendSameAndRead" should return the following event
     """
     <event id="73d2ac98-04cf-4531-bd88-0da46e394a02">
-        <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>
+        <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[Anything goes]]></data>
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "1" }]]></meta>
     </event>
     """
     And reading event 1 from stream "AppendSameAndRead" should return the following event
     """
     <event id="668879c5-7a86-420d-8d7f-e8a66205002e">
-        <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+        <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
     </event>
     """
@@ -37,11 +37,11 @@ Feature: Read a single event
     """
     <events>
         <event id="73d2ac98-04cf-4531-bd88-0da46e394a02">
-            <data type="BookAddedEvent" mime-type="application/xml; version=1; encoding=utf-8"><![CDATA[<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>]]></data>
+            <data type="BookAddedEvent" mime-type="application/xml; encoding=utf-8"><![CDATA[<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>]]></data>
             <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "1" }]]></meta>
         </event>
         <event id="668879c5-7a86-420d-8d7f-e8a66205002e">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
             <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
         </event>
     </events>
@@ -49,14 +49,14 @@ Feature: Read a single event
     Then reading event 0 from stream "AppendDiffAndRead" should return the following event
     """
     <event id="73d2ac98-04cf-4531-bd88-0da46e394a02">
-        <data type="BookAddedEvent" mime-type="application/xml; version=1; encoding=utf-8"><![CDATA[<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>]]></data>
+        <data type="BookAddedEvent" mime-type="application/xml; encoding=utf-8"><![CDATA[<book-added-event><name>Shining</name><author>Stephen King</author></book-added-event>]]></data>
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "1" }]]></meta>
     </event>
     """
     And reading event 1 from stream "AppendDiffAndRead" should return the following event
     """
     <event id="668879c5-7a86-420d-8d7f-e8a66205002e">
-        <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+        <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
         <meta type="MyMeta" mime-type="application/json; encoding=utf-8"><![CDATA[{ "a" : "2" }]]></meta>
     </event>
     """

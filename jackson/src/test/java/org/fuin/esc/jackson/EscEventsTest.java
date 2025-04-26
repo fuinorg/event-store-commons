@@ -17,10 +17,8 @@
  */
 package org.fuin.esc.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.activation.MimeTypeParseException;
 import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -34,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test for {@link EscEvents} class.
  */
-public class EscEventsTest {
+public class EscEventsTest extends AbstractTest {
 
     @Test
     public void testMarshalJackson() throws Exception {
@@ -78,24 +76,13 @@ public class EscEventsTest {
                 ]
                 """;
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
-
         final EscEvents events = new EscEvents(createEvent1(), createEvent2());
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final String currentJson = getMapperProvider().writer().writeValueAsString(events);
 
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final String currentJson = objectMapper.writeValueAsString(events);
-
-            // VERIFY
-            assertThatJson(currentJson).isEqualTo(expectedJson);
-
-        }
+        // VERIFY
+        assertThatJson(currentJson).isEqualTo(expectedJson);
 
     }
 
@@ -114,9 +101,9 @@ public class EscEventsTest {
                 		},
                 		"MetaData": {
                 			"data-type": "MyEvent",
-                			"data-content-type": "application/json; version=1; encoding=UTF-8",
+                			"data-content-type": "application/json; encoding=UTF-8",
                 			"meta-type": "MyMeta",
-                			"meta-content-type": "application/json; version=1; encoding=UTF-8",
+                			"meta-content-type": "application/json; encoding=UTF-8",
                 			"MyMeta": {
                 				"user": "abc"
                 			}
@@ -130,9 +117,9 @@ public class EscEventsTest {
                 		},
                 		"MetaData": {
                 			"data-type": "MyEvent",
-                			"data-content-type": "application/json; version=1; transfer-encoding=base64; encoding=UTF-8",
+                			"data-content-type": "application/json; transfer-encoding=base64; encoding=UTF-8",
                 			"meta-type": "MyMeta",
-                			"meta-content-type": "application/json; version=1; encoding=UTF-8",
+                			"meta-content-type": "application/json; encoding=UTF-8",
                 			"MyMeta": {
                 				"user": "abc"
                 			}
@@ -141,24 +128,14 @@ public class EscEventsTest {
                 ]
                 """;
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        // TEST
+        final EscEvents testee = getMapperProvider().reader().readValue(json, EscEvents.class);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // VERIFY
+        assertThat(testee.getList()).hasSize(2);
+        assertThat(testee.getList().get(0).getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
+        assertThat(testee.getList().get(1).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
 
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final EscEvents testee = objectMapper.readValue(json, EscEvents.class);
-
-            // VERIFY
-            assertThat(testee.getList()).hasSize(2);
-            assertThat(testee.getList().get(0).getEventId()).isEqualTo("b2a936ce-d479-414f-b67f-3df4da383d47");
-            assertThat(testee.getList().get(1).getEventId()).isEqualTo("68616d90-cf72-4c2a-b913-32bf6e6506ed");
-
-        }
     }
 
     private EscEvent createEvent1() throws MimeTypeParseException {

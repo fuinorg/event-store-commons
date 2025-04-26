@@ -23,6 +23,8 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.utils4j.TestCommand;
 
+import java.util.Map;
+
 /**
  * Creates a new stream.
  */
@@ -76,6 +78,16 @@ public final class CreateStreamCommand implements TestCommand<TestContext> {
         super();
         this.streamName = streamName;
         this.expectedException = expectedException;
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public CreateStreamCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.expectedException = cucumberTable.get("Expected Exception");
     }
 
     @Override

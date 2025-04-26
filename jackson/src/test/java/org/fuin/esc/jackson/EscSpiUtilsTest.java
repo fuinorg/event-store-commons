@@ -23,10 +23,10 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.Serializer;
 import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests the {@link EscSpiUtils} class together with {@link EscMeta}.
+ * Tests the {@link EscSpiUtils} class.
  */
-public class EscSpiUtilsTest {
+public class EscSpiUtilsTest extends AbstractTest {
 
     private static final EnhancedMimeType TARGET_CONTENT_TYPE = EnhancedMimeType.create("application/json; encoding=UTF-8");
 
@@ -60,29 +60,18 @@ public class EscSpiUtilsTest {
         final MyEvent myEvent = new MyEvent(ID, DESC);
         final EventId eventId = new EventId();
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta result = EscSpiUtils.createEscMeta(getSerDeserializerRegistry(), new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
 
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.addSerializer(MyEvent.SER_TYPE, jacksonDeSer);
-            final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
-
-            // TEST
-            final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
-
-            // VERIFY
-            assertThat(result).isNotNull();
-            assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-            assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
-            assertThat(result.getMetaType()).isNull();
-            assertThat(result.getMetaContentType()).isNull();
-            assertThat(result.getMeta()).isNull();
-
-        }
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
+        assertThat(result.getMetaType()).isNull();
+        assertThat(result.getMetaContentType()).isNull();
+        assertThat(result.getMeta()).isNull();
 
     }
 
@@ -93,29 +82,20 @@ public class EscSpiUtilsTest {
         final MyEvent myEvent = new MyEvent(ID, DESC);
         final EventId eventId = new EventId();
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(TARGET_CONTENT_TYPE)
+                .add(MyEvent.SER_TYPE, dummySerializer("application/xml; encoding=utf-8")).build();
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
 
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.addSerializer(MyEvent.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"));
-            final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
-
-            // TEST
-            final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
-
-            // VERIFY
-            assertThat(result).isNotNull();
-            assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-            assertThat(result.getDataContentType()).isEqualTo(XML_BASE64_UTF8);
-            assertThat(result.getMetaType()).isNull();
-            assertThat(result.getMetaContentType()).isNull();
-            assertThat(result.getMeta()).isNull();
-
-        }
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getDataContentType()).isEqualTo(XML_BASE64_UTF8);
+        assertThat(result.getMetaType()).isNull();
+        assertThat(result.getMetaContentType()).isNull();
+        assertThat(result.getMeta()).isNull();
 
     }
 
@@ -127,33 +107,19 @@ public class EscSpiUtilsTest {
         final EventId eventId = new EventId();
         final MyMeta myMeta = new MyMeta("peter");
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
+                myMeta);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta result = EscSpiUtils.createEscMeta(getSerDeserializerRegistry(), new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
 
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.addSerializer(MyEvent.SER_TYPE, jacksonDeSer);
-            registry.addSerializer(MyMeta.SER_TYPE, jacksonDeSer);
-
-
-            final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                    myMeta);
-
-            // TEST
-            final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
-
-            // VERIFY
-            assertThat(result).isNotNull();
-            assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-            assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
-            assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
-            assertThat(result.getMetaContentType()).isEqualTo(JSON_UTF8);
-            assertThat(result.getMeta()).isEqualTo(myMeta);
-
-        }
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
+        assertThat(result.getMetaContentType()).isEqualTo(JSON_UTF8);
+        assertThat(result.getMeta()).isEqualTo(myMeta);
 
     }
 
@@ -165,34 +131,26 @@ public class EscSpiUtilsTest {
         final EventId eventId = new EventId();
         final MyMeta myMeta = new MyMeta("peter");
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(TARGET_CONTENT_TYPE)
+                .add(MyEvent.SER_TYPE, getSerDeserializer())
+                .add(MyMeta.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"))
+                .build();
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
+                myMeta);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
 
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.addSerializer(MyEvent.SER_TYPE, jacksonDeSer);
-            registry.addSerializer(MyMeta.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"));
-            final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                    myMeta);
-
-            // TEST
-            final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
-
-            // VERIFY
-            assertThat(result).isNotNull();
-            assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-            assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
-            assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
-            assertThat(result.getMetaContentType()).isEqualTo(XML_BASE64_UTF8);
-            assertThat(result.getMeta()).isInstanceOf(IBase64Data.class);
-            final IBase64Data base64Meta = (IBase64Data) result.getMeta();
-            assertThat(new String(base64Meta.getDecoded(), StandardCharsets.UTF_8)).isEqualTo(
-                    "<MyMeta><user>peter</user></MyMeta>");
-
-        }
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getDataContentType()).isEqualTo(JSON_UTF8);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
+        assertThat(result.getMetaContentType()).isEqualTo(XML_BASE64_UTF8);
+        assertThat(result.getMeta()).isInstanceOf(IBase64Data.class);
+        final IBase64Data base64Meta = (IBase64Data) result.getMeta();
+        assertThat(new String(base64Meta.getDecoded(), StandardCharsets.UTF_8)).isEqualTo(
+                "<MyMeta><user>peter</user></MyMeta>");
 
     }
 
@@ -204,31 +162,23 @@ public class EscSpiUtilsTest {
         final EventId eventId = new EventId();
         final MyMeta myMeta = new MyMeta("peter");
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyEvent.SER_TYPE, MyEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(TARGET_CONTENT_TYPE)
+                .add(MyEvent.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"))
+                .add(MyMeta.SER_TYPE, getSerDeserializer())
+                .build();
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
+                myMeta);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
 
-            final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-            registry.addSerializer(MyEvent.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"));
-            registry.addSerializer(MyMeta.SER_TYPE, jacksonDeSer);
-            final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                    myMeta);
-
-            // TEST
-            final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
-
-            // VERIFY
-            assertThat(result).isNotNull();
-            assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
-            assertThat(result.getDataContentType()).isEqualTo(XML_BASE64_UTF8);
-            assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
-            assertThat(result.getMetaContentType()).isEqualTo(JSON_UTF8);
-            assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
-
-        }
+        // VERIFY
+        assertThat(result).isNotNull();
+        assertThat(result.getDataType()).isEqualTo(MyEvent.TYPE.asBaseType());
+        assertThat(result.getDataContentType()).isEqualTo(XML_BASE64_UTF8);
+        assertThat(result.getMetaType()).isEqualTo(MyMeta.TYPE.asBaseType());
+        assertThat(result.getMetaContentType()).isEqualTo(JSON_UTF8);
+        assertThat(result.getMeta()).isInstanceOf(MyMeta.class);
 
     }
 

@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.esgrpc;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.AppendToStreamOptions;
 import io.kurrent.dbclient.DeleteStreamOptions;
 import io.kurrent.dbclient.EventData;
@@ -25,8 +27,6 @@ import io.kurrent.dbclient.ReadResult;
 import io.kurrent.dbclient.ReadStreamOptions;
 import io.kurrent.dbclient.ResolvedEvent;
 import io.kurrent.dbclient.WriteResult;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;

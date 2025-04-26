@@ -23,13 +23,14 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.utils4j.TestCommand;
 
+import java.util.Map;
+
 /**
  * Reads a stream backward and expects and exception.
  */
 public final class ReadBackwardExceptionCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -82,6 +83,19 @@ public final class ReadBackwardExceptionCommand implements TestCommand<TestConte
         this.count = count;
         this.expectedException = expectedException;
         this.expectedMessage = expectedMessage;
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public ReadBackwardExceptionCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.start = Long.parseLong(cucumberTable.get("Start"));
+        this.count = Integer.parseInt(cucumberTable.get("Count"));
+        this.expectedException = cucumberTable.get("Expected Exception");
+        this.expectedMessage = cucumberTable.get("Expected Message");
     }
 
     @Override

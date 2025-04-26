@@ -1,10 +1,10 @@
 package org.fuin.esc.esgrpc;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import org.fuin.esc.api.ProjectionAdminEventStore;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamId;

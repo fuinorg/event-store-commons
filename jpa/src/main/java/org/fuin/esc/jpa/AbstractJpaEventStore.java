@@ -49,7 +49,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static org.fuin.esc.jpa.JpaUtils.*;
+import static org.fuin.esc.jpa.JpaUtils.camel2Underscore;
+import static org.fuin.esc.jpa.JpaUtils.nativeEventsTableName;
+import static org.fuin.esc.jpa.JpaUtils.streamEntityName;
 
 /**
  * Read only JPA implementation of the event store.

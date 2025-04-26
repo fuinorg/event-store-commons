@@ -9,29 +9,30 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.DeserializerRegistryRequired;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SerializedDataTypeRegistryRequired;
 import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SerializerRegistryRequired;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * Adapter to use for JSON-B.
  */
 @TestOmitted("Already tested along with the other tests in this package")
-public final class EscEventJsonbSerializerDeserializer implements JsonbSerializer<EscEvent>,
-        JsonbDeserializer<EscEvent>, SerializerRegistryRequired, DeserializerRegistryRequired {
+public final class EscEventJsonbSerializerDeserializer implements JsonbSerializer<EscEvent>, JsonbDeserializer<EscEvent> {
 
-    private SerializerRegistry serializerRegistry;
+    private final SerializerRegistry serializerRegistry;
 
-    private DeserializerRegistry deserializerRegistry;
+    private final DeserializerRegistry deserializerRegistry;
+
+    public EscEventJsonbSerializerDeserializer(SerializerRegistry serializerRegistry, DeserializerRegistry deserializerRegistry) {
+        this.serializerRegistry = Objects.requireNonNull(serializerRegistry, "serializerRegistry==null");
+        this.deserializerRegistry = Objects.requireNonNull(deserializerRegistry, "deserializerRegistry==null");
+    }
 
     @Override
     public EscEvent deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
@@ -107,16 +108,6 @@ public final class EscEventJsonbSerializerDeserializer implements JsonbSerialize
             ctx.serialize(IEscEvent.EL_META_DATA, escEvent.getMeta().getObj(), generator);
         }
         generator.writeEnd();
-    }
-
-    @Override
-    public void setRegistry(final DeserializerRegistry registry) {
-        this.deserializerRegistry = registry;
-    }
-
-    @Override
-    public void setRegistry(final SerializerRegistry registry) {
-        this.serializerRegistry = registry;
     }
 
 }

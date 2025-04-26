@@ -1,28 +1,27 @@
 package org.fuin.esc.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SerializerRegistryRequired;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Serializes an {@link EscEvent} instance to JSON with Jackson.
  */
 @TestOmitted("Already tested along with the other tests in this package")
-public final class EscEventJacksonSerializer extends StdSerializer<EscEvent> implements SerializerRegistryRequired {
+public final class EscEventJacksonSerializer extends StdSerializer<EscEvent> {
 
-    private SerializerRegistry serializerRegistry;
+    private final SerializerRegistry serializerRegistry;
 
-    public EscEventJacksonSerializer() {
+    public EscEventJacksonSerializer(final SerializerRegistry serializerRegistry) {
         super(EscEvent.class);
+        this.serializerRegistry = Objects.requireNonNull(serializerRegistry, "serializerRegistry==null");
     }
 
     @Override
@@ -43,11 +42,6 @@ public final class EscEventJacksonSerializer extends StdSerializer<EscEvent> imp
             provider.defaultSerializeField(IEscEvent.EL_META_DATA, escEvent.getMeta().getObj(), generator);
         }
         generator.writeEndObject();
-    }
-
-    @Override
-    public void setRegistry(final SerializerRegistry registry) {
-        this.serializerRegistry = registry;
     }
 
 }

@@ -19,7 +19,6 @@ package org.fuin.esc.jpa;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

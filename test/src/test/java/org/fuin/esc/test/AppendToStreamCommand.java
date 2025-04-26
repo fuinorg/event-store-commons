@@ -32,6 +32,7 @@ import org.fuin.utils4j.TestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Appends some data to a stream.
@@ -39,7 +40,6 @@ import java.util.List;
 public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -75,16 +75,13 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
     /**
      * Constructor for manual creation.
      *
-     * @param streamName
-     *            Uniquely identifies the stream to create.
-     * @param expectedVersion
-     *            The version the stream should have when being deleted.
-     * @param expectedExceptionClass
-     *            The exception type that is expected.
-     * @param events
-     *            Events to add.
+     * @param streamName             Uniquely identifies the stream to create.
+     * @param expectedVersion        The version the stream should have when being deleted.
+     * @param expectedExceptionClass The exception type that is expected.
+     * @param events                 Events to add.
      */
-    public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
+    public AppendToStreamCommand(@NotNull final String streamName,
+                                 @Nullable final long expectedVersion,
                                  @Nullable final Class<? extends Exception> expectedExceptionClass,
                                  @NotNull final CommonEvent... events) {
         this(streamName, expectedVersion, expectedExceptionClass, EscSpiUtils.asList(events));
@@ -93,14 +90,10 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
     /**
      * Constructor for manual creation.
      *
-     * @param streamName
-     *            Uniquely identifies the stream to create.
-     * @param expectedVersion
-     *            The version the stream should have when being deleted.
-     * @param expectedExceptionClass
-     *            The exception type that is expected.
-     * @param events
-     *            Events to add.
+     * @param streamName             Uniquely identifies the stream to create.
+     * @param expectedVersion        The version the stream should have when being deleted.
+     * @param expectedExceptionClass The exception type that is expected.
+     * @param events                 Events to add.
      */
     public AppendToStreamCommand(@NotNull final String streamName, @Nullable final long expectedVersion,
                                  @Nullable final Class<? extends Exception> expectedExceptionClass,
@@ -114,6 +107,18 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
             this.expectedException = expectedExceptionClass.getSimpleName();
         }
         this.events = events;
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public AppendToStreamCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.expectedVersion = cucumberTable.get("Expected Version");
+        this.eventId = cucumberTable.get("Event Id");
+        this.expectedException = cucumberTable.get("Expected Exception");
     }
 
     @Override

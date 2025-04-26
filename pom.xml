@@ -118,6 +118,12 @@
 
             <dependency>
                 <groupId>org.fuin.objects4j</groupId>
+                <artifactId>objects4j-jsonb</artifactId>
+                <version>${objects4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.objects4j</groupId>
                 <artifactId>objects4j-core</artifactId>
                 <version>${objects4j.version}</version>
             </dependency>
@@ -161,7 +167,19 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>5.10.5</version>
+                <version>5.12.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite-api</artifactId>
+                <version>1.12.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite-engine</artifactId>
+                <version>1.12.2</version>
             </dependency>
 
             <dependency>
@@ -216,13 +234,13 @@
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-java</artifactId>
-                <version>1.2.6</version>
+                <version>7.21.1</version>
             </dependency>
 
             <dependency>
                 <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-junit</artifactId>
-                <version>1.2.6</version>
+                <artifactId>cucumber-junit-platform-engine</artifactId>
+                <version>7.22.1</version>
             </dependency>
 
             <dependency>

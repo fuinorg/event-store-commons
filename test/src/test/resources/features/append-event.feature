@@ -20,10 +20,10 @@ Feature: Append events
     """
     <events>
         <event id="7ab8e400-373b-4f65-96e1-96b78a791a42">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[Anything goes]]></data>
         </event>
         <event id="35ae2b63-c820-4cea-8ad6-0d25e4519390">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
         </event>
     </events>
     """
@@ -31,10 +31,10 @@ Feature: Append events
     """
     <events>
         <event id="7ab8e400-373b-4f65-96e1-96b78a791a42">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[Anything goes]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[Anything goes]]></data>
         </event>
         <event id="35ae2b63-c820-4cea-8ad6-0d25e4519390">
-            <data type="TextEvent" mime-type="text/plain; version=1; encoding=utf-8"><![CDATA[More to come]]></data>
+            <data type="TextEvent" mime-type="text/plain; encoding=utf-8"><![CDATA[More to come]]></data>
         </event>
     </events>
     """

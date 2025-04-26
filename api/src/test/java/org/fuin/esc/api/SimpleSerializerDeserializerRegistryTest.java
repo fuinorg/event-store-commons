@@ -17,9 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.activation.MimeTypeParseException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -32,53 +29,40 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class SimpleSerializerDeserializerRegistryTest {
 
-    private SimpleSerializerDeserializerRegistry testee;
-
-    @BeforeEach
-    public void setup() throws MimeTypeParseException {
-        testee = new SimpleSerializerDeserializerRegistry();
-    }
-
-    @AfterEach
-    public void teardown() {
-        testee = null;
-    }
-
     @Test
     public void testAddGetDeserializer() {
 
         // PREPARE
         final SerializedDataType type = new SerializedDataType("MyType");
-        final String contentType = "application/json";
         final Deserializer deserializer = Mockito.mock(Deserializer.class);
         final EnhancedMimeType mimeType = EnhancedMimeType.create(
                 "application", "json", StandardCharsets.UTF_8, "1");
+        final SimpleSerializerDeserializerRegistry.Builder testee = new SimpleSerializerDeserializerRegistry.Builder(mimeType);
 
         // TEST
-        testee.addDeserializer(type, contentType, deserializer);
+        testee.add(type, deserializer, mimeType);
 
         // VERIFY
-        assertThat(testee.getDeserializer(type, mimeType)).isSameAs(deserializer);
+        final SimpleSerializerDeserializerRegistry registry = testee.build();
+        assertThat(registry.getDeserializer(type, mimeType)).isSameAs(deserializer);
 
     }
 
     @Test
-    public void testSetGetDefaultContentType() {
+    public void testSetGetDefaultMimeType() {
 
         // PREPARE
         final SerializedDataType type = new SerializedDataType("MyType");
-        final String contentType = "application/json";
         final Deserializer deserializer = Mockito.mock(Deserializer.class);
         final EnhancedMimeType mimeType = EnhancedMimeType.create(
                 "application", "json", StandardCharsets.UTF_8);
-        testee.addDeserializer(type, contentType, deserializer);
+        final SimpleSerializerDeserializerRegistry.Builder testee = new SimpleSerializerDeserializerRegistry.Builder(mimeType);
+        testee.add(type, deserializer, mimeType);
 
-        // TEST
-        testee.setDefaultContentType(type, mimeType);
-
-        // VERIFY
-        assertThat(testee.getDeserializer(type)).isSameAs(deserializer);
-        assertThat(testee.getDefaultContentType(type)).isSameAs(mimeType);
+        // TEST & VERIFY
+        final SimpleSerializerDeserializerRegistry registry = testee.build();
+        assertThat(registry.getDeserializer(type)).isSameAs(deserializer);
+        assertThat(registry.getDefaultMimeType()).isSameAs(mimeType);
 
     }
 
@@ -88,12 +72,16 @@ public class SimpleSerializerDeserializerRegistryTest {
         // PREPARE
         final SerializedDataType type = new SerializedDataType("MyType");
         final Serializer serializer = Mockito.mock(Serializer.class);
+        final EnhancedMimeType mimeType = EnhancedMimeType.create(
+                "application", "json", StandardCharsets.UTF_8);
+        final SimpleSerializerDeserializerRegistry.Builder testee = new SimpleSerializerDeserializerRegistry.Builder(mimeType);
 
         // TEST
-        testee.addSerializer(type, serializer);
+        testee.add(type, serializer);
 
         // VERIFY
-        assertThat(testee.getSerializer(type)).isSameAs(serializer);
+        final SimpleSerializerDeserializerRegistry registry = testee.build();
+        assertThat(registry.getSerializer(type)).isSameAs(serializer);
 
     }
 

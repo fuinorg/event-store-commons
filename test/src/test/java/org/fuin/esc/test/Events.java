@@ -110,6 +110,12 @@ public final class Events implements Serializable {
         return list;
     }
 
+    public void init(TestContext testContext) {
+        for (final Event event : events) {
+            event.init(testContext);
+        }
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("events", events).toString();

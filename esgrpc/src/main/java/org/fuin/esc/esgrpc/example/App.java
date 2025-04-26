@@ -1,6 +1,15 @@
 package org.fuin.esc.esgrpc.example;
 
-import io.kurrent.dbclient.*;
+import io.kurrent.dbclient.DeleteResult;
+import io.kurrent.dbclient.DeleteStreamOptions;
+import io.kurrent.dbclient.EventData;
+import io.kurrent.dbclient.KurrentDBClient;
+import io.kurrent.dbclient.KurrentDBClientSettings;
+import io.kurrent.dbclient.KurrentDBConnectionString;
+import io.kurrent.dbclient.ReadResult;
+import io.kurrent.dbclient.ReadStreamOptions;
+import io.kurrent.dbclient.ResolvedEvent;
+import io.kurrent.dbclient.WriteResult;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;

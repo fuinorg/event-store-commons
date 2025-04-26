@@ -24,13 +24,14 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
 import org.fuin.utils4j.TestCommand;
 
+import java.util.Map;
+
 /**
  * Queries a stream state.
  */
 public final class StreamStateCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -64,12 +65,9 @@ public final class StreamStateCommand implements TestCommand<TestContext> {
     /**
      * Constructor for manual creation.
      *
-     * @param streamName
-     *            Uniquely identifies the stream to create.
-     * @param expectedState
-     *            The state the stream should have, an empty string or "-".
-     * @param expectedException
-     *            The exception that is expected, an empty string or "-".
+     * @param streamName        Uniquely identifies the stream to create.
+     * @param expectedState     The state the stream should have, an empty string or "-".
+     * @param expectedException The exception that is expected, an empty string or "-".
      */
     public StreamStateCommand(@NotNull final String streamName, final String expectedState,
                               final String expectedException) {
@@ -77,6 +75,17 @@ public final class StreamStateCommand implements TestCommand<TestContext> {
         this.streamName = streamName;
         this.expectedState = expectedState;
         this.expectedException = expectedException;
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public StreamStateCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.expectedState = cucumberTable.get("Expected State");
+        this.expectedException = cucumberTable.get("Expected Exception");
     }
 
     @Override

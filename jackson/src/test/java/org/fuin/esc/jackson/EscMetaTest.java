@@ -17,11 +17,9 @@
  */
 package org.fuin.esc.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -34,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test for {@link IEscMeta} class.
  */
-public class EscMetaTest {
+public class EscMetaTest extends AbstractTest {
 
     @Test
     public final void testMarshalJackson() throws Exception {
@@ -61,20 +59,11 @@ public class EscMetaTest {
         final IEscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 myMeta);
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(EscMeta.SER_TYPE, IEscMeta.class);
+        // TEST
+        final String currentJson = getMapperProvider().writer().writeValueAsString(escMeta);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final String currentJson = objectMapper.writeValueAsString(escMeta);
-
-            // VERIFY
-            assertThatJson(currentJson).isEqualTo(expectedJson);
-
-        }
+        // VERIFY
+        assertThatJson(currentJson).isEqualTo(expectedJson);
 
     }
 
@@ -85,41 +74,31 @@ public class EscMetaTest {
         final String json = """
                 {
                     "data-type": "MyEvent",
-                    "data-content-type":"application/xml; version=1; transfer-encoding=base64; encoding=UTF-8",
+                    "data-content-type":"application/xml; transfer-encoding=base64; encoding=UTF-8",
                     "meta-type": "MyMeta",
-                    "meta-content-type":"application/json; version=1; encoding=UTF-8",
+                    "meta-content-type":"application/json; encoding=UTF-8",
                     "MyMeta":{
                         "user":"abc"
                     }
                 }
                 """;
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
-
         final Map<String, String> params = new HashMap<>();
         params.put("transfer-encoding", "base64");
-        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", StandardCharsets.UTF_8, "1", params);
-        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
+        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "xml", StandardCharsets.UTF_8, null, params);
+        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta testee = getMapperProvider().reader().readValue(json, EscMeta.class);
 
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final IEscMeta testee = objectMapper.readValue(json, EscMeta.class);
-
-            // VERIFY
-            assertThat(testee.getDataType()).isEqualTo("MyEvent");
-            assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
-            assertThat(testee.getMetaType()).isEqualTo("MyMeta");
-            assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
-            assertThat(testee.getMeta()).isInstanceOf(MyMeta.class);
-            final MyMeta myMeta = (MyMeta) testee.getMeta();
-            assertThat(myMeta.getUser()).isEqualTo("abc");
-
-        }
+        // VERIFY
+        assertThat(testee.getDataType()).isEqualTo("MyEvent");
+        assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+        assertThat(testee.getMetaType()).isEqualTo("MyMeta");
+        assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
+        assertThat(testee.getMeta()).isInstanceOf(MyMeta.class);
+        final MyMeta myMeta = (MyMeta) testee.getMeta();
+        assertThat(myMeta.getUser()).isEqualTo("abc");
 
     }
 
@@ -144,21 +123,11 @@ public class EscMetaTest {
         final IEscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
                 base64Data);
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(EscMeta.SER_TYPE, IEscMeta.class);
+        // TEST
+        final String currentJson = getMapperProvider().writer().writeValueAsString(escMeta);
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
-
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final String currentJson = objectMapper.writeValueAsString(escMeta);
-
-            // VERIFY
-            assertThatJson(currentJson).isEqualTo(expectedJson);
-
-        }
+        // VERIFY
+        assertThatJson(currentJson).isEqualTo(expectedJson);
 
     }
 
@@ -176,30 +145,20 @@ public class EscMetaTest {
                 }
                 """;
 
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
-
         final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/xml; encoding=UTF-8");
         final EnhancedMimeType metaContentType = EnhancedMimeType.create("application/xml; transfer-encoding=base64; encoding=UTF-8");
 
-        try (final JacksonDeSerializer jacksonDeSer = TestUtils.createJacksonDeSerializer()) {
-            TestUtils.initSerDeserializerRegistry(typeRegistry, jacksonDeSer);
+        // TEST
+        final IEscMeta testee = getMapperProvider().reader().readValue(json, EscMeta.class);
 
-            final ObjectMapper objectMapper = jacksonDeSer.getObjectMapper();
-
-            // TEST
-            final IEscMeta testee = objectMapper.readValue(json, EscMeta.class);
-
-            // VERIFY
-            assertThat(testee.getDataType()).isEqualTo("MyEvent");
-            assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
-            assertThat(testee.getMetaType()).isEqualTo("MyMeta");
-            assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
-            assertThat(testee.getMeta()).isInstanceOf(IBase64Data.class);
-            final IBase64Data base64Data = (IBase64Data) testee.getMeta();
-            assertThat(base64Data.getEncoded()).isEqualTo("PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+");
-
-        }
+        // VERIFY
+        assertThat(testee.getDataType()).isEqualTo("MyEvent");
+        assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+        assertThat(testee.getMetaType()).isEqualTo("MyMeta");
+        assertThat(testee.getMetaContentType()).isEqualTo(metaContentType);
+        assertThat(testee.getMeta()).isInstanceOf(IBase64Data.class);
+        final IBase64Data base64Data = (IBase64Data) testee.getMeta();
+        assertThat(base64Data.getEncoded()).isEqualTo("PG15LW1ldGE+PHVzZXI+bWljaGFlbDwvdXNlcj48L215LW1ldGE+");
 
     }
 

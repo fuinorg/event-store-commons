@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.DeserializerRegistryRequired;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscEvent;
@@ -15,17 +14,19 @@ import org.fuin.objects4j.jackson.Objects4JacksonUtils;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Deserializes JSON to an {@link EscEvent} instance with Jackson.
  */
 @TestOmitted("Already tested along with the other tests in this package")
-public final class EscEventJacksonDeserializer extends StdDeserializer<EscEvent> implements DeserializerRegistryRequired {
+public final class EscEventJacksonDeserializer extends StdDeserializer<EscEvent> {
 
-    private DeserializerRegistry deserializerRegistry;
+    private final DeserializerRegistry deserializerRegistry;
 
-    public EscEventJacksonDeserializer() {
+    public EscEventJacksonDeserializer(final DeserializerRegistry deserializerRegistry) {
         super(EscEvent.class);
+        this.deserializerRegistry = Objects.requireNonNull(deserializerRegistry, "deserializerRegistry==null");
     }
 
     @Override
@@ -52,11 +53,6 @@ public final class EscEventJacksonDeserializer extends StdDeserializer<EscEvent>
             escEvent.setData(new DataWrapper(new Base64Data(base64Node.asText())));
         }
         return escEvent;
-    }
-
-    @Override
-    public void setRegistry(final DeserializerRegistry registry) {
-        this.deserializerRegistry = registry;
     }
 
 }

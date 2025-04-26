@@ -54,4 +54,38 @@ public interface SerializedDataTypeRegistry {
     record TypeClass(SerializedDataType type, Class<?> clasz) {
     }
 
+    /**
+     * Builds an instance of the registry.
+     *
+     * @param <T> Type of the builder.
+     */
+    interface Builder<T extends SerializedDataTypeRegistry, B extends Builder<T, B>> {
+
+        /**
+         * Adds a new type/class combination to the registry.
+         *
+         * @param type  Type of the data.
+         * @param clasz Class for the type.
+         * @return The builder.
+         */
+        B add(@NotNull final SerializedDataType type, final Class<?> clasz);
+
+        /**
+         * Adds a new type/class combination to the registry.
+         *
+         * @param mapping Type to class mapping.
+         * @return The builder.
+         */
+        B add(@NotNull final SerializedDataType2ClassMapping mapping);
+
+        /**
+         * Builds an instance of the registry.
+         *
+         * @return New instance.
+         */
+        T build();
+
+    }
+
+
 }

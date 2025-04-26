@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.DeserializerRegistryRequired;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
@@ -14,17 +13,19 @@ import org.fuin.esc.api.SerializedDataType;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Adapter to use for JSON-B.
  */
 @TestOmitted("Already tested along with the other tests in this package")
-public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> implements DeserializerRegistryRequired {
+public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
 
-    private DeserializerRegistry deserializerRegistry;
+    private final DeserializerRegistry deserializerRegistry;
 
-    public EscMetaJacksonDeserializer() {
+    public EscMetaJacksonDeserializer(final DeserializerRegistry deserializerRegistry) {
         super(EscMeta.class);
+        this.deserializerRegistry = Objects.requireNonNull(deserializerRegistry, "deserializerRegistry==null");
     }
 
     @Override
@@ -50,11 +51,6 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> i
             escMeta.setMeta(new Base64Data(base64Node.asText()));
         }
         return escMeta;
-    }
-
-    @Override
-    public void setRegistry(final DeserializerRegistry registry) {
-        this.deserializerRegistry = registry;
     }
 
 }

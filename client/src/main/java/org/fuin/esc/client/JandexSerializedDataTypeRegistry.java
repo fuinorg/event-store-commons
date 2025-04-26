@@ -33,7 +33,7 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
 
     private static final Logger LOG = LoggerFactory.getLogger(JandexSerializedDataTypeRegistry.class);
 
-    private final SimpleSerializedDataTypeRegistry delegate;
+    private final SerializedDataTypeRegistry delegate;
 
     private final List<File> classesDirs;
 
@@ -52,12 +52,13 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
      * @param classesDirs Directories with class files.
      */
     public JandexSerializedDataTypeRegistry(final File... classesDirs) {
-        delegate = new SimpleSerializedDataTypeRegistry();
+        final SimpleSerializedDataTypeRegistry.Builder builder = new SimpleSerializedDataTypeRegistry.Builder();
         this.classesDirs = Arrays.asList(classesDirs);
         classes = scanForClasses();
         for (final Class<?> domainEventClass : classes) {
-            delegate.add(serializedDataTypeConstant(domainEventClass), domainEventClass);
+            builder.add(serializedDataTypeConstant(domainEventClass), domainEventClass);
         }
+        delegate = builder.build();
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.fuin.objects4j.common.Contract;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 /**
  * Asynchronous event store that uses a synchronous one internally.

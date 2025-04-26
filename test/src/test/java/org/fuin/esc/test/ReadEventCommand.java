@@ -107,6 +107,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
             expectedEvent = null;
         } else {
             event = unmarshal(expectedEventXml, Event.class);
+            event.init(context);
             expectedEvent = event.asCommonEvent(createCtx());
         }
 

@@ -1,12 +1,20 @@
 package org.fuin.esc.jackson;
 
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
-import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.jackson.ImmutableObjectMapper;
 import org.fuin.utils4j.TestOmitted;
 
 import java.nio.charset.StandardCharsets;
+
+import static org.fuin.esc.jackson.EscJacksonUtils.MIME_TYPE;
+import static org.fuin.esc.jackson.EscJacksonUtils.addEscSerDeserializer;
+import static org.fuin.esc.jackson.EscJacksonUtils.addEscTypes;
 
 /**
  * Helper methods for the test package.
@@ -18,43 +26,50 @@ final class TestUtils {
     }
 
     /**
-     * Creates a {@link JacksonDeSerializer} with standard settings.
+     * Creates a builder.
      *
-     * @return New instance.
+     * @return Builder.
      */
-    public static JacksonDeSerializer createJacksonDeSerializer() {
-        return JacksonDeSerializer.builder()
-                .withSerializers(EscJacksonUtils.createEscJacksonSerializers())
-                .withDeserializers(EscJacksonUtils.createEscJacksonDeserializers())
-                .withEncoding(StandardCharsets.UTF_8)
-                .build();
+    public static ImmutableObjectMapper.Builder createMapperBuilder() {
+
+        return new ImmutableObjectMapper.Builder(new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .enable(SerializationFeature.INDENT_OUTPUT));
+
     }
 
     /**
-     * Creates a registry that connects the type with the appropriate serializer and de-serializer.
+     * Creates a pre-configured serializer/deserializer.
      *
-     * @param typeRegistry Type registry (Mapping from type name to class).
-     * @param jacksonDeSer   JSON-B serializer/deserializer to use.
+     * @param mapperProvider Mapper provider.
+     * @param typeRegistry   Type registry.
+     * @return New instance.
      */
-    public static void initSerDeserializerRegistry(@NotNull SerializedDataTypeRegistry typeRegistry,
-                                                   @NotNull JacksonDeSerializer jacksonDeSer) {
+    public static JacksonSerDeserializer createSerDeserializer(
+            final ImmutableObjectMapper.Provider mapperProvider,
+            final SerializedDataTypeRegistry typeRegistry) {
 
-        Contract.requireArgNotNull("typeRegistry", typeRegistry);
-        Contract.requireArgNotNull("jacksonDeSer", jacksonDeSer);
-
-        SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-
-        // Base types always needed
-        registry.add(EscEvents.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
-        registry.add(EscEvent.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
-        registry.add(EscMeta.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
-
-        // User defined types
-        registry.add(MyMeta.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
-        registry.add(MyEvent.SER_TYPE, jacksonDeSer.getMimeType().getBaseType(), jacksonDeSer);
-
-        jacksonDeSer.init(typeRegistry, registry, registry);
+        return new JacksonSerDeserializer.Builder()
+                .withObjectMapper(mapperProvider)
+                .withTypeRegistry(typeRegistry)
+                .withEncoding(StandardCharsets.UTF_8)
+                .build();
 
     }
+
+    public static SerializedDataTypeRegistry createSerializedDataTypeRegistry() {
+        return addEscTypes(new SimpleSerializedDataTypeRegistry.Builder())
+                .add(MyEvent.SER_TYPE, MyEvent.class)
+                .add(MyMeta.SER_TYPE, MyMeta.class)
+                .build();
+    }
+
+    public static SerDeserializerRegistry createSerDeserializerRegistry(JacksonSerDeserializer serDeserializer) {
+        return addEscSerDeserializer(new SimpleSerializerDeserializerRegistry.Builder(MIME_TYPE), serDeserializer)
+                .add(MyMeta.SER_TYPE, serDeserializer, serDeserializer.getMimeType())
+                .add(MyEvent.SER_TYPE, serDeserializer, serDeserializer.getMimeType())
+                .build();
+    }
+
 
 }
