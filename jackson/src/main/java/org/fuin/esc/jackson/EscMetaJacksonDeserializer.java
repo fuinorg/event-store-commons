@@ -35,20 +35,22 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
         final JsonNode node = jp.getCodec().readTree(jp);
         escMeta.setDataType(node.get(IEscMeta.EL_DATA_TYPE).asText());
         escMeta.setDataContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_DATA_CONTENT_TYPE).asText()));
-        escMeta.setMetaType(node.get(IEscMeta.EL_META_TYPE).asText());
-        escMeta.setMetaContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_META_CONTENT_TYPE).asText()));
-        final JsonNode base64Node = node.get(IBase64Data.EL_ROOT_NAME);
-        if (base64Node == null) {
-            final JsonNode metaNode = node.get(escMeta.getMetaType());
-            final SerializedDataType metaType = new SerializedDataType(escMeta.getMetaType());
-            final EnhancedMimeType metaContentType = escMeta.getMetaContentType();
-            if (metaContentType == null) {
-                throw new IllegalStateException("Content type for meta is not defined");
+        if (node.has(IEscMeta.EL_META_TYPE)) {
+            escMeta.setMetaType(node.get(IEscMeta.EL_META_TYPE).asText());
+            escMeta.setMetaContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_META_CONTENT_TYPE).asText()));
+            final JsonNode base64Node = node.get(IBase64Data.EL_ROOT_NAME);
+            if (base64Node == null) {
+                final JsonNode metaNode = node.get(escMeta.getMetaType());
+                final SerializedDataType metaType = new SerializedDataType(escMeta.getMetaType());
+                final EnhancedMimeType metaContentType = escMeta.getMetaContentType();
+                if (metaContentType == null) {
+                    throw new IllegalStateException("Content type for meta is not defined");
+                }
+                final Object meta = EscJacksonUtils.deserialize(metaNode, metaType, metaContentType, deserializerRegistry);
+                escMeta.setMeta(meta);
+            } else {
+                escMeta.setMeta(new Base64Data(base64Node.asText()));
             }
-            final Object meta = EscJacksonUtils.deserialize(metaNode, metaType, metaContentType, deserializerRegistry);
-            escMeta.setMeta(meta);
-        } else {
-            escMeta.setMeta(new Base64Data(base64Node.asText()));
         }
         return escMeta;
     }

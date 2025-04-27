@@ -186,7 +186,7 @@ public final class EscMeta implements IEscMeta {
      *
      * @return Meta data object.
      */
-    @NotNull
+    @Nullable
     public Object getMeta() {
         return meta;
     }

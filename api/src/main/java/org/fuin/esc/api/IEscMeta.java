@@ -83,7 +83,7 @@ public interface IEscMeta extends IBaseType {
      *
      * @return Metadata object.
      */
-    @NotNull
+    @Nullable
     Object getMeta();
 
 }
