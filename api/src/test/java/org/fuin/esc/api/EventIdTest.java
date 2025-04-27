@@ -10,7 +10,7 @@ public class EventIdTest {
 
     @Test
     void testEqualsHashCode() {
-        EqualsVerifier.forClass(EventId.class).verify();
+        EqualsVerifier.forClass(EventId.class).withRedefinedSuperclass().verify();
     }
 
 }

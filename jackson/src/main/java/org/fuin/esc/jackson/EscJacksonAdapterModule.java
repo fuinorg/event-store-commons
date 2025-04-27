@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.jackson.ValueObjectStringJacksonDeserializer;
+import org.fuin.objects4j.jackson.ValueObjectStringJacksonSerializer;
 import org.fuin.utils4j.TestOmitted;
 
 import java.util.Objects;
@@ -46,6 +50,8 @@ public class EscJacksonAdapterModule extends Module {
         serializers.addSerializer(EscEvents.class, new EscEventsJacksonSerializer());
         serializers.addSerializer(EscEvent.class, new EscEventJacksonSerializer(serializerRegistry));
         serializers.addSerializer(EscMeta.class, new EscMetaJacksonSerializer(serializerRegistry));
+        serializers.addSerializer(EventId.class, new ValueObjectStringJacksonSerializer<>(EventId.class));
+        serializers.addSerializer(TypeName.class, new ValueObjectStringJacksonSerializer<>(TypeName.class));
         context.addSerializers(serializers);
 
         final SimpleDeserializers deserializers = new SimpleDeserializers();
@@ -53,7 +59,8 @@ public class EscJacksonAdapterModule extends Module {
         deserializers.addDeserializer(EscEvents.class, new EscEventsJacksonDeserializer());
         deserializers.addDeserializer(EscEvent.class, new EscEventJacksonDeserializer(deserializerRegistry));
         deserializers.addDeserializer(EscMeta.class, new EscMetaJacksonDeserializer(deserializerRegistry));
-
+        deserializers.addDeserializer(EventId.class, new ValueObjectStringJacksonDeserializer<>(EventId.class, EventId::valueOf));
+        deserializers.addDeserializer(TypeName.class, new ValueObjectStringJacksonDeserializer<>(TypeName.class, TypeName::valueOf));
         context.addDeserializers(deserializers);
     }
 

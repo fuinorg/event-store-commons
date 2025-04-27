@@ -37,6 +37,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.fuin.objects4j</groupId>
+            <artifactId>objects4j-ui</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>

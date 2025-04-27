@@ -56,6 +56,11 @@
             <artifactId>objects4j-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.fuin</groupId>
+            <artifactId>utils4j</artifactId>
+        </dependency>
+
         <!-- test -->
 
         <dependency>
@@ -248,12 +253,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.fuin</groupId>
-            <artifactId>utils4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <scope>test</scope>
@@ -403,6 +402,7 @@
                     <ignoredNonTestScopedDependencies>
                         <ignoredNonTestScopedDependency>org.fuin.objects4j:objects4j-common</ignoredNonTestScopedDependency>
                         <ignoredNonTestScopedDependency>org.fuin.objects4j:objects4j-core</ignoredNonTestScopedDependency>
+                        <ignoredNonTestScopedDependency>org.fuin:utils4j</ignoredNonTestScopedDependency>
                     </ignoredNonTestScopedDependencies>
                 </configuration>
             </plugin>

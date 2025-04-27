@@ -17,110 +17,97 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.AsStringCapable;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.ValueObjectWithBaseType;
-import org.fuin.objects4j.core.UUIDStr;
-import org.fuin.objects4j.core.UUIDStrValidator;
+import org.fuin.objects4j.common.HasPublicStaticIsValidMethod;
+import org.fuin.objects4j.common.HasPublicStaticValueOfMethod;
+import org.fuin.objects4j.core.AbstractUuidValueObject;
+import org.fuin.objects4j.ui.Label;
+import org.fuin.objects4j.ui.Prompt;
+import org.fuin.objects4j.ui.ShortLabel;
+import org.fuin.objects4j.ui.Tooltip;
+import org.fuin.utils4j.TechnicalId;
 
 import javax.annotation.concurrent.Immutable;
-import java.io.Serializable;
-import java.util.Objects;
+import java.io.Serial;
 import java.util.UUID;
 
 /**
- * Represents a unique event identifier based on a UUID.
+ * Universal unique event identifier.
  */
 @Immutable
-public final class EventId implements ValueObjectWithBaseType<UUID>, Comparable<EventId>, Serializable {
+@Label("Event Identifier")
+@ShortLabel("EventID")
+@Tooltip("Identifies an event universally unique")
+@Prompt("bb05f34d-4eac-4f6a-b3c2-5c89269720f3")
+@HasPublicStaticValueOfMethod
+@HasPublicStaticIsValidMethod
+public final class EventId extends AbstractUuidValueObject implements TechnicalId, AsStringCapable {
 
+    @Serial
     private static final long serialVersionUID = 1000L;
 
-    private final long mostSigBits;
-
-    private final long leastSigBits;
-
-    // Do not access this variable directly inside this class.
-    // Use <code>asBaseType()</code> to be sure this is initialized.
-    private transient UUID uuid;
-
-    // Do not access this variable directly inside this class.
-    // Use <code>toString()</code> to be sure this is initialized.
-    private transient String str;
+    @NotNull
+    private final UUID uuid;
 
     /**
-     * Creates a new event ID using a random UUID.
+     * Default constructor.
      */
     public EventId() {
-        this(UUID.randomUUID());
-    }
-
-    /**
-     * Creates a new event ID using the given string.
-     *
-     * @param value
-     *            String that represents a UUID.
-     */
-    public EventId(@NotNull @UUIDStr final String value) {
-        this(parseArg("value", value));
-    }
-
-    /**
-     * Creates a new event ID using the given value.
-     *
-     * @param value
-     *            UUID to use.
-     */
-    public EventId(@NotNull final UUID value) {
         super();
-        Contract.requireArgNotNull("value", value);
-        this.uuid = value;
-        this.mostSigBits = uuid.getMostSignificantBits();
-        this.leastSigBits = uuid.getLeastSignificantBits();
+        uuid = UUID.randomUUID();
     }
 
-    @Override
-    public Class<UUID> getBaseType() {
-        return UUID.class;
+    /**
+     * Constructor with UUID.
+     *
+     * @param uuid UUID.
+     */
+    public EventId(@NotNull final UUID uuid) {
+        super();
+        Contract.requireArgNotNull("uuid", uuid);
+        this.uuid = uuid;
+    }
+
+    /**
+     * Constructor with text UUID.
+     *
+     * @param uuid Text with UUID.
+     */
+    public EventId(@NotNull final String uuid) {
+        super();
+        Contract.requireArgNotNull("uuid", uuid);
+        this.uuid = UUID.fromString(uuid);
     }
 
     @Override
     public UUID asBaseType() {
-        if (uuid == null) {
-            uuid = new UUID(mostSigBits, leastSigBits);
-        }
         return uuid;
     }
 
     @Override
+    public String asString() {
+        return uuid.toString();
+    }
+
+    @Override
     public String toString() {
-        if (str == null) {
-            str = uuid.toString();
+        return uuid.toString();
+    }
+
+    /**
+     * Converts a string into an entity identifier. A <code>null</code> parameter will return <code>null</code>.
+     *
+     * @param value Representation of the entity identifier as string.
+     * @return Value object.
+     */
+    public static EventId valueOf(@Nullable final String value) {
+        if (value == null) {
+            return null;
         }
-        return str;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final EventId eventId = (EventId) o;
-        return mostSigBits == eventId.mostSigBits && leastSigBits == eventId.leastSigBits;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mostSigBits, leastSigBits);
-    }
-
-    @Override
-    public int compareTo(final EventId other) {
-        return asBaseType().compareTo(other.asBaseType());
-    }
-
-    private static UUID parseArg(final String name, final String value) {
-        Contract.requireArgNotNull(name, value);
-        return UUIDStrValidator.parseArg(name, value);
+        return new EventId(UUID.fromString(value));
     }
 
 }

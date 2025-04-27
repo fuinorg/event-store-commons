@@ -49,11 +49,34 @@ public final class EscJsonbUtils {
      */
     public static final EnhancedMimeType MIME_TYPE = EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8);
 
+    private static final List<JsonbAdapter<?, ?>> ADAPTERS = List.of(
+            new EventIdJsonbAdapter(),
+            new TypeNameJsonbAdapter()
+    );
+
     /**
      * Private utility constructor.
      */
     private EscJsonbUtils() {
         throw new UnsupportedOperationException("Creating instances of a utility class is not allowed.");
+    }
+
+    /**
+     * Returns the list of {@link JsonbAdapter} objects defined by the package.
+     *
+     * @return New instance of the adapter list.
+     */
+    public static List<JsonbAdapter<?, ?>> getJsonbAdapters() {
+        return new ArrayList<>(ADAPTERS);
+    }
+
+    /**
+     * Returns an array of {@link JsonbAdapter} objects defined by the package.
+     *
+     * @return Array with adapters.
+     */
+    public static JsonbAdapter<?, ?>[] getJsonbAdapterArray() {
+        return getJsonbAdapters().toArray(new JsonbAdapter[0]);
     }
 
     /**
@@ -79,9 +102,7 @@ public final class EscJsonbUtils {
      * @return Adapters.
      */
     public static JsonbAdapter<?, ?>[] createEscJsonbAdapters() {
-        return new JsonbAdapter<?, ?>[]{
-                // Currently we have none
-        };
+        return ADAPTERS.toArray(new JsonbAdapter[0]);
     }
 
     /**
