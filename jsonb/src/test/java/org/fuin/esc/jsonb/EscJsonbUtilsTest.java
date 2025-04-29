@@ -129,7 +129,6 @@ public class EscJsonbUtilsTest {
         };
 
         assertThat(EscJsonbUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[]{})).isEmpty();
-        ;
         assertThat(EscJsonbUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[]{}, a)).containsExactly(a);
         assertThat(EscJsonbUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[]{a}, b)).containsExactly(a, b);
         assertThat(EscJsonbUtils.joinJsonbDeserializers(new JsonbDeserializer<?>[]{a, b}, c)).containsExactly(a, b, c);

@@ -31,8 +31,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -58,6 +57,7 @@ import org.fuin.esc.test.jpa.TestIdStreamFactory;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.fuin.utils4j.MultipleCommands;
 import org.fuin.utils4j.TestCommand;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -307,9 +307,10 @@ public class TestFeatures {
     }
 
     private void whenAppendXmlEvents(final String streamName, final long version, final String eventsXml) {
-        final Events events = unmarshal(eventsXml, Events.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Events.class).build();
+        final Events events = unmarshal(unmarshaller, eventsXml);
         events.init(testContext);
-        final List<CommonEvent> commonEvents = events.asCommonEvents(createCtx());
+        final List<CommonEvent> commonEvents = events.asCommonEvents();
 
         final TestCommand<TestContext> command = new AppendToStreamCommand(streamName, version, null, commonEvents);
         command.init(testContext);
@@ -455,14 +456,6 @@ public class TestFeatures {
                     transaction.commit();
                 }
             }
-        }
-    }
-
-    private JAXBContext createCtx() {
-        try {
-            return JAXBContext.newInstance(BookAddedEvent.class);
-        } catch (final JAXBException ex) {
-            throw new RuntimeException(ex);
         }
     }
 

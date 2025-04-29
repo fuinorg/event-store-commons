@@ -18,12 +18,15 @@
 package org.fuin.esc.jaxb;
 
 import jakarta.activation.MimeTypeParseException;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.apache.commons.io.IOUtils;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.utils4j.jaxb.JaxbUtils;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,8 +89,7 @@ public class DataTest extends AbstractXmlTest {
         final Data original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
 
         // VERIFY
         final String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
@@ -107,9 +109,9 @@ public class DataTest extends AbstractXmlTest {
         final Data original = testee;
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
-        final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Data.class).build();
+        final Data copy = unmarshal(unmarshaller, xml);
 
         // VERIFY
         assertThat(copy.getType()).isEqualTo(TYPE);
@@ -129,9 +131,9 @@ public class DataTest extends AbstractXmlTest {
         final Data original = new Data(type, mimeType, content);
 
         // TEST
-        final String xml = marshalToStr(original, createXmlAdapter(),
-                Data.class);
-        final Data copy = unmarshal(xml, createXmlAdapter(), Data.class);
+        final String xml = marshalToStr(original, createXmlAdapter(), Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Data.class).build();
+        final Data copy = unmarshal(unmarshaller, xml);
 
         // VERIFY
         assertThat(copy.getType()).isEqualTo(type);
@@ -144,7 +146,8 @@ public class DataTest extends AbstractXmlTest {
     public void testUnmarshalXmlContent() throws JAXBException {
 
         // TEST
-        final BookAddedEvent event = unmarshal(JAXBContext.newInstance(BookAddedEvent.class), testee.getContent(), null);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(BookAddedEvent.class).build();
+        final BookAddedEvent event = unmarshal(unmarshaller, testee.getContent());
 
         // VERIFY
         assertThat(event).isNotNull();
@@ -161,7 +164,8 @@ public class DataTest extends AbstractXmlTest {
 
         // TEST
 
-        final String dataXml = marshal(event, event.getClass());
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(event.getClass()).build();
+        final String dataXml = marshal(marshaller, event);
         final Data data = new Data("BookAddedEvent", EnhancedMimeType.create("application/xml; encoding=utf-8"), dataXml);
 
         // VERIFY

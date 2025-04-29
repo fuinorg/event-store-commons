@@ -17,6 +17,10 @@
  */
 package org.fuin.esc.jaxb;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -59,7 +63,8 @@ public class EscEventTest {
                 """;
 
         // TEST
-        final EscEvent testee = unmarshal(expectedXml, EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class).build();
+        final EscEvent testee = unmarshal(unmarshaller, expectedXml);
 
         // VERIFY
         assertThat(testee).isNotNull();
@@ -72,7 +77,8 @@ public class EscEventTest {
         assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
 
         // TEST
-        final String xml = marshal(testee, EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class);
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class).build();
+        final String xml = marshal(marshaller, testee);
 
         // VERIFY
         final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();

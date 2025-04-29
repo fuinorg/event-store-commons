@@ -105,8 +105,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
             return dataDeserializer.unmarshal(data, dataType, dataMimeType);
         }
 
-        if (data instanceof IBase64Data) {
-            final IBase64Data base64Data = (IBase64Data) data;
+        if (data instanceof IBase64Data base64Data) {
             return dataDeserializer.unmarshal(base64Data.getDecoded(), dataType, dataMimeType);
         }
 

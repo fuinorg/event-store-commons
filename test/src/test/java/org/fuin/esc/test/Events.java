@@ -18,7 +18,6 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -98,14 +97,12 @@ public final class Events implements Serializable {
     /**
      * Returns this object as a list of common event objects.
      *
-     * @param ctx In case the XML JAXB unmarshalling is used, you have to pass
-     *            the JAXB context here.
      * @return Converted list.
      */
-    public List<CommonEvent> asCommonEvents(final JAXBContext ctx) {
+    public List<CommonEvent> asCommonEvents() {
         final List<CommonEvent> list = new ArrayList<>();
         for (final Event event : events) {
-            list.add(event.asCommonEvent(ctx));
+            list.add(event.asCommonEvent());
         }
         return list;
     }

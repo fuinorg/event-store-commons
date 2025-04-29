@@ -25,7 +25,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,14 +68,14 @@ public class EnhancedMimeTypeTest {
             throws MimeTypeParseException {
 
         // PREPARE & TEST
-        final EnhancedMimeType testee = new EnhancedMimeType("application",
+        final EnhancedMimeType otherTestee = new EnhancedMimeType("application",
                 "json", StandardCharsets.UTF_8);
 
         // VERIFY
-        assertThat(testee.getPrimaryType()).isEqualTo("application");
-        assertThat(testee.getSubType()).isEqualTo("json");
-        assertThat(testee.getVersion()).isNull();
-        assertThat(testee.getEncoding()).isEqualTo(Charset.forName("UTF-8"));
+        assertThat(otherTestee.getPrimaryType()).isEqualTo("application");
+        assertThat(otherTestee.getSubType()).isEqualTo("json");
+        assertThat(otherTestee.getVersion()).isNull();
+        assertThat(otherTestee.getEncoding()).isEqualTo(StandardCharsets.UTF_8);
     }
 
     @Test
@@ -85,20 +84,20 @@ public class EnhancedMimeTypeTest {
         // PREPARE & TEST
         final Map<String, String> params = new HashMap<String, String>();
         params.put("a", "1");
-        final EnhancedMimeType testee = new EnhancedMimeType("application",
-                "json", Charset.forName("utf-8"), "1.0.2", params);
+        final EnhancedMimeType otherTestee = new EnhancedMimeType("application",
+                "json", StandardCharsets.UTF_8, "1.0.2", params);
 
         // VERIFY
-        assertThat(testee.getPrimaryType()).isEqualTo("application");
-        assertThat(testee.getSubType()).isEqualTo("json");
-        assertThat(testee.getEncoding()).isEqualTo(Charset.forName("utf-8"));
-        assertThat(testee.getParameter(EnhancedMimeType.ENCODING)).isEqualTo(
+        assertThat(otherTestee.getPrimaryType()).isEqualTo("application");
+        assertThat(otherTestee.getSubType()).isEqualTo("json");
+        assertThat(otherTestee.getEncoding()).isEqualTo(StandardCharsets.UTF_8);
+        assertThat(otherTestee.getParameter(EnhancedMimeType.ENCODING)).isEqualTo(
                 "UTF-8");
-        assertThat(testee.getVersion()).isEqualTo("1.0.2");
-        assertThat(testee.getParameter(EnhancedMimeType.VERSION)).isEqualTo(
+        assertThat(otherTestee.getVersion()).isEqualTo("1.0.2");
+        assertThat(otherTestee.getParameter(EnhancedMimeType.VERSION)).isEqualTo(
                 "1.0.2");
-        assertThat(testee.getParameter("a")).isEqualTo("1");
-        assertThat(testee.getParameters().size()).isEqualTo(3);
+        assertThat(otherTestee.getParameter("a")).isEqualTo("1");
+        assertThat(otherTestee.getParameters().size()).isEqualTo(3);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class EnhancedMimeTypeTest {
         assertThat(testee.getPrimaryType()).isEqualTo("application");
         assertThat(testee.getSubType()).isEqualTo("xml");
         assertThat(testee.getVersion()).isEqualTo("1.0.2");
-        assertThat(testee.getEncoding()).isEqualTo(Charset.forName("utf-8"));
+        assertThat(testee.getEncoding()).isEqualTo(StandardCharsets.UTF_8);
     }
 
     @Test

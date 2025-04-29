@@ -51,7 +51,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     @Override
     public CompletableFuture<Void> open() {
-        return CompletableFuture.runAsync(() -> delegate.open(), executor);
+        return CompletableFuture.runAsync(delegate::open, executor);
     }
 
     @Override

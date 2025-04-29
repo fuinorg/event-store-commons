@@ -17,6 +17,10 @@
  */
 package org.fuin.esc.jaxb;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
@@ -38,7 +42,8 @@ public class Base64DataTest {
         final Base64Data testee = new Base64Data("Hello world!".getBytes(Charset.forName("utf-8")));
 
         // TEST
-        final String result = marshal(testee, Base64Data.class);
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(Base64Data.class).build();
+        final String result = marshal(marshaller, testee);
 
         // VERIFY
         assertThat(result).isEqualTo(XML_PREFIX + "<Base64>SGVsbG8gd29ybGQh</Base64>");
@@ -49,8 +54,8 @@ public class Base64DataTest {
     public final void testUnmarshal() throws Exception {
 
         // TEST
-        final Base64Data testee = unmarshal(XML_PREFIX + "<Base64>SGVsbG8gd29ybGQh</Base64>",
-                Base64Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Base64Data.class).build();
+        final Base64Data testee = unmarshal(unmarshaller, XML_PREFIX + "<Base64>SGVsbG8gd29ybGQh</Base64>");
 
         // VERIFY
         assertThat(testee).isNotNull();

@@ -130,6 +130,7 @@ public final class HasSerializedDataTypeConstantValidatorTest {
     }
 
     @HasSerializedDataTypeConstant
+    @SuppressWarnings("java:S116") // Intentionally wrong naming for test
     public static final class MyClassNotStatic {
         public final SerializedDataType SER_TYPE = new SerializedDataType("XYZ");
     }
@@ -154,6 +155,7 @@ public final class HasSerializedDataTypeConstantValidatorTest {
     }
 
     @HasSerializedDataTypeConstant
+    @SuppressWarnings("java:S3008") // Intentionally wrong naming for test
     public static final class MyClassNotFinal {
         public static SerializedDataType SER_TYPE = new SerializedDataType("XYZ");
     }

@@ -3,7 +3,6 @@ package org.fuin.esc.esgrpc;
 import jakarta.json.bind.JsonbConfig;
 import org.eclipse.yasson.FieldAccessStrategy;
 import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.esc.jsonb.EscJsonbUtils;
@@ -19,8 +18,6 @@ import java.nio.charset.StandardCharsets;
  */
 @TestOmitted("This is only a test class")
 final class TestUtils {
-
-    private static final EnhancedMimeType XML_MIME_TYPE = EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8);
 
     private TestUtils() {
     }

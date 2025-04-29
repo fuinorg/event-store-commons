@@ -19,7 +19,6 @@ package org.fuin.esc.test;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -36,6 +35,7 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.esc.jaxb.Data;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ValueObject;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
@@ -155,11 +155,9 @@ public final class Event implements Serializable, ValueObject {
     /**
      * Returns this object as a common event object.
      *
-     * @param ctx In case the XML JAXB unmarshalling is used, you have to pass
-     *            the JAXB context here.
      * @return Converted object.
      */
-    public CommonEvent asCommonEvent(final JAXBContext ctx) {
+    public CommonEvent asCommonEvent() {
         final Object m;
         if (getMeta() == null) {
             m = null;
@@ -226,13 +224,13 @@ public final class Event implements Serializable, ValueObject {
      */
     public static Event valueOf(final CommonEvent selEvent) {
 
-        final String dataXml = marshal(selEvent.getData(), selEvent.getData().getClass());
+        final String dataXml = marshal(new MarshallerBuilder().addClassesToBeBound(selEvent.getData().getClass()).build(), selEvent.getData());
         final Data data = new Data(selEvent.getDataType().asBaseType(), MIME_TYPE, dataXml);
         if (selEvent.getMeta() == null) {
             return new Event(selEvent.getId(), data);
         }
 
-        final String metaXml = marshal(selEvent.getMeta(), selEvent.getMeta().getClass());
+        final String metaXml = marshal(new MarshallerBuilder().addClassesToBeBound(selEvent.getMeta().getClass()).build(), selEvent.getMeta());
         final Data meta = new Data("meta", MIME_TYPE, metaXml);
         return new Event(selEvent.getId(), data, meta);
 

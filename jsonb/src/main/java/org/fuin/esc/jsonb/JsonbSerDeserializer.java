@@ -121,7 +121,7 @@ public final class JsonbSerDeserializer implements SerDeserializer, Closeable {
 
         } catch (final JsonbException ex) {
             final String dataStr;
-            if (data instanceof JsonStructure js) {
+            if (data instanceof JsonStructure) {
                 dataStr = data.toString();
             } else if (data instanceof byte[]) {
                 dataStr = new String((byte[])data, mimeType.getEncoding());

@@ -18,14 +18,14 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.utils4j.TestCommand;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 
 import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
@@ -101,14 +101,13 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
         streamId = new SimpleStreamId(streamName);
         expectedExceptionClass = EscTestUtils
                 .exceptionForName(expectedException);
-        final Event event;
         if (expectedEventXml == null) {
-            event = null;
             expectedEvent = null;
         } else {
-            event = unmarshal(expectedEventXml, Event.class);
+            final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EventId.class).build();
+            final Event event = unmarshal(unmarshaller, expectedEventXml);
             event.init(context);
-            expectedEvent = event.asCommonEvent(createCtx());
+            expectedEvent = event.asCommonEvent();
         }
 
     }
@@ -156,14 +155,6 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
                 + ", actualEvent=" + actualEvent + ", expectedException="
                 + expectedException + ", actualException=" + actualException
                 + "]";
-    }
-
-    private JAXBContext createCtx() {
-        try {
-            return JAXBContext.newInstance(BookAddedEvent.class);
-        } catch (final JAXBException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
 }

@@ -67,7 +67,8 @@ public class EscJacksonAdapterModule extends Module {
     @Override
     public Version version() {
         // Don't forget to change from release to SNAPSHOT and back!
-        return new Version(0, 9, 0, "SNAPSHOT");
+        return new Version(0, 9, 0, "SNAPSHOT",
+        "org.fuin.esc", "esc-jackson");
     }
 
 }

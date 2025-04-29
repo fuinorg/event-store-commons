@@ -73,11 +73,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             es.getStatus(new TenantStreamId(tenantId, projectionId).asString()).get();
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
-            if (ex.getCause() instanceof StatusRuntimeException sre) {
-                if (sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
+            if (ex.getCause() instanceof StatusRuntimeException sre
+                    && sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
                     return false;
                 }
-            }
+
             throw new RuntimeException("Error waiting for getStatus(..) result", ex);
         }
 
