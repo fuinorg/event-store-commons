@@ -19,7 +19,7 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Locates a class for a given type.
@@ -43,7 +43,7 @@ public interface SerializedDataTypeRegistry {
      * @return Mappings from type to class.
      */
     @NotNull
-    List<TypeClass> findAll();
+    Set<TypeClass> findAll();
 
     /**
      * Helper class for type/class combination.

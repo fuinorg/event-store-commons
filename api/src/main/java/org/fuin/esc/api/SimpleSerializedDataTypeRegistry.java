@@ -21,8 +21,9 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Contains all known types and the corresponding class.
@@ -60,10 +61,10 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
     }
 
     @Override
-    public List<TypeClass> findAll() {
+    public Set<TypeClass> findAll() {
         return map.entrySet().stream()
                 .map(e -> new TypeClass(e.getKey(), e.getValue()))
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     /**
