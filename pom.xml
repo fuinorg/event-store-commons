@@ -88,6 +88,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-jackson</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-esgrpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
