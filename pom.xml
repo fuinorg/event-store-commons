@@ -31,8 +31,8 @@
 
     <properties>
         <eventstore.version>24.10</eventstore.version>
-        <objects4j.version>0.11.0-SNAPSHOT</objects4j.version>
-        <utils4j.version>0.15.0-SNAPSHOT</utils4j.version>
+        <objects4j.version>0.11.0</objects4j.version>
+        <utils4j.version>0.15.0</utils4j.version>
         <units4j.version>0.12.0</units4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
