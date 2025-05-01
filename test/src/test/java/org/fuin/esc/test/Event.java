@@ -19,21 +19,23 @@ package org.fuin.esc.test;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.fuin.esc.api.CommonEvent;
+import org.fuin.esc.api.Deserializer;
+import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.jaxb.Data;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ValueObject;
-import org.fuin.utils4j.jaxb.JaxbUtils;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
@@ -55,6 +57,8 @@ public final class Event implements Serializable, ValueObject {
     private static final long serialVersionUID = 1000L;
 
     private static final EnhancedMimeType MIME_TYPE = EnhancedMimeType.create("application/xml; encoding=utf-8");
+
+    private transient DeserializerRegistry serDeserializerRegistry;
 
     /**
      * The ID of the event, used as part of the idempotent write check.
@@ -151,18 +155,16 @@ public final class Event implements Serializable, ValueObject {
     /**
      * Returns this object as a common event object.
      *
-     * @param ctx In case the XML JAXB unmarshalling is used, you have to pass
-     *            the JAXB context here.
      * @return Converted object.
      */
-    public CommonEvent asCommonEvent(final JAXBContext ctx) {
+    public CommonEvent asCommonEvent() {
         final Object m;
         if (getMeta() == null) {
             m = null;
         } else {
-            m = JaxbUtils.unmarshal(ctx, getMeta().getContent(), null);
+            m = deserialize(getMeta().getType(), getMeta().getMimeType(), meta.getContent());
         }
-        final Object d = JaxbUtils.unmarshal(ctx, getData().getContent(), null);
+        final Object d = deserialize(getData().getType(), getData().getMimeType(), getData().getContent());
         if (getMeta() == null) {
             return new SimpleCommonEvent(getId(),
                     new TypeName(getData().getType()), d);
@@ -171,6 +173,20 @@ public final class Event implements Serializable, ValueObject {
                 d, new TypeName(getMeta().getType()), m);
     }
 
+    /**
+     * Initializes the instance with the test context.
+     *
+     * @param testContext Deserializer registry.
+     */
+    public void init(TestContext testContext) {
+        this.serDeserializerRegistry = testContext.getDeserializerRegistry();
+    }
+
+    private <T> T deserialize(String type, EnhancedMimeType mimeType, String content) {
+        final SerializedDataType serDataType = new SerializedDataType(type);
+        final Deserializer deserializer = serDeserializerRegistry.getDeserializer(serDataType, mimeType);
+        return deserializer.unmarshal(content.getBytes(mimeType.getEncoding()), serDataType, mimeType);
+    }
 
     @Override
     public int hashCode() {
@@ -208,13 +224,13 @@ public final class Event implements Serializable, ValueObject {
      */
     public static Event valueOf(final CommonEvent selEvent) {
 
-        final String dataXml = marshal(selEvent.getData(), selEvent.getData().getClass());
+        final String dataXml = marshal(new MarshallerBuilder().addClassesToBeBound(selEvent.getData().getClass()).build(), selEvent.getData());
         final Data data = new Data(selEvent.getDataType().asBaseType(), MIME_TYPE, dataXml);
         if (selEvent.getMeta() == null) {
             return new Event(selEvent.getId(), data);
         }
 
-        final String metaXml = marshal(selEvent.getMeta(), selEvent.getMeta().getClass());
+        final String metaXml = marshal(new MarshallerBuilder().addClassesToBeBound(selEvent.getMeta().getClass()).build(), selEvent.getMeta());
         final Data meta = new Data("meta", MIME_TYPE, metaXml);
         return new Event(selEvent.getId(), data, meta);
 

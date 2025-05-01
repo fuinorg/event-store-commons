@@ -41,7 +41,7 @@ import java.util.Map;
  * pu_name=testPU<br>
  * If the file is not found, the above default values are used.
  */
-public abstract class AbstractPersistenceTest {
+public abstract class AbstractPersistenceTest extends AbstractTest {
 
     private static EntityManagerFactory emf;
 

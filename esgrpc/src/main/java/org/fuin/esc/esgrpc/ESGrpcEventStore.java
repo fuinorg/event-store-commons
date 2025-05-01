@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.esgrpc;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.AppendToStreamOptions;
 import io.kurrent.dbclient.DeleteStreamOptions;
 import io.kurrent.dbclient.EventData;
@@ -25,8 +27,6 @@ import io.kurrent.dbclient.ReadResult;
 import io.kurrent.dbclient.ReadStreamOptions;
 import io.kurrent.dbclient.ResolvedEvent;
 import io.kurrent.dbclient.WriteResult;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
@@ -76,7 +76,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     /**
      * Private constructor with all data used by the builder.
      *
-     * @param es                Delegate.
+     * @param es                Connection that is maintained outside. Opening/Closing is up to the caller!
      * @param serRegistry       Registry used to locate serializers.
      * @param desRegistry       Registry used to locate deserializers.
      * @param baseTypeFactory   Factory used to create basic types.
@@ -104,16 +104,14 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     @Override
     public ESGrpcEventStore open() {
-        // Do nothing - We assume that the eventstore is already
+        // Do nothing - We assume that the connection is already
         // fully initialized when passed in to constructor
         return this;
     }
 
     @Override
     public void close() {
-        if (!es.isShutdown()) {
-            es.shutdown();
-        }
+        // Do nothing - Connection is handled outside
     }
 
     @Override

@@ -10,7 +10,8 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 [![Java Development Kit 17](https://img.shields.io/badge/JDK-17-green.svg)](https://openjdk.java.net/projects/jdk/17/)
 
 ## Versions
-- 0.8.0 = See [Release Notes](release-notes.md)
+- [0.9.0](release-notes.md#090)
+- [0.8.0](release-notes.md#080)
 - 0.7.x = New **GRPC** client / Removed **http**/**esjc** modules
 - 0.6.x = **Java 17** and JUnit5
 - 0.5.x = **Java 11** with new **jakarta** namespace
@@ -21,17 +22,18 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 
 ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif) **This is work in progress** ![Warning](https://raw.githubusercontent.com/fuinorg/event-store-commons/master/doc/warning.gif)
 
-| Module               | Description                                                                                                                                                      |
-|:---------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [esc-api](api)       | Defines the event store commons API.                                                                                                                             |
-| [esc-grpc](grpc)     | [Event Store DB Client](https://github.com/EventStore/KurrentDB-Client-Java) based implementation for Greg Young's [event store](https://www.geteventstore.com/) |
-| [esc-jacoco](jacoco) | Helper module to collect JaCoco results                                                                                                                          |
-| [esc-jaxb](jaxb)     | JAX-B serialization support                                                                                                                                      |
-| [esc-jpa](jpa)       | JPA based implementation (events are stored in a relational database)                                                                                            |
-| [esc-jsonb](jsonb)   | JSON-B serialization support                                                                                                                                     |
-| [esc-mem](mem)       | In-memory implementation (events are not persisted)                                                                                                              |
-| [esc-spi](spi)       | Helper classes for adapters and implementations                                                                                                                  |
-| [esc-test](test)     | Cucumber tests for adapters and implementations                                                                                                                  |
+| Module                 | Description                                                                                                                                                  |
+|:-----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [esc-api](api)         | Defines the event store commons API.                                                                                                                         |
+| [esc-grpc](grpc)       | [Kurrent DB Client](https://github.com/kurrent-io/KurrentDB-Client-Java) - [Kurrent](https://www.kurrent.io/) founded as "Event Store" in 2019 by Greg Young |
+| [esc-jackson](jackson) | Jackson serialization support                                                                                                                                |
+| [esc-jacoco](jacoco)   | Helper module to collect JaCoco results                                                                                                                      |
+| [esc-jaxb](jaxb)       | JAX-B serialization support                                                                                                                                  |
+| [esc-jpa](jpa)         | JPA based implementation (events are stored in a relational database)                                                                                        |
+| [esc-jsonb](jsonb)     | JSON-B serialization support                                                                                                                                 |
+| [esc-mem](mem)         | In-memory implementation (events are not persisted)                                                                                                          |
+| [esc-spi](spi)         | Helper classes for adapters and implementations                                                                                                              |
+| [esc-test](test)       | Cucumber tests for adapters and implementations                                                                                                              |
 
 ## Architecture
 

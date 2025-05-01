@@ -28,50 +28,36 @@ public interface DeserializerRegistry {
     /**
      * Tries to find a deserializer for the given combination.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     * @param mimeType
-     *            Mime type.
-     *
+     * @param type     Unique identifier for the type of data.
+     * @param mimeType Mime type.
      * @return Deserializer instance configured with the arguments or throws an
-     *         {@link IllegalArgumentException} if no deserializer was found for the type.
+     * {@link IllegalArgumentException} if no deserializer was found for the type.
      */
     @NotNull
     Deserializer getDeserializer(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
 
     /**
-     * Tries to find a deserializer for the given type using the
-     * {@link #getDefaultContentType(SerializedDataType)}. This method fails if the default mime type is not
-     * set.
+     * Tries to find a deserializer for the given type using the {@link #getDefaultMimeType()}.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     *
+     * @param type Unique identifier for the type of data.
      * @return Deserializer instance configured with the arguments oor throws an
-     *         {@link IllegalArgumentException} if no deserializer was found for the type.
+     * {@link IllegalArgumentException} if no deserializer was found for the type.
      */
     @NotNull
     Deserializer getDeserializer(@NotNull SerializedDataType type);
 
     /**
-     * Returns the default mime type for the given type.
+     * Returns the default mime type.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     *
-     * @return Default mime type or NULL if nothing was configured for the given type.
+     * @return Default mime type.
      */
     @Nullable
-    EnhancedMimeType getDefaultContentType(@NotNull SerializedDataType type);
+    EnhancedMimeType getDefaultMimeType();
 
     /**
-     * Tries to find a deserializer for the given type using the
-     * {@link #getDefaultContentType(SerializedDataType)}. This method fails if the default mime type is not
-     * set.
+     * Tries to find a deserializer for the given type using the {@link #getDefaultMimeType()}.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     *
+     * @param type Unique identifier for the type of data.
      * @return TRUE if a deserializer was found.
      */
     boolean deserializerExists(@NotNull SerializedDataType type);
@@ -79,13 +65,48 @@ public interface DeserializerRegistry {
     /**
      * Tries to find a deserializer for the given combination.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     * @param mimeType
-     *            Mime type.
-     *
+     * @param type     Unique identifier for the type of data.
+     * @param mimeType Mime type.
      * @return TRUE if a deserializer was found.
      */
     boolean deserializerExists(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
+
+    /**
+     * Defines a builder for the registry.
+     *
+     * @param <T> Type of the registry.
+     * @param <B> Type of the builder.
+     */
+    interface Builder<T extends DeserializerRegistry, B extends Builder<T, B>> {
+
+        /**
+         * Adds a new deserializer to the registry.
+         *
+         * @param type         Type of the data.
+         * @param deserializer Deserializer.
+         * @param mimeType     Mime type. In case it's {@literal null}, the base type of the registry will be used.
+         */
+        B add(@NotNull final SerializedDataType type,
+              @NotNull final Deserializer deserializer,
+              final EnhancedMimeType mimeType);
+
+        /**
+         * Adds a new deserializer to the registry.
+         * The base content type of the registry will be used.
+         *
+         * @param type         Type of the data.
+         * @param deserializer Deserializer.
+         */
+        B add(@NotNull final SerializedDataType type,
+              @NotNull final Deserializer deserializer);
+
+        /**
+         * Builds an instance of the registry.
+         *
+         * @return New instance.
+         */
+        T build();
+
+    }
 
 }

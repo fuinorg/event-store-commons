@@ -19,6 +19,8 @@ package org.fuin.esc.jsonb;
 
 import jakarta.annotation.Nullable;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
@@ -30,6 +32,7 @@ import java.io.Serializable;
  * Example meta data. .
  */
 @TestOmitted("This is only a test class")
+@XmlRootElement
 public final class MyMeta implements Serializable {
 
     @Serial
@@ -45,6 +48,7 @@ public final class MyMeta implements Serializable {
      */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
+    @XmlElement(name = "id")
     @JsonbProperty
     private String user;
 

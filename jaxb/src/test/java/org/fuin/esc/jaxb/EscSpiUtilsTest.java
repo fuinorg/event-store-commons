@@ -17,23 +17,17 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.activation.MimeTypeParseException;
 import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Deserializer;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.Serializer;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class EscSpiUtilsTest {
 
+    private static final EnhancedMimeType DEFAULT_MIME_TYPE = EnhancedMimeType.create("application", "xml");
+
+
     @Test
     public void testCreateEscMetaTargetXmlDataXmlMetaNull() {
 
@@ -51,8 +48,9 @@ public class EscSpiUtilsTest {
         final UUID uuid = UUID.randomUUID();
         final MyEvent myEvent = new MyEvent(uuid, description);
         final EventId eventId = new EventId();
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(MyEvent.SER_TYPE, XmlDeSerializer.builder().add(MyEvent.class).build())
+                .build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
 
         // TEST
@@ -78,8 +76,8 @@ public class EscSpiUtilsTest {
         final UUID uuid = UUID.randomUUID();
         final MyEvent myEvent = new MyEvent(uuid, description);
         final EventId eventId = new EventId();
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(MyEvent.SER_TYPE, XmlDeSerializer.builder().add(MyEvent.class).build()).build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
 
         // TEST
@@ -104,9 +102,10 @@ public class EscSpiUtilsTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Whatever");
         final EventId eventId = new EventId();
         final MyMeta myMeta = new MyMeta("peter");
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(MyEvent.SER_TYPE, XmlDeSerializer.builder().add(MyEvent.class).build())
+                .add(MyMeta.SER_TYPE, XmlDeSerializer.builder().add(MyMeta.class).build())
+                .build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
                 myMeta);
 
@@ -135,9 +134,10 @@ public class EscSpiUtilsTest {
         final MyEvent myEvent = new MyEvent(uuid, description);
         final EventId eventId = new EventId();
         final MyMeta myMeta = new MyMeta("peter");
-        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-        registry.addSerializer(MyEvent.SER_TYPE, new XmlDeSerializer(MyEvent.class));
-        registry.addSerializer(MyMeta.SER_TYPE, new XmlDeSerializer(MyMeta.class));
+        final SerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(DEFAULT_MIME_TYPE)
+                .add(MyEvent.SER_TYPE, XmlDeSerializer.builder().add(MyEvent.class).build())
+                .add(MyMeta.SER_TYPE, XmlDeSerializer.builder().add(MyMeta.class).build())
+                .build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
                 myMeta);
 
@@ -158,48 +158,6 @@ public class EscSpiUtilsTest {
         assertThat(new String(base64Meta.getDecoded(), StandardCharsets.UTF_8)).isEqualTo(
                 "<MyMeta><user>peter</user></MyMeta>");
 
-    }
-
-    private EnhancedMimeType mimeType(String str) {
-        try {
-            return new EnhancedMimeType(str);
-        } catch (final MimeTypeParseException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private Serializer dummySerializer(final String baseType) {
-        return new Serializer() {
-            @Override
-            public <T> byte[] marshal(T obj, SerializedDataType type) {
-                if (obj == null) {
-                    return null;
-                }
-                return obj.toString().getBytes();
-            }
-
-            @Override
-            public EnhancedMimeType getMimeType() {
-                return mimeType(baseType);
-            }
-        };
-    }
-
-    private Deserializer dummyDeserializer() {
-        return new Deserializer() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> T unmarshal(Object data, SerializedDataType type, EnhancedMimeType mimeType) {
-                if (data instanceof byte[]) {
-                    return (T) new String((byte[]) data);
-                }
-                throw new IllegalArgumentException("Unknown input type: " + data);
-            }
-        };
-    }
-
-    private List<CommonEvent> asList(CommonEvent... events) {
-        return new ArrayList<>(Arrays.asList(events));
     }
 
 }

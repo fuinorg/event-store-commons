@@ -17,10 +17,46 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  * Convenience interface that combines both registry types.
  */
-public interface SerDeserializerRegistry extends SerializerRegistry,
-        DeserializerRegistry {
+public interface SerDeserializerRegistry extends SerializerRegistry, DeserializerRegistry {
+
+    /**
+     * Defines a builder for the registry.
+     */
+    interface Builder<T extends SerDeserializerRegistry, B extends Builder<T, B>> extends SerializerRegistry.Builder<T, B>, DeserializerRegistry.Builder<T, B> {
+
+        /**
+         * Convenience method that adds both, a new serializer and deserializer to the registry.
+         *
+         * @param type            Type of the data.
+         * @param serDeserializer Serializer and deserializer.
+         * @param mimeType        Mime type. In case it's {@literal null}, the default type of the registry will be used.
+         */
+        B add(@NotNull final SerializedDataType type,
+              @NotNull final SerDeserializer serDeserializer,
+              final EnhancedMimeType mimeType);
+
+        /**
+         * Convenience method that adds both, a new serializer and deserializer to the registry.
+         * The base content type of the registry will be used.
+         *
+         * @param type            Type of the data.
+         * @param serDeserializer Serializer/Deserializer.
+         */
+        B add(@NotNull final SerializedDataType type,
+              @NotNull final SerDeserializer serDeserializer);
+
+        /**
+         * Builds an instance of the registry.
+         *
+         * @return New instance.
+         */
+        T build();
+
+    }
 
 }

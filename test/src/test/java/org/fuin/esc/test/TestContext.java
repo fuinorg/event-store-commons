@@ -1,6 +1,7 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EventStore;
 
 /**
@@ -14,6 +15,9 @@ public final class TestContext {
     @NotNull
     private final EventStore eventStore;
 
+    @NotNull
+    private DeserializerRegistry deserializerRegistry;
+
     /**
      * Constructor with mandatory data.
      *
@@ -21,10 +25,13 @@ public final class TestContext {
      *                                  clashes for multiple implementations for the same backend store.
      * @param eventStore                Event store to use.
      */
-    public TestContext(@NotNull String currentEventStoreImplType, @NotNull EventStore eventStore) {
+    public TestContext(@NotNull String currentEventStoreImplType,
+                       @NotNull EventStore eventStore,
+                       @NotNull DeserializerRegistry deserializerRegistry) {
         super();
         this.currentEventStoreImplType = currentEventStoreImplType;
         this.eventStore = eventStore;
+        this.deserializerRegistry = deserializerRegistry;
     }
 
     /**
@@ -47,4 +54,12 @@ public final class TestContext {
     }
 
 
+    /**
+     * Returns the deserializer registry.
+     *
+     * @return Registry.
+     */
+    public DeserializerRegistry getDeserializerRegistry() {
+        return deserializerRegistry;
+    }
 }

@@ -17,12 +17,14 @@
  */
 package org.fuin.esc.test;
 
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.jaxb.Data;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,7 +130,8 @@ public class EventTest extends AbstractXmlTest {
 
         // TEST
         final String xml = AbstractXmlTest.marshalToStr(original, createXmlAdapter(), Event.class);
-        final Event copy = unmarshal(xml, createXmlAdapter(), Event.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Event.class).addAdapters(createXmlAdapter()).build();
+        final Event copy = unmarshal(unmarshaller, xml);
 
         // VERIFY
         assertEqualsConstantValues(copy);

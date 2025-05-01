@@ -17,11 +17,13 @@
  */
 package org.fuin.esc.test;
 
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.jaxb.Data;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -126,7 +128,8 @@ public class SliceTest extends AbstractXmlTest {
 
         // TEST
         final String xml = marshalToStr(original, createXmlAdapter(), Slice.class);
-        final Slice copy = unmarshal(xml, createXmlAdapter(), Slice.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Slice.class).addAdapters(createXmlAdapter()).build();
+        final Slice copy = unmarshal(unmarshaller, xml);
 
         // VERIFY
         assertThat(copy).isEqualTo(original);

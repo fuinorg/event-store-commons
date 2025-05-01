@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Registry that is built up by scanning for classes that are annotated with {@link HasSerializedDataTypeConstant}.
@@ -33,11 +35,11 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
 
     private static final Logger LOG = LoggerFactory.getLogger(JandexSerializedDataTypeRegistry.class);
 
-    private final SimpleSerializedDataTypeRegistry delegate;
+    private final SerializedDataTypeRegistry delegate;
 
     private final List<File> classesDirs;
 
-    private final List<Class<?>> classes;
+    private final Set<Class<?>> classes;
 
     /**
      * Default constructor.
@@ -52,12 +54,13 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
      * @param classesDirs Directories with class files.
      */
     public JandexSerializedDataTypeRegistry(final File... classesDirs) {
-        delegate = new SimpleSerializedDataTypeRegistry();
+        final SimpleSerializedDataTypeRegistry.Builder builder = new SimpleSerializedDataTypeRegistry.Builder();
         this.classesDirs = Arrays.asList(classesDirs);
         classes = scanForClasses();
         for (final Class<?> domainEventClass : classes) {
-            delegate.add(serializedDataTypeConstant(domainEventClass), domainEventClass);
+            builder.add(serializedDataTypeConstant(domainEventClass), domainEventClass);
         }
+        delegate = builder.build();
     }
 
     @Override
@@ -66,16 +69,22 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
         return delegate.findClass(type);
     }
 
+    @Override
+    @NotNull
+    public Set<TypeClass> findAll() {
+        return delegate.findAll();
+    }
+
     /**
      * Returns a list of known classes that can be serialized.
      *
      * @return SerializedDataType classes.
      */
-    public List<Class<?>> getClasses() {
-        return Collections.unmodifiableList(classes);
+    public Set<Class<?>> getClasses() {
+        return Collections.unmodifiableSet(classes);
     }
 
-    private List<Class<?>> scanForClasses() {
+    private Set<Class<?>> scanForClasses() {
         final List<IndexView> indexes = new ArrayList<>();
         indexes.add(new JandexIndexFileReader.Builder().addDefaultResource().build().loadR());
         indexes.add(indexClassesDirs());
@@ -91,8 +100,8 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
         return indexer.complete();
     }
 
-    private static List<Class<?>> findClasses(final IndexView index) {
-        List<Class<?>> classes = new ArrayList<>();
+    private static Set<Class<?>> findClasses(final IndexView index) {
+        Set<Class<?>> classes = new HashSet<>();
         final Collection<AnnotationInstance> annotationInstances = index.getAnnotations(DotName.createSimple(HasSerializedDataTypeConstant.class));
         for (final AnnotationInstance annotationInstance : annotationInstances) {
             final ClassInfo classInfo = annotationInstance.target().asClass();
@@ -107,7 +116,7 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
         return classes;
     }
 
-    public SerializedDataType serializedDataTypeConstant(Class<?> domainEventClass) {
+    private static SerializedDataType serializedDataTypeConstant(Class<?> domainEventClass) {
         final HasSerializedDataTypeConstant annotation = domainEventClass.getAnnotation(HasSerializedDataTypeConstant.class);
         return HasSerializedDataTypeConstantValidator.extractValue(domainEventClass, annotation.value());
     }

@@ -17,16 +17,13 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.activation.MimeTypeParseException;
-import org.fuin.esc.api.EnhancedMimeType;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
-
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
@@ -87,7 +84,8 @@ public class EscEventsTest {
                 """;
 
         // TEST
-        final EscEvents testee = unmarshal(expectedXml, EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class).build();
+        final EscEvents testee = unmarshal(unmarshaller, expectedXml);
 
         // VERIFY
         assertThat(testee).isNotNull();
@@ -97,39 +95,13 @@ public class EscEventsTest {
         assertThat(testee.getList().get(1).getEventId()).isEqualTo("c198a02e-126e-4fbb-910c-918abf39a4a6");
 
         // TEST
-        final String xml = marshal(testee, EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class);
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(EscEvents.class, MyMeta.class, MyEvent.class, Base64Data.class).build();
+        final String xml = marshal(marshaller, testee);
 
         // VERIFY
         final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
         assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
 
-    }
-
-    private EscEvent createEvent1() throws MimeTypeParseException {
-        final UUID eventId = UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47");
-        final MyEvent myEvent = new MyEvent(UUID.fromString("b2a936ce-d479-414f-b67f-3df4da383d47"), "Hello, JSON!");
-        final MyMeta myMeta = new MyMeta("abc");
-        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
-        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
-        final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
-                myMeta);
-        return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(myEvent), new DataWrapper(escMeta));
-    }
-
-    private EscEvent createEvent2() throws MimeTypeParseException {
-        final UUID eventId = UUID.fromString("68616d90-cf72-4c2a-b913-32bf6e6506ed");
-        final Base64Data data = new Base64Data(
-                "eyAibXktZXZlbnQiOiB7ICJpZCI6ICAiNjg2MTZkOTAtY2Y3Mi00YzJhLWI5MTMtMzJiZjZlNjUwNmVkIiwgImRlc2NyaXB0aW9uIjogIkhlbGxvLCBKU09OISIgfSB9");
-
-        final MyMeta myMeta = new MyMeta("abc");
-
-        final Map<String, String> params = new HashMap<>();
-        params.put("transfer-encoding", "base64");
-        final EnhancedMimeType dataContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1", params);
-        final EnhancedMimeType metaContentType = new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1");
-        final EscMeta escMeta = new EscMeta(MyEvent.SER_TYPE.asBaseType(), dataContentType, MyMeta.SER_TYPE.asBaseType(), metaContentType,
-                myMeta);
-        return new EscEvent(eventId, MyEvent.TYPE.asBaseType(), new DataWrapper(data), new DataWrapper(escMeta));
     }
 
 }

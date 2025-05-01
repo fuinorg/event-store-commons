@@ -17,8 +17,10 @@
  */
 package org.fuin.esc.test;
 
+import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.fuin.esc.api.EventId;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -48,7 +50,8 @@ public class EventsTest extends AbstractXmlTest {
                 """;
 
         // TEST
-        final Events testee = unmarshal(expectedXml, Events.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Events.class).build();
+        final Events testee = unmarshal(unmarshaller, expectedXml);
 
         // VERIFY
         assertThat(testee).isNotNull();

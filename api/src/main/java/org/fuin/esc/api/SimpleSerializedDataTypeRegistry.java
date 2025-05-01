@@ -22,6 +22,8 @@ import org.fuin.objects4j.common.Contract;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Contains all known types and the corresponding class.
@@ -33,30 +35,16 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
     /**
      * Default constructor.
      */
-    public SimpleSerializedDataTypeRegistry() {
+    private SimpleSerializedDataTypeRegistry() {
         super();
         map = new HashMap<>();
     }
 
-    /**
-     * Adds a new type/class combination to the registry.
-     *
-     * @param type  Type of the data.
-     * @param clasz Class for the type.
-     */
-    public void add(@NotNull final SerializedDataType type, final Class<?> clasz) {
-        Contract.requireArgNotNull("type", type);
-        Contract.requireArgNotNull("clasz", clasz);
+    private void add(@NotNull final SerializedDataType type, final Class<?> clasz) {
         map.put(type, clasz);
     }
 
-    /**
-     * Adds a new type/class combination to the registry.
-     *
-     * @param mapping Type to class mapping.
-     */
-    public void add(@NotNull final SerializedDataType2ClassMapping mapping) {
-        Contract.requireArgNotNull("mapping", mapping);
+    private void add(@NotNull final SerializedDataType2ClassMapping mapping) {
         map.put(mapping.type(), mapping.clasz());
     }
 
@@ -70,6 +58,52 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
             throw new IllegalArgumentException("No class found for: " + type);
         }
         return clasz;
+    }
+
+    @Override
+    public Set<TypeClass> findAll() {
+        return map.entrySet().stream()
+                .map(e -> new TypeClass(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Builds an instance of the outer class.
+     */
+    public static final class Builder implements SerializedDataTypeRegistry.Builder<SimpleSerializedDataTypeRegistry, Builder> {
+
+        private SimpleSerializedDataTypeRegistry delegate;
+
+        /**
+         * Default constructor.
+         */
+        public Builder() {
+            delegate = new SimpleSerializedDataTypeRegistry();
+        }
+
+        @Override
+        public Builder add(SerializedDataType type, Class<?> clasz) {
+            Contract.requireArgNotNull("type", type);
+            Contract.requireArgNotNull("clasz", clasz);
+            delegate.add(type, clasz);
+            return this;
+        }
+
+        @Override
+        public Builder add(SerializedDataType2ClassMapping mapping) {
+            Contract.requireArgNotNull("mapping", mapping);
+            delegate.add(mapping);
+            return this;
+        }
+
+        @Override
+        public SimpleSerializedDataTypeRegistry build() {
+            final SimpleSerializedDataTypeRegistry tmp = delegate;
+            delegate = new SimpleSerializedDataTypeRegistry();
+            return tmp;
+        }
+
+
     }
 
 }

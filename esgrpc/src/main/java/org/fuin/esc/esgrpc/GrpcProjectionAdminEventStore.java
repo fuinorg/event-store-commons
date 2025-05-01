@@ -1,10 +1,10 @@
 package org.fuin.esc.esgrpc;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import org.fuin.esc.api.ProjectionAdminEventStore;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamId;
@@ -34,7 +34,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     /**
      * Constructor with mandatory data.
      *
-     * @param es Eventstore client to use.
+     * @param es Connection that is maintained outside. Opening/Closing is up to the caller!
      */
     public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
         this(es, null);
@@ -61,9 +61,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     @Override
     public void close() {
-         if (!es.isShutdown()) {
-             es.shutdown();
-         }
+        // Do nothing - Connection is handled outside
     }
 
     @Override
@@ -75,11 +73,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             es.getStatus(new TenantStreamId(tenantId, projectionId).asString()).get();
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
-            if (ex.getCause() instanceof StatusRuntimeException sre) {
-                if (sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
+            if (ex.getCause() instanceof StatusRuntimeException sre
+                    && sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode())) {
                     return false;
                 }
-            }
+
             throw new RuntimeException("Error waiting for getStatus(..) result", ex);
         }
 

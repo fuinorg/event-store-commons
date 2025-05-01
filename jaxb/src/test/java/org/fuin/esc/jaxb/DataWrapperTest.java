@@ -17,12 +17,18 @@
  */
 package org.fuin.esc.jaxb;
 
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.fuin.utils4j.jaxb.JaxbUtils.*;
+import static org.fuin.utils4j.jaxb.JaxbUtils.XML_PREFIX;
+import static org.fuin.utils4j.jaxb.JaxbUtils.marshal;
+import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 /**
  * Test for {@link DataWrapper} class.
@@ -37,7 +43,8 @@ public class DataWrapperTest {
         final DataWrapper testee = new DataWrapper(base64);
 
         // TEST
-        final String result = marshal(testee, DataWrapper.class, Base64Data.class);
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(DataWrapper.class, Base64Data.class).build();
+        final String result = marshal(marshaller, testee);
 
         // VERIFY
         assertThat(result).isEqualTo(
@@ -49,9 +56,8 @@ public class DataWrapperTest {
     public final void testUnmarshal() throws Exception {
 
         // TEST
-        final DataWrapper testee = unmarshal(XML_PREFIX
-                        + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>", DataWrapper.class,
-                Base64Data.class);
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(DataWrapper.class, Base64Data.class).build();
+        final DataWrapper testee = unmarshal(unmarshaller, XML_PREFIX + "<Wrapper><Base64>SGVsbG8gd29ybGQh</Base64></Wrapper>");
 
         // VERIFY
         assertThat(testee).isNotNull();

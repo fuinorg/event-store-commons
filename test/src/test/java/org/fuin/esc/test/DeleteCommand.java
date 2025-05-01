@@ -24,13 +24,14 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.utils4j.TestCommand;
 
+import java.util.Map;
+
 /**
  * Deletes a stream.
  */
 public final class DeleteCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -82,6 +83,18 @@ public final class DeleteCommand implements TestCommand<TestContext> {
         this.hardDelete = hardDelete;
         this.expectedVersion = expectedVersion;
         this.expectedException = expectedException;
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public DeleteCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.hardDelete = Boolean.parseBoolean(cucumberTable.get("Hard Delete"));
+        this. expectedVersion = cucumberTable.get("Expected Version");
+        this.expectedException = cucumberTable.get("Expected Exception");
     }
 
     @Override

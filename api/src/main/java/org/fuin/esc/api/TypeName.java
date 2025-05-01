@@ -17,9 +17,11 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.HasPublicStaticValueOfMethod;
 import org.fuin.objects4j.core.AbstractStringValueObject;
 
 import javax.annotation.concurrent.Immutable;
@@ -29,6 +31,7 @@ import java.io.Serial;
  * Name that uniquely identifies a type of data.
  */
 @Immutable
+@HasPublicStaticValueOfMethod
 public final class TypeName extends AbstractStringValueObject {
 
     @Serial
@@ -47,8 +50,7 @@ public final class TypeName extends AbstractStringValueObject {
     /**
      * Constructor with unique type name.
      *
-     * @param value
-     *            Type name.
+     * @param value Type name.
      */
     public TypeName(@NotEmpty final String value) {
         super();
@@ -64,6 +66,20 @@ public final class TypeName extends AbstractStringValueObject {
     @Override
     public String toString() {
         return asBaseType();
+    }
+
+    /**
+     * Converts a given string into an instance of this class.
+     *
+     * @param str String to convert.
+     * @return New instance.
+     */
+    @Nullable
+    public static TypeName valueOf(@Nullable final String str) {
+        if (str == null) {
+            return null;
+        }
+        return new TypeName(str);
     }
 
 }

@@ -1,13 +1,21 @@
 package org.fuin.esc.jsonb;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.json.bind.JsonbConfig;
 import org.eclipse.yasson.FieldAccessStrategy;
+import org.fuin.esc.api.DeserializerRegistry;
+import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
-import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.fuin.utils4j.TestOmitted;
 
 import java.nio.charset.StandardCharsets;
+
+import static org.fuin.esc.jsonb.EscJsonbUtils.MIME_TYPE;
+import static org.fuin.esc.jsonb.EscJsonbUtils.addEscSerDeserializer;
+import static org.fuin.esc.jsonb.EscJsonbUtils.addEscTypes;
 
 /**
  * Helper methods for the test package.
@@ -19,44 +27,47 @@ final class TestUtils {
     }
 
     /**
-     * Creates a {@link JsonbDeSerializer} with standard settings.
+     * Creates a basic JSON-B configuration.
      *
-     * @return New instance.
+     * @return Config initialized with some defaults.
      */
-    public static JsonbDeSerializer createJsonbDeSerializer() {
-        return JsonbDeSerializer.builder()
-                .withSerializers(EscJsonbUtils.createEscJsonbSerializers())
-                .withDeserializers(EscJsonbUtils.createEscJsonbDeserializers())
+    public static JsonbConfig createJsonbConfig() {
+        return new JsonbConfig()
                 .withPropertyVisibilityStrategy(new FieldAccessStrategy())
-                .withEncoding(StandardCharsets.UTF_8)
-                .build();
+                .withEncoding(StandardCharsets.UTF_8.name());
     }
 
     /**
-     * Creates a registry that connects the type with the appropriate serializer and de-serializer.
+     * Creates a pre-configured serializer/deserializer.
      *
-     * @param typeRegistry Type registry (Mapping from type name to class).
-     * @param jsonbDeSer   JSON-B serializer/deserializer to use.
+     * @param jsonbProvider JSON-B provider.
+     * @param typeRegistry  Type registry.
+     * @return New instance.
      */
-    public static void initSerDeserializerRegistry(@NotNull SerializedDataTypeRegistry typeRegistry,
-                                                   @NotNull JsonbDeSerializer jsonbDeSer) {
+    public static JsonbSerDeserializer createSerDeserializer(
+            final JsonbProvider jsonbProvider,
+            final SerializedDataTypeRegistry typeRegistry) {
 
-        Contract.requireArgNotNull("typeRegistry", typeRegistry);
-        Contract.requireArgNotNull("jsonbDeSer", jsonbDeSer);
-
-        SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-
-        // Base types always needed
-        registry.add(EscEvents.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-        registry.add(EscEvent.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-        registry.add(EscMeta.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-
-        // User defined types
-        registry.add(MyMeta.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-        registry.add(MyEvent.SER_TYPE, jsonbDeSer.getMimeType().getBaseType(), jsonbDeSer);
-
-        jsonbDeSer.init(typeRegistry, registry, registry);
-
+        return new JsonbSerDeserializer(jsonbProvider, typeRegistry, StandardCharsets.UTF_8);
     }
 
+    public static SerializedDataTypeRegistry createSerializedDataTypeRegistry() {
+        return addEscTypes(new SimpleSerializedDataTypeRegistry.Builder())
+                .add(MyEvent.SER_TYPE, MyEvent.class)
+                .add(MyMeta.SER_TYPE, MyMeta.class)
+                .build();
+    }
+
+    public static SerDeserializerRegistry createSerDeserializerRegistry(JsonbSerDeserializer serDeserializer) {
+        return addEscSerDeserializer(new SimpleSerializerDeserializerRegistry.Builder(MIME_TYPE), serDeserializer)
+                .add(MyMeta.SER_TYPE, serDeserializer, serDeserializer.getMimeType())
+                .add(MyEvent.SER_TYPE, serDeserializer, serDeserializer.getMimeType())
+                .build();
+    }
+
+    public static void register(JsonbConfig jsonbConfig, SerializerRegistry serializerRegistry, DeserializerRegistry deserializerRegistry) {
+        jsonbConfig.withAdapters(EscJsonbUtils.createEscJsonbAdapters());
+        jsonbConfig.withDeserializers(EscJsonbUtils.createEscJsonbDeserializers(serializerRegistry, deserializerRegistry));
+        jsonbConfig.withSerializers(EscJsonbUtils.createEscJsonbSerializers(serializerRegistry, deserializerRegistry));
+    }
 }

@@ -48,6 +48,7 @@ class ArchitectureTest {
                     "org.apache.commons.lang3..",
                     "org.fuin.objects4j.common..",
                     "org.fuin.objects4j.core..",
+                    "org.fuin.objects4j.ui..",
                     "org.fuin.utils4j.."
             );
 

@@ -17,50 +17,47 @@
  */
 package org.fuin.esc.test;
 
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.DataTableType;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.kurrent.dbclient.KurrentDBClient;
 import io.kurrent.dbclient.KurrentDBClientSettings;
 import io.kurrent.dbclient.KurrentDBConnectionString;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import jakarta.json.bind.JsonbConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.eclipse.yasson.FieldAccessStrategy;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SerDeserializerRegistry;
+import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.esgrpc.ESGrpcEventStore;
-import org.fuin.esc.jaxb.Base64Data;
-import org.fuin.esc.jaxb.EscEvent;
-import org.fuin.esc.jaxb.EscEvents;
-import org.fuin.esc.jaxb.EscMeta;
+import org.fuin.esc.jaxb.EscJaxbUtils;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.esc.jpa.JpaEventStore;
-import org.fuin.esc.jsonb.EscJsonbUtils;
-import org.fuin.esc.jsonb.JsonbDeSerializer;
+import org.fuin.esc.jsonb.JsonbSerDeserializer;
 import org.fuin.esc.mem.InMemoryEventStore;
 import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.esc.test.examples.MyMeta;
 import org.fuin.esc.test.jpa.TestIdStreamFactory;
+import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.fuin.utils4j.MultipleCommands;
 import org.fuin.utils4j.TestCommand;
+import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -76,14 +73,6 @@ import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 public class TestFeatures {
 
-    private static final Class<?>[] JAXB_CLASSES = new Class<?>[]{
-            BookAddedEvent.class,
-            EscEvent.class,
-            EscEvents.class,
-            EscMeta.class,
-            Base64Data.class
-    };
-
     private TestContext testContext;
 
     private TestCommand<TestContext> lastCommand;
@@ -92,55 +81,102 @@ public class TestFeatures {
 
     private EntityManager em;
 
+    private KurrentDBClient client;
+
     private Connection connection;
+
+    @DataTableType
+    public AppendToStreamCommand createAppendToStreamCommand(Map<String, String> entry) {
+        return new AppendToStreamCommand(entry);
+    }
+
+    @DataTableType
+    public CreateStreamCommand createCreateStreamCommand(Map<String, String> entry) {
+        return new CreateStreamCommand(entry);
+    }
+
+    @DataTableType
+    public DeleteCommand createDeleteCommand(Map<String, String> entry) {
+        return new DeleteCommand(entry);
+    }
+
+    @DataTableType
+    public ReadForwardExceptionCommand createReadForwardExceptionCommand(Map<String, String> entry) {
+        return new ReadForwardExceptionCommand(entry);
+    }
+
+    @DataTableType
+    public ReadBackwardCommand createReadBackwardCommand(Map<String, String> entry) {
+        return new ReadBackwardCommand(entry);
+    }
+
+    @DataTableType
+    public ReadBackwardExceptionCommand createReadBackwardExceptionCommand(Map<String, String> entry) {
+        return new ReadBackwardExceptionCommand(entry);
+    }
+
+    @DataTableType
+    public StreamStateCommand streamStateCommand(Map<String, String> entry) {
+        return new StreamStateCommand(entry);
+    }
+
+    @DataTableType
+    public ReadForwardCommand createReadForwardCommand(Map<String, String> entry) {
+        return new ReadForwardCommand(entry);
+    }
+
+    @DataTableType
+    public ReadAllForwardChunk createReadAllForwardChunk(Map<String, String> entry) {
+        return new ReadAllForwardChunk(entry);
+    }
 
     @Before
     public void beforeFeature() throws IOException {
 
+        // Configure JSON-B
+        final SerializedDataTypeRegistry jsonTypeRegistry = TestUtils.createSerializedDataTypeRegistry();
+        final JsonbConfig jsonbConfig = TestUtils.createJsonbConfig();
+        final JsonbProvider jsonbProvider = new JsonbProvider(jsonbConfig);
+        final JsonbSerDeserializer jsonDeSer = TestUtils.createSerDeserializer(jsonTypeRegistry, jsonbProvider);
+
+        // Configure JAX-B
+        final XmlDeSerializer xmlDeSer = EscJaxbUtils.xmlDeSerializerBuilder().add(BookAddedEvent.class).add(MyMeta.class).build();
+        final TextDeSerializer textDeSer = new TextDeSerializer();
+        final SerDeserializerRegistry serDeserializerRegistry = TestUtils.serDeserializerRegistry(xmlDeSer, jsonDeSer, textDeSer);
+
+        // Finalize initialization of JSON-B
+        TestUtils.register(jsonbConfig, serDeserializerRegistry, serDeserializerRegistry);
+
+        // Start with tests
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "changeit");
         credentialsProvider.setCredentials(AuthScope.ANY, credentials);
 
         // Use the property to select the correct implementation:
-        final String currentEventStoreImplType = System.getProperty(EscCucumber.SYSTEM_PROPERTY);
+        final String currentEventStoreImplType = System.getProperty(TestUtils.IMPLEMENTATION_KEY,TestUtils.MEM_IMPLEMENTATION);
         final EventStore eventStore;
-        if (currentEventStoreImplType.equals("mem")) {
+        if (currentEventStoreImplType.equals(TestUtils.MEM_IMPLEMENTATION)) {
             eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
-        } else if (currentEventStoreImplType.equals("jpa") || currentEventStoreImplType.equals("esgrpc")) {
+        } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION) || currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)) {
 
-            final XmlDeSerializer xmlDeSer = new XmlDeSerializer(false, JAXB_CLASSES);
-            final SimpleSerializedDataTypeRegistry typeRegistry = createTypeRegistry();
-            try (final JsonbDeSerializer jsonbDeSer = createJsonbDeSerializer()) {
-                jsonbDeSer.init(typeRegistry);
-
-                final TextDeSerializer textDeSer = new TextDeSerializer();
-                SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry();
-                registry.add(new SerializedDataType(BookAddedEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
-                registry.add(new SerializedDataType(MyMeta.TYPE.asBaseType()), "application/json", jsonbDeSer);
-                registry.add(new SerializedDataType(Base64Data.TYPE.asBaseType()), "application/xml", xmlDeSer);
-                registry.add(new SerializedDataType(EscEvent.TYPE.asBaseType()), "application/xml", xmlDeSer);
-                registry.add(new SerializedDataType(EscEvents.TYPE.asBaseType()), "application/xml", xmlDeSer);
-                registry.add(new SerializedDataType(EscMeta.TYPE.asBaseType()), "application/xml", xmlDeSer);
-                registry.add(new SerializedDataType("TextEvent"), "text/plain", textDeSer);
-                if (currentEventStoreImplType.equals("jpa")) {
-                    setupDb();
-                    eventStore = new JpaEventStore(em, new TestIdStreamFactory(), registry, registry);
-                } else {
-                    final KurrentDBClientSettings setts = KurrentDBConnectionString
-                            .parseOrThrow("esdb://localhost:2113?tls=false");
-                    final KurrentDBClient client = KurrentDBClient.create(setts);
-                    eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(registry)
-                            .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
-                            .build();
-                }
-
+            if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
+                setupDb();
+                eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry);
+            } else {
+                final KurrentDBClientSettings setts = KurrentDBConnectionString
+                        .parseOrThrow("esdb://localhost:2113?tls=false");
+                client = KurrentDBClient.create(setts);
+                eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(serDeserializerRegistry)
+                        .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
+                        .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
+                        .build();
             }
 
         } else {
             throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
         }
         eventStore.open();
-        testContext = new TestContext(currentEventStoreImplType, eventStore);
+        testContext = new TestContext(currentEventStoreImplType, eventStore, serDeserializerRegistry);
         lastCommand = null;
     }
 
@@ -271,8 +307,10 @@ public class TestFeatures {
     }
 
     private void whenAppendXmlEvents(final String streamName, final long version, final String eventsXml) {
-        final Events events = unmarshal(eventsXml, Events.class);
-        final List<CommonEvent> commonEvents = events.asCommonEvents(createCtx());
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Events.class).build();
+        final Events events = unmarshal(unmarshaller, eventsXml);
+        events.init(testContext);
+        final List<CommonEvent> commonEvents = events.asCommonEvents();
 
         final TestCommand<TestContext> command = new AppendToStreamCommand(streamName, version, null, commonEvents);
         command.init(testContext);
@@ -360,6 +398,9 @@ public class TestFeatures {
         if (emf != null) {
             emf.close();
         }
+        if (client != null && !client.isShutdown()) {
+            client.shutdown();
+        }
         try {
             if (connection != null) {
                 connection.createStatement().execute("SHUTDOWN");
@@ -416,34 +457,6 @@ public class TestFeatures {
                 }
             }
         }
-    }
-
-    private JAXBContext createCtx() {
-        try {
-            return JAXBContext.newInstance(BookAddedEvent.class);
-        } catch (final JAXBException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private static SimpleSerializedDataTypeRegistry createTypeRegistry() {
-        final SimpleSerializedDataTypeRegistry typeRegistry = new SimpleSerializedDataTypeRegistry();
-        typeRegistry.add(EscMeta.SER_TYPE, EscMeta.class);
-        typeRegistry.add(EscEvent.SER_TYPE, EscEvent.class);
-        typeRegistry.add(EscEvents.SER_TYPE, EscEvents.class);
-        typeRegistry.add(Base64Data.SER_TYPE, Base64Data.class);
-        typeRegistry.add(BookAddedEvent.SER_TYPE, BookAddedEvent.class);
-        typeRegistry.add(MyMeta.SER_TYPE, MyMeta.class);
-        return typeRegistry;
-    }
-
-    private static JsonbDeSerializer createJsonbDeSerializer() {
-        return JsonbDeSerializer.builder()
-                .withSerializers(EscJsonbUtils.createEscJsonbSerializers())
-                .withDeserializers(EscJsonbUtils.createEscJsonbDeserializers())
-                .withPropertyVisibilityStrategy(new FieldAccessStrategy())
-                .withEncoding(StandardCharsets.UTF_8)
-                .build();
     }
 
 }

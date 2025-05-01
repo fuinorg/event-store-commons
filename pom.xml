@@ -12,7 +12,7 @@
 
     <groupId>org.fuin.esc</groupId>
     <artifactId>esc-parent</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>esc-parent</name>
     <description>Defines a common event store Java interface and provides some adapters (like for Greg Young's event store) and implementations (like in-memory or file-based).
@@ -31,9 +31,12 @@
 
     <properties>
         <eventstore.version>24.10</eventstore.version>
-        <objects4j.version>0.10.0</objects4j.version>
+        <objects4j.version>0.11.0</objects4j.version>
+        <utils4j.version>0.15.0</utils4j.version>
+        <units4j.version>0.12.0</units4j.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit.version>1.4.0</archunit.version>
+        <jackson.version>2.18.2</jackson.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
@@ -85,6 +88,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-jackson</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-esgrpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -104,7 +113,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>utils4j</artifactId>
-                <version>0.14.0</version>
+                <version>${utils4j.version}</version>
             </dependency>
 
             <dependency>
@@ -115,7 +124,25 @@
 
             <dependency>
                 <groupId>org.fuin.objects4j</groupId>
+                <artifactId>objects4j-jsonb</artifactId>
+                <version>${objects4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.objects4j</groupId>
                 <artifactId>objects4j-core</artifactId>
+                <version>${objects4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.objects4j</groupId>
+                <artifactId>objects4j-ui</artifactId>
+                <version>${objects4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.objects4j</groupId>
+                <artifactId>objects4j-jackson</artifactId>
                 <version>${objects4j.version}</version>
             </dependency>
 
@@ -152,7 +179,19 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>5.10.5</version>
+                <version>5.12.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite-api</artifactId>
+                <version>1.12.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite-engine</artifactId>
+                <version>1.12.2</version>
             </dependency>
 
             <dependency>
@@ -207,13 +246,13 @@
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-java</artifactId>
-                <version>1.2.6</version>
+                <version>7.21.1</version>
             </dependency>
 
             <dependency>
                 <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-junit</artifactId>
-                <version>1.2.6</version>
+                <artifactId>cucumber-junit-platform-engine</artifactId>
+                <version>7.22.1</version>
             </dependency>
 
             <dependency>
@@ -327,7 +366,7 @@
             <dependency>
                 <groupId>org.fuin</groupId>
                 <artifactId>units4j</artifactId>
-                <version>0.12.0</version>
+                <version>${units4j.version}</version>
             </dependency>
 
             <dependency>
@@ -360,6 +399,24 @@
                 <version>1.1.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>
@@ -372,6 +429,7 @@
         <module>jaxb</module>
         <module>jpa</module>
         <module>jsonb</module>
+        <module>jackson</module>
         <module>esgrpc</module>
         <module>test</module>
         <module>jacoco</module>

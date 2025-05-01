@@ -20,6 +20,8 @@ package org.fuin.esc.jsonb;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
@@ -32,6 +34,7 @@ import java.util.UUID;
  * Something interesting happened. Equals and hash code are based on the UUID.
  */
 @TestOmitted("This is only a test class")
+@XmlRootElement
 public final class MyEvent implements Serializable {
 
     private static final long serialVersionUID = 100L;
@@ -42,9 +45,11 @@ public final class MyEvent implements Serializable {
     /** Unique name of the serialized event. */
     public static final SerializedDataType SER_TYPE = new SerializedDataType(TYPE.asBaseType());
 
+    @XmlElement(name = "id")
     @JsonbProperty
     private String id;
 
+    @XmlElement(name = "description")
     @JsonbProperty
     private String description;
 

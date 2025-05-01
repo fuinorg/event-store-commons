@@ -27,9 +27,7 @@ public interface SerializerRegistry {
     /**
      * Tries to find a serializer for the given type.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     *
+     * @param type Unique identifier for the type of data.
      * @return Serializer instance or throws a {@link IllegalArgumentException} if no serializer was found.
      */
     @NotNull
@@ -38,11 +36,34 @@ public interface SerializerRegistry {
     /**
      * Tries to find a serializer for the given type.
      *
-     * @param type
-     *            Unique identifier for the type of data.
-     *
+     * @param type Unique identifier for the type of data.
      * @return TRUE if a serializer was found for the type.
      */
     boolean serializerExists(@NotNull SerializedDataType type);
+
+    /**
+     * Defines a builder for the registry.
+     *
+     * @param <T> Type of the registry.
+     * @param <B> Type of the builder.
+     */
+    interface Builder<T extends SerializerRegistry, B extends SerializerRegistry.Builder<T, B>> {
+
+        /**
+         * Adds a new serializer to the registry.
+         *
+         * @param type       Type of the data.
+         * @param serializer Serializer to add.
+         */
+        B add(@NotNull final SerializedDataType type, @NotNull final Serializer serializer);
+
+        /**
+         * Builds an instance.
+         *
+         * @return New instance.
+         */
+        T build();
+
+    }
 
 }

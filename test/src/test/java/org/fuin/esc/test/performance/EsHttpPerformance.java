@@ -18,6 +18,7 @@ public final class EsHttpPerformance {
      * @param args Not used.
      * @throws IOException Error reading console input.
      */
+    @SuppressWarnings("java:S125") // Commented out code by intention
     public static void main(final String[] args) throws IOException {
 /*
         
@@ -116,6 +117,7 @@ public final class EsHttpPerformance {
 */
     }
 
+    @SuppressWarnings("java:S1144") // Unused intentionally
     private static void measure(final String name, final int count, final Consumer<String> func) {
         final long start = System.currentTimeMillis();
         System.out.println("START          " + name + ": " + start);
@@ -130,6 +132,7 @@ public final class EsHttpPerformance {
         System.out.println("EVENTS PER SEC " + name + ": " + (long) perSec);
     }
 
+    @SuppressWarnings("java:S1144") // Unused intentionally
     private static void waitForInput(final String message) throws IOException {
         System.out.println("---------------------");
         System.out.println(message);

@@ -93,22 +93,25 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         return new SimpleCommonEvent(eventId, dataType, data, metaType, meta);
     }
 
-    private Object unmarshal(final String transferEncoding, final SerializedDataType dataType,
-                             final Deserializer dataDeserializer, final EnhancedMimeType dataMimeType, final Object data,
-                             final EnhancedMimeType metaMimeType, final EnhancedMimeType escMetaMimeType) {
+    private Object unmarshal(final String transferEncoding,
+                             final SerializedDataType dataType,
+                             final Deserializer dataDeserializer,
+                             final EnhancedMimeType dataMimeType,
+                             final Object data,
+                             final EnhancedMimeType metaMimeType,
+                             final EnhancedMimeType escMetaMimeType) {
 
         if (transferEncoding == null) {
             return dataDeserializer.unmarshal(data, dataType, dataMimeType);
         }
 
-        if (data instanceof IBase64Data) {
-            final IBase64Data base64Data = (IBase64Data) data;
+        if (data instanceof IBase64Data base64Data) {
             return dataDeserializer.unmarshal(base64Data.getDecoded(), dataType, dataMimeType);
         }
 
         // Currently only 'base64' is supported
         final Deserializer base64Deserializer = deserRegistry.getDeserializer(IBase64Data.SER_TYPE, escMetaMimeType);
-        final IBase64Data base64Data = base64Deserializer.unmarshal(data, IBase64Data.SER_TYPE, metaMimeType);
+        final IBase64Data base64Data = base64Deserializer.unmarshal(data, IBase64Data.SER_TYPE, escMetaMimeType);
         return dataDeserializer.unmarshal(base64Data.getDecoded(), dataType, dataMimeType);
     }
 

@@ -26,6 +26,7 @@ import org.fuin.objects4j.core.UUIDStrValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Expected chunk when reading forward all events of a stream.
@@ -33,7 +34,6 @@ import java.util.List;
 public final class ReadAllForwardChunk {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String resultEventId1;
 
@@ -92,6 +92,23 @@ public final class ReadAllForwardChunk {
         if (events != null) {
             eventList.addAll(events);
         }
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public ReadAllForwardChunk(Map<String, String> cucumberTable) {
+        this.resultEventId1 = cucumberTable.get("Result Event Id 1");
+        this.resultEventId2 = cucumberTable.get("Result Event Id 2");
+        this.resultEventId3 = cucumberTable.get("Result Event Id 3");
+        this.resultEventId4 = cucumberTable.get("Result Event Id 4");
+        this.resultEventId5 = cucumberTable.get("Result Event Id 5");
+        this.resultEventId6 = cucumberTable.get("Result Event Id 6");
+        this.resultEventId7 = cucumberTable.get("Result Event Id 7");
+        this.resultEventId8 = cucumberTable.get("Result Event Id 8");
+        this.resultEventId9 = cucumberTable.get("Result Event Id 9");
     }
 
     /**

@@ -17,20 +17,22 @@
  */
 package org.fuin.esc.jsonb;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.jsonb.ValueObjectStringJsonbAdapter;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Tests the {@link JsonbDeSerializer} class.
+ * Converts a {@link TypeName} into a String and back.
  */
-public class JsonbDeSerializerTest {
+@ThreadSafe
+public final class TypeNameJsonbAdapter extends ValueObjectStringJsonbAdapter<TypeName> {
 
-    @Disabled("TODO Implement!")
-    @Test
-    void testX() {
-        fail("Implement!");
+    /**
+     * Default constructor.
+     */
+    public TypeNameJsonbAdapter() {
+        super(TypeName::valueOf);
     }
 
 }

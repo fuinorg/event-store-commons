@@ -30,13 +30,12 @@ public class SimpleSerializedDataTypeRegistryTest {
     @Test
     public void testFindClass() {
 
-        final SimpleSerializedDataTypeRegistry testee = new SimpleSerializedDataTypeRegistry();
-
         final SerializedDataType stringType = new SerializedDataType("String");
-        testee.add(stringType, String.class);
-
         final SerializedDataType integerType = new SerializedDataType("Integer");
-        testee.add(new SerializedDataType2ClassMapping(integerType, Integer.class));
+        final SimpleSerializedDataTypeRegistry testee = new SimpleSerializedDataTypeRegistry.Builder()
+                .add(stringType, String.class)
+                .add(new SerializedDataType2ClassMapping(integerType, Integer.class))
+                .build();
 
         assertThat(testee.findClass(stringType)).isEqualTo(String.class);
         assertThat(testee.findClass(integerType)).isEqualTo(Integer.class);
@@ -49,5 +48,23 @@ public class SimpleSerializedDataTypeRegistryTest {
         }
 
     }
+
+    @Test
+    public void testFindAll() {
+
+        final SerializedDataType stringType = new SerializedDataType("String");
+        final SerializedDataType integerType = new SerializedDataType("Integer");
+        final SimpleSerializedDataTypeRegistry testee = new SimpleSerializedDataTypeRegistry.Builder()
+                .add(stringType, String.class)
+                .add(new SerializedDataType2ClassMapping(integerType, Integer.class))
+                .build();
+
+        assertThat(testee.findAll()).containsOnly(
+                new SerializedDataTypeRegistry.TypeClass(stringType, String.class),
+                new SerializedDataTypeRegistry.TypeClass(integerType, Integer.class)
+        );
+
+    }
+
 }
 

@@ -66,7 +66,7 @@ public class VendorStream extends JpaStream {
      *
      * @return Vendor identifier.
      */
-    public final String getVendorId() {
+    public String getVendorId() {
         return vendorId;
     }
 
@@ -77,7 +77,7 @@ public class VendorStream extends JpaStream {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return vendorId;
     }
 

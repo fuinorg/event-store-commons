@@ -31,6 +31,7 @@ import org.fuin.utils4j.TestCommand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reads a stream forward.
@@ -38,7 +39,6 @@ import java.util.List;
 public final class ReadForwardCommand implements TestCommand<TestContext> {
 
     // Creation (Initialized by Cucumber)
-    // DO NOT CHANGE ORDER OR RENAME VARIABLES!
 
     private String streamName;
 
@@ -127,6 +127,29 @@ public final class ReadForwardCommand implements TestCommand<TestContext> {
         }
         this.expectedSlice = new StreamEventsSlice(fromEventNumber, expectedEvents, nextEventNumber,
                 endOfStream);
+    }
+
+    /**
+     * Creates an instance with values from the table headers in the feature.
+     *
+     * @param cucumberTable Column values.
+     */
+    public ReadForwardCommand(Map<String, String> cucumberTable) {
+        this.streamName = cucumberTable.get("Stream Name");
+        this.start = Long.parseLong(cucumberTable.get("Start"));
+        this.count = Integer.parseInt(cucumberTable.get("Count"));
+        this.resultFrom = Long.parseLong(cucumberTable.get("Result From"));
+        this.resultNext = Long.parseLong(cucumberTable.get("Result Next"));
+        this.endOfStream = Boolean.parseBoolean(cucumberTable.get("End Of Stream"));
+        this.resultEventId1 = cucumberTable.get("Result Event Id 1");
+        this.resultEventId2 = cucumberTable.get("Result Event Id 2");
+        this.resultEventId3 = cucumberTable.get("Result Event Id 3");
+        this.resultEventId4 = cucumberTable.get("Result Event Id 4");
+        this.resultEventId5 = cucumberTable.get("Result Event Id 5");
+        this.resultEventId6 = cucumberTable.get("Result Event Id 6");
+        this.resultEventId7 = cucumberTable.get("Result Event Id 7");
+        this.resultEventId8 = cucumberTable.get("Result Event Id 8");
+        this.resultEventId9 = cucumberTable.get("Result Event Id 9");
     }
 
     @Override
