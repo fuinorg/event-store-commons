@@ -30,7 +30,7 @@ public abstract class AbstractTest {
         mapperProvider = new ImmutableObjectMapper.Provider(mapperBuilder);
         serDeserializer = TestUtils.createSerDeserializer(mapperProvider, typeRegistry);
         serDeserializerRegistry = createSerDeserializerRegistry(serDeserializer);
-        mapperBuilder.registerModule(new EscJacksonAdapterModule(serDeserializerRegistry, serDeserializerRegistry));
+        mapperBuilder.registerModule(new EscJacksonModule(serDeserializerRegistry, serDeserializerRegistry));
     }
 
     @AfterEach

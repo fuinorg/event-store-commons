@@ -18,7 +18,7 @@ import java.util.Objects;
  * Module that registers the adapters for the package.
  */
 @TestOmitted("Trivial")
-public class EscJacksonAdapterModule extends Module {
+public class EscJacksonModule extends Module {
 
     private final DeserializerRegistry deserializerRegistry;
 
@@ -30,8 +30,8 @@ public class EscJacksonAdapterModule extends Module {
      * @param deserializerRegistry Deserializer registry.
      * @param serializerRegistry   Serializer registry.
      */
-    public EscJacksonAdapterModule(final DeserializerRegistry deserializerRegistry,
-                                   final SerializerRegistry serializerRegistry) {
+    public EscJacksonModule(final DeserializerRegistry deserializerRegistry,
+                            final SerializerRegistry serializerRegistry) {
         this.deserializerRegistry = Objects.requireNonNull(deserializerRegistry, "deserializerRegistry==null");
         this.serializerRegistry = Objects.requireNonNull(serializerRegistry, "serializerRegistry==null");
     }

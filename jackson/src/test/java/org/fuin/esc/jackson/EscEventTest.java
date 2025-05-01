@@ -252,7 +252,7 @@ public class EscEventTest extends AbstractTest {
                 .add(MyMeta.SER_TYPE, jaxbDeSer, jaxbDeSer.getMimeType())
                 .add(MyEvent.SER_TYPE, jaxbDeSer, jaxbDeSer.getMimeType())
                 .build();
-        mapperBuilder.registerModule(new EscJacksonAdapterModule(serDeserializerRegistry, serDeserializerRegistry));
+        mapperBuilder.registerModule(new EscJacksonModule(serDeserializerRegistry, serDeserializerRegistry));
 
         // Serialize
         final String json = mapperProvider.writer().writeValueAsString(expectedEvent);
