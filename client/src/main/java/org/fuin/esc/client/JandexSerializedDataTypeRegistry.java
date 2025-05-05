@@ -6,6 +6,7 @@ import org.fuin.esc.api.HasSerializedDataTypeConstantValidator;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
+import org.fuin.objects4j.common.TypeConstantValidator;
 import org.fuin.utils4j.jandex.JandexIndexFileReader;
 import org.fuin.utils4j.jandex.JandexUtils;
 import org.jboss.jandex.AnnotationInstance;
@@ -118,7 +119,7 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
 
     private static SerializedDataType serializedDataTypeConstant(Class<?> domainEventClass) {
         final HasSerializedDataTypeConstant annotation = domainEventClass.getAnnotation(HasSerializedDataTypeConstant.class);
-        return HasSerializedDataTypeConstantValidator.extractValue(domainEventClass, annotation.value());
+        return TypeConstantValidator.extractValue(domainEventClass, SerializedDataType.class, annotation.value());
     }
 
 }

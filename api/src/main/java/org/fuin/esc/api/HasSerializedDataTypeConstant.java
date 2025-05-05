@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A class that has a public static constant of type {@link SerializedDataType}.
+ * A class that has a public static final constant of type {@link SerializedDataType}.
  * The expected default name of the constant is <b>SER_TYPE</b>.
  */
 @Documented
@@ -28,7 +28,7 @@ public @interface HasSerializedDataTypeConstant {
      */
     String value() default "SER_TYPE";
 
-    String message() default "Does not define a public static constant with the given name";
+    String message() default "{org.fuin.esc.api.HasSerializedDataTypeConstant.message}";
 
     Class<?>[] groups() default {};
 
