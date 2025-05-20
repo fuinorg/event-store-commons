@@ -3,6 +3,9 @@
 ## 0.9.1
 - Extend new TypeConstantValidator base class 
 
+## 0.9.1
+- Added missing constraint validation messages
+
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
 - **Incompatible** The [ESGrpcEventStore](esgrpc/src/main/java/org/fuin/esc/esgrpc/ESGrpcEventStore.java) does no longer shutdown the `KurrentDBClient` to allow sharing the client between multiple instances as it is thread-safe.
