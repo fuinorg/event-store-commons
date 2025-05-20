@@ -70,6 +70,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-jaxb</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -426,6 +432,7 @@
         <module>client</module>
         <module>spi</module>
         <module>mem</module>
+        <module>file</module>
         <module>jaxb</module>
         <module>jpa</module>
         <module>jsonb</module>

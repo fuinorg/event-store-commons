@@ -72,6 +72,15 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
         this.open = false;
     }
 
+    /**
+     * Determines if the store is open.
+     *
+     * @return {@literal true} in case the {@link #open()} method has been called and no {@link #close()} after that.
+     */
+    public boolean isOpen() {
+        return open;
+    }
+
     @Override
     public InMemoryEventStore open() {
         if (open) {
