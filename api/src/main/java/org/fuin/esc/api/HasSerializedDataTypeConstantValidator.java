@@ -10,7 +10,7 @@ import org.fuin.utils4j.TestOmitted;
 public final class HasSerializedDataTypeConstantValidator extends TypeConstantValidator<HasSerializedDataTypeConstant> {
 
     public HasSerializedDataTypeConstantValidator() {
-        super(HasSerializedDataTypeConstant.class);
+        super(HasSerializedDataTypeConstant.class, "value", null, null, SerializedDataType.class);
     }
 
 }
