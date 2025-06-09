@@ -19,6 +19,7 @@ package org.fuin.esc.spi;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 

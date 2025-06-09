@@ -12,7 +12,7 @@ import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
-import org.fuin.esc.spi.TenantStreamId;
+import org.fuin.esc.api.TenantStreamId;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;

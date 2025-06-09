@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see http://www.gnu.org/licenses/.
  */
-package org.fuin.esc.spi;
+package org.fuin.esc.api;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
 

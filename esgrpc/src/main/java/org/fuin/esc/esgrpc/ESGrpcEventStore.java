@@ -48,7 +48,7 @@ import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.spi.TenantStreamId;
+import org.fuin.esc.api.TenantStreamId;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;
 

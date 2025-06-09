@@ -1,7 +1,8 @@
 # Release Notes
 
-## 0.9.1
-- Extend new TypeConstantValidator base class 
+## 0.10.0
+- Extend new TypeConstantValidator base class
+- **Incompatible** Moved [TenantStreamId](api/src/main/java/org/fuin/esc/api/TenantStreamId.java) to API 
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
