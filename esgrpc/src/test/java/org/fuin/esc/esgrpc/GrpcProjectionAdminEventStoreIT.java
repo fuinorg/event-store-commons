@@ -37,7 +37,7 @@ class GrpcProjectionAdminEventStoreIT {
 
     @BeforeEach
     void beforeEach() throws MalformedURLException {
-        testee = new GrpcProjectionAdminEventStore(client, null);
+        testee = new GrpcProjectionAdminEventStore(client);
     }
 
     @AfterAll
