@@ -29,27 +29,14 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     private final KurrentDBProjectionManagementClient es;
 
-    private final TenantId tenantId;
-
     /**
      * Constructor with mandatory data.
      *
      * @param es Connection that is maintained outside. Opening/Closing is up to the caller!
      */
     public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
-        this(es, null);
-    }
-
-    /**
-     * Constructor with all data.
-     *
-     * @param es       Eventstore client to use.
-     * @param tenantId Tenant ID or {@literal null}.
-     */
-    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es, TenantId tenantId) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
-        this.tenantId = tenantId;
     }
 
     @Override
@@ -65,7 +52,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public boolean projectionExists(StreamId projectionId) {
+    public boolean projectionExists(TenantId tenantId, StreamId projectionId) {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
 
@@ -84,7 +71,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void enableProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void enableProjection(TenantId tenantId, StreamId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
 
@@ -96,7 +83,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void disableProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void disableProjection(TenantId tenantId, StreamId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
 
@@ -108,17 +95,24 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void createProjection(StreamId projectionId, boolean enable, TypeName... eventType) throws StreamAlreadyExistsException {
-        createProjection(projectionId, enable, Arrays.asList(eventType));
+    public void createProjection(TenantId tenantId, StreamId projectionId, boolean enable, TypeName... eventType) throws StreamAlreadyExistsException {
+        createProjection(tenantId, projectionId, enable, Arrays.asList(eventType));
     }
 
     @Override
-    public void createProjection(StreamId projectionId, boolean enable, List<TypeName> eventTypes) throws StreamAlreadyExistsException {
+    public void createProjection(TenantId tenantId, StreamId projectionId, boolean enable, List<TypeName> eventTypes) throws StreamAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
 
+        final ProjectionJavaScriptBuilder builder;
+        if (tenantId == null) {
+            builder = new ProjectionJavaScriptBuilder(projectionId);
+        } else {
+            builder = new ProjectionJavaScriptBuilder(new TenantStreamId(tenantId, projectionId));
+        }
+        final String javascript = builder.types(eventTypes).build();
+
         final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
-        final String javascript = new ProjectionJavaScriptBuilder(pid).types(eventTypes).build();
         try {
             es.create(pid.asString(), javascript, CreateProjectionOptions.get()
                     .emitEnabled(false).trackEmittedStreams(true)).get();
@@ -140,7 +134,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void deleteProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void deleteProjection(TenantId tenantId, StreamId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
         requireProjection(projectionId);
 
