@@ -97,7 +97,7 @@ public class ProjectionJavaScriptBuilderTest {
                   fromCategory('foo').foreachStream().when({
                     'AccountDebited': function (state, ev) {
                        if (isTenant(ev)) {
-                          linkTo('foo-the-view', ev);
+                          linkTo('v_foo-the-view', ev);
                        }
                     }
                   })

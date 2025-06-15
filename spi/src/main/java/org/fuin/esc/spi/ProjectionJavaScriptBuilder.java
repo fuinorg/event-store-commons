@@ -169,7 +169,7 @@ public final class ProjectionJavaScriptBuilder {
             sb.append(Utils4J.replaceVars("""
                       '${eventType}': function (state, ev) {
                          if (isTenant(ev)) {
-                            linkTo('${tenantId}-${projection}', ev);
+                            linkTo('v_${tenantId}-${projection}', ev);
                          }
                       }
                     """, Map.of("eventType", eventType,
