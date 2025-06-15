@@ -34,6 +34,10 @@ public final class SimpleCommonEvent implements CommonEvent {
     @NotNull
     private EventId id;
 
+    /** The optional unique tenant identifier. */
+    @Nullable
+    private TenantId tenantId;
+
     /** Never changing unique event type name. */
     @NotNull
     private TypeName dataType;
@@ -67,9 +71,10 @@ public final class SimpleCommonEvent implements CommonEvent {
      *            Event data.
      *
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final TypeName dataType,
+    public SimpleCommonEvent(@NotNull final EventId id,
+                             @NotNull final TypeName dataType,
                              @NotNull final Object data) {
-        this(id, dataType, data, null, null);
+        this(id, dataType, data, null, null, null);
     }
 
     /**
@@ -86,10 +91,15 @@ public final class SimpleCommonEvent implements CommonEvent {
      *            Unique name of the type of metadata.
      * @param meta
      *            Meta data.
-     *
+     * @param tenantId
+     *            Optional unique tenant identifier.
      */
-    public SimpleCommonEvent(@NotNull final EventId id, @NotNull final TypeName dataType,
-                             @NotNull final Object data, @Nullable final TypeName metaType, @Nullable final Object meta) {//NOSONAR
+    public SimpleCommonEvent(@NotNull final EventId id,
+                             @NotNull final TypeName dataType,
+                             @NotNull final Object data,
+                             @Nullable final TypeName metaType,
+                             @Nullable final Object meta,
+                             @Nullable final TenantId tenantId) {//NOSONAR
         super();
 
         Contract.requireArgNotNull("id", id);
@@ -101,6 +111,7 @@ public final class SimpleCommonEvent implements CommonEvent {
         this.data = data;
         this.metaType = metaType;
         this.meta = meta;
+        this.tenantId = tenantId;
 
     }
 
@@ -112,6 +123,12 @@ public final class SimpleCommonEvent implements CommonEvent {
     @Override
     public TypeName getDataType() {
         return dataType;
+    }
+
+    @Nullable
+    @Override
+    public TenantId getTenantId() {
+        return tenantId;
     }
 
     @Override

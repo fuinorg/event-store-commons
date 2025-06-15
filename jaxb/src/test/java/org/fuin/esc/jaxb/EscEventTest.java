@@ -19,6 +19,7 @@ package org.fuin.esc.jaxb;
 
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.utils4j.jaxb.MarshallerBuilder;
 import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,48 @@ public class EscEventTest {
         // VERIFY
         final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(xml).ignoreWhitespace().build();
         assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
+
+    }
+
+    @Test
+    public final void testUnmarshalTenant() throws Exception {
+
+        // PREPARE
+        final String expectedXml = """
+                <Event>
+                    <EventId>68616d90-cf72-4c2a-b913-32bf6e6506ed</EventId>
+                    <EventType>MyEvent</EventType>
+                    <Data>
+                        <MyEvent>
+                            <id>68616d90-cf72-4c2a-b913-32bf6e6506ed</id>
+                            <description>Hello, XML!</description>
+                        </MyEvent>
+                    </Data>
+                    <MetaData>
+                        <esc-meta>
+                            <data-type>MyEvent</data-type>
+                            <data-content-type>application/xml; version=1; encoding=utf-8</data-content-type>
+                            <meta-type>MyMeta</meta-type>
+                            <meta-content-type>application/xml; version=1; encoding=utf-8</meta-content-type>
+                            <tenant>foo</tenant>
+                            <MyMeta>
+                                <user>abc</user>
+                            </MyMeta>
+                        </esc-meta>
+                    </MetaData>
+                </Event>
+                """;
+
+        // TEST
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EscEvent.class, EscMeta.class, MyMeta.class, MyEvent.class, Base64Data.class).build();
+        final EscEvent testee = unmarshal(unmarshaller, expectedXml);
+
+        // VERIFY
+        assertThat(testee).isNotNull();
+        assertThat(testee.getMeta()).isNotNull();
+        assertThat(testee.getMeta().getObj()).isInstanceOf(EscMeta.class);
+        final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
+        assertThat(escMeta.getTenantId()).isEqualTo(new SimpleTenantId("foo"));
 
     }
 

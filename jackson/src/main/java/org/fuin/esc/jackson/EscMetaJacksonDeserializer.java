@@ -10,6 +10,7 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
@@ -35,6 +36,9 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
         final JsonNode node = jp.getCodec().readTree(jp);
         escMeta.setDataType(node.get(IEscMeta.EL_DATA_TYPE).asText());
         escMeta.setDataContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_DATA_CONTENT_TYPE).asText()));
+        if (node.has(IEscMeta.EL_TENANT)) {
+            escMeta.setTenantId(new SimpleTenantId(node.get(IEscMeta.EL_TENANT).asText()));
+        }
         if (node.has(IEscMeta.EL_META_TYPE)) {
             escMeta.setMetaType(node.get(IEscMeta.EL_META_TYPE).asText());
             escMeta.setMetaContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_META_CONTENT_TYPE).asText()));

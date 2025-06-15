@@ -105,7 +105,7 @@ public class EscSpiUtilsTest extends AbstractTest {
         final MyMeta myMeta = new MyMeta("peter");
 
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                myMeta);
+                myMeta, null);
 
         // TEST
         final IEscMeta result = EscSpiUtils.createEscMeta(getSerDeserializerRegistry(), new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
@@ -133,7 +133,7 @@ public class EscSpiUtilsTest extends AbstractTest {
                 .add(MyMeta.SER_TYPE, dummySerializer("application/xml; encoding=utf-8"))
                 .build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                myMeta);
+                myMeta, null);
 
         // TEST
         final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
@@ -164,7 +164,7 @@ public class EscSpiUtilsTest extends AbstractTest {
                 .add(MyMeta.SER_TYPE, getSerDeserializer())
                 .build();
         final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, MyMeta.TYPE,
-                myMeta);
+                myMeta, null);
 
         // TEST
         final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);

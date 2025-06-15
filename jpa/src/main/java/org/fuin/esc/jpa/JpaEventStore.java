@@ -236,7 +236,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         } else {
             jpaMeta = new JpaData(serMeta);
         }
-        return new JpaEvent(commonEvent.getId(), jpaData, jpaMeta);
+        return new JpaEvent(commonEvent.getId(), commonEvent.getTenantId(), jpaData, jpaMeta);
 
     }
 

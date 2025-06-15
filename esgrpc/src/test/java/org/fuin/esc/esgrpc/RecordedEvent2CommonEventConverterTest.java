@@ -81,7 +81,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent,
-                MyMeta.TYPE, myMeta);
+                MyMeta.TYPE, myMeta, null);
 
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jsonb.BaseTypeFactory(), JSON_UTF8);
         final EventData eventData = converter.convert(commonEvent);
@@ -137,7 +137,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
         final MyMeta myMeta = new MyMeta("michael");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent,
-                MyMeta.TYPE, myMeta);
+                MyMeta.TYPE, myMeta, null);
 
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jsonb.BaseTypeFactory(), JSON_UTF8);
         final EventData eventData = converter.convert(commonEvent);
@@ -189,7 +189,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
 
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
         final MyMeta myMeta = new MyMeta("michael");
-        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta);
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta, null);
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jsonb.BaseTypeFactory(), JSON_UTF8);
         final EventData eventData = converter.convert(commonEvent);
 
@@ -242,7 +242,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent,
-                MyMeta.TYPE, myMeta);
+                MyMeta.TYPE, myMeta, null);
 
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jaxb.BaseTypeFactory(), XML_UTF8);
         final EventData eventData = converter.convert(commonEvent);
@@ -297,7 +297,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, XML!");
         final MyMeta myMeta = new MyMeta("michael");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent,
-                MyMeta.TYPE, myMeta);
+                MyMeta.TYPE, myMeta, null);
 
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jaxb.BaseTypeFactory(), XML_UTF8);
         final EventData eventData = converter.convert(commonEvent);
@@ -349,7 +349,7 @@ public class RecordedEvent2CommonEventConverterTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(UUID.randomUUID(), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
         final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent,
-                MyMeta.TYPE, myMeta);
+                MyMeta.TYPE, myMeta, null);
 
         final CommonEvent2EventDataConverter converter = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jaxb.BaseTypeFactory(), XML_UTF8);
         final EventData eventData = converter.convert(commonEvent);

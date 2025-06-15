@@ -26,6 +26,8 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IEscMeta;
+import org.fuin.esc.api.SimpleTenantId;
+import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
 
 /**
@@ -40,6 +42,9 @@ public final class EscMeta implements IEscMeta {
 
     @XmlElement(name = IEscMeta.EL_DATA_CONTENT_TYPE)
     private String dataContentTypeStr;
+
+    @XmlElement(name = IEscMeta.EL_TENANT)
+    private String tenantId;
 
     @XmlElement(name = IEscMeta.EL_META_TYPE)
     private String metaType;
@@ -69,8 +74,26 @@ public final class EscMeta implements IEscMeta {
      * @param dataType        Type of the data.
      * @param dataContentType Content type of the data.
      */
-    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType) {
-        this(dataType, dataContentType, null, null, null);
+    public EscMeta(@NotNull final String dataType,
+                   @NotNull final EnhancedMimeType dataContentType) {
+        this(dataType, dataContentType, null, null, null, null);
+    }
+
+    /**
+     * Constructor with all data except tenant.
+     *
+     * @param dataType        Type of the data.
+     * @param dataContentType Type of the data.
+     * @param metaType        Unique name of the metadata type if available.
+     * @param metaContentType Type of the metadata if metadata is available.
+     * @param meta            Meta data object if available.
+     */
+    public EscMeta(@NotNull final String dataType,
+                   @NotNull final EnhancedMimeType dataContentType,
+                   @Nullable final String metaType,
+                   @Nullable final EnhancedMimeType metaContentType,
+                   @Nullable final Object meta) {
+        this(dataType, dataContentType, metaType, metaContentType, meta, null);
     }
 
     /**
@@ -78,12 +101,17 @@ public final class EscMeta implements IEscMeta {
      *
      * @param dataType        Type of the data.
      * @param dataContentType Type of the data.
-     * @param metaType        Unique name of the meta data type if available.
-     * @param metaContentType Type of the meta data if meta data is available.
+     * @param metaType        Unique name of the metadata type if available.
+     * @param metaContentType Type of the metadata if metadata is available.
      * @param meta            Meta data object if available.
+     * @param tenantId        Optional unique tenant identifier.
      */
-    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType, @Nullable final String metaType,
-                   @Nullable final EnhancedMimeType metaContentType, @Nullable final Object meta) {
+    public EscMeta(@NotNull final String dataType,
+                   @NotNull final EnhancedMimeType dataContentType,
+                   @Nullable final String metaType,
+                   @Nullable final EnhancedMimeType metaContentType,
+                   @Nullable final Object meta,
+                   @Nullable final TenantId tenantId) {
         super();
         Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("dataContentType", dataContentType);
@@ -97,6 +125,7 @@ public final class EscMeta implements IEscMeta {
             this.metaContentTypeStr = metaContentType.toString();
         }
         this.meta = meta;
+        this.tenantId = tenantId == null ? null : tenantId.asString();
     }
 
     /**
@@ -107,6 +136,19 @@ public final class EscMeta implements IEscMeta {
     @NotNull
     public String getDataType() {
         return dataType;
+    }
+
+    /**
+     * Returns the unique tenant identifier.
+     *
+     * @return Optional tenant.
+     */
+    @Nullable
+    public TenantId getTenantId() {
+        if (tenantId == null) {
+            return null;
+        }
+        return new SimpleTenantId(tenantId);
     }
 
     /**

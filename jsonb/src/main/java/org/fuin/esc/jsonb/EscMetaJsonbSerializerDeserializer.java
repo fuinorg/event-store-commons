@@ -13,6 +13,7 @@ import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
@@ -49,6 +50,9 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
                         case IEscMeta.EL_DATA_CONTENT_TYPE:
                             escMeta.setDataContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
                             break;
+                        case IEscMeta.EL_TENANT:
+                            escMeta.setTenantId(new SimpleTenantId(ctx.deserialize(String.class, parser)));
+                            break;
                         case IEscMeta.EL_META_TYPE:
                             escMeta.setMetaType(ctx.deserialize(String.class, parser));
                             break;
@@ -84,6 +88,9 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
         generator.writeStartObject();
         generator.write(IEscMeta.EL_DATA_TYPE, escMeta.getDataType());
         generator.write(IEscMeta.EL_DATA_CONTENT_TYPE, escMeta.getDataContentType().toString());
+        if (escMeta.getTenantId() != null) {
+            generator.write(IEscMeta.EL_TENANT, escMeta.getTenantId().asString());
+        }
         if (escMeta.getMeta() != null) { //NOSONAR Can unfortunately be null because it's not set above...
             generator.write(IEscMeta.EL_META_TYPE, escMeta.getMetaType());
             generator.write(IEscMeta.EL_META_CONTENT_TYPE, Objects.requireNonNull(escMeta.getMetaContentType()).toString());

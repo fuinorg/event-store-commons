@@ -44,6 +44,14 @@ public interface CommonEvent {
     TypeName getDataType();
 
     /**
+     * Returns the unique tenant identifier.
+     *
+     * @return Optional tenant ID.
+     */
+    @Nullable
+    TenantId getTenantId();
+
+    /**
      * Returns the event data.
      *
      * @return Event data.

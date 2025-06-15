@@ -23,7 +23,8 @@ public class BaseTypeFactoryTest {
                 new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1"),
                 "MetaY",
                 new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1"),
-                "Meta")).isInstanceOf(EscMeta.class);
+                "Meta",
+                null)).isInstanceOf(EscMeta.class);
     }
 
 }

@@ -44,7 +44,7 @@ public class SimpleCommonEventTest {
 
     @BeforeEach
     public void setup() {
-        testee = new SimpleCommonEvent(ID, DATA_TYPE, DATA, META_TYPE, META);
+        testee = new SimpleCommonEvent(ID, DATA_TYPE, DATA, META_TYPE, META, null);
     }
 
     @AfterEach

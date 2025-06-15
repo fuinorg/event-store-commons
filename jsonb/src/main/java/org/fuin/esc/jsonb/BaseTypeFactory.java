@@ -6,6 +6,7 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IBaseTypeFactory;
 import org.fuin.esc.api.IEscMeta;
+import org.fuin.esc.api.TenantId;
 
 /**
  * Creates necessary implementations in the JAX-B module.
@@ -22,8 +23,9 @@ public final class BaseTypeFactory implements IBaseTypeFactory {
                                   @NotNull EnhancedMimeType dataContentType,
                                   @Nullable String metaType,
                                   @Nullable EnhancedMimeType metaContentType,
-                                  @Nullable Object meta) {
-        return new EscMeta(dataType, dataContentType, metaType, metaContentType, meta);
+                                  @Nullable Object meta,
+                                  @Nullable TenantId tenantId) {
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType, meta, tenantId);
     }
 
 }

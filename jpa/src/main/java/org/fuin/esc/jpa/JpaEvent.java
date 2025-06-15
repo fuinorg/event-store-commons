@@ -30,6 +30,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EventId;
+import org.fuin.esc.api.SimpleTenantId;
+import org.fuin.esc.api.TenantId;
 
 import java.time.ZonedDateTime;
 
@@ -51,6 +53,9 @@ public class JpaEvent {
     /** SQL EVENT ID column name. */
     public static final String COLUMN_EVENT_ID = "event_id";
 
+    /** SQL TENANT ID column name. */
+    public static final String COLUMN_TENANT_ID = "tenant_id";
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EventEntrySequenceGenerator")
     @Column(name = COLUMN_ID, nullable = false)
@@ -61,6 +66,9 @@ public class JpaEvent {
 
     @Column(name = "created", nullable = false)
     private ZonedDateTime created;
+
+    @Column(name = COLUMN_TENANT_ID, length = 10, nullable = true, columnDefinition = "CHAR(10)")
+    private String tenantId;
 
     @Embedded
     @NotNull
@@ -90,7 +98,7 @@ public class JpaEvent {
      *            Data of the event.
      */
     public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data) {
-        this(eventId, data, null);
+        this(eventId, null, data, null);
     }
 
     /**
@@ -100,15 +108,20 @@ public class JpaEvent {
      *            Unique identifier of the event. Generated on the client and
      *            used to achieve idempotence when trying to append the same
      *            event multiple times.
+     * @param tenantId
+     *            Optional unique tenant identifier.
      * @param data
      *            Data of the event.
      * @param meta
      *            Meta data (Optional).
      */
-    public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data,
+    public JpaEvent(@NotNull final EventId eventId,
+                    @Nullable final TenantId tenantId,
+                    @NotNull final JpaData data,
                     @Nullable final JpaData meta) {
         super();
         this.eventId = eventId.asBaseType().toString();
+        this.tenantId = tenantId == null ? null : tenantId.asString();
         this.data = data;
         this.meta = meta;
     }
@@ -132,6 +145,18 @@ public class JpaEvent {
     @NotNull
     public EventId getEventId() {
         return new EventId(eventId);
+    }
+
+    /**
+     * Returns the unique tenant identifier.
+     *
+     * @return Optional tenant ID.
+     */
+    public TenantId getTenantId() {
+        if (tenantId == null) {
+            return null;
+        }
+        return new SimpleTenantId(tenantId);
     }
 
     /**

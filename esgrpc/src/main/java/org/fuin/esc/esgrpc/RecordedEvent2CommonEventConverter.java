@@ -90,7 +90,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, metaMimeType);
         final Object meta = unmarshal(metaTransferEncoding, serMetaType, metaDeserializer, metaMimeType,
                 escMeta.getMeta(), metaMimeType, escMetaMimeType);
-        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta);
+        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta, escMeta.getTenantId());
     }
 
     private Object unmarshal(final String transferEncoding,

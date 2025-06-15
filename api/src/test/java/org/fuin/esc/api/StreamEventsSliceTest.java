@@ -50,8 +50,8 @@ public class StreamEventsSliceTest {
         final TypeName metaType = new TypeName("MyMeta");
         final String meta = "{ \"ip\" : \"127.0.0.1\" }";
         events = new ArrayList<CommonEvent>();
-        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Peter"), metaType, meta));
-        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Mary Jane"), metaType, meta));
+        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Peter"), metaType, meta, null));
+        events.add(new SimpleCommonEvent(new EventId(), dataType, new MyEvent("Mary Jane"), metaType, meta, null));
     }
 
     @BeforeEach

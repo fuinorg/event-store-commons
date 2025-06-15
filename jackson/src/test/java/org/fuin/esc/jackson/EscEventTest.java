@@ -22,6 +22,7 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.objects4j.jackson.ImmutableObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.esc.jackson.EscJacksonUtils.MIME_TYPE;
 import static org.fuin.esc.jackson.EscJacksonUtils.addEscSerDeserializer;
@@ -284,6 +285,40 @@ public class EscEventTest extends AbstractTest {
 
         // Should be the same as before
         assertThatJson(currentJson).isEqualTo(expectedJson);
+
+    }
+
+    @Test
+    public final void testUnmarshalTenant() throws Exception {
+
+        // PREPARE
+        final String json = """
+                {
+                    "EventId":"b2a936ce-d479-414f-b67f-3df4da383d47",
+                    "EventType":"MyEvent",
+                    "Data":{
+                        "id":"b2a936ce-d479-414f-b67f-3df4da383d47",
+                        "description":"Hello, JSON!"
+                    },
+                    "MetaData":{
+                        "data-type":"MyEvent",
+                        "data-content-type":"application/json; encoding=UTF-8",
+                        "tenant":"foo",
+                        "meta-type":"MyMeta",
+                        "meta-content-type":"application/json; encoding=UTF-8",
+                        "MyMeta":{
+                            "user":"abc"
+                        }
+                    }
+                }
+                """;
+
+        // TEST
+        final EscEvent testee = getMapperProvider().reader().readValue(json, EscEvent.class);
+
+        // VERIFY
+        final EscMeta escMeta = (EscMeta) testee.getMeta().getObj();
+        assertThat(escMeta.getTenantId()).isEqualTo(new SimpleTenantId("foo"));
 
     }
 

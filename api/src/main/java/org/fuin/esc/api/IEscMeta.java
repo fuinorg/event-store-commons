@@ -37,6 +37,9 @@ public interface IEscMeta extends IBaseType {
     /** XML/JSON tag name of the {@link #getDataType()}. */
     String EL_DATA_TYPE = "data-type";
 
+    /** XML/JSON tag name of the {@link #getDataType()}. */
+    String EL_TENANT = "tenant";
+
     /** XML/JSON tag name of the {@link #getDataContentType()}. */
     String EL_DATA_CONTENT_TYPE = "data-content-type";
 
@@ -61,6 +64,14 @@ public interface IEscMeta extends IBaseType {
      */
     @NotNull
     EnhancedMimeType getDataContentType();
+
+    /**
+     * Returns the unique tenant identifier.
+     *
+     * @return Optional tenant ID.
+     */
+    @Nullable
+    TenantId getTenantId();
 
     /**
      * Returns the unique name of the metadata type if available.

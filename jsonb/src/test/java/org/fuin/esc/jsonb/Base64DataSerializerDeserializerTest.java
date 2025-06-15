@@ -3,7 +3,7 @@ package org.fuin.esc.jsonb;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.junit.jupiter.api.Test;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 /**
  * Test for the {@link Base64DataSerializerDeserializer} class.

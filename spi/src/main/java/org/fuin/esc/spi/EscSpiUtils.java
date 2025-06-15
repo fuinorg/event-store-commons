@@ -28,6 +28,7 @@ import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.Serializer;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.Arrays;
@@ -210,19 +211,19 @@ public final class EscSpiUtils {
         final EnhancedMimeType dataContentType = contentType(dataSerializer.getMimeType(), targetContentType);
 
         if (commonEvent.getMeta() == null) {
-            return baseTypeFactory.createEscMeta(dataType, dataContentType, null, null, null);
+            return baseTypeFactory.createEscMeta(dataType, dataContentType, null, null, null, commonEvent.getTenantId());
         }
 
         final String metaType = commonEvent.getMetaType().asBaseType();
         final SerializedDataType serDataType = new SerializedDataType(metaType);
         final Serializer metaSerializer = registry.getSerializer(serDataType);
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
-            return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(), commonEvent.getMeta());
+            return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(), commonEvent.getMeta(), commonEvent.getTenantId());
         }
 
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta(), serDataType);
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
-        return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaContentType, baseTypeFactory.createBase64Data(serMeta));
+        return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaContentType, baseTypeFactory.createBase64Data(serMeta), commonEvent.getTenantId());
 
     }
 

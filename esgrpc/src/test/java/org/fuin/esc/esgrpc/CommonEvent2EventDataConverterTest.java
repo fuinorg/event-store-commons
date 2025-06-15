@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -74,7 +74,7 @@ public final class CommonEvent2EventDataConverterTest extends AbstractTest {
 
         final MyEvent myEvent = new MyEvent(UUID.fromString("52faeb52-3933-422e-a1f4-4393a6517678"), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
-        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta);
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta, null);
         final CommonEvent2EventDataConverter testee = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jaxb.BaseTypeFactory(), XML_UTF8);
 
         // TEST
@@ -141,7 +141,7 @@ public final class CommonEvent2EventDataConverterTest extends AbstractTest {
 
         final MyEvent myEvent = new MyEvent(UUID.fromString("52faeb52-3933-422e-a1f4-4393a6517678"), "Hello, JSON!");
         final MyMeta myMeta = new MyMeta("michael");
-        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta);
+        final CommonEvent commonEvent = new SimpleCommonEvent(new EventId(myEvent.getId()), MyEvent.TYPE, myEvent, MyMeta.TYPE, myMeta, null);
         final CommonEvent2EventDataConverter testee = new CommonEvent2EventDataConverter(serDeserRegistry, new org.fuin.esc.jsonb.BaseTypeFactory(), JSON_UTF8);
 
         // TEST

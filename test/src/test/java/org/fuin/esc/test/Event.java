@@ -170,7 +170,7 @@ public final class Event implements Serializable, ValueObject {
                     new TypeName(getData().getType()), d);
         }
         return new SimpleCommonEvent(getId(), new TypeName(getData().getType()),
-                d, new TypeName(getMeta().getType()), m);
+                d, new TypeName(getMeta().getType()), m, null);
     }
 
     /**
