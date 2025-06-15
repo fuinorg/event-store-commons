@@ -121,8 +121,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
         final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
         try {
-            es.create(pid.asString(), javascript, CreateProjectionOptions.get()
-                    .emitEnabled(false).trackEmittedStreams(true)).get();
+            es.create(pid.asString(), javascript,
+                            CreateProjectionOptions.get()
+                                    .emitEnabled(true)
+                                    .trackEmittedStreams(true))
+                    .get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
                     // TODO Are there better ways than parsing the text?
