@@ -152,13 +152,10 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
+        ensureStreamNoProjection(streamId);
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
-
-        if (sid.isProjection()) {
-            throw new StreamReadOnlyException(sid);
-        }
 
         try {
             final Iterator<EventData> eventDataIt = asEventData(commonEvents).iterator();
@@ -188,14 +185,10 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
+        ensureStreamNoProjection(streamId);
         ensureOpen();
 
         final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
-
-        if (sid.isProjection()) {
-            throw new StreamReadOnlyException(sid);
-        }
-
         try {
             final DeleteStreamOptions options = DeleteStreamOptions.get()
                     .streamState(version2State(expectedVersion));
@@ -392,6 +385,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     private void ensureOpen() {
         if (es.isShutdown()) {
             throw new IllegalStateException("The event store has already been closed");
+        }
+    }
+
+    private static void ensureStreamNoProjection(StreamId streamId) {
+        if (streamId.isProjection()) {
+            throw new StreamReadOnlyException(streamId);
         }
     }
 
