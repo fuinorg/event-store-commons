@@ -91,7 +91,7 @@ public class ProjectionJavaScriptBuilderTest {
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                   isTenant = (ev) => {
-                    return (ev.meta && ev.meta.tenant && ev.meta.tenant === "foo" );
+                    return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "foo" );
                   }
                 
                   fromCategory('foo').foreachStream().when({

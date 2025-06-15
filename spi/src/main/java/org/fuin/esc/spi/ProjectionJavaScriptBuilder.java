@@ -140,7 +140,7 @@ public final class ProjectionJavaScriptBuilder {
         sb = new StringBuilder();
         sb.append(Utils4J.replaceVars("""
                 isTenant = (ev) => {
-                  return (ev.meta && ev.meta.tenant && ev.meta.tenant === "${tenantId}" );
+                  return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "${tenantId}" );
                 }
                 
                 fromCategory('${category}').foreachStream().when({
