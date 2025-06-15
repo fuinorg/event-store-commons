@@ -104,7 +104,7 @@ public final class ReadEventCommand implements TestCommand<TestContext> {
         if (expectedEventXml == null) {
             expectedEvent = null;
         } else {
-            final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EventId.class).build();
+            final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(Events.class).build();
             final Event event = unmarshal(unmarshaller, expectedEventXml);
             event.init(context);
             expectedEvent = event.asCommonEvent();
