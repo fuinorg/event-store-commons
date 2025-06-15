@@ -218,7 +218,7 @@ public class TestFeatures {
             final String streamName = streams.get(i);
             command.add(new CreateStreamCommand(streamName));
             final CommonEvent event = new SimpleCommonEvent(new EventId(), BookAddedEvent.TYPE,
-                    new BookAddedEvent("Unknown", "John Doe"));
+                    new BookAddedEvent("Unknown", "John Doe"), null);
             command.add(new AppendToStreamCommand(streamName, ExpectedVersion.ANY.getNo(), null, event));
         }
 

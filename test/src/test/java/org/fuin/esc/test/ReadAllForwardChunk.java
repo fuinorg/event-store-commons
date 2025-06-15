@@ -167,7 +167,7 @@ public final class ReadAllForwardChunk {
                                  final String eventId) {
         if (eventId != null && UUIDStrValidator.isValid(eventId)) {
             final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId),
-                    BookAddedEvent.TYPE, new BookAddedEvent("Any", "John Doe"));
+                    BookAddedEvent.TYPE, new BookAddedEvent("Any", "John Doe"), null);
             events.add(ce);
         }
     }

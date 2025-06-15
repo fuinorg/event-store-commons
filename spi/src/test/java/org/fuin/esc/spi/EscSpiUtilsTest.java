@@ -54,9 +54,9 @@ public class EscSpiUtilsTest {
         // PREPARE
         final UUID uuidA = UUID.randomUUID();
         final UUID uuidB = UUID.randomUUID();
-        final CommonEvent eventA = new SimpleCommonEvent(new EventId(uuidA), new TypeName("A"), "a");
-        final CommonEvent eventB = new SimpleCommonEvent(new EventId(uuidB), new TypeName("B"), "b");
-        final CommonEvent eventAa = new SimpleCommonEvent(new EventId(uuidA), new TypeName("Aa"), "aa");
+        final CommonEvent eventA = new SimpleCommonEvent(new EventId(uuidA), new TypeName("A"), "a", null);
+        final CommonEvent eventB = new SimpleCommonEvent(new EventId(uuidB), new TypeName("B"), "b", null);
+        final CommonEvent eventAa = new SimpleCommonEvent(new EventId(uuidA), new TypeName("Aa"), "aa", null);
 
         // TEST & VERIFY
         assertThat(EscSpiUtils.eventsEqual(null, null)).isTrue();
@@ -173,7 +173,7 @@ public class EscSpiUtilsTest {
                 .add(serType, dummySerializer("text/plain"))
                 .build();
         final List<CommonEvent> events = new ArrayList<>();
-        events.add(new SimpleCommonEvent(new EventId(), eventType, "One"));
+        events.add(new SimpleCommonEvent(new EventId(), eventType, "One", null));
 
         // TEST
         final EnhancedMimeType mimeType = EscSpiUtils.mimeType(registry, events);
@@ -201,8 +201,8 @@ public class EscSpiUtilsTest {
                 .build();
 
         final List<CommonEvent> events = new ArrayList<>();
-        events.add(new SimpleCommonEvent(new EventId(), eventTypeA, "One"));
-        events.add(new SimpleCommonEvent(new EventId(), eventTypeB, "<Other/>"));
+        events.add(new SimpleCommonEvent(new EventId(), eventTypeA, "One", null));
+        events.add(new SimpleCommonEvent(new EventId(), eventTypeB, "<Other/>", null));
 
         // TEST
         final EnhancedMimeType mimeType = EscSpiUtils.mimeType(registry, events);

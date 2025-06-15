@@ -77,7 +77,7 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
             final AggregateStreamId streamId = new AggregateStreamId("Vendor", "vendorId", vendorId);
             final EventId eventId = new EventId();
             final TypeName dataType = new TypeName(VendorCreatedEvent.TYPE);
-            final CommonEvent eventData = new SimpleCommonEvent(eventId, dataType, vendorCreatedEvent);
+            final CommonEvent eventData = new SimpleCommonEvent(eventId, dataType, vendorCreatedEvent, null);
 
             // TEST
             execute(testee, streamId, eventData, eventId);
@@ -93,12 +93,12 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
         final EventA eventA = new EventA("John Doe");
         final SimpleStreamId streamA = new SimpleStreamId("StreamA");
         final EventId eventIdA = new EventId("84fe8213-ac1b-4cda-8321-703c2e448052");
-        final CommonEvent commonEventA = new SimpleCommonEvent(eventIdA, EventA.TYPE, eventA);
+        final CommonEvent commonEventA = new SimpleCommonEvent(eventIdA, EventA.TYPE, eventA, null);
 
         final EventB eventB = new EventB("Jane Doe");
         final SimpleStreamId streamB = new SimpleStreamId("StreamB");
         final EventId eventIdB = new EventId("23962a5e-da10-402f-8560-340745b09b2c");
-        final CommonEvent commonEventB = new SimpleCommonEvent(eventIdB, EventB.TYPE, eventB);
+        final CommonEvent commonEventB = new SimpleCommonEvent(eventIdB, EventB.TYPE, eventB, null);
 
         try (final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
             @Override

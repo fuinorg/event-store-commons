@@ -265,7 +265,7 @@ public class DelegatingAsyncEventStoreTest {
     }
 
     private static CommonEvent event(final EventId id, final String name) {
-        return new SimpleCommonEvent(id, new TypeName("MyEvent"), new MyEvent(name));
+        return new SimpleCommonEvent(id, new TypeName("MyEvent"), new MyEvent(name), null);
     }
 
 }

@@ -39,7 +39,7 @@ public final class InMemoryExample {
             EventId eventId = new EventId("b3074933-c3ac-44c1-8854-04a21d560999"); // Create a unique event ID
             TypeName eventType = new TypeName("BookAddedEvent");// Define unique event type (name of the event)
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event); // Combines user and general data
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, eventType, event, null); // Combines user and general data
 
             // Append the event to the stream
             eventStore.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), commonEvent);

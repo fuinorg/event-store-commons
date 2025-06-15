@@ -83,7 +83,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         final EventId eventId = new EventId(eventData.getEventId());
         final TypeName dataType = new TypeName(eventData.getEventType());
         if (escMeta.getMetaType() == null) {
-            return new SimpleCommonEvent(eventId, dataType, data);
+            return new SimpleCommonEvent(eventId, dataType, data, escMeta.getTenantId());
         }
         final TypeName metaType = new TypeName(escMeta.getMetaType());
         final SerializedDataType serMetaType = new SerializedDataType(escMeta.getMetaType());

@@ -185,7 +185,7 @@ public final class ReadForwardCommand implements TestCommand<TestContext> {
     private static void addEvent(final List<CommonEvent> events, final String eventId) {
         if (eventId != null) {
             final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
-                    new BookAddedEvent("Any", "John Doe"));
+                    new BookAddedEvent("Any", "John Doe"), null);
             events.add(ce);
         }
     }

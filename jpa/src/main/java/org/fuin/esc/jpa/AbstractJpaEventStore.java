@@ -541,7 +541,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final Object data = deserialize(jpaEvent.getData());
         final Object meta = deserialize(jpaEvent.getMeta());
         if (meta == null) {
-            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data);
+            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, jpaEvent.getTenantId());
         }
         return new SimpleCommonEvent(jpaEvent.getEventId(),
                 jpaEvent.getData().getTypeName(), data,

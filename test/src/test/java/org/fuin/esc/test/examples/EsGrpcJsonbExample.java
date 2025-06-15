@@ -159,7 +159,7 @@ public final class EsGrpcJsonbExample {
             StreamId streamId = new SimpleStreamId("books-jsonb-example"); // Unique stream name + NO PROJECTION
             EventId eventId = new EventId("c8af28d4-5544-4624-99ff-7fcf1a0c8cfe"); // Create a unique event ID
             BookAddedEvent event = new BookAddedEvent("Shining", "Stephen King"); // Your event
-            CommonEvent commonEvent = new SimpleCommonEvent(eventId, BookAddedEvent.TYPE, event); // Combines user and
+            CommonEvent commonEvent = new SimpleCommonEvent(eventId, BookAddedEvent.TYPE, event, null); // Combines user and
             // general data
 
             // Append the event to the stream

@@ -69,12 +69,14 @@ public final class SimpleCommonEvent implements CommonEvent {
      *            Unique name of the type of data.
      * @param data
      *            Event data.
-     *
+     * @param tenantId
+     *            Optional unique tenant identifier.
      */
     public SimpleCommonEvent(@NotNull final EventId id,
                              @NotNull final TypeName dataType,
-                             @NotNull final Object data) {
-        this(id, dataType, data, null, null, null);
+                             @NotNull final Object data,
+                             @Nullable final TenantId tenantId) {
+        this(id, dataType, data, null, null, tenantId);
     }
 
     /**

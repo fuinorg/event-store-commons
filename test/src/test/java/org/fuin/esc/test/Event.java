@@ -167,7 +167,7 @@ public final class Event implements Serializable, ValueObject {
         final Object d = deserialize(getData().getType(), getData().getMimeType(), getData().getContent());
         if (getMeta() == null) {
             return new SimpleCommonEvent(getId(),
-                    new TypeName(getData().getType()), d);
+                    new TypeName(getData().getType()), d, null);
         }
         return new SimpleCommonEvent(getId(), new TypeName(getData().getType()),
                 d, new TypeName(getMeta().getType()), m, null);

@@ -56,7 +56,7 @@ public class EscSpiUtilsTest extends AbstractTest {
         final MyEvent myEvent = new MyEvent(ID, DESC);
         final EventId eventId = new EventId();
 
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, null);
 
         // TEST
         final IEscMeta result = EscSpiUtils.createEscMeta(getSerDeserializerRegistry(), new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);
@@ -80,7 +80,7 @@ public class EscSpiUtilsTest extends AbstractTest {
 
         final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(TARGET_CONTENT_TYPE)
                 .add(MyEvent.SER_TYPE, dummySerializer("application/xml; encoding=utf-8")).build();
-        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent);
+        final CommonEvent commonEvent = new SimpleCommonEvent(eventId, MyEvent.TYPE, myEvent, null);
 
         // TEST
         final IEscMeta result = EscSpiUtils.createEscMeta(registry, new BaseTypeFactory(), TARGET_CONTENT_TYPE, commonEvent);

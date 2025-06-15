@@ -140,7 +140,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
         } else {
             events = new ArrayList<>();
             final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
-                    new BookAddedEvent("Any", "John Doe"));
+                    new BookAddedEvent("Any", "John Doe"), null);
             events.add(ce);
         }
 
