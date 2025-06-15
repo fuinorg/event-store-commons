@@ -91,13 +91,13 @@ public class ProjectionJavaScriptBuilderTest {
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                   isTenant = (ev) => {
-                    return (ev.meta && ev.meta.tenantId && ev.meta.tenantId === "foo" );
+                    return (ev.meta && ev.meta.tenant && ev.meta.tenant === "foo" );
                   }
                 
                   fromCategory('foo').foreachStream().when({
                     'AccountDebited': function (state, ev) {
                        if (isTenant(ev)) {
-                          linkTo('the-view', ev);
+                          linkTo('foo-the-view', ev);
                        }
                     }
                   })

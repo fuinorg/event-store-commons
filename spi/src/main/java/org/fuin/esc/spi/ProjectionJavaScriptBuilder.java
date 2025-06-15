@@ -18,6 +18,7 @@
 package org.fuin.esc.spi;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TenantStreamId;
@@ -33,7 +34,7 @@ import java.util.Map;
  */
 public final class ProjectionJavaScriptBuilder {
 
-    private final boolean tenantProjection;
+    private final TenantId tenantId;
 
     private int count;
 
@@ -49,11 +50,15 @@ public final class ProjectionJavaScriptBuilder {
     public ProjectionJavaScriptBuilder(@NotNull final TenantStreamId tenantStreamId) {
         super();
         Contract.requireArgNotNull("tenantStreamId", tenantStreamId);
-        tenantProjection = true;
+        count = 0;
         if (tenantStreamId.getTenantId() == null) {
-            initAll(tenantStreamId.getDelegate().asString());
+            tenantId = null;
+            projection = tenantStreamId.getDelegate().asString();
+            initAll();
         } else {
-            initTenant(tenantStreamId);
+            tenantId = tenantStreamId.getTenantId();
+            projection = tenantStreamId.getDelegate().asString();
+            initTenant(tenantId);
         }
     }
 
@@ -63,10 +68,11 @@ public final class ProjectionJavaScriptBuilder {
      * @param projectionId Projection ID to use as projection name.
      */
     public ProjectionJavaScriptBuilder(@NotNull final StreamId projectionId) {
-        super();
-        tenantProjection = false;
         Contract.requireArgNotNull("projectionId", projectionId);
-        initAll(projectionId.asString());
+        count = 0;
+        tenantId = null;
+        projection = projectionId.asString();
+        initAll();
     }
 
     /**
@@ -75,10 +81,11 @@ public final class ProjectionJavaScriptBuilder {
      * @param projection Projection name.
      */
     public ProjectionJavaScriptBuilder(@NotNull final String projection) {
-        super();
         Contract.requireArgNotNull("projection", projection);
-        tenantProjection = false;
-        initAll(projection);
+        count = 0;
+        tenantId = null;
+        this.projection = projection;
+        initAll();
     }
 
     /**
@@ -92,8 +99,10 @@ public final class ProjectionJavaScriptBuilder {
         super();
         Contract.requireArgNotNull("projectionId", projectionId);
         Contract.requireArgNotNull("categoryId", categoryId);
-        tenantProjection = false;
-        initCategory(projectionId.asString(), categoryId.asString());
+        count = 0;
+        tenantId = null;
+        projection = projectionId.asString();
+        initCategory(categoryId.asString());
     }
 
     /**
@@ -107,42 +116,36 @@ public final class ProjectionJavaScriptBuilder {
         super();
         Contract.requireArgNotNull("projection", projection);
         Contract.requireArgNotNull("category", category);
-        tenantProjection = false;
-        initCategory(projection, category);
+        count = 0;
+        tenantId = null;
+        this.projection = projection;
+        initCategory(category);
     }
 
-    private void initAll(final String projection) {
-        count = 0;
-        this.projection = projection;
+    private void initAll() {
         sb = new StringBuilder();
         sb.append("""
                 fromAll().foreachStream().when({
                 """);
     }
 
-    private void initCategory(final String projection, final String category) {
-        count = 0;
-        this.projection = projection;
+    private void initCategory(final String category) {
         sb = new StringBuilder();
         sb.append(Utils4J.replaceVars("""
                 fromCategory('${category}').foreachStream().when({
                 """, Map.of("category", category)));
     }
 
-    private void initTenant(TenantStreamId tenantStreamId) {
-        count = 0;
-        projection = tenantStreamId.getDelegate().asString();
-        final String category = tenantStreamId.getTenantId().asString();
-
+    private void initTenant(TenantId tenantId) {
         sb = new StringBuilder();
         sb.append(Utils4J.replaceVars("""
                 isTenant = (ev) => {
-                  return (ev.meta && ev.meta.tenantId && ev.meta.tenantId === "${tenantId}" );
+                  return (ev.meta && ev.meta.tenant && ev.meta.tenant === "${tenantId}" );
                 }
                 
                 fromCategory('${category}').foreachStream().when({
-                """, Map.of("tenantId", tenantStreamId.getTenantId().asString(),
-                "category", category)));
+                """, Map.of("tenantId", tenantId.asString(),
+                "category", tenantId.asString())));
     }
 
     /**
@@ -155,20 +158,23 @@ public final class ProjectionJavaScriptBuilder {
         if (count > 0) {
             sb.append(",");
         }
-        if (tenantProjection) {
-            sb.append(Utils4J.replaceVars("""
-                      '${eventType}': function (state, ev) {
-                         if (isTenant(ev)) {
-                            linkTo('${projection}', ev);
-                         }
-                      }
-                    """, Map.of("eventType", eventType, "projection", projection)));
-        } else {
+        if (tenantId == null) {
             sb.append(Utils4J.replaceVars("""
                       '${eventType}': function(state, ev) {
                           linkTo('${projection}', ev);
                       }
-                    """, Map.of("eventType", eventType, "projection", projection)));
+                    """, Map.of("eventType", eventType,
+                    "projection", projection)));
+        } else {
+            sb.append(Utils4J.replaceVars("""
+                      '${eventType}': function (state, ev) {
+                         if (isTenant(ev)) {
+                            linkTo('${tenantId}-${projection}', ev);
+                         }
+                      }
+                    """, Map.of("eventType", eventType,
+                    "projection", projection,
+                    "tenantId", tenantId.asString())));
         }
         count++;
         return this;
