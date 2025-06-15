@@ -44,11 +44,11 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.TenantId;
+import org.fuin.esc.api.TenantContext;
+import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
-import org.fuin.esc.api.TenantStreamId;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;
 
@@ -71,7 +71,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     private final RecordedEvent2CommonEventConverter ed2ceConv;
 
-    private final TenantId tenantId;
+    private final TenantContext tenantContext;
 
     /**
      * Private constructor with all data used by the builder.
@@ -82,24 +82,25 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
      * @param baseTypeFactory   Factory used to create basic types.
      * @param targetContentType Target content type (Allows only 'application/xml'
      *                          or 'application/json' with 'utf-8' encoding).
-     * @param tenantId          Unique tenant identifier.
+     * @param tenantContext     Provides the current tenant.
      */
     private ESGrpcEventStore(@NotNull final KurrentDBClient es,
                              @NotNull final SerializerRegistry serRegistry,
                              @NotNull final DeserializerRegistry desRegistry,
                              @NotNull final IBaseTypeFactory baseTypeFactory,
                              @NotNull final EnhancedMimeType targetContentType,
-                             @Nullable final TenantId tenantId) {
+                             @Nullable final TenantContext tenantContext) {
         super();
         Contract.requireArgNotNull("es", es);
         Contract.requireArgNotNull("serRegistry", serRegistry);
         Contract.requireArgNotNull("desRegistry", desRegistry);
         Contract.requireArgNotNull("baseTypeFactory", baseTypeFactory);
         Contract.requireArgNotNull("targetContentType", targetContentType);
+        Contract.requireArgNotNull("tenantContext", tenantContext);
         this.es = es;
         this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry, baseTypeFactory, targetContentType);
         this.ed2ceConv = new RecordedEvent2CommonEventConverter(desRegistry);
-        this.tenantId = tenantId;
+        this.tenantContext = tenantContext;
     }
 
     @Override
@@ -153,7 +154,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("commonEvents", commonEvents);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
 
         if (sid.isProjection()) {
             throw new StreamReadOnlyException(sid);
@@ -189,7 +190,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
 
         if (sid.isProjection()) {
             throw new StreamReadOnlyException(sid);
@@ -236,7 +237,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
         try {
 
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(start).maxCount(count)
@@ -268,7 +269,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
@@ -309,7 +310,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(0).maxCount(1);
             es.readStream(sid.asString(), options).get();
@@ -334,7 +335,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantId, streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
         try {
             es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
             return StreamState.ACTIVE;
@@ -428,7 +429,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         private EnhancedMimeType targetContentType;
 
-        private TenantId tenantId;
+        private TenantContext tenantContext;
 
         /**
          * Sets the event store to use internally.
@@ -502,11 +503,11 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         /**
          * Sets the tenant identifier.
          *
-         * @param tenantId Unique tenant identifier.
+         * @param tenantContext Unique tenant identifier.
          * @return Builder
          */
-        public Builder tenantId(final TenantId tenantId) {
-            this.tenantId = tenantId;
+        public Builder tenantContext(final TenantContext tenantContext) {
+            this.tenantContext = tenantContext;
             return this;
         }
 
@@ -529,7 +530,11 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             verifyNotNull("desRegistry", desRegistry);
             verifyNotNull("baseTypeFactory", baseTypeFactory);
             verifyNotNull("targetContentType", targetContentType);
-            return new ESGrpcEventStore(eventStore, serRegistry, desRegistry, baseTypeFactory, targetContentType, tenantId);
+            if (tenantContext == null) {
+                tenantContext = () -> null;
+            }
+            return new ESGrpcEventStore(eventStore, serRegistry, desRegistry,
+                    baseTypeFactory, targetContentType, tenantContext);
         }
 
     }
