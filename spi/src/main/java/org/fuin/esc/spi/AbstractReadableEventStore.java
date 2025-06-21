@@ -40,18 +40,12 @@ public abstract class AbstractReadableEventStore implements ReadableEventStore {
         long sliceStart = startingAtEventNumber;
         StreamEventsSlice currentSlice;
         do {
-            try {
-                LOG.debug(
-                        "Read slice: streamId={}, sliceStart={}, sliceCount={}",
-                        streamId, sliceStart, chunkSize);
-                currentSlice = readEventsForward(streamId, sliceStart,
-                        chunkSize);
-                LOG.debug("Result slice: {}", currentSlice);
-            } catch (final StreamNotFoundException ex) {
-                // Nothing to read
-                LOG.debug(ex.getMessage());
-                break;
-            }
+            LOG.debug(
+                    "Read slice: streamId={}, sliceStart={}, sliceCount={}",
+                    streamId, sliceStart, chunkSize);
+            currentSlice = readEventsForward(streamId, sliceStart,
+                    chunkSize);
+            LOG.debug("Result slice: {}", currentSlice);
             if (!currentSlice.getEvents().isEmpty()) {
                 handler.handle(currentSlice);
             }
