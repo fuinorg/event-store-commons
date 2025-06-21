@@ -5,20 +5,19 @@ import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.ProjectionAdminEventStore;
+import org.fuin.esc.api.ProjectionAlreadyExistsException;
+import org.fuin.esc.api.ProjectionId;
 import org.fuin.esc.api.ProjectionStreamId;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.TenantStreamId;
+import org.fuin.esc.api.TenantContext;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
-import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -30,14 +29,19 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     private final KurrentDBProjectionManagementClient es;
 
+    private final TenantContext tenantContext;
+
     /**
      * Constructor with mandatory data.
      *
      * @param es Connection that is maintained outside. Opening/Closing is up to the caller!
+     * @param tenantContext Optional tenant context.
      */
-    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es) {
+    public GrpcProjectionAdminEventStore(@NotNull KurrentDBProjectionManagementClient es,
+                                         @Nullable TenantContext tenantContext) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
+        this.tenantContext = tenantContext == null ? () -> null : tenantContext;
     }
 
     @Override
@@ -53,12 +57,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public boolean projectionExists(StreamId projectionId) {
+    public boolean projectionExists(ProjectionId projectionId) {
         Contract.requireArgNotNull("projectionId", projectionId);
-        requireProjection(projectionId);
 
         try {
-            es.getStatus(projectionId.asString()).get();
+            es.getStatus(projectionName(projectionId)).get();
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
@@ -72,56 +75,39 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     @Override
-    public void enableProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void enableProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
-        requireProjection(projectionId);
 
         try {
-            es.enable(projectionId.asString()).get();
+            es.enable(projectionName(projectionId)).get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for enable(..) result", ex);
         }
     }
 
     @Override
-    public void disableProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void disableProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
-        requireProjection(projectionId);
 
         try {
-            es.disable(projectionId.asString()).get();
+            es.disable(projectionName(projectionId)).get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for disable(..) result", ex);
         }
     }
 
     @Override
-    public void createProjection(TenantId tenantId,
-                                 ProjectionStreamId projectionId,
+    public void createProjection(ProjectionId projectionId,
+                                 @NotNull ProjectionStreamId targetStreamId,
                                  boolean enable,
-                                 TypeName... eventType) throws StreamAlreadyExistsException {
-        createProjection(tenantId, projectionId, enable, Arrays.asList(eventType));
-    }
-
-    @Override
-    public void createProjection(TenantId tenantId,
-                                 ProjectionStreamId projectionId,
-                                 boolean enable,
-                                 List<TypeName> eventTypes) throws StreamAlreadyExistsException {
+                                 List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
-        requireProjection(projectionId);
 
-        final ProjectionJavaScriptBuilder builder;
-        if (tenantId == null) {
-            builder = new ProjectionJavaScriptBuilder(projectionId);
-        } else {
-            builder = new ProjectionJavaScriptBuilder(new TenantStreamId(tenantId, projectionId));
-        }
+        final ProjectionJavaScriptBuilder builder = new ProjectionJavaScriptBuilder(tenantContext.getTenantId(), targetStreamId);
         final String javascript = builder.types(eventTypes).build();
 
-        final TenantStreamId pid = new TenantStreamId(tenantId, projectionId);
         try {
-            es.create(pid.asString(), javascript,
+            es.create(projectionName(projectionId), javascript,
                             CreateProjectionOptions.get()
                                     .emitEnabled(true)
                                     .trackEmittedStreams(true))
@@ -131,36 +117,43 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
                     // TODO Are there better ways than parsing the text?
                     && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
                     && sre.getMessage().contains("Conflict")) {
-                throw new StreamAlreadyExistsException(projectionId);
+                throw new ProjectionAlreadyExistsException(projectionId);
             }
             throw new RuntimeException("Error waiting for create(..) result", ex);
         }
         if (enable) {
-            enableProjection(pid);
+            enableProjection(projectionId);
         } else {
             // Workaround for https://github.com/EventStore/KurrentDB-Client-Java/issues/259 (not a perfect one...)
-            disableProjection(pid);
+            disableProjection(projectionId);
         }
     }
 
     @Override
-    public void deleteProjection(StreamId projectionId) throws StreamNotFoundException {
+    public void deleteProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
-        requireProjection(projectionId);
 
         disableProjection(projectionId);
         try {
-            es.delete(projectionId.asString(), DeleteProjectionOptions.get().deleteCheckpointStream().deleteStateStream().deleteEmittedStreams()).get();
+            es.delete(projectionName(projectionId),
+                    DeleteProjectionOptions.get()
+                            .deleteCheckpointStream()
+                            .deleteStateStream()
+                            .deleteEmittedStreams()).get();
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for delete(..) result", ex);
         }
 
     }
 
-    static void requireProjection(final StreamId projectionId) {
-        if (!projectionId.isProjection()) {
-            throw new ConstraintViolationException("The stream identifier is not a projection id");
+    private String projectionName(ProjectionId projectionId) {
+        if (tenantContext == null) {
+            return projectionId.getName();
         }
+        if (tenantContext.getTenantId() == null) {
+            return projectionId.getName();
+        }
+        return tenantContext.getTenantId().asString() + "-" + projectionId.getName();
     }
 
 }

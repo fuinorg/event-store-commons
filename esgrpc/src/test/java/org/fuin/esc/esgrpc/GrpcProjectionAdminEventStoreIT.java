@@ -3,8 +3,11 @@ package org.fuin.esc.esgrpc;
 import io.kurrent.dbclient.KurrentDBClientSettings;
 import io.kurrent.dbclient.KurrentDBConnectionString;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
+import org.fuin.esc.api.ProjectionAlreadyExistsException;
+import org.fuin.esc.api.ProjectionId;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamAlreadyExistsException;
+import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
 import org.junit.jupiter.api.AfterAll;
@@ -41,7 +44,7 @@ class GrpcProjectionAdminEventStoreIT {
 
     @BeforeEach
     void beforeEach() throws MalformedURLException {
-        testee = new GrpcProjectionAdminEventStore(client);
+        testee = new GrpcProjectionAdminEventStore(client, null);
     }
 
     @AfterAll
@@ -52,7 +55,7 @@ class GrpcProjectionAdminEventStoreIT {
 
     @Test
     void testProjectionNotExists() {
-        assertThat(testee.projectionExists(new ProjectionStreamId("grpc-test-not-existing" + UUID.randomUUID()))).isFalse();
+        assertThat(testee.projectionExists(new ProjectionId("grpc-test-not-existing" + UUID.randomUUID()))).isFalse();
     }
 
     @Test
@@ -60,8 +63,10 @@ class GrpcProjectionAdminEventStoreIT {
     void testEnableDisableProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("grpc-test-disabled-" + UUID.randomUUID());
-        testee.createProjection(projectionId, false, new TypeName("one"), new TypeName("two"));
+        final String name = "grpc-test-disabled-" + UUID.randomUUID();
+        final ProjectionId projectionId = new ProjectionId(name + "-projection");
+        final ProjectionStreamId streamId = new ProjectionStreamId(name + "-stream");
+        testee.createProjection(projectionId, streamId, false, new TypeName("one"), new TypeName("two"));
 
         // WHEN
         testee.enableProjection(projectionId);
@@ -75,11 +80,13 @@ class GrpcProjectionAdminEventStoreIT {
     void testCreateAndExistsProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("grpc-test-create-" +  UUID.randomUUID());
+        final String name = "grpc-test-create-" + UUID.randomUUID();
+        final ProjectionId projectionId = new ProjectionId(name);
+        final ProjectionStreamId streamId = new ProjectionStreamId(name + "-stream");
         assertThat(testee.projectionExists(projectionId)).isFalse();
 
         // WHEN
-        testee.createProjection(projectionId, true, new TypeName("one"), new TypeName("two"));
+        testee.createProjection(projectionId, streamId, true, new TypeName("one"), new TypeName("two"));
 
         // THEN
         await().atMost(5, SECONDS).until(() -> (testee.projectionExists(projectionId)));
@@ -90,13 +97,15 @@ class GrpcProjectionAdminEventStoreIT {
     void testCreateAlreadyExistingProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("grpc-test-create-already-existing-" + UUID.randomUUID());
+        final String name = "grpc-test-create-already-existing-" + UUID.randomUUID();
+        final ProjectionId projectionId = new ProjectionId(name);
+        final ProjectionStreamId streamId = new ProjectionStreamId(name + "-stream");
         assertThat(testee.projectionExists(projectionId)).isFalse();
-        testee.createProjection(projectionId, true, new TypeName("one"));
+        testee.createProjection(projectionId, streamId, true, new TypeName("one"));
 
         // WHEN - THEN
-        assertThatThrownBy( () -> testee.createProjection(projectionId, true, new TypeName("one")))
-                .isInstanceOf(StreamAlreadyExistsException.class);
+        assertThatThrownBy( () -> testee.createProjection(projectionId, streamId,true, new TypeName("one")))
+                .isInstanceOf(ProjectionAlreadyExistsException.class);
 
     }
 
@@ -104,8 +113,10 @@ class GrpcProjectionAdminEventStoreIT {
     void testDeleteProjection() {
 
         // GIVEN
-        final ProjectionStreamId projectionId = new ProjectionStreamId("grpc-test-delete-" + UUID.randomUUID());
-        testee.createProjection(projectionId, false, new TypeName("one"), new TypeName("two"));
+        final String name = "grpc-test-delete-" + UUID.randomUUID();
+        final ProjectionId projectionId = new ProjectionId(name);
+        final ProjectionStreamId streamId = new ProjectionStreamId(name + "-stream");
+        testee.createProjection(projectionId, streamId, false, new TypeName("one"), new TypeName("two"));
         await().atMost(5, SECONDS).until(() -> testee.projectionExists(projectionId));
 
         // WHEN

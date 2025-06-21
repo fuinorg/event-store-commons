@@ -17,10 +17,11 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * An event store that provides a projection administration API.
@@ -45,7 +46,7 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
      * @param projectionId Unique identifier of the projection.
      * @return TRUE if the projection exists, else FALSE.
      */
-    boolean projectionExists(@NotNull StreamId projectionId);
+    boolean projectionExists(@NotNull ProjectionId projectionId);
 
     /**
      * Enables an existing projection. If the projection is already enabled, the
@@ -55,7 +56,7 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
      * @throws StreamNotFoundException The given projection could not be enabled because it does not
      *                                 exist.
      */
-    void enableProjection(@NotNull StreamId projectionId) throws StreamNotFoundException;
+    void enableProjection(@NotNull ProjectionId projectionId) throws StreamNotFoundException;
 
     /**
      * Disables an existing projection. If the projection is already disabled,
@@ -65,71 +66,42 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
      * @throws StreamNotFoundException The given projection could not be disabled because it does
      *                                 not exist.
      */
-    void disableProjection(@NotNull StreamId projectionId) throws StreamNotFoundException;
+    void disableProjection(@NotNull ProjectionId projectionId) throws StreamNotFoundException;
 
     /**
      * Creates a new projection that selects an array of events by their type.
      *
      * @param projectionId Unique name of the projection to create.
+     * @param targetStreamId Unique name of the stream the projection should create.
      * @param enable       Enable the projection (<code>true</code>) or not
      *                     (<code>false</code>).
      * @param eventType    Unique type names of events to select.
-     * @throws StreamAlreadyExistsException The given projection could not be created because it already
+     * @throws ProjectionAlreadyExistsException The given projection could not be created because it already
      *                                      exists.
      */
-    default void createProjection(@NotNull ProjectionStreamId projectionId,
+    default void createProjection(@NotNull ProjectionId projectionId,
+                                  @NotNull ProjectionStreamId targetStreamId,
                                   boolean enable,
-                                  @NotNull TypeName... eventType) throws StreamAlreadyExistsException {
-        createProjection(null, projectionId, enable, eventType);
-    }
-
-    /**
-     * Creates a new projection that selects an array of events by their type.
-     *
-     * @param tenantId     Optional unique tenant identifier.
-     * @param projectionId Unique name of the projection to create.
-     * @param enable       Enable the projection (<code>true</code>) or not
-     *                     (<code>false</code>).
-     * @param eventType    Unique type names of events to select.
-     * @throws StreamAlreadyExistsException The given projection could not be created because it already
-     *                                      exists.
-     */
-    void createProjection(@Nullable TenantId tenantId,
-                          @NotNull ProjectionStreamId projectionId,
-                          boolean enable,
-                          @NotNull TypeName... eventType) throws StreamAlreadyExistsException;
-
-    /**
-     * Creates a new projection that selects a list of events by their type.
-     *
-     * @param projectionId Unique name of the projection to create.
-     * @param enable       Enable the projection (<code>true</code>) or not
-     *                     (<code>false</code>).
-     * @param eventTypes   Unique type names of events to select.
-     * @throws StreamAlreadyExistsException The given projection could not be created because it already
-     *                                      exists.
-     */
-    default void createProjection(@NotNull ProjectionStreamId projectionId,
-                                  boolean enable,
-                                  @NotNull List<TypeName> eventTypes) throws StreamAlreadyExistsException {
-        createProjection(null, projectionId, enable, eventTypes);
+                                  @NotNull TypeName... eventType) throws ProjectionAlreadyExistsException {
+        createProjection(projectionId, targetStreamId, enable,
+                Arrays.asList(Objects.requireNonNull(eventType, "eventType==null")));
     }
 
     /**
      * Creates a new projection that selects a list of events by their type.
      *
-     * @param tenantId     Optional unique tenant identifier.
      * @param projectionId Unique name of the projection to create.
+     * @param targetStreamId Unique name of the stream the projection should create.
      * @param enable       Enable the projection (<code>true</code>) or not
      *                     (<code>false</code>).
      * @param eventTypes   Unique type names of events to select.
-     * @throws StreamAlreadyExistsException The given projection could not be created because it already
+     * @throws ProjectionAlreadyExistsException The given projection could not be created because it already
      *                                      exists.
      */
-    void createProjection(@Nullable TenantId tenantId,
-                          @NotNull ProjectionStreamId projectionId,
+    void createProjection(@NotNull ProjectionId projectionId,
+                          @NotNull ProjectionStreamId targetStreamId,
                           boolean enable,
-                          @NotNull List<TypeName> eventTypes) throws StreamAlreadyExistsException;
+                          @NotNull List<TypeName> eventTypes) throws ProjectionAlreadyExistsException;
 
     /**
      * Deletes an existing projection.
@@ -138,6 +110,6 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
      * @throws StreamNotFoundException The given projection could not be deleted because it does not
      *                                 exist.
      */
-    void deleteProjection(@NotNull StreamId projectionId) throws StreamNotFoundException;
+    void deleteProjection(@NotNull ProjectionId projectionId) throws StreamNotFoundException;
 
 }

@@ -21,7 +21,6 @@ import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.TypeName;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testFromAll() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("AccountsView");
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(new SimpleStreamId("AccountsView"));
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                 fromAll().foreachStream().when({
@@ -55,7 +54,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testNoEventType() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("AccountsView", "account");
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));
         try {
             testee.build();
             fail();
@@ -69,7 +68,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testOneEventType() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("AccountsView", "account");
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                 fromCategory('account').foreachStream().when({
@@ -86,8 +85,7 @@ public class ProjectionJavaScriptBuilderTest {
 
         final TenantId tenantId = new SimpleTenantId("foo");
         final StreamId streamId = new SimpleStreamId("the-view");
-        final TenantStreamId tenantStreamId = new TenantStreamId(tenantId, streamId);
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(tenantStreamId);
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(tenantId, streamId);
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                   isTenant = (ev) => {
@@ -97,7 +95,7 @@ public class ProjectionJavaScriptBuilderTest {
                   fromCategory('foo').foreachStream().when({
                     'AccountDebited': function (state, ev) {
                        if (isTenant(ev)) {
-                          linkTo('v_foo-the-view', ev);
+                          linkTo('foo-the-view', ev);
                        }
                     }
                   })
@@ -108,7 +106,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testTwoEventTypes() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("AccountsView", "account");
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));;
         testee.type("AccountDebited");
         testee.type("AccountCredited");
         assertThat(testee.build()).isEqualTo("""
@@ -127,8 +125,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testEventType() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(
-                new SimpleStreamId("AccountsView"), new SimpleStreamId("account"));
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));;
         testee.type(new TypeName("AccountDebited"));
         assertThat(testee.build()).isEqualTo("""
                 fromCategory('account').foreachStream().when({
@@ -143,8 +140,7 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testEventTypes() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(
-                new SimpleStreamId("AccountsView"), new SimpleStreamId("account"));
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));;
         final List<TypeName> list = new ArrayList<>();
         list.add(new TypeName("AccountDebited"));
         list.add(new TypeName("AccountCredited"));
