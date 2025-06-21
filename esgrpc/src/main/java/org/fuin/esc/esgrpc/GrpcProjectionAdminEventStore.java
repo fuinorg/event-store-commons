@@ -17,6 +17,8 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,8 @@ import java.util.concurrent.ExecutionException;
  */
 @TestOmitted("Tested in the 'test' project")
 public final class GrpcProjectionAdminEventStore implements ProjectionAdminEventStore {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GrpcProjectionAdminEventStore.class);
 
     private final KurrentDBProjectionManagementClient es;
 
@@ -104,13 +108,16 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
                                  List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
+        final String projectionName = projectionName(projectionId);
+        LOG.info("Create projection '{}' with stream '{}' listening to events: {}", projectionName,  targetStreamId, eventTypes);
+
         final ProjectionJavaScriptBuilder builder = new ProjectionJavaScriptBuilder(
                 tenantContext.getTenantId().orElse(null),
                 targetStreamId);
         final String javascript = builder.types(eventTypes).build();
 
         try {
-            es.create(projectionName(projectionId), javascript,
+            es.create(projectionName, javascript,
                             CreateProjectionOptions.get()
                                     .emitEnabled(true)
                                     .trackEmittedStreams(true))
@@ -136,9 +143,12 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     public void deleteProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
+        final String projectionName = projectionName(projectionId);
+        LOG.info("Delete projection '{}'", projectionName);
+
         disableProjection(projectionId);
         try {
-            es.delete(projectionName(projectionId),
+            es.delete(projectionName,
                     DeleteProjectionOptions.get()
                             .deleteCheckpointStream()
                             .deleteStateStream()
