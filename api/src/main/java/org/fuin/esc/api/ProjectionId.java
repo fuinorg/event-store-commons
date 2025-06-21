@@ -18,32 +18,20 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
-import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
 /**
- * Projection identifier that is based on a name with a restricted character set.
- * See {@link #PATTERN}.
+ * Projection identifier that is based on a name.
  */
 @Immutable
 public final class ProjectionId implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-    public static final Pattern PATTERN = Pattern.compile("^[a-z|A-Z][a-z|A-Z|0-9|_|-]*[a-z|A-Z|0-9]$");
-
-    /** Minimal length of a valid value. */
-    public static final int MIN_LENGTH = 2;
-
-    /** Maximum length of a valid value. */
-    public static final int MAX_LENGTH = 1000;
 
     private final String name;
 
@@ -54,7 +42,6 @@ public final class ProjectionId implements Serializable {
      */
     public ProjectionId(@NotNull final String name) {
         Contract.requireArgNotNull("name", name);
-        requireArgValid("name", name);
         this.name = name;
     }
 
@@ -91,60 +78,6 @@ public final class ProjectionId implements Serializable {
     @Override
     public String toString() {
         return name;
-    }
-
-    /**
-     * Verifies that a given string can be converted into the type.
-     *
-     * @param value
-     *            Value to validate.
-     *
-     * @return Returns <code>true</code> if it's a valid type else <code>false</code>.
-     */
-    public static boolean isValid(final String value) {
-        if (value == null) {
-            return true;
-        }
-        if (value.length() < MIN_LENGTH) {
-            return false;
-        }
-        final String trimmed = value.trim();
-        if (trimmed.length() > MAX_LENGTH) {
-            return false;
-        }
-        return PATTERN.matcher(trimmed).matches();
-    }
-
-    /**
-     * Converts the given string into the type.
-     *
-     * @param value
-     *            Value to convert.
-     *
-     * @return Returns <code>true</code> if it's a valid type else <code>false</code>.
-     */
-    public static ProjectionId valueOf(@Nullable final String value) {
-        if (value == null) {
-            return null;
-        }
-        return new ProjectionId(value);
-    }
-
-    /**
-     * Verifies if the argument is valid and throws an exception if this is not the case.
-     *
-     * @param name
-     *            Name of the value for a possible error message.
-     * @param value
-     *            Value to check.
-     *
-     * @throws ConstraintViolationException
-     *             The value was not valid.
-     */
-    public static void requireArgValid(@NotNull final String name, @NotNull final String value) throws ConstraintViolationException {
-        if (!isValid(value)) {
-            throw new ConstraintViolationException("The argument '" + name + "' is not valid: '" + value + "'");
-        }
     }
 
 }
