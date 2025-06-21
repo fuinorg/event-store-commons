@@ -42,7 +42,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
                                          @Nullable TenantContext tenantContext) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
-        this.tenantContext = tenantContext == null ? Optional::empty : tenantContext;
+        this.tenantContext = tenantContext == null ? new TenantContext.NoopTenantContext() : tenantContext;
     }
 
     @Override

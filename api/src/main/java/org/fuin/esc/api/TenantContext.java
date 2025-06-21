@@ -21,4 +21,15 @@ public interface TenantContext {
      */
     Optional<TenantId> getTenantId();
 
+    /**
+     * Noop tenant context.
+     */
+    class NoopTenantContext implements TenantContext {
+
+        @Override
+        public Optional<TenantId> getTenantId() {
+            return Optional.empty();
+        }
+    }
+
 }

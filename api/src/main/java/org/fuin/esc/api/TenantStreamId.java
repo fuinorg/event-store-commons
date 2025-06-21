@@ -26,57 +26,67 @@ import java.io.Serial;
 import java.util.List;
 
 /**
- * Represents a tenant stream identifier.
+ * Represents a stream identifier that may belong to a tenant.
+ * In case the tenant ID is {@literal null}, it's a normal stream.
  */
 public final class TenantStreamId implements StreamId {
+
+    /**
+     * Prefix used for projection streams that are emitted by projections.
+     * Will be used if the stream ID is of type {@link ProjectionStreamId}.
+     */
+    public static final String PROJECTION_PREFIX = "projection-";
 
     @Serial
     private static final long serialVersionUID = 1000L;
 
     private final TenantId tenantId;
 
-    private final StreamId delegate;
+    private final StreamId streamId;
 
     public TenantStreamId(@Nullable final TenantId tenantId, @NotNull final StreamId streamId) {
         super();
         Contract.requireArgNotNull("streamId", streamId);
         this.tenantId = tenantId;
-        this.delegate = streamId;
+        this.streamId = streamId;
     }
 
     @Override
     @NotNull
     public String getName() {
         if (tenantId == null) {
-            return delegate.getName();
+            if (streamId instanceof ProjectionStreamId) {
+                return PROJECTION_PREFIX + streamId.getName();
+            }
+            return streamId.getName();
         }
-        return tenantId + "-" + delegate.getName();
+        if (streamId instanceof ProjectionStreamId) {
+            return PROJECTION_PREFIX + tenantId + "-" + streamId.getName();
+        }
+        return tenantId + "-" + streamId.getName();
     }
 
     @Override
     public boolean isProjection() {
-        return delegate.isProjection();
+        return streamId.isProjection();
     }
 
     @Override
     @NotNull
     public <T> T getSingleParamValue() {
-        return delegate.getSingleParamValue();
+        return streamId.getSingleParamValue();
     }
 
     @Override
     @NotNull
     public List<KeyValue> getParameters() {
-        return delegate.getParameters();
+        return streamId.getParameters();
     }
 
     @Override
     @NotNull
     public String asString() {
-        if (tenantId == null) {
-            return delegate.asString();
-        }
-        return tenantId.asString() + "-" + delegate.asString();
+        return getName();
     }
 
     /**
@@ -95,13 +105,13 @@ public final class TenantStreamId implements StreamId {
      * @return Stream identifier.
      */
     @NotNull
-    public StreamId getDelegate() {
-        return delegate;
+    public StreamId getStreamId() {
+        return streamId;
     }
 
     @Override
     public int hashCode() {
-        return asString().hashCode();
+        return getName().hashCode();
     }
 
     @Override
@@ -116,12 +126,12 @@ public final class TenantStreamId implements StreamId {
             return false;
         }
         final TenantStreamId other = (TenantStreamId) obj;
-        return asString().equals(other.asString());
+        return getName().equals(other.getName());
     }
 
     @Override
     public String toString() {
-        return asString();
+        return getName();
     }
 
 }

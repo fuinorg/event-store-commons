@@ -18,8 +18,10 @@
 package org.fuin.esc.spi;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
+import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.Utils4J;
@@ -54,11 +56,11 @@ public final class ProjectionJavaScriptBuilder {
         count = 0;
         if (tenantId == null) {
             tenantProjection = false;
-            targetStream = targetStreamId.asString();
+            targetStream = new TenantStreamId(null, targetStreamId).getName();
             initAll();
         } else {
             tenantProjection = true;
-            targetStream = tenantId.asString() + "-" + targetStreamId.asString();
+            targetStream = new TenantStreamId(tenantId, targetStreamId).getName();
             initTenant(tenantId);
         }
     }
@@ -72,7 +74,7 @@ public final class ProjectionJavaScriptBuilder {
         Contract.requireArgNotNull("targetStreamId", targetStreamId);
         count = 0;
         tenantProjection = false;
-        targetStream = targetStreamId.asString();
+        targetStream = new TenantStreamId(null, targetStreamId).getName();
         initAll();
     }
 
@@ -90,7 +92,7 @@ public final class ProjectionJavaScriptBuilder {
         Contract.requireArgNotNull("targetStreamId", targetStreamId);
         count = 0;
         tenantProjection = false;
-        targetStream = targetStreamId.asString();
+        targetStream = new TenantStreamId(null, targetStreamId).getName();
         initCategory(categoryName);
     }
 

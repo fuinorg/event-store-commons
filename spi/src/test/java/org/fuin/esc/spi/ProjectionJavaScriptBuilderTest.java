@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.spi;
 
+import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.api.StreamId;
@@ -35,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class ProjectionJavaScriptBuilderTest {
 
-
     @Test
     public void testFromAll() {
 
@@ -52,7 +52,7 @@ public class ProjectionJavaScriptBuilderTest {
     }
 
     @Test
-    public void testNoEventType() {
+    public void testCategoryNoType() {
 
         final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));
         try {
@@ -66,7 +66,7 @@ public class ProjectionJavaScriptBuilderTest {
     }
 
     @Test
-    public void testOneEventType() {
+    public void testCategoryOneType() {
 
         final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));
         testee.type("AccountDebited");
@@ -84,7 +84,7 @@ public class ProjectionJavaScriptBuilderTest {
     public void testTenantOneType() {
 
         final TenantId tenantId = new SimpleTenantId("foo");
-        final StreamId streamId = new SimpleStreamId("the-view");
+        final ProjectionStreamId streamId = new ProjectionStreamId("TheView");
         final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(tenantId, streamId);
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
@@ -95,7 +95,7 @@ public class ProjectionJavaScriptBuilderTest {
                   fromCategory('foo').foreachStream().when({
                     'AccountDebited': function (state, ev) {
                        if (isTenant(ev)) {
-                          linkTo('foo-the-view', ev);
+                          linkTo('projection-foo-TheView', ev);
                        }
                     }
                   })
@@ -106,16 +106,17 @@ public class ProjectionJavaScriptBuilderTest {
     @Test
     public void testTwoEventTypes() {
 
-        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));;
+        final ProjectionStreamId streamId = new ProjectionStreamId("AccountsView");
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", streamId);
         testee.type("AccountDebited");
         testee.type("AccountCredited");
         assertThat(testee.build()).isEqualTo("""
                 fromCategory('account').foreachStream().when({
                   'AccountDebited': function(state, ev) {
-                      linkTo('AccountsView', ev);
+                      linkTo('projection-AccountsView', ev);
                   }
                 ,  'AccountCredited': function(state, ev) {
-                      linkTo('AccountsView', ev);
+                      linkTo('projection-AccountsView', ev);
                   }
                 })
                 """);

@@ -49,7 +49,7 @@ public class TenantStreamIdTest {
     @Test
     public void testEqualsHashCode() {
         EqualsVerifier.forClass(TenantStreamId.class)
-                .withNonnullFields("tenantId", "delegate")
+                .withNonnullFields("tenantId", "streamId")
                 .withPrefabValues(TenantId.class, new SimpleTenantId("red"), new SimpleTenantId("black"))
                 .withPrefabValues(StreamId.class, new SimpleStreamId("green"), new SimpleStreamId("yellow"))
                 .verify();
@@ -61,7 +61,7 @@ public class TenantStreamIdTest {
         assertThat(testee.asString()).isEqualTo(TENANT_ID.asString() + "-" + STREAM_ID.asString());
         assertThat(testee.isProjection()).isFalse();
         assertThat(testee.getParameters()).isEmpty();
-        assertThat(testee.getDelegate()).isEqualTo(STREAM_ID);
+        assertThat(testee.getStreamId()).isEqualTo(STREAM_ID);
         assertThat(testee.getTenantId()).isEqualTo(TENANT_ID);
     }
 

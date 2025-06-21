@@ -55,6 +55,7 @@ import org.fuin.utils4j.TestOmitted;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.fuin.esc.api.ExpectedVersion.ANY;
@@ -89,7 +90,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
                              @NotNull final DeserializerRegistry desRegistry,
                              @NotNull final IBaseTypeFactory baseTypeFactory,
                              @NotNull final EnhancedMimeType targetContentType,
-                             @Nullable final TenantContext tenantContext) {
+                             @NotNull final TenantContext tenantContext) {
         super();
         Contract.requireArgNotNull("es", es);
         Contract.requireArgNotNull("serRegistry", serRegistry);
@@ -530,7 +531,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             verifyNotNull("baseTypeFactory", baseTypeFactory);
             verifyNotNull("targetContentType", targetContentType);
             if (tenantContext == null) {
-                tenantContext = () -> null;
+                tenantContext = new TenantContext.NoopTenantContext();
             }
             return new ESGrpcEventStore(eventStore, serRegistry, desRegistry,
                     baseTypeFactory, targetContentType, tenantContext);
