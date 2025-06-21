@@ -155,7 +155,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         ensureStreamNoProjection(streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
 
         try {
             final Iterator<EventData> eventDataIt = asEventData(commonEvents).iterator();
@@ -188,7 +188,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         ensureStreamNoProjection(streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
         try {
             final DeleteStreamOptions options = DeleteStreamOptions.get()
                     .streamState(version2State(expectedVersion));
@@ -230,7 +230,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
         try {
 
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(start).maxCount(count)
@@ -262,7 +262,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
@@ -303,7 +303,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(0).maxCount(1);
             es.readStream(sid.asString(), options).get();
@@ -328,7 +328,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId(), streamId);
+        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
         try {
             es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
             return StreamState.ACTIVE;

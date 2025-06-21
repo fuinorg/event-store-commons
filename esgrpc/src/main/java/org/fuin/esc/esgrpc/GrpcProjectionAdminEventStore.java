@@ -19,6 +19,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.TestOmitted;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -34,14 +35,14 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     /**
      * Constructor with mandatory data.
      *
-     * @param es Connection that is maintained outside. Opening/Closing is up to the caller!
+     * @param es            Connection that is maintained outside. Opening/Closing is up to the caller!
      * @param tenantContext Optional tenant context.
      */
     public GrpcProjectionAdminEventStore(@NotNull KurrentDBProjectionManagementClient es,
                                          @Nullable TenantContext tenantContext) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
-        this.tenantContext = tenantContext == null ? () -> null : tenantContext;
+        this.tenantContext = tenantContext == null ? Optional::empty : tenantContext;
     }
 
     @Override
@@ -103,7 +104,9 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
                                  List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
-        final ProjectionJavaScriptBuilder builder = new ProjectionJavaScriptBuilder(tenantContext.getTenantId(), targetStreamId);
+        final ProjectionJavaScriptBuilder builder = new ProjectionJavaScriptBuilder(
+                tenantContext.getTenantId().orElse(null),
+                targetStreamId);
         final String javascript = builder.types(eventTypes).build();
 
         try {
@@ -150,10 +153,9 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         if (tenantContext == null) {
             return projectionId.getName();
         }
-        if (tenantContext.getTenantId() == null) {
-            return projectionId.getName();
-        }
-        return tenantContext.getTenantId().asString() + "-" + projectionId.getName();
+        return tenantContext.getTenantId()
+                .map(id -> id.asString() + "-" + projectionId.getName())
+                .orElse(projectionId.getName());
     }
 
 }

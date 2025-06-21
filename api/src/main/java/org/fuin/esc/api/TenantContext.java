@@ -3,6 +3,7 @@ package org.fuin.esc.api;
 import jakarta.annotation.Nullable;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.Optional;
 
 /**
  * Helper to return the current tenant.
@@ -18,7 +19,6 @@ public interface TenantContext {
      *
      * @return Optional tenant ID.
      */
-    @Nullable
-    TenantId getTenantId();
+    Optional<TenantId> getTenantId();
 
 }
