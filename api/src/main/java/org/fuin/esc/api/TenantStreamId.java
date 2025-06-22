@@ -56,14 +56,14 @@ public final class TenantStreamId implements StreamId {
     public String getName() {
         if (tenantId == null) {
             if (streamId instanceof ProjectionStreamId) {
-                return PROJECTION_PREFIX + streamId.getName();
+                return PROJECTION_PREFIX + streamId.asString();
             }
-            return streamId.getName();
+            return streamId.asString();
         }
         if (streamId instanceof ProjectionStreamId) {
-            return PROJECTION_PREFIX + tenantId + "-" + streamId.getName();
+            return PROJECTION_PREFIX + tenantId + "-" + streamId.asString();
         }
-        return tenantId + "-" + streamId.getName();
+        return tenantId + "-" + streamId.asString();
     }
 
     @Override
