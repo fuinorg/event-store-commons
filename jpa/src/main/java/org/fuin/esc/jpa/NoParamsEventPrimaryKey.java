@@ -37,6 +37,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
     /**
      * Default constructor for JPA. <b><i>CAUTION:</i> DO NOT USE IN APPLICATION CODE.</b>
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     public NoParamsEventPrimaryKey() {
         super();
     }
@@ -49,7 +50,7 @@ public final class NoParamsEventPrimaryKey implements Serializable {
      * @param eventNumber
      *            Number of the event within the stream.
      */
-    public NoParamsEventPrimaryKey(@NotNull final StreamId streamId, @NotNull final Long eventNumber) {
+    public NoParamsEventPrimaryKey(final StreamId streamId, final Long eventNumber) {
         super();
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("eventNumber", eventNumber);

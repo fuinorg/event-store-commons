@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
@@ -40,11 +40,12 @@ public final class TenantStreamId implements StreamId {
     @Serial
     private static final long serialVersionUID = 1000L;
 
+    @Nullable
     private final TenantId tenantId;
 
     private final StreamId streamId;
 
-    public TenantStreamId(@Nullable final TenantId tenantId, @NotNull final StreamId streamId) {
+    public TenantStreamId(@Nullable final TenantId tenantId, final StreamId streamId) {
         super();
         Contract.requireArgNotNull("streamId", streamId);
         this.tenantId = tenantId;

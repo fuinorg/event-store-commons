@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.slf4j.Logger;
@@ -79,8 +79,8 @@ public final class EscTestUtils {
      *
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final String identifier, final Class<? extends Exception> expectedExceptionClass,
-                                                       final String expectedExceptionMessage, final Exception exception) {
+    public static String createExceptionFailureMessage(final String identifier, @Nullable final Class<? extends Exception> expectedExceptionClass,
+                                                       @Nullable final String expectedExceptionMessage, final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
                 return "[" + identifier + "] OK";
@@ -100,7 +100,7 @@ public final class EscTestUtils {
         return msg;
     }
 
-    private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass, final String expectedExceptionMessage) {
+    private static String nameAndMessage(final Class<? extends Exception> expectedExceptionClass, @Nullable final String expectedExceptionMessage) {
         if (expectedExceptionMessage == null) {
             return expectedExceptionClass.getName();
         }
@@ -119,6 +119,7 @@ public final class EscTestUtils {
      *
      * @return String or <code>null</code> if the input string was "" or "-".
      */
+    @Nullable
     public static String emptyAsNull(@Nullable final String str) {
         if (str == null) {
             return null;
@@ -139,6 +140,7 @@ public final class EscTestUtils {
      *
      * @return Class.
      */
+    @Nullable
     @SuppressWarnings("unchecked")
     public static Class<? extends Exception> exceptionForName(final String exceptionName) {
         String name = emptyAsNull(exceptionName);

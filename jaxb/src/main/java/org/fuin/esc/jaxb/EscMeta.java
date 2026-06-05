@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -29,6 +29,8 @@ import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.objects4j.common.Contract;
+
+import java.util.Objects;
 
 /**
  * A structure that contains the user's metadata and the system's meta information.
@@ -44,26 +46,32 @@ public final class EscMeta implements IEscMeta {
     private String dataContentTypeStr;
 
     @XmlElement(name = IEscMeta.EL_TENANT)
+    @Nullable
     private String tenantId;
 
     @XmlElement(name = IEscMeta.EL_META_TYPE)
+    @Nullable
     private String metaType;
 
     @XmlElement(name = IEscMeta.EL_META_CONTENT_TYPE)
+    @Nullable
     private String metaContentTypeStr;
 
     @XmlAnyElement(lax = true)
+    @Nullable
     private Object meta;
 
     @XmlTransient
     private EnhancedMimeType dataContentType;
 
     @XmlTransient
+    @Nullable
     private EnhancedMimeType metaContentType;
 
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JAXB
     protected EscMeta() {
         super();
     }
@@ -74,8 +82,8 @@ public final class EscMeta implements IEscMeta {
      * @param dataType        Type of the data.
      * @param dataContentType Content type of the data.
      */
-    public EscMeta(@NotNull final String dataType,
-                   @NotNull final EnhancedMimeType dataContentType) {
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType) {
         this(dataType, dataContentType, null, null, null, null);
     }
 
@@ -88,8 +96,8 @@ public final class EscMeta implements IEscMeta {
      * @param metaContentType Type of the metadata if metadata is available.
      * @param meta            Meta data object if available.
      */
-    public EscMeta(@NotNull final String dataType,
-                   @NotNull final EnhancedMimeType dataContentType,
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
                    @Nullable final String metaType,
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta) {
@@ -106,8 +114,8 @@ public final class EscMeta implements IEscMeta {
      * @param meta            Meta data object if available.
      * @param tenantId        Optional unique tenant identifier.
      */
-    public EscMeta(@NotNull final String dataType,
-                   @NotNull final EnhancedMimeType dataContentType,
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
                    @Nullable final String metaType,
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta,
@@ -159,7 +167,7 @@ public final class EscMeta implements IEscMeta {
     @NotNull
     public EnhancedMimeType getDataContentType() {
         if (dataContentType == null) {
-            dataContentType = EnhancedMimeType.create(dataContentTypeStr);
+            dataContentType = Objects.requireNonNull(EnhancedMimeType.create(dataContentTypeStr));
         }
         return dataContentType;
     }
@@ -192,7 +200,7 @@ public final class EscMeta implements IEscMeta {
      *
      * @return Meta data object.
      */
-    @NotNull
+    @Nullable
     public Object getMeta() {
         return meta;
     }

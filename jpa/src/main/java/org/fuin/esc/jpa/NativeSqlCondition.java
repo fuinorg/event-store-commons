@@ -18,12 +18,14 @@
 package org.fuin.esc.jpa;
 
 import org.fuin.objects4j.common.Contract;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines a native SQL 'where' condition.
  */
 public final class NativeSqlCondition {
 
+    @Nullable
     private final String table;
 
     private final String column;
@@ -58,7 +60,7 @@ public final class NativeSqlCondition {
      * @param value
      *            Value of the attribute.
      */
-    public NativeSqlCondition(final String table, final String column, final String operator,
+    public NativeSqlCondition(@Nullable final String table, final String column, final String operator,
                               final Object value) {
         Contract.requireArgNotNull("column", column);
         Contract.requireArgNotNull("operator", operator);
@@ -74,6 +76,7 @@ public final class NativeSqlCondition {
      *
      * @return Optional table name or prefix.
      */
+    @Nullable
     public String getTable() {
         return table;
     }

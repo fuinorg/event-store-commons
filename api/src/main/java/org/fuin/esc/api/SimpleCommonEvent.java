@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
@@ -47,14 +47,17 @@ public final class SimpleCommonEvent implements CommonEvent {
     private Object data;
 
     /** Never changing unique meta type name. */
+    @Nullable
     private TypeName metaType;
 
     /** The meta data. */
+    @Nullable
     private Object meta;
 
     /**
      * Protected constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the deserialization framework
     protected SimpleCommonEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -72,9 +75,9 @@ public final class SimpleCommonEvent implements CommonEvent {
      * @param tenantId
      *            Optional unique tenant identifier.
      */
-    public SimpleCommonEvent(@NotNull final EventId id,
-                             @NotNull final TypeName dataType,
-                             @NotNull final Object data,
+    public SimpleCommonEvent(final EventId id,
+                             final TypeName dataType,
+                             final Object data,
                              @Nullable final TenantId tenantId) {
         this(id, dataType, data, null, null, tenantId);
     }
@@ -96,9 +99,9 @@ public final class SimpleCommonEvent implements CommonEvent {
      * @param tenantId
      *            Optional unique tenant identifier.
      */
-    public SimpleCommonEvent(@NotNull final EventId id,
-                             @NotNull final TypeName dataType,
-                             @NotNull final Object data,
+    public SimpleCommonEvent(final EventId id,
+                             final TypeName dataType,
+                             final Object data,
                              @Nullable final TypeName metaType,
                              @Nullable final Object meta,
                              @Nullable final TenantId tenantId) {//NOSONAR
@@ -138,11 +141,13 @@ public final class SimpleCommonEvent implements CommonEvent {
         return data;
     }
 
+    @Nullable
     @Override
     public TypeName getMetaType() {
         return metaType;
     }
 
+    @Nullable
     @Override
     public Object getMeta() {
         return meta;

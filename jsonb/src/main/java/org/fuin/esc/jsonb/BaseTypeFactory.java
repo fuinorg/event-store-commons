@@ -1,7 +1,6 @@
 package org.fuin.esc.jsonb;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IBaseTypeFactory;
@@ -14,13 +13,13 @@ import org.fuin.esc.api.TenantId;
 public final class BaseTypeFactory implements IBaseTypeFactory {
 
     @Override
-    public IBase64Data createBase64Data(@NotNull byte[] binaryData) {
+    public IBase64Data createBase64Data(byte[] binaryData) {
         return new Base64Data(binaryData);
     }
 
     @Override
-    public IEscMeta createEscMeta(@NotNull String dataType,
-                                  @NotNull EnhancedMimeType dataContentType,
+    public IEscMeta createEscMeta(String dataType,
+                                  EnhancedMimeType dataContentType,
                                   @Nullable String metaType,
                                   @Nullable EnhancedMimeType metaContentType,
                                   @Nullable Object meta,

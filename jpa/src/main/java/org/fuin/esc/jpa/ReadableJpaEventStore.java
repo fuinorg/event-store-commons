@@ -18,7 +18,6 @@
 package org.fuin.esc.jpa;
 
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.utils4j.TestOmitted;
@@ -39,8 +38,8 @@ public final class ReadableJpaEventStore extends AbstractJpaEventStore {
      * @param desRegistry
      *            Registry used to locate deserializers.
      */
-    public ReadableJpaEventStore(@NotNull final EntityManager em,
-                                 @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+    public ReadableJpaEventStore(final EntityManager em,
+                                 final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
     }
 

@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import javax.annotation.concurrent.Immutable;

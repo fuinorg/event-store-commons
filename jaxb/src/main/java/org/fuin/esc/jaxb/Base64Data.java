@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlValue;
@@ -43,6 +42,7 @@ public final class Base64Data implements IBase64Data {
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JAXB
     protected Base64Data() {
         super();
     }
@@ -52,7 +52,7 @@ public final class Base64Data implements IBase64Data {
      *
      * @param base64Str Base64 encoded data.
      */
-    public Base64Data(@NotNull final String base64Str) {
+    public Base64Data(final String base64Str) {
         super();
         Contract.requireArgNotNull("base64Str", base64Str);
         this.base64Str = base64Str;
@@ -64,7 +64,7 @@ public final class Base64Data implements IBase64Data {
      *
      * @param binaryData Binary data.
      */
-    public Base64Data(@NotNull final byte[] binaryData) {
+    public Base64Data(final byte[] binaryData) {
         super();
         Contract.requireArgNotNull("binaryData", binaryData);
         this.base64Str = Base64.getEncoder().encodeToString(binaryData);

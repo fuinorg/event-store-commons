@@ -31,6 +31,7 @@ public final class DataWrapper implements IDataWrapper {
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Field is populated by the JSON-B deserializer
     protected DataWrapper() {
         super();
     }
@@ -41,7 +42,7 @@ public final class DataWrapper implements IDataWrapper {
      * @param obj
      *            Object to wrap.
      */
-    public DataWrapper(@NotNull final Object obj) {
+    public DataWrapper(final Object obj) {
         super();
         Contract.requireArgNotNull("obj", obj);
         this.obj = obj;

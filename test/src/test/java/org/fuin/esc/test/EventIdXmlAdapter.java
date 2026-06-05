@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.test;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import org.fuin.esc.api.EventId;
 

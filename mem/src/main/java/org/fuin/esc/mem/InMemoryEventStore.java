@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.mem;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventNotFoundException;
 import org.fuin.esc.api.ExpectedVersion;
@@ -33,6 +32,7 @@ import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
@@ -62,7 +63,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
      * @param executor
      *            Executor used to create the necessary threads for event notifications.
      */
-    public InMemoryEventStore(@NotNull final Executor executor) {
+    public InMemoryEventStore(final Executor executor) {
         super();
         Contract.requireArgNotNull("executor", executor);
 
@@ -265,7 +266,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     @Override
     public long appendToStream(final StreamId streamId, final long expectedVersion, final CommonEvent... events) {
 
-        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
+        return appendToStream(streamId, expectedVersion, Objects.requireNonNull(EscSpiUtils.asList(events)));
 
     }
 
@@ -281,7 +282,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         Contract.requireArgNotNull("events", events);
 
-        return appendToStream(streamId, EscSpiUtils.asList(events));
+        return appendToStream(streamId, Objects.requireNonNull(EscSpiUtils.asList(events)));
 
     }
 
@@ -372,11 +373,13 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
                     final BiConsumer<Subscription, CommonEvent> eventListener = internalSubscription.getEventListener();
                     final InMemorySubscription subscription = internalSubscription.getSubscription();
                     final List<CommonEvent> copy = new ArrayList<>(events);
-                    executor.execute(() -> {
-                        for (long i = idx; i < copy.size(); i++) {
-                            eventListener.accept(subscription, copy.get((int) i));
-                        }
-                    });
+                    if (eventListener != null) {
+                        executor.execute(() -> {
+                            for (long i = idx; i < copy.size(); i++) {
+                                eventListener.accept(subscription, copy.get((int) i));
+                            }
+                        });
+                    }
                 }
             }
 
@@ -495,6 +498,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
         private final InMemorySubscription subscription;
 
+        @Nullable
         private final BiConsumer<Subscription, CommonEvent> eventListener;
 
         /**
@@ -515,7 +519,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
          * @param eventListener
          *            Listens to events.
          */
-        public InternalSubscription(final InMemorySubscription subscription, final BiConsumer<Subscription, CommonEvent> eventListener) {
+        public InternalSubscription(final InMemorySubscription subscription, @Nullable final BiConsumer<Subscription, CommonEvent> eventListener) {
             super();
             this.subscription = subscription;
             this.eventListener = eventListener;
@@ -555,6 +559,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
          *
          * @return the listener
          */
+        @Nullable
         public BiConsumer<Subscription, CommonEvent> getEventListener() {
             return eventListener;
         }

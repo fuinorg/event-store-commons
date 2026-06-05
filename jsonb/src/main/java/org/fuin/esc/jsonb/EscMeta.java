@@ -17,14 +17,17 @@
  */
 package org.fuin.esc.jsonb;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.api.TenantId;
+import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
+
+import java.util.Objects;
 
 /**
  * A structure that contains the user's metadata and the system's meta information.
@@ -36,21 +39,27 @@ public final class EscMeta implements IEscMeta {
 
     private String dataContentTypeStr;
 
+    @Nullable
     private String tenantId;
 
+    @Nullable
     private String metaType;
 
+    @Nullable
     private String metaContentTypeStr;
 
+    @Nullable
     private Object meta;
 
     private transient EnhancedMimeType dataContentType;
 
+    @Nullable
     private transient EnhancedMimeType metaContentType;
 
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the JSON-B deserializer
     protected EscMeta() {
         super();
     }
@@ -61,7 +70,7 @@ public final class EscMeta implements IEscMeta {
      * @param dataType        Type of the data.
      * @param dataContentType Content type of the data.
      */
-    public EscMeta(@NotNull final String dataType, @NotNull final EnhancedMimeType dataContentType) {
+    public EscMeta(final String dataType, final EnhancedMimeType dataContentType) {
         this(dataType, dataContentType, null, null, null, null);
     }
 
@@ -74,8 +83,8 @@ public final class EscMeta implements IEscMeta {
      * @param metaContentType Type of the metadata. Must be non-null if 'meta' is not null.
      * @param meta            Metadata object, if available.
      */
-    public EscMeta(@NotNull final String dataType,
-                   @NotNull final EnhancedMimeType dataContentType,
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
                    @Nullable final String metaType,
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta) {
@@ -92,8 +101,8 @@ public final class EscMeta implements IEscMeta {
      * @param meta            Metadata object, if available.
      * @param tenantId        Optional unique tenant identifier.
      */
-    public EscMeta(@NotNull final String dataType,
-                   @NotNull final EnhancedMimeType dataContentType,
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
                    @Nullable final String metaType,
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta,
@@ -102,8 +111,12 @@ public final class EscMeta implements IEscMeta {
         Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("dataContentType", dataContentType);
         if (meta != null) {
-            Contract.requireArgNotNull("metaType", metaType);
-            Contract.requireArgNotNull("metaContentType", metaContentType);
+            if (metaType == null) {
+                throw new ConstraintViolationException("The argument 'metaType' cannot be null");
+            }
+            if (metaContentType == null) {
+                throw new ConstraintViolationException("The argument 'metaContentType' cannot be null");
+            }
         }
 
         this.dataType = dataType;
@@ -133,7 +146,7 @@ public final class EscMeta implements IEscMeta {
      *
      * @param dataType Data type.
      */
-    void setDataType(@NotNull final String dataType) {
+    void setDataType(final String dataType) {
         Contract.requireArgNotNull("dataType", dataType);
         this.dataType = dataType;
     }
@@ -146,7 +159,7 @@ public final class EscMeta implements IEscMeta {
     @NotNull
     public EnhancedMimeType getDataContentType() {
         if (dataContentType == null) {
-            dataContentType = EnhancedMimeType.create(dataContentTypeStr);
+            dataContentType = Objects.requireNonNull(EnhancedMimeType.create(dataContentTypeStr));
         }
         return dataContentType;
     }

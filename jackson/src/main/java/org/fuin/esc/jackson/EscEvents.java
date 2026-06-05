@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jackson;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.IEscEvents;
@@ -38,6 +37,7 @@ public final class EscEvents implements IEscEvents {
     /**
      * Default constructor for Jackson.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the Jackson deserializer
     protected EscEvents() {
         super();
     }
@@ -47,7 +47,7 @@ public final class EscEvents implements IEscEvents {
      *
      * @param events Event array.
      */
-    public EscEvents(@NotNull final EscEvent... events) {
+    public EscEvents(final EscEvent... events) {
         this(Arrays.asList(events));
     }
 
@@ -56,7 +56,7 @@ public final class EscEvents implements IEscEvents {
      *
      * @param events Event list.
      */
-    public EscEvents(@NotNull final List<EscEvent> events) {
+    public EscEvents(final List<EscEvent> events) {
         super();
         Contract.requireArgNotNull("events", events);
         this.list = events;

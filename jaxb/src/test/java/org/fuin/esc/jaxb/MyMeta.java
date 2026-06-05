@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;

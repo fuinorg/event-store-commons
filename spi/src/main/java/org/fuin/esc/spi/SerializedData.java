@@ -27,6 +27,7 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Represents a block of data in a serialized form.
@@ -52,6 +53,7 @@ public class SerializedData implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the deserialization framework
     protected SerializedData() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -66,8 +68,8 @@ public class SerializedData implements ValueObject, Serializable {
      * @param raw
      *            Raw data block.
      */
-    public SerializedData(@NotNull final SerializedDataType type,
-                          @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
+    public SerializedData(final SerializedDataType type,
+                          final EnhancedMimeType mimeType, final byte[] raw) {
         super();
 
         Contract.requireArgNotNull("type", type);
@@ -96,7 +98,7 @@ public class SerializedData implements ValueObject, Serializable {
      */
     @NotNull
     public final EnhancedMimeType getMimeType() {
-        return EnhancedMimeType.create(mimeType);
+        return Objects.requireNonNull(EnhancedMimeType.create(mimeType));
     }
 
     /**

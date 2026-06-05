@@ -44,6 +44,7 @@ public abstract class JpaStreamEvent {
     /**
      * Protected default constructor only required for JPA.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected JpaStreamEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -54,7 +55,7 @@ public abstract class JpaStreamEvent {
      * @param event
      *            Event to be connected with this event stream.
      */
-    public JpaStreamEvent(@NotNull final JpaEvent event) {
+    public JpaStreamEvent(final JpaEvent event) {
         super();
         Contract.requireArgNotNull("eventEntry", event);
         this.event = event;

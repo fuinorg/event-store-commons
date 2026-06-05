@@ -17,8 +17,7 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
@@ -44,11 +43,13 @@ public final class EscEvent implements IEscEvent {
     private DataWrapper data;
 
     @XmlElement(name = IEscEvent.EL_META_DATA)
+    @Nullable
     private DataWrapper meta;
 
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JAXB
     protected EscEvent() {
         super();
     }
@@ -60,7 +61,7 @@ public final class EscEvent implements IEscEvent {
      * @param eventType Unique type name of the event.
      * @param data      The data.
      */
-    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, @NotNull final DataWrapper data) {
+    public EscEvent(final UUID eventId, final String eventType, final DataWrapper data) {
         this(eventId, eventType, data, null);
     }
 
@@ -72,7 +73,7 @@ public final class EscEvent implements IEscEvent {
      * @param data      The data.
      * @param meta      The meta data if available.
      */
-    public EscEvent(@NotNull final UUID eventId, @NotNull final String eventType, @NotNull final DataWrapper data,
+    public EscEvent(final UUID eventId, final String eventType, final DataWrapper data,
                     @Nullable final DataWrapper meta) {
         super();
         Contract.requireArgNotNull("eventId", eventId);
@@ -116,6 +117,7 @@ public final class EscEvent implements IEscEvent {
      *
      * @return Metadata.
      */
+    @Nullable
     public DataWrapper getMeta() {
         return meta;
     }

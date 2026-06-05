@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -73,11 +73,11 @@ public final class XmlDeSerializer implements SerDeserializer {
      * @param jaxbFragment     Generate the XML fragment or not.
      * @param classesToBeBound Classes to use for the JAXB context.
      */
-    private XmlDeSerializer(@NotNull final Charset encoding,
+    private XmlDeSerializer(final Charset encoding,
                            @Nullable final String version,
                            @Nullable final XmlAdapter<?, ?>[] adapters,
                            final boolean jaxbFragment,
-                           @NotNull final Class<?>... classesToBeBound) {
+                           final Class<?>... classesToBeBound) {
         super();
         this.mimeType = EnhancedMimeType.create("application", "xml", encoding, version);
         try {
@@ -115,7 +115,7 @@ public final class XmlDeSerializer implements SerDeserializer {
     }
 
     @Override
-    public byte[] marshal(@NotNull final Object obj, @NotNull final SerializedDataType type) {
+    public byte[] marshal(final Object obj, final SerializedDataType type) {
         Contract.requireArgNotNull("obj", obj);
         Contract.requireArgNotNull("type", type);
         try {
@@ -177,6 +177,7 @@ public final class XmlDeSerializer implements SerDeserializer {
 
         private Charset encoding;
 
+        @Nullable
         private String version;
 
         private boolean jaxbFragment;
@@ -201,7 +202,7 @@ public final class XmlDeSerializer implements SerDeserializer {
          * @param encoding Encoding.
          * @return Builder.
          */
-        public Builder encoding(@NotNull final Charset encoding) {
+        public Builder encoding(final Charset encoding) {
             this.encoding = Objects.requireNonNull(encoding, "encoding==null");
             return this;
         }
@@ -223,7 +224,7 @@ public final class XmlDeSerializer implements SerDeserializer {
          * @param classToBeBound Class to add.
          * @return Builder.
          */
-        public Builder add(@NotNull final Class<?> classToBeBound) {
+        public Builder add(final Class<?> classToBeBound) {
             this.classesToBeBound.add(Objects.requireNonNull(classToBeBound, "classToBeBound==null"));
             return this;
         }
@@ -234,7 +235,7 @@ public final class XmlDeSerializer implements SerDeserializer {
          * @param adapter Adapter to add.
          * @return Builder.
          */
-        public Builder add(@NotNull final XmlAdapter<?, ?> adapter) {
+        public Builder add(final XmlAdapter<?, ?> adapter) {
             this.adapters.add(Objects.requireNonNull(adapter, "adapter==null"));
             return this;
         }

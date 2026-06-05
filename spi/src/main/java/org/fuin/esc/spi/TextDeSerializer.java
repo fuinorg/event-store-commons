@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.spi;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializer;
 import org.fuin.esc.api.SerializedDataType;
@@ -45,7 +44,7 @@ public final class TextDeSerializer implements SerDeserializer {
      * @param encoding
      *            Default encoding to use.
      */
-    public TextDeSerializer(@NotNull final Charset encoding) {
+    public TextDeSerializer(final Charset encoding) {
         super();
         this.mimeType = EnhancedMimeType.create("text", "plain", encoding);
     }
@@ -56,7 +55,7 @@ public final class TextDeSerializer implements SerDeserializer {
     }
 
     @Override
-    public byte[] marshal(@NotNull final Object obj, @NotNull final SerializedDataType type) {
+    public byte[] marshal(final Object obj, final SerializedDataType type) {
         if (!(obj instanceof String str)) {
             throw new IllegalArgumentException("Can only handle instances of type 'String', but not: "
                     + obj.getClass());
@@ -66,7 +65,7 @@ public final class TextDeSerializer implements SerDeserializer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T unmarshal(@NotNull final Object data, @NotNull final SerializedDataType type, @NotNull final EnhancedMimeType mimeType) {
+    public <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
 
         if (data instanceof byte[]) {
             return (T) new String((byte[]) data, mimeType.getEncoding());

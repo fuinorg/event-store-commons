@@ -59,9 +59,9 @@ public final class JsonbSerDeserializer implements SerDeserializer, Closeable {
      * @param typeRegistry  Type registry.
      * @param encoding      Encoding to use.
      */
-    public JsonbSerDeserializer(@NotNull final JsonbProvider jsonbProvider,
-                                @NotNull final SerializedDataTypeRegistry typeRegistry,
-                                @NotNull final Charset encoding) {
+    public JsonbSerDeserializer(final JsonbProvider jsonbProvider,
+                                final SerializedDataTypeRegistry typeRegistry,
+                                final Charset encoding) {
         super();
         Objects.requireNonNull(jsonbProvider, "jsonbProvider==null");
         Objects.requireNonNull(typeRegistry, "typeRegistry==null");
@@ -78,7 +78,7 @@ public final class JsonbSerDeserializer implements SerDeserializer, Closeable {
     }
 
     @Override
-    public byte[] marshal(@NotNull final Object obj, @NotNull final SerializedDataType type) {
+    public byte[] marshal(final Object obj, final SerializedDataType type) {
         Objects.requireNonNull(obj, "obj==null");
         Objects.requireNonNull(type, "type==null");
         try {
@@ -98,7 +98,7 @@ public final class JsonbSerDeserializer implements SerDeserializer, Closeable {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T unmarshal(@NotNull final Object data, @NotNull final SerializedDataType type, @NotNull final EnhancedMimeType mimeType) {
+    public <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
         Objects.requireNonNull(data, "data==null");
         Objects.requireNonNull(type, "type==null");
         Objects.requireNonNull(mimeType, "mimeType==null");

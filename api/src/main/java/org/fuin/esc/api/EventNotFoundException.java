@@ -42,7 +42,7 @@ public final class EventNotFoundException extends RuntimeException {
      * @param eventNumber
      *            Number of the event that was not found.
      */
-    public EventNotFoundException(@NotNull final StreamId streamId,
+    public EventNotFoundException(final StreamId streamId,
                                   final long eventNumber) {
         super("Version " + eventNumber + " does not exist on stream '"
                 + streamId + "'");

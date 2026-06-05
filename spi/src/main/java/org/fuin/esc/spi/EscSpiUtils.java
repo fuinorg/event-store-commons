@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Deserializer;
@@ -33,6 +33,7 @@ import org.fuin.objects4j.common.Contract;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utilities to ease the implementation of service provider implementations.
@@ -59,7 +60,7 @@ public final class EscSpiUtils {
      * @return Event ready to persist or <code>null</code> if the given data was <code>null</code>.
      */
     @Nullable
-    public static SerializedData serialize(@NotNull final SerializerRegistry registry, @NotNull final SerializedDataType type,
+    public static SerializedData serialize(final SerializerRegistry registry, final SerializedDataType type,
                                            @Nullable final Object data) {
 
         if (data == null) {
@@ -87,7 +88,7 @@ public final class EscSpiUtils {
      *            Expected type of event.
      */
     @NotNull
-    public static <T> T deserialize(@NotNull final DeserializerRegistry registry, @NotNull final SerializedData data) {
+    public static <T> T deserialize(final DeserializerRegistry registry, final SerializedData data) {
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("data", data);
         final Deserializer deserializer = registry.getDeserializer(data.getType(), data.getMimeType());
@@ -105,7 +106,8 @@ public final class EscSpiUtils {
      *
      * @return Mime type if all events share the same type or <code>null</code> if there are events with different mime types.
      */
-    public static EnhancedMimeType mimeType(@NotNull final SerializerRegistry registry, @NotNull final List<CommonEvent> commonEvents) {
+    @Nullable
+    public static EnhancedMimeType mimeType(final SerializerRegistry registry, final List<CommonEvent> commonEvents) {
 
         Contract.requireArgNotNull("registry", registry);
         Contract.requireArgNotNull("commonEvents", commonEvents);
@@ -194,9 +196,10 @@ public final class EscSpiUtils {
      *
      * @return New meta instance.
      */
-    public static IEscMeta createEscMeta(@NotNull final SerializerRegistry registry,
-                                         @NotNull final IBaseTypeFactory baseTypeFactory,
-                                         @NotNull final EnhancedMimeType targetContentType,
+    @Nullable
+    public static IEscMeta createEscMeta(final SerializerRegistry registry,
+                                         final IBaseTypeFactory baseTypeFactory,
+                                         final EnhancedMimeType targetContentType,
                                          @Nullable final CommonEvent commonEvent) {
 
         Contract.requireArgNotNull("registry", registry);
@@ -214,7 +217,7 @@ public final class EscSpiUtils {
             return baseTypeFactory.createEscMeta(dataType, dataContentType, null, null, null, commonEvent.getTenantId());
         }
 
-        final String metaType = commonEvent.getMetaType().asBaseType();
+        final String metaType = Objects.requireNonNull(commonEvent.getMetaType(), "metaType").asBaseType();
         final SerializedDataType serDataType = new SerializedDataType(metaType);
         final Serializer metaSerializer = registry.getSerializer(serDataType);
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
@@ -231,7 +234,7 @@ public final class EscSpiUtils {
         if (sourceContentType.matchEncoding(targetContentType)) {
             return sourceContentType;
         }
-        return EnhancedMimeType.create(sourceContentType + "; transfer-encoding=base64");
+        return Objects.requireNonNull(EnhancedMimeType.create(sourceContentType + "; transfer-encoding=base64"));
     }
 
 }

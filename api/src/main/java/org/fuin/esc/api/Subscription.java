@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
@@ -32,6 +32,7 @@ public abstract class Subscription implements Serializable {
 
     private final StreamId streamId;
 
+    @Nullable
     private final Long lastEventNumber;
 
     /**
@@ -42,7 +43,7 @@ public abstract class Subscription implements Serializable {
      * @param lastEventNumber
      *            Number of the last event written to the stream.
      */
-    public Subscription(@NotNull final StreamId streamId,
+    public Subscription(final StreamId streamId,
                         @Nullable final Long lastEventNumber) {
         this.streamId = streamId;
         this.lastEventNumber = lastEventNumber;

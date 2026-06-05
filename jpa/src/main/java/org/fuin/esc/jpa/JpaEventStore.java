@@ -20,7 +20,6 @@ package org.fuin.esc.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EventStore;
@@ -37,10 +36,12 @@ import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.fuin.esc.api.ExpectedVersion.ANY;
 
@@ -65,8 +66,8 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
      * @param desRegistry
      *            Registry used to locate deserializers.
      */
-    public JpaEventStore(@NotNull final EntityManager em, @NotNull final JpaIdStreamFactory streamFactory,
-                         @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+    public JpaEventStore(final EntityManager em, final JpaIdStreamFactory streamFactory,
+                         final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
         Contract.requireArgNotNull("streamFactory", streamFactory);
         this.streamFactory = streamFactory;
@@ -84,13 +85,13 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     @Override
     public long appendToStream(final StreamId streamId, final CommonEvent... events) {
-        return appendToStream(streamId, ANY.getNo(), EscSpiUtils.asList(events));
+        return appendToStream(streamId, ANY.getNo(), Objects.requireNonNull(EscSpiUtils.asList(events)));
     }
 
     @Override
     public long appendToStream(final StreamId streamId, final long expectedVersion,
                                final CommonEvent... events) {
-        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
+        return appendToStream(streamId, expectedVersion, Objects.requireNonNull(EscSpiUtils.asList(events)));
     }
 
     @Override
@@ -190,6 +191,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
 
     }
 
+    @Nullable
     private JpaStream findAndLockJpaStream(final StreamId streamId) {
         if (!streamEntityExists(streamId)) {
             return null;
@@ -210,23 +212,24 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
                 + sql + "]");
     }
 
-    private JpaEvent asJpaEvent(final CommonEvent commonEvent) {
+    @Nullable
+    private JpaEvent asJpaEvent(@Nullable final CommonEvent commonEvent) {
         if (commonEvent == null) {
             return null;
         }
 
         // Serialize data
         final SerializedDataType serDataType = new SerializedDataType(commonEvent.getDataType().asBaseType());
-        final SerializedData serData = serialize(serDataType, commonEvent.getData());
+        final SerializedData serData = Objects.requireNonNull(serialize(serDataType, commonEvent.getData()));
 
         // Serialize meta data
-        final SerializedDataType serMetaType;
+        final SerializedData serMeta;
         if (commonEvent.getMetaType() == null) {
-            serMetaType = null;
+            serMeta = null;
         } else {
-            serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+            final SerializedDataType serMetaType = new SerializedDataType(commonEvent.getMetaType().asBaseType());
+            serMeta = serialize(serMetaType, commonEvent.getMeta());
         }
-        final SerializedData serMeta = serialize(serMetaType, commonEvent.getMeta());
 
         // Create the JPA event to store
         final JpaData jpaData = new JpaData(serData);

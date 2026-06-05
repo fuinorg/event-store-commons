@@ -54,7 +54,7 @@ public interface StreamId extends Serializable {
      * @param <T>
      *            Type of the returned value.
      */
-    @NotNull <T> T getSingleParamValue();
+    <T> T getSingleParamValue();
 
     /**
      * Returns the parameters used in addition to the pure stream name to identify the stream.

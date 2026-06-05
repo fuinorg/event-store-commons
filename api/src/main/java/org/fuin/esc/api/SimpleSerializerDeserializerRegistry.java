@@ -17,8 +17,8 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,22 +45,22 @@ public final class SimpleSerializerDeserializerRegistry implements SerDeserializ
         this.defaultMimeType = Objects.requireNonNull(defaultMimeType, "defaultMimeType==null");
     }
 
-    private void addSerDeserializer(@NotNull final SerializedDataType type,
-                                    @NotNull final SerDeserializer serDeserializer,
-                                    final EnhancedMimeType mimeType) {
+    private void addSerDeserializer(final SerializedDataType type,
+                                    final SerDeserializer serDeserializer,
+                                    @Nullable final EnhancedMimeType mimeType) {
         this.addSerializer(type, serDeserializer);
         this.addDeserializer(type, serDeserializer, mimeType);
     }
 
-    private void addDeserializer(@NotNull final SerializedDataType type,
-                                 @NotNull final Deserializer deserializer,
-                                 final EnhancedMimeType mimeType) {
+    private void addDeserializer(final SerializedDataType type,
+                                 final Deserializer deserializer,
+                                 @Nullable final EnhancedMimeType mimeType) {
         final Key key = new Key(type, mimeType == null ? defaultMimeType : mimeType);
         desMap.put(key, deserializer);
     }
 
-    private void addSerializer(@NotNull final SerializedDataType type,
-                               @NotNull final Serializer serializer) {
+    private void addSerializer(final SerializedDataType type,
+                               final Serializer serializer) {
         serMap.put(type, serializer);
     }
 

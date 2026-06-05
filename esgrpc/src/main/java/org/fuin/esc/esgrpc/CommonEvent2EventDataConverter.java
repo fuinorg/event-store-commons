@@ -19,7 +19,6 @@ package org.fuin.esc.esgrpc;
 
 import io.kurrent.dbclient.EventData;
 import io.kurrent.dbclient.EventDataBuilder;
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Converter;
 import org.fuin.esc.api.EnhancedMimeType;
@@ -33,6 +32,7 @@ import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * Converts a {@link CommonEvent} into {@link EventData}.
@@ -59,8 +59,8 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
      * @param targetContentType Target content type (Allows only 'application/xml'
      *                          or 'application/json' with 'utf-8' encoding).
      */
-    public CommonEvent2EventDataConverter(@NotNull final SerializerRegistry serRegistry,
-                                          @NotNull final IBaseTypeFactory baseTypeFactory,
+    public CommonEvent2EventDataConverter(final SerializerRegistry serRegistry,
+                                          final IBaseTypeFactory baseTypeFactory,
                                           final EnhancedMimeType targetContentType) {
         super();
         Contract.requireArgNotNull("serRegistry", serRegistry);
@@ -100,7 +100,8 @@ public final class CommonEvent2EventDataConverter implements Converter<CommonEve
         }
 
         // EscMeta
-        final IEscMeta escMeta = EscSpiUtils.createEscMeta(serRegistry, baseTypeFactory, targetContentType, commonEvent);
+        final IEscMeta escMeta = Objects.requireNonNull(
+                EscSpiUtils.createEscMeta(serRegistry, baseTypeFactory, targetContentType, commonEvent));
         final SerializedDataType escMetaType = new SerializedDataType(IEscMeta.TYPE.asBaseType());
         final Serializer escMetaSerializer = getSerializer(escMetaType);
         final byte[] escSerMeta = escMetaSerializer.marshal(escMeta, escMetaType);

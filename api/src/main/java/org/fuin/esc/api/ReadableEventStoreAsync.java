@@ -49,7 +49,7 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    CompletableFuture<StreamEventsSlice> readEventsForward(@NotNull StreamId streamId, long start,
+    CompletableFuture<StreamEventsSlice> readEventsForward(StreamId streamId, long start,
                                                            int count);
 
     /**
@@ -74,7 +74,7 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    CompletableFuture<StreamEventsSlice> readEventsBackward(@NotNull StreamId streamId, long start,
+    CompletableFuture<StreamEventsSlice> readEventsBackward(StreamId streamId, long start,
                                                             int count);
 
     /**
@@ -97,7 +97,7 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    CompletableFuture<CommonEvent> readEvent(@NotNull StreamId streamId, long eventNumber);
+    CompletableFuture<CommonEvent> readEvent(StreamId streamId, long eventNumber);
 
     /**
      * Determines if a stream exists.
@@ -108,7 +108,7 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      * @return TRUE if the stream exists, else FALSE.
      */
     @NotNull
-    CompletableFuture<Boolean> streamExists(@NotNull StreamId streamId);
+    CompletableFuture<Boolean> streamExists(StreamId streamId);
 
     /**
      * Returns the state of the stream.
@@ -123,6 +123,6 @@ public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
      *             repository.
      */
     @NotNull
-    CompletableFuture<StreamState> streamState(@NotNull StreamId streamId);
+    CompletableFuture<StreamState> streamState(StreamId streamId);
 
 }

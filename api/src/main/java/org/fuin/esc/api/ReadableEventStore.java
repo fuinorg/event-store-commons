@@ -47,7 +47,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    StreamEventsSlice readEventsForward(@NotNull StreamId streamId,
+    StreamEventsSlice readEventsForward(StreamId streamId,
                                         long start, int count);
 
     /**
@@ -72,7 +72,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    StreamEventsSlice readEventsBackward(@NotNull StreamId streamId,
+    StreamEventsSlice readEventsBackward(StreamId streamId,
                                          long start, int count);
 
     /**
@@ -95,7 +95,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    CommonEvent readEvent(@NotNull StreamId streamId, long eventNumber);
+    CommonEvent readEvent(StreamId streamId, long eventNumber);
 
     /**
      * Determines if a stream exists.
@@ -105,7 +105,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *
      * @return TRUE if the stream exists, else FALSE.
      */
-    boolean streamExists(@NotNull StreamId streamId);
+    boolean streamExists(StreamId streamId);
 
     /**
      * Returns the state of the stream.
@@ -120,7 +120,7 @@ public interface ReadableEventStore extends EventStoreBasics {
      *             repository.
      */
     @NotNull
-    StreamState streamState(@NotNull StreamId streamId);
+    StreamState streamState(StreamId streamId);
 
     /**
      * Reads all events until the end of the stream. A stream that does not

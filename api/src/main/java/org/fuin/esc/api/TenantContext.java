@@ -1,6 +1,6 @@
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Optional;

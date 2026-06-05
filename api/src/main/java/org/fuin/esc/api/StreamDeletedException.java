@@ -38,7 +38,7 @@ public final class StreamDeletedException extends RuntimeException {
      * @param streamId
      *            Unique name of the stream.
      */
-    public StreamDeletedException(@NotNull final StreamId streamId) {
+    public StreamDeletedException(final StreamId streamId) {
         super("Stream '" + streamId + "' previously existed but was deleted");
         Contract.requireArgNotNull("streamId", streamId);
         this.streamId = streamId;

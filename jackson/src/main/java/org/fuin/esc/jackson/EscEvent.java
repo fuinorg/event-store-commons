@@ -42,6 +42,7 @@ public final class EscEvent implements IEscEvent {
     /**
      * Default constructor for Jackson.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the Jackson deserializer
     protected EscEvent() {
         super();
     }
@@ -59,10 +60,10 @@ public final class EscEvent implements IEscEvent {
      * @param meta
      *            The meta data, if available.
      */
-    public EscEvent(@NotNull final UUID eventId,
-                    @NotNull final String eventType,
-                    @NotNull final DataWrapper data,
-                    @NotNull final DataWrapper meta) {
+    public EscEvent(final UUID eventId,
+                    final String eventType,
+                    final DataWrapper data,
+                    final DataWrapper meta) {
         super();
         Contract.requireArgNotNull("eventId", eventId);
         Contract.requireArgNotNull("eventType", eventType);
@@ -88,7 +89,7 @@ public final class EscEvent implements IEscEvent {
      *
      * @param eventId Event ID.
      */
-    void setEventId(@NotNull final String eventId) {
+    void setEventId(final String eventId) {
         Contract.requireArgNotNull("eventId", eventId);
         this.eventId = eventId;
     }
@@ -107,7 +108,7 @@ public final class EscEvent implements IEscEvent {
      *
      * @param eventType Event type.
      */
-    void setEventType(@NotNull final String eventType) {
+    void setEventType(final String eventType) {
         Contract.requireArgNotNull("eventType", eventType);
         this.eventType = eventType;
     }
@@ -146,7 +147,7 @@ public final class EscEvent implements IEscEvent {
      *
      * @param meta Metadata.
      */
-    void setMeta(@NotNull final DataWrapper meta) {
+    void setMeta(final DataWrapper meta) {
         Contract.requireArgNotNull("meta", meta);
         this.meta = meta;
     }

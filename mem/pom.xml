@@ -33,6 +33,11 @@
         <!-- compile -->
 
         <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.fuin.esc</groupId>
             <artifactId>esc-api</artifactId>
         </dependency>
@@ -176,6 +181,11 @@
                         <ignoredUsedUndeclaredDependency>com.tngtech.archunit:archunit-junit5-api</ignoredUsedUndeclaredDependency>
                         <ignoredUsedUndeclaredDependency>org.junit.jupiter:junit-jupiter-api</ignoredUsedUndeclaredDependency>
                     </ignoredUsedUndeclaredDependencies>
+                    <ignoredNonTestScopedDependencies>
+                        <!-- Needed on the compile classpath for Error Prone type-annotation
+                             resolution of objects4j Contract, but only referenced from tests. -->
+                        <ignoredNonTestScopedDependency>jakarta.validation:jakarta.validation-api</ignoredNonTestScopedDependency>
+                    </ignoredNonTestScopedDependencies>
                 </configuration>
             </plugin>
 

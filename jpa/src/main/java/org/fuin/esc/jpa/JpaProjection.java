@@ -42,6 +42,7 @@ public class JpaProjection {
     /**
      * Protected default constructor for JPA.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected JpaProjection() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -52,7 +53,7 @@ public class JpaProjection {
      * @param name
      *            Unique name for the projection.
      */
-    public JpaProjection(@NotNull final String name) {
+    public JpaProjection(final String name) {
         super();
         Contract.requireArgNotNull("name", name);
         this.name = name;
@@ -66,7 +67,7 @@ public class JpaProjection {
      * @param enabled
      *            FALSE if the query is being created, else TRUE.
      */
-    public JpaProjection(@NotNull final String name, final boolean enabled) {
+    public JpaProjection(final String name, final boolean enabled) {
         super();
         Contract.requireArgNotNull("name", name);
         this.name = name;

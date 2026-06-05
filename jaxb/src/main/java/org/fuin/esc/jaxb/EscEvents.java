@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jaxb;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
@@ -42,6 +41,7 @@ public final class EscEvents implements IEscEvents {
     /**
      * Default constructor for JAXB.
      */
+    @SuppressWarnings("NullAway.Init") // Field is populated by JAXB
     protected EscEvents() {
         super();
     }
@@ -51,7 +51,7 @@ public final class EscEvents implements IEscEvents {
      *
      * @param events Event array.
      */
-    public EscEvents(@NotNull final EscEvent... events) {
+    public EscEvents(final EscEvent... events) {
         this(Arrays.asList(events));
     }
 
@@ -60,7 +60,7 @@ public final class EscEvents implements IEscEvents {
      *
      * @param events Event list.
      */
-    public EscEvents(@NotNull final List<EscEvent> events) {
+    public EscEvents(final List<EscEvent> events) {
         super();
         Contract.requireArgNotNull("events", events);
         this.list = events;

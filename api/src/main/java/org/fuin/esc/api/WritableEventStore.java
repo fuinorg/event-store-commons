@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamAlreadyExistsException
      *             The stream already exists.
      */
-    void createStream(@NotNull StreamId streamId) throws StreamAlreadyExistsException;
+    void createStream(StreamId streamId) throws StreamAlreadyExistsException;
 
     /**
      * Appends one or more events to a stream. If the stream does not exist, the
@@ -77,7 +76,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    long appendToStream(@NotNull StreamId streamId, long expectedVersion, @NotNull CommonEvent... events)
+    long appendToStream(StreamId streamId, long expectedVersion, CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException;
 
@@ -101,7 +100,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    long appendToStream(@NotNull StreamId streamId, @NotNull CommonEvent... events)
+    long appendToStream(StreamId streamId, CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
@@ -127,8 +126,8 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    long appendToStream(@NotNull StreamId streamId, long expectedVersion,
-                        @NotNull List<CommonEvent> events) throws StreamNotFoundException, StreamDeletedException,
+    long appendToStream(StreamId streamId, long expectedVersion,
+                        List<CommonEvent> events) throws StreamNotFoundException, StreamDeletedException,
             WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
@@ -150,7 +149,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    long appendToStream(@NotNull StreamId streamId, @NotNull List<CommonEvent> events)
+    long appendToStream(StreamId streamId, List<CommonEvent> events)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
     /**
@@ -178,7 +177,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    void deleteStream(@NotNull StreamId streamId, long expectedVersion, boolean hardDelete)
+    void deleteStream(StreamId streamId, long expectedVersion, boolean hardDelete)
             throws StreamDeletedException, WrongExpectedVersionException, StreamReadOnlyException;
 
     /**
@@ -202,7 +201,7 @@ public interface WritableEventStore extends EventStoreBasics {
      * @throws StreamReadOnlyException
      *             The given stream identifier points to a projection.
      */
-    void deleteStream(@NotNull StreamId streamId, boolean hardDelete)
+    void deleteStream(StreamId streamId, boolean hardDelete)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException;
 
 }

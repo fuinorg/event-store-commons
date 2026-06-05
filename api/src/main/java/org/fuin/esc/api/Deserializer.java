@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 
 /**
  * Serializes an object.
@@ -41,6 +40,6 @@ public interface Deserializer {
      * @param <T>
      *            Type the data is converted into.
      */
-    <T> T unmarshal(@NotNull Object data, @NotNull SerializedDataType dataType, @NotNull EnhancedMimeType mimeType);
+    <T> T unmarshal(Object data, SerializedDataType dataType, EnhancedMimeType mimeType);
 
 }

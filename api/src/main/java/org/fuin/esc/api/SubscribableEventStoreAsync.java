@@ -46,9 +46,9 @@ public interface SubscribableEventStoreAsync extends EventStoreBasicsAsync {
      * @return Future with subscription result.
      */
     @NotNull
-    CompletableFuture<Subscription> subscribeToStream(@NotNull StreamId streamId, long eventNumber,
-                                                      @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
-                                                      @NotNull BiConsumer<Subscription, Exception> onDrop);
+    CompletableFuture<Subscription> subscribeToStream(StreamId streamId, long eventNumber,
+                                                      BiConsumer<Subscription, CommonEvent> onEvent,
+                                                      BiConsumer<Subscription, Exception> onDrop);
 
     /**
      * Unsubscribe from a stream.
@@ -59,6 +59,6 @@ public interface SubscribableEventStoreAsync extends EventStoreBasicsAsync {
      * @return Future with no result.
      */
     @NotNull
-    CompletableFuture<Void> unsubscribeFromStream(@NotNull Subscription subscription);
+    CompletableFuture<Void> unsubscribeFromStream(Subscription subscription);
 
 }

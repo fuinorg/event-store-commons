@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jpa;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
 
@@ -45,7 +44,7 @@ public final class ProjectionJpaStreamId implements JpaStreamId {
      * @param nativeTableName
      *            Unique database table name.
      */
-    public ProjectionJpaStreamId(@NotNull final String entityName, @NotNull final String nativeTableName) {
+    public ProjectionJpaStreamId(final String entityName, final String nativeTableName) {
         Contract.requireArgNotNull("entityName", entityName);
         Contract.requireArgNotNull("nativeTableName", nativeTableName);
         this.entityName = entityName;

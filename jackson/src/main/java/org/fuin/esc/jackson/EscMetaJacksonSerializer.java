@@ -42,9 +42,9 @@ public final class EscMetaJacksonSerializer extends StdSerializer<EscMeta> {
                 generator.writeStringField(IBase64Data.EL_ROOT_NAME, base64data.getEncoded());
             } else {
                 provider.defaultSerializeField(escMeta.getMetaType(), escMeta.getMeta(), generator);
-                final SerializedDataType serDataType = new SerializedDataType(escMeta.getMetaType());
+                final SerializedDataType serDataType = new SerializedDataType(Objects.requireNonNull(escMeta.getMetaType()));
                 EscJacksonUtils.serialize(generator, serializerRegistry,
-                        serDataType, escMeta.getMetaType(), escMeta.getMeta());
+                        serDataType, Objects.requireNonNull(escMeta.getMetaType()), escMeta.getMeta());
             }
         }
         generator.writeEndObject();

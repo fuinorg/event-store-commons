@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.spi;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
@@ -26,7 +25,7 @@ import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.utils4j.Utils4J;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public final class ProjectionJavaScriptBuilder {
 
     private int count;
 
-    private StringBuilder sb;
+    private StringBuilder sb = new StringBuilder();
 
     /**
      * Constructor for building a tenant or an 'all' projection.
@@ -50,7 +49,7 @@ public final class ProjectionJavaScriptBuilder {
      * @param targetStreamId Identifier of the output stream the projection creates.
      */
     public ProjectionJavaScriptBuilder(@Nullable final TenantId tenantId,
-                                       @NotNull final StreamId targetStreamId) {
+                                       final StreamId targetStreamId) {
         super();
         Contract.requireArgNotNull("targetStreamId", targetStreamId);
         count = 0;
@@ -70,7 +69,7 @@ public final class ProjectionJavaScriptBuilder {
      *
      * @param targetStreamId Identifier of the output stream the projection creates.
      */
-    public ProjectionJavaScriptBuilder(@NotNull final StreamId targetStreamId) {
+    public ProjectionJavaScriptBuilder(final StreamId targetStreamId) {
         Contract.requireArgNotNull("targetStreamId", targetStreamId);
         count = 0;
         tenantProjection = false;
@@ -85,8 +84,8 @@ public final class ProjectionJavaScriptBuilder {
      * @param categoryName Category name.
      * @param targetStreamId Identifier of the output stream the projection creates.
      */
-    public ProjectionJavaScriptBuilder(@NotNull final String categoryName,
-                                       @NotNull final StreamId targetStreamId) {
+    public ProjectionJavaScriptBuilder(final String categoryName,
+                                       final StreamId targetStreamId) {
         super();
         Contract.requireArgNotNull("categoryName", categoryName);
         Contract.requireArgNotNull("targetStreamId", targetStreamId);

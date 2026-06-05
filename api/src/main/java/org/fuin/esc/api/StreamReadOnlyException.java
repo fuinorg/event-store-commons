@@ -38,7 +38,7 @@ public final class StreamReadOnlyException extends RuntimeException {
      * @param streamId
      *            Unique name of the stream.
      */
-    public StreamReadOnlyException(@NotNull final StreamId streamId) {
+    public StreamReadOnlyException(final StreamId streamId) {
         super("Stream '" + streamId + "' is read only");
         Contract.requireArgNotNull("streamId", streamId);
         this.streamId = streamId;

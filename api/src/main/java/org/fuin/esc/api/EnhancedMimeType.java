@@ -18,7 +18,7 @@
 package org.fuin.esc.api;
 
 import jakarta.activation.MimeTypeParseException;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import java.nio.charset.Charset;
@@ -55,7 +55,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the string is not valid.
      */
-    public EnhancedMimeType(@NotNull final String str) throws MimeTypeParseException {
+    public EnhancedMimeType(final String str) throws MimeTypeParseException {
         super(str);
     }
 
@@ -70,7 +70,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or subtype is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub)
+    public EnhancedMimeType(final String primary, final String sub)
             throws MimeTypeParseException {
         super(primary, sub);
     }
@@ -88,7 +88,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or subtype is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+    public EnhancedMimeType(final String primary, final String sub,
                             @Nullable final Charset encoding) throws MimeTypeParseException {
         super(primary, sub);
         if (encoding != null) {
@@ -111,7 +111,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or subtype is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+    public EnhancedMimeType(final String primary, final String sub,
                             @Nullable final Charset encoding, @Nullable final String version) throws MimeTypeParseException {
         this(primary, sub, encoding, version, null);
     }
@@ -133,7 +133,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @throws MimeTypeParseException
      *             If the primary type or subtype is not a valid token
      */
-    public EnhancedMimeType(@NotNull final String primary, @NotNull final String sub,
+    public EnhancedMimeType(final String primary, final String sub,
                             @Nullable final Charset encoding, @Nullable final String version,
                             @Nullable final Map<String, String> params) throws MimeTypeParseException {
         super(primary, sub);
@@ -250,7 +250,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub) {
+    public static EnhancedMimeType create(final String primary, final String sub) {
         return create(primary, sub, null, null, null);
     }
 
@@ -268,7 +268,7 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
+    public static EnhancedMimeType create(final String primary, final String sub,
                                           final Charset encoding) {
         return create(primary, sub, encoding, null, null);
     }
@@ -289,8 +289,8 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
-                                          final Charset encoding, final String version) {
+    public static EnhancedMimeType create(final String primary, final String sub,
+                                          @Nullable final Charset encoding, @Nullable final String version) {
         return create(primary, sub, encoding, version, new HashMap<>());
     }
 
@@ -311,8 +311,9 @@ public final class EnhancedMimeType extends jakarta.activation.MimeType {
      * @return New instance.
      */
     @NotNull
-    public static EnhancedMimeType create(@NotNull final String primary, @NotNull final String sub,
-                                          final Charset encoding, final String version, final Map<String, String> parameters) {
+    public static EnhancedMimeType create(final String primary, final String sub,
+                                          @Nullable final Charset encoding, @Nullable final String version,
+                                          @Nullable final Map<String, String> parameters) {
         try {
             return new EnhancedMimeType(primary, sub, encoding, version, parameters);
         } catch (final MimeTypeParseException ex) {

@@ -27,8 +27,7 @@ import io.kurrent.dbclient.ReadResult;
 import io.kurrent.dbclient.ReadStreamOptions;
 import io.kurrent.dbclient.ResolvedEvent;
 import io.kurrent.dbclient.WriteResult;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
@@ -55,6 +54,7 @@ import org.fuin.utils4j.TestOmitted;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -85,12 +85,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
      *                          or 'application/json' with 'utf-8' encoding).
      * @param tenantContext     Provides the current tenant.
      */
-    private ESGrpcEventStore(@NotNull final KurrentDBClient es,
-                             @NotNull final SerializerRegistry serRegistry,
-                             @NotNull final DeserializerRegistry desRegistry,
-                             @NotNull final IBaseTypeFactory baseTypeFactory,
-                             @NotNull final EnhancedMimeType targetContentType,
-                             @NotNull final TenantContext tenantContext) {
+    private ESGrpcEventStore(final KurrentDBClient es,
+                             final SerializerRegistry serRegistry,
+                             final DeserializerRegistry desRegistry,
+                             final IBaseTypeFactory baseTypeFactory,
+                             final EnhancedMimeType targetContentType,
+                             final TenantContext tenantContext) {
         super();
         Contract.requireArgNotNull("es", es);
         Contract.requireArgNotNull("serRegistry", serRegistry);
@@ -129,14 +129,14 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     @Override
     public long appendToStream(final StreamId streamId, final CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, StreamReadOnlyException {
-        return appendToStream(streamId, -2, EscSpiUtils.asList(events));
+        return appendToStream(streamId, -2, Objects.requireNonNull(EscSpiUtils.asList(events)));
     }
 
     @Override
     public long appendToStream(final StreamId streamId, final long expectedVersion, final CommonEvent... events)
             throws StreamNotFoundException, StreamDeletedException, WrongExpectedVersionException,
             StreamReadOnlyException {
-        return appendToStream(streamId, expectedVersion, EscSpiUtils.asList(events));
+        return appendToStream(streamId, expectedVersion, Objects.requireNonNull(EscSpiUtils.asList(events)));
     }
 
     @Override
@@ -417,6 +417,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     /**
      * Builder used to create a new instance of the event store.
      */
+    @SuppressWarnings("NullAway.Init") // Required fields are populated through the builder setters
     public static final class Builder {
 
         private io.kurrent.dbclient.KurrentDBClient eventStore;

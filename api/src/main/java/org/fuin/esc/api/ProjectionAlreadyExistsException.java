@@ -39,7 +39,7 @@ public final class ProjectionAlreadyExistsException extends RuntimeException {
      *
      * @param projectionId Unique name of the projection.
      */
-    public ProjectionAlreadyExistsException(@NotNull final ProjectionId projectionId) {
+    public ProjectionAlreadyExistsException(final ProjectionId projectionId) {
         super("Stream '" + projectionId + "' already exist");
         Contract.requireArgNotNull("projectionId", projectionId);
         this.projectionId = projectionId;

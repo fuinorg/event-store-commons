@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.AsStringCapable;
 import org.fuin.objects4j.common.Contract;
@@ -65,7 +65,7 @@ public final class EventId extends AbstractUuidValueObject implements TechnicalI
      *
      * @param uuid UUID.
      */
-    public EventId(@NotNull final UUID uuid) {
+    public EventId(final UUID uuid) {
         super();
         Contract.requireArgNotNull("uuid", uuid);
         this.uuid = uuid;
@@ -76,7 +76,7 @@ public final class EventId extends AbstractUuidValueObject implements TechnicalI
      *
      * @param uuid Text with UUID.
      */
-    public EventId(@NotNull final String uuid) {
+    public EventId(final String uuid) {
         super();
         Contract.requireArgNotNull("uuid", uuid);
         this.uuid = UUID.fromString(uuid);
@@ -103,6 +103,7 @@ public final class EventId extends AbstractUuidValueObject implements TechnicalI
      * @param value Representation of the entity identifier as string.
      * @return Value object.
      */
+    @Nullable
     public static EventId valueOf(@Nullable final String value) {
         if (value == null) {
             return null;

@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
@@ -43,6 +43,7 @@ public final class TypeName extends AbstractStringValueObject {
     /**
      * Protected default constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Field is populated by the deserialization framework
     protected TypeName() { //NOSONAR Ignore uninitialized fields
         super();
     }

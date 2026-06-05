@@ -43,7 +43,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The stream already exists.
      */
     @NotNull
-    CompletableFuture<Void> createStream(@NotNull StreamId streamId)
+    CompletableFuture<Void> createStream(StreamId streamId)
             throws StreamAlreadyExistsException;
 
     /**
@@ -71,8 +71,8 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    CompletableFuture<Long> appendToStream(@NotNull StreamId streamId, long expectedVersion,
-                                           @NotNull CommonEvent... events);
+    CompletableFuture<Long> appendToStream(StreamId streamId, long expectedVersion,
+                                           CommonEvent... events);
 
     /**
      * Appends one or more events to a stream. If the stream does not exist, the
@@ -95,8 +95,8 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    CompletableFuture<Long> appendToStream(@NotNull StreamId streamId,
-                                           @NotNull CommonEvent... events);
+    CompletableFuture<Long> appendToStream(StreamId streamId,
+                                           CommonEvent... events);
 
     /**
      * Appends a list of events to a stream. If the stream does not exist, the
@@ -122,8 +122,8 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    CompletableFuture<Long> appendToStream(@NotNull StreamId streamId, long expectedVersion,
-                                           @NotNull List<CommonEvent> events);
+    CompletableFuture<Long> appendToStream(StreamId streamId, long expectedVersion,
+                                           List<CommonEvent> events);
 
     /**
      * Appends a list of events to a stream. If the stream does not exist, the
@@ -145,8 +145,8 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The given stream identifier points to a projection.
      */
     @NotNull
-    CompletableFuture<Long> appendToStream(@NotNull StreamId streamId,
-                                           @NotNull List<CommonEvent> events);
+    CompletableFuture<Long> appendToStream(StreamId streamId,
+                                           List<CommonEvent> events);
 
     /**
      * Deletes a stream from the event store if it has a given version.
@@ -173,7 +173,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             The expected version didn't match the actual version.
      */
     @NotNull
-    CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, long expectedVersion,
+    CompletableFuture<Void> deleteStream(StreamId streamId, long expectedVersion,
                                          boolean hardDelete);
 
     /**
@@ -198,7 +198,7 @@ public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
      *             deleted.
      */
     @NotNull
-    CompletableFuture<Void> deleteStream(@NotNull StreamId streamId, boolean hardDelete);
+    CompletableFuture<Void> deleteStream(StreamId streamId, boolean hardDelete);
 
     /**
      * Returns the information if the event store implementation supports

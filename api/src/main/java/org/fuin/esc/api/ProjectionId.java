@@ -40,7 +40,7 @@ public final class ProjectionId implements Serializable {
      *
      * @param name Unique name.
      */
-    public ProjectionId(@NotNull final String name) {
+    public ProjectionId(final String name) {
         Contract.requireArgNotNull("name", name);
         this.name = name;
     }

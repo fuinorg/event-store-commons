@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
 
@@ -41,7 +40,7 @@ public final class SimpleStreamId implements StreamId {
      * @param name
      *            Unique name.
      */
-    public SimpleStreamId(@NotNull final String name) {
+    public SimpleStreamId(final String name) {
         Contract.requireArgNotNull("name", name);
         this.name = name;
     }

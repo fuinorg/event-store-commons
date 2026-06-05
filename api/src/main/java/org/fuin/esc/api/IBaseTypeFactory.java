@@ -1,7 +1,6 @@
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Creates the bases types that are only known as interfaces in this module.
@@ -13,7 +12,7 @@ public interface IBaseTypeFactory {
      *
      * @param binaryData Binary data.
      */
-    IBase64Data createBase64Data(@NotNull byte[] binaryData);
+    IBase64Data createBase64Data(byte[] binaryData);
 
 
     /**
@@ -26,8 +25,8 @@ public interface IBaseTypeFactory {
      * @param meta            Meta data object if available.
      * @param tenantId        Optional unique tenant identifier.
      */
-    IEscMeta createEscMeta(@NotNull final String dataType,
-                           @NotNull final EnhancedMimeType dataContentType,
+    IEscMeta createEscMeta(final String dataType,
+                           final EnhancedMimeType dataContentType,
                            @Nullable final String metaType,
                            @Nullable final EnhancedMimeType metaContentType,
                            @Nullable final Object meta,

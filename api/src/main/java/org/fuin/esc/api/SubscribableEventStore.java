@@ -52,9 +52,9 @@ public interface SubscribableEventStore extends EventStoreBasics {
      *             deleted.
      */
     @NotNull
-    Subscription subscribeToStream(@NotNull StreamId streamId, long eventNumber,
-                                   @NotNull BiConsumer<Subscription, CommonEvent> onEvent,
-                                   @NotNull BiConsumer<Subscription, Exception> onDrop);
+    Subscription subscribeToStream(StreamId streamId, long eventNumber,
+                                   BiConsumer<Subscription, CommonEvent> onEvent,
+                                   BiConsumer<Subscription, Exception> onDrop);
 
     /**
      * Unsubscribe from a stream. If the given subscription does not exist,
@@ -63,6 +63,6 @@ public interface SubscribableEventStore extends EventStoreBasics {
      * @param subscription
      *            to be terminated.
      */
-    void unsubscribeFromStream(@NotNull Subscription subscription);
+    void unsubscribeFromStream(Subscription subscription);
 
 }

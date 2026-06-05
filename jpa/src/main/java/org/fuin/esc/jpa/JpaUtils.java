@@ -17,8 +17,10 @@
  */
 package org.fuin.esc.jpa;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.StreamId;
+
+import java.util.Objects;
 
 /**
  * Package utilities.
@@ -67,7 +69,7 @@ final class JpaUtils {
         }
         // Default ID
         if (streamId.isProjection()) {
-            return camel2Underscore(streamId.getName());
+            return Objects.requireNonNull(camel2Underscore(streamId.getName()));
         }
         if (streamId.getParameters().isEmpty()) {
             return NoParamsEvent.NO_PARAMS_EVENTS_TABLE;
@@ -82,6 +84,7 @@ final class JpaUtils {
      *
      * @return Camel case replaced with underscores.
      */
+    @Nullable
     public static String camel2Underscore(@Nullable final String name) {
         if (name == null) {
             return null;

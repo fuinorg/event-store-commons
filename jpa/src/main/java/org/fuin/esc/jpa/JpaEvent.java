@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.jpa;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -68,6 +68,7 @@ public class JpaEvent {
     private ZonedDateTime created;
 
     @Column(name = COLUMN_TENANT_ID, length = 10, nullable = true, columnDefinition = "CHAR(10)")
+    @Nullable
     private String tenantId;
 
     @Embedded
@@ -78,11 +79,13 @@ public class JpaEvent {
     @AttributeOverride(name = "type", column = @Column(name = "META_TYPE"))
     @AttributeOverride(name = "mimeType", column = @Column(name = "META_MIME_TYPE"))
     @AttributeOverride(name = "raw", column = @Column(name = "META_RAW"))
+    @Nullable
     private JpaData meta;
 
     /**
      * Protected default constructor only required for JPA.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected JpaEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -97,7 +100,7 @@ public class JpaEvent {
      * @param data
      *            Data of the event.
      */
-    public JpaEvent(@NotNull final EventId eventId, @NotNull final JpaData data) {
+    public JpaEvent(final EventId eventId, final JpaData data) {
         this(eventId, null, data, null);
     }
 
@@ -115,9 +118,10 @@ public class JpaEvent {
      * @param meta
      *            Meta data (Optional).
      */
-    public JpaEvent(@NotNull final EventId eventId,
+    @SuppressWarnings("NullAway.Init") // id and created are populated by JPA / @PrePersist
+    public JpaEvent(final EventId eventId,
                     @Nullable final TenantId tenantId,
-                    @NotNull final JpaData data,
+                    final JpaData data,
                     @Nullable final JpaData meta) {
         super();
         this.eventId = eventId.asBaseType().toString();
@@ -152,6 +156,7 @@ public class JpaEvent {
      *
      * @return Optional tenant ID.
      */
+    @Nullable
     public TenantId getTenantId() {
         if (tenantId == null) {
             return null;
@@ -184,6 +189,7 @@ public class JpaEvent {
      *
      * @return The event's metadata or NULL.
      */
+    @Nullable
     public JpaData getMeta() {
         return meta;
     }

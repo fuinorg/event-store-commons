@@ -40,6 +40,7 @@ public class NoParamsStream extends JpaStream {
     /**
      * Protected default constructor for JPA.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected NoParamsStream() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -50,7 +51,7 @@ public class NoParamsStream extends JpaStream {
      * @param streamId
      *            Unique stream identifier.
      */
-    public NoParamsStream(@NotNull final StreamId streamId) {
+    public NoParamsStream(final StreamId streamId) {
         super();
         Contract.requireArgNotNull("streamId", streamId);
         this.streamName = streamId.getName();

@@ -19,7 +19,6 @@ package org.fuin.esc.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
 
@@ -95,6 +94,6 @@ public abstract class JpaStream {
      *
      * @return JPA entity.
      */
-    public abstract JpaStreamEvent createEvent(@NotNull StreamId streamId, @NotNull JpaEvent eventEntry);
+    public abstract JpaStreamEvent createEvent(StreamId streamId, JpaEvent eventEntry);
 
 }

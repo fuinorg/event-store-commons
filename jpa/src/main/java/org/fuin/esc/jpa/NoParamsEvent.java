@@ -53,6 +53,7 @@ public class NoParamsEvent extends JpaStreamEvent {
     /**
      * Protected default constructor only required for JPA.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected NoParamsEvent() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -67,8 +68,8 @@ public class NoParamsEvent extends JpaStreamEvent {
      * @param jpaEvent
      *            Event to store.
      */
-    public NoParamsEvent(@NotNull final StreamId streamId, @NotNull final Long version,
-                         @NotNull final JpaEvent jpaEvent) {
+    public NoParamsEvent(final StreamId streamId, final Long version,
+                         final JpaEvent jpaEvent) {
         super(jpaEvent);
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("version", version);

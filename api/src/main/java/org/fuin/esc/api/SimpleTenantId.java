@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
 import javax.annotation.concurrent.Immutable;
@@ -38,7 +37,7 @@ public final class SimpleTenantId implements TenantId {
      * @param name
      *            Unique name.
      */
-    public SimpleTenantId(@NotNull final String name) {
+    public SimpleTenantId(final String name) {
         Contract.requireArgNotNull("name", name);
         this.name = name;
     }

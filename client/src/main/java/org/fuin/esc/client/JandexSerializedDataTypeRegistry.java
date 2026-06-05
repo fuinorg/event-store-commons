@@ -66,7 +66,7 @@ public final class JandexSerializedDataTypeRegistry implements SerializedDataTyp
 
     @Override
     @NotNull
-    public Class<?> findClass(@NotNull SerializedDataType type) {
+    public Class<?> findClass(SerializedDataType type) {
         return delegate.findClass(type);
     }
 

@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -34,7 +34,7 @@ public interface DeserializerRegistry {
      * {@link IllegalArgumentException} if no deserializer was found for the type.
      */
     @NotNull
-    Deserializer getDeserializer(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
+    Deserializer getDeserializer(SerializedDataType type, EnhancedMimeType mimeType);
 
     /**
      * Tries to find a deserializer for the given type using the {@link #getDefaultMimeType()}.
@@ -44,7 +44,7 @@ public interface DeserializerRegistry {
      * {@link IllegalArgumentException} if no deserializer was found for the type.
      */
     @NotNull
-    Deserializer getDeserializer(@NotNull SerializedDataType type);
+    Deserializer getDeserializer(SerializedDataType type);
 
     /**
      * Returns the default mime type.
@@ -60,7 +60,7 @@ public interface DeserializerRegistry {
      * @param type Unique identifier for the type of data.
      * @return TRUE if a deserializer was found.
      */
-    boolean deserializerExists(@NotNull SerializedDataType type);
+    boolean deserializerExists(SerializedDataType type);
 
     /**
      * Tries to find a deserializer for the given combination.
@@ -69,7 +69,7 @@ public interface DeserializerRegistry {
      * @param mimeType Mime type.
      * @return TRUE if a deserializer was found.
      */
-    boolean deserializerExists(@NotNull SerializedDataType type, @NotNull EnhancedMimeType mimeType);
+    boolean deserializerExists(SerializedDataType type, EnhancedMimeType mimeType);
 
     /**
      * Defines a builder for the registry.
@@ -86,8 +86,8 @@ public interface DeserializerRegistry {
          * @param deserializer Deserializer.
          * @param mimeType     Mime type. In case it's {@literal null}, the base type of the registry will be used.
          */
-        B add(@NotNull final SerializedDataType type,
-              @NotNull final Deserializer deserializer,
+        B add(final SerializedDataType type,
+              final Deserializer deserializer,
               final EnhancedMimeType mimeType);
 
         /**
@@ -97,8 +97,8 @@ public interface DeserializerRegistry {
          * @param type         Type of the data.
          * @param deserializer Deserializer.
          */
-        B add(@NotNull final SerializedDataType type,
-              @NotNull final Deserializer deserializer);
+        B add(final SerializedDataType type,
+              final Deserializer deserializer);
 
         /**
          * Builds an instance of the registry.

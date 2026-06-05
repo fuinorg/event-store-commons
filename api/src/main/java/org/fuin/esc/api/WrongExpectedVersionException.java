@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
@@ -35,6 +35,7 @@ public final class WrongExpectedVersionException extends RuntimeException {
 
     private final Long expected;
 
+    @Nullable
     private final Long actual;
 
     /**
@@ -47,8 +48,8 @@ public final class WrongExpectedVersionException extends RuntimeException {
      * @param actual
      *            Actual version.
      */
-    public WrongExpectedVersionException(@NotNull final StreamId streamId,
-                                         @NotNull final Long expected, @Nullable final Long actual) {
+    public WrongExpectedVersionException(final StreamId streamId,
+                                         final Long expected, @Nullable final Long actual) {
         super("Expected version " + expected + " for stream '" + streamId
                 + (actual == null ? "'" : "', but was " + actual));
 

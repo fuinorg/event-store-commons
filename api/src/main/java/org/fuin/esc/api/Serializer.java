@@ -45,6 +45,6 @@ public interface Serializer {
      * @param <T>
      *            Type the data is converted into.
      */
-    @NotNull <T> byte[] marshal(@NotNull T obj, @NotNull SerializedDataType type);
+    <T> byte[] marshal(T obj, SerializedDataType type);
 
 }

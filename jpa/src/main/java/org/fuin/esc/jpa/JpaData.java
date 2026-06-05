@@ -30,6 +30,7 @@ import org.fuin.objects4j.common.ValueObject;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Represents a block of data in a serialized form.
@@ -58,6 +59,7 @@ public class JpaData implements ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
     protected JpaData() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -72,8 +74,8 @@ public class JpaData implements ValueObject, Serializable {
      * @param raw
      *            Raw data block.
      */
-    public JpaData(@NotNull final TypeName typeName,
-                   @NotNull final EnhancedMimeType mimeType, @NotNull final byte[] raw) {
+    public JpaData(final TypeName typeName,
+                   final EnhancedMimeType mimeType, final byte[] raw) {
         super();
 
         Contract.requireArgNotNull("type", typeName);
@@ -93,7 +95,7 @@ public class JpaData implements ValueObject, Serializable {
      * @param data
      *            Data to copy.
      */
-    public JpaData(@NotNull final SerializedData data) {
+    public JpaData(final SerializedData data) {
         super();
         Contract.requireArgNotNull("data", data);
         this.type = data.getType().asBaseType();
@@ -118,7 +120,7 @@ public class JpaData implements ValueObject, Serializable {
      */
     @NotNull
     public EnhancedMimeType getMimeType() {
-        return EnhancedMimeType.create(mimeType);
+        return Objects.requireNonNull(EnhancedMimeType.create(mimeType));
     }
 
     /**

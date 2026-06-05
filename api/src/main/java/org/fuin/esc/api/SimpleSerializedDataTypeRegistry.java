@@ -40,18 +40,18 @@ public final class SimpleSerializedDataTypeRegistry implements SerializedDataTyp
         map = new HashMap<>();
     }
 
-    private void add(@NotNull final SerializedDataType type, final Class<?> clasz) {
+    private void add(final SerializedDataType type, final Class<?> clasz) {
         map.put(type, clasz);
     }
 
-    private void add(@NotNull final SerializedDataType2ClassMapping mapping) {
+    private void add(final SerializedDataType2ClassMapping mapping) {
         map.put(mapping.type(), mapping.clasz());
     }
 
 
     @Override
     @NotNull
-    public Class<?> findClass(@NotNull final SerializedDataType type) {
+    public Class<?> findClass(final SerializedDataType type) {
         Contract.requireArgNotNull("type", type);
         final Class<?> clasz = map.get(type);
         if (clasz == null) {

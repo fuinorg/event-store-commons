@@ -41,12 +41,14 @@ import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.ConstraintViolationException;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.fuin.esc.jpa.JpaUtils.camel2Underscore;
@@ -82,8 +84,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      * @param desRegistry
      *            Registry used to locate deserializers.
      */
-    public AbstractJpaEventStore(@NotNull final EntityManager em,
-                                 @NotNull final SerializerRegistry serRegistry, @NotNull final DeserializerRegistry desRegistry) {
+    public AbstractJpaEventStore(final EntityManager em,
+                                 final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
         super();
         Contract.requireArgNotNull("em", em);
         Contract.requireArgNotNull("serRegistry", serRegistry);
@@ -358,7 +360,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      *
      * @return Event ready to persist.
      */
-    protected final SerializedData serialize(final SerializedDataType type, final Object data) {
+    @Nullable
+    protected final SerializedData serialize(final SerializedDataType type, @Nullable final Object data) {
         return EscSpiUtils.serialize(serRegistry, type, data);
     }
 
@@ -417,7 +420,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      * @return Stream.
      */
     @NotNull
-    protected final JpaStream findStream(@NotNull final StreamId streamId) {
+    protected final JpaStream findStream(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
         verifyStreamEntityExists(streamId);
@@ -523,7 +526,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
                     "=", streamId.getName()));
         } else {
             for (final KeyValue kv : streamId.getParameters()) {
-                conditions.add(new NativeSqlCondition(camel2Underscore(kv.getKey()), "=", kv.getValue()));
+                conditions.add(new NativeSqlCondition(Objects.requireNonNull(camel2Underscore(kv.getKey())), "=",
+                        Objects.requireNonNull(kv.getValue())));
             }
         }
         return conditions;
@@ -538,18 +542,20 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     }
 
     private CommonEvent asCommonEvent(final JpaEvent jpaEvent) {
-        final Object data = deserialize(jpaEvent.getData());
-        final Object meta = deserialize(jpaEvent.getMeta());
+        final Object data = Objects.requireNonNull(deserialize(jpaEvent.getData()));
+        final JpaData jpaMeta = jpaEvent.getMeta();
+        final Object meta = deserialize(jpaMeta);
         if (meta == null) {
             return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, jpaEvent.getTenantId());
         }
         return new SimpleCommonEvent(jpaEvent.getEventId(),
                 jpaEvent.getData().getTypeName(), data,
-                jpaEvent.getMeta().getTypeName(), meta,
+                Objects.requireNonNull(jpaMeta).getTypeName(), meta,
                 jpaEvent.getTenantId());
     }
 
-    private Object deserialize(final JpaData data) {
+    @Nullable
+    private Object deserialize(@Nullable final JpaData data) {
         if (data == null) {
             return null;
         }

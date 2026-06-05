@@ -26,6 +26,7 @@ import org.fuin.objects4j.common.ValueObject;
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Helper class that allows sending the data of an event as XML directly to the
@@ -59,6 +60,7 @@ public final class Data implements IData, ValueObject, Serializable {
     /**
      * Protected constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Fields are populated by the Jackson deserializer
     protected Data() { //NOSONAR Ignore uninitialized fields
         super();
     }
@@ -71,9 +73,9 @@ public final class Data implements IData, ValueObject, Serializable {
      *                 the data.
      * @param content  Content.
      */
-    public Data(@NotNull final String type,
-                @NotNull final EnhancedMimeType mimeType,
-                @NotNull final String content) {
+    public Data(final String type,
+                final EnhancedMimeType mimeType,
+                final String content) {
         super();
 
         Contract.requireArgNotNull("type", type);
@@ -103,7 +105,7 @@ public final class Data implements IData, ValueObject, Serializable {
      */
     @NotNull
     public EnhancedMimeType getMimeType() {
-        return EnhancedMimeType.create(mimeType);
+        return Objects.requireNonNull(EnhancedMimeType.create(mimeType));
     }
 
     /**

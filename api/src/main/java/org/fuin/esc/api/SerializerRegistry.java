@@ -31,7 +31,7 @@ public interface SerializerRegistry {
      * @return Serializer instance or throws a {@link IllegalArgumentException} if no serializer was found.
      */
     @NotNull
-    Serializer getSerializer(@NotNull SerializedDataType type);
+    Serializer getSerializer(SerializedDataType type);
 
     /**
      * Tries to find a serializer for the given type.
@@ -39,7 +39,7 @@ public interface SerializerRegistry {
      * @param type Unique identifier for the type of data.
      * @return TRUE if a serializer was found for the type.
      */
-    boolean serializerExists(@NotNull SerializedDataType type);
+    boolean serializerExists(SerializedDataType type);
 
     /**
      * Defines a builder for the registry.
@@ -55,7 +55,7 @@ public interface SerializerRegistry {
          * @param type       Type of the data.
          * @param serializer Serializer to add.
          */
-        B add(@NotNull final SerializedDataType type, @NotNull final Serializer serializer);
+        B add(final SerializedDataType type, final Serializer serializer);
 
         /**
          * Builds an instance.

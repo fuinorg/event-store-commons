@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.api;
 
-import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public final class DelegatingAsyncEventStore implements EventStoreAsync {
      * @param delegate
      *            Delegate to forward all method calls to.
      */
-    public DelegatingAsyncEventStore(@NotNull final Executor executor, @NotNull final EventStore delegate) {
+    public DelegatingAsyncEventStore(final Executor executor, final EventStore delegate) {
         super();
         Contract.requireArgNotNull("executor", executor);
         Contract.requireArgNotNull("delegate", delegate);

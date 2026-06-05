@@ -38,6 +38,7 @@ public final class SerializedDataType extends AbstractStringValueObject {
     /**
      * Protected default constructor for deserialization.
      */
+    @SuppressWarnings("NullAway.Init") // Field is populated by the deserialization framework
     protected SerializedDataType() { //NOSONAR Ignore uninitialized fields
         super();
     }

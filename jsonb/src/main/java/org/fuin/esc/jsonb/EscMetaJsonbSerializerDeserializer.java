@@ -48,7 +48,7 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
                             escMeta.setDataType(ctx.deserialize(String.class, parser));
                             break;
                         case IEscMeta.EL_DATA_CONTENT_TYPE:
-                            escMeta.setDataContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
+                            escMeta.setDataContentType(Objects.requireNonNull(EnhancedMimeType.create(ctx.deserialize(String.class, parser))));
                             break;
                         case IEscMeta.EL_TENANT:
                             escMeta.setTenantId(new SimpleTenantId(ctx.deserialize(String.class, parser)));
@@ -69,7 +69,7 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
                                 }
                                 parser.next();
                                 final JsonValue content = ctx.deserialize(JsonValue.class, parser);
-                                final SerializedDataType metaType = new SerializedDataType(escMeta.getMetaType());
+                                final SerializedDataType metaType = new SerializedDataType(Objects.requireNonNull(escMeta.getMetaType()));
                                 final EnhancedMimeType metaContentType = escMeta.getMetaContentType();
                                 final Object meta = EscJsonbUtils.deserialize(content, metaType, metaContentType, deserializerRegistry);
                                 escMeta.setMeta(meta);
@@ -97,9 +97,9 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
             if (escMeta.getMeta() instanceof Base64Data base64data) {
                 generator.write(IBase64Data.EL_ROOT_NAME, base64data.getEncoded());
             } else {
-                final SerializedDataType serDataType = new SerializedDataType(escMeta.getMetaType());
+                final SerializedDataType serDataType = new SerializedDataType(Objects.requireNonNull(escMeta.getMetaType()));
                 EscJsonbUtils.serialize(generator, ctx, serializerRegistry,
-                        serDataType, escMeta.getMetaType(), escMeta.getMeta());
+                        serDataType, Objects.requireNonNull(escMeta.getMetaType()), escMeta.getMeta());
             }
         }
         generator.writeEnd();

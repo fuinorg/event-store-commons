@@ -57,9 +57,9 @@ public final class JacksonSerDeserializer implements SerDeserializer, Closeable 
      * @param encoding       Encoding to use.
      * @param typeRegistry   Mapping from type to classes.
      */
-    private JacksonSerDeserializer(@NotNull final ImmutableObjectMapper.Provider mapperProvider,
-                                   @NotNull final SerializedDataTypeRegistry typeRegistry,
-                                   @NotNull final Charset encoding) {
+    private JacksonSerDeserializer(final ImmutableObjectMapper.Provider mapperProvider,
+                                   final SerializedDataTypeRegistry typeRegistry,
+                                   final Charset encoding) {
         super();
         Objects.requireNonNull(mapperProvider, "mapperProvider==null");
         Objects.requireNonNull(typeRegistry, "typeRegistry==null");
@@ -76,7 +76,7 @@ public final class JacksonSerDeserializer implements SerDeserializer, Closeable 
     }
 
     @Override
-    public byte[] marshal(@NotNull final Object obj, @NotNull final SerializedDataType type) {
+    public byte[] marshal(final Object obj, final SerializedDataType type) {
         Objects.requireNonNull(obj, "obj==null");
         Objects.requireNonNull(type, "type==null");
 
@@ -97,7 +97,7 @@ public final class JacksonSerDeserializer implements SerDeserializer, Closeable 
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T unmarshal(@NotNull final Object data, @NotNull final SerializedDataType type, @NotNull final EnhancedMimeType mimeType) {
+    public <T> T unmarshal(final Object data, final SerializedDataType type, final EnhancedMimeType mimeType) {
         Objects.requireNonNull(data, "data==null");
         Objects.requireNonNull(type, "type==null");
         Objects.requireNonNull(mimeType, "mimeType==null");
@@ -157,6 +157,7 @@ public final class JacksonSerDeserializer implements SerDeserializer, Closeable 
 
         private Charset encoding = StandardCharsets.UTF_8;
 
+        @SuppressWarnings("NullAway.Init") // Fields are populated by the builder setters
         public Builder() {
             super();
         }

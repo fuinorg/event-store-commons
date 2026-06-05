@@ -5,8 +5,7 @@ import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.ProjectionAdminEventStore;
 import org.fuin.esc.api.ProjectionAlreadyExistsException;
 import org.fuin.esc.api.ProjectionId;
@@ -32,6 +31,12 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     private static final Logger LOG = LoggerFactory.getLogger(GrpcProjectionAdminEventStore.class);
 
+    /** Maximum time to wait for a freshly created projection to become disableable. */
+    private static final long DISABLE_TIMEOUT_MILLIS = 10_000;
+
+    /** Delay between retries while waiting for a projection to become disableable. */
+    private static final long DISABLE_RETRY_DELAY_MILLIS = 250;
+
     private final KurrentDBProjectionManagementClient es;
 
     private final TenantContext tenantContext;
@@ -42,7 +47,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      * @param es            Connection that is maintained outside. Opening/Closing is up to the caller!
      * @param tenantContext Optional tenant context.
      */
-    public GrpcProjectionAdminEventStore(@NotNull KurrentDBProjectionManagementClient es,
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es,
                                          @Nullable TenantContext tenantContext) {
         Contract.requireArgNotNull("es", es);
         this.es = es;
@@ -94,16 +99,47 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     public void disableProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
+        final String projectionName = projectionName(projectionId);
+        final long deadline = System.currentTimeMillis() + DISABLE_TIMEOUT_MILLIS;
+        while (true) {
+            try {
+                es.disable(projectionName).get();
+                return;
+            } catch (final InterruptedException ex) { // NOSONAR
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted waiting for disable(..) result", ex);
+            } catch (final ExecutionException ex) { // NOSONAR
+                // A projection that has just been created is not immediately disableable: KurrentDB
+                // answers with a transient "OperationFailed" until it finished initializing the
+                // projection. Retry for a bounded time before giving up.
+                if (projectionNotReadyYet(ex) && System.currentTimeMillis() < deadline) {
+                    LOG.debug("Projection '{}' not ready to be disabled yet, retrying...", projectionName);
+                    sleepQuietly(DISABLE_RETRY_DELAY_MILLIS);
+                    continue;
+                }
+                throw new RuntimeException("Error waiting for disable(..) result", ex);
+            }
+        }
+    }
+
+    private static boolean projectionNotReadyYet(final ExecutionException ex) {
+        return ex.getCause() instanceof StatusRuntimeException sre
+                && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
+                && sre.getMessage() != null
+                && sre.getMessage().contains("OperationFailed");
+    }
+
+    private static void sleepQuietly(final long millis) {
         try {
-            es.disable(projectionName(projectionId)).get();
-        } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
-            throw new RuntimeException("Error waiting for disable(..) result", ex);
+            Thread.sleep(millis);
+        } catch (final InterruptedException ex) { // NOSONAR
+            Thread.currentThread().interrupt();
         }
     }
 
     @Override
     public void createProjection(ProjectionId projectionId,
-                                 @NotNull ProjectionStreamId targetStreamId,
+                                 ProjectionStreamId targetStreamId,
                                  boolean enable,
                                  List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
@@ -126,7 +162,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
             if (ex.getCause() instanceof StatusRuntimeException sre
                     // TODO Are there better ways than parsing the text?
                     && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
-                    && sre.getMessage().contains("Conflict")) {
+                    && sre.getMessage() != null && sre.getMessage().contains("Conflict")) {
                 throw new ProjectionAlreadyExistsException(projectionId);
             }
             throw new RuntimeException("Error waiting for create(..) result", ex);

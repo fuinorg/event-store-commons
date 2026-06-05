@@ -38,7 +38,7 @@ public final class StreamNotFoundException extends RuntimeException {
      * @param streamId
      *            Unique name of the stream.
      */
-    public StreamNotFoundException(@NotNull final StreamId streamId) {
+    public StreamNotFoundException(final StreamId streamId) {
         super("Stream '" + streamId + "' does not exist");
         Contract.requireArgNotNull("streamId", streamId);
         this.streamId = streamId;

@@ -35,7 +35,7 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
 
         final JsonNode node = jp.getCodec().readTree(jp);
         escMeta.setDataType(node.get(IEscMeta.EL_DATA_TYPE).asText());
-        escMeta.setDataContentType(EnhancedMimeType.create(node.get(IEscMeta.EL_DATA_CONTENT_TYPE).asText()));
+        escMeta.setDataContentType(Objects.requireNonNull(EnhancedMimeType.create(node.get(IEscMeta.EL_DATA_CONTENT_TYPE).asText())));
         if (node.has(IEscMeta.EL_TENANT)) {
             escMeta.setTenantId(new SimpleTenantId(node.get(IEscMeta.EL_TENANT).asText()));
         }
@@ -45,7 +45,7 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
             final JsonNode base64Node = node.get(IBase64Data.EL_ROOT_NAME);
             if (base64Node == null) {
                 final JsonNode metaNode = node.get(escMeta.getMetaType());
-                final SerializedDataType metaType = new SerializedDataType(escMeta.getMetaType());
+                final SerializedDataType metaType = new SerializedDataType(Objects.requireNonNull(escMeta.getMetaType()));
                 final EnhancedMimeType metaContentType = escMeta.getMetaContentType();
                 if (metaContentType == null) {
                     throw new IllegalStateException("Content type for meta is not defined");

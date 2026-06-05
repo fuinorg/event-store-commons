@@ -18,7 +18,6 @@
 package org.fuin.esc.esgrpc;
 
 import io.kurrent.dbclient.RecordedEvent;
-import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.Converter;
 import org.fuin.esc.api.Deserializer;
@@ -31,8 +30,10 @@ import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SimpleCommonEvent;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * Converts a {@link RecordedEvent} into {@link CommonEvent}.
@@ -46,7 +47,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
      *
      * @param deserRegistry Registry used to locate deserializers.
      */
-    public RecordedEvent2CommonEventConverter(@NotNull final DeserializerRegistry deserRegistry) {
+    public RecordedEvent2CommonEventConverter(final DeserializerRegistry deserRegistry) {
         super();
         Contract.requireArgNotNull("deserRegistry", deserRegistry);
         this.deserRegistry = deserRegistry;
@@ -87,18 +88,19 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         }
         final TypeName metaType = new TypeName(escMeta.getMetaType());
         final SerializedDataType serMetaType = new SerializedDataType(escMeta.getMetaType());
-        final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, metaMimeType);
-        final Object meta = unmarshal(metaTransferEncoding, serMetaType, metaDeserializer, metaMimeType,
-                escMeta.getMeta(), metaMimeType, escMetaMimeType);
+        final EnhancedMimeType nonNullMetaMimeType = Objects.requireNonNull(metaMimeType);
+        final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, nonNullMetaMimeType);
+        final Object meta = unmarshal(metaTransferEncoding, serMetaType, metaDeserializer, nonNullMetaMimeType,
+                Objects.requireNonNull(escMeta.getMeta()), nonNullMetaMimeType, escMetaMimeType);
         return new SimpleCommonEvent(eventId, dataType, data, metaType, meta, escMeta.getTenantId());
     }
 
-    private Object unmarshal(final String transferEncoding,
+    private Object unmarshal(@Nullable final String transferEncoding,
                              final SerializedDataType dataType,
                              final Deserializer dataDeserializer,
                              final EnhancedMimeType dataMimeType,
                              final Object data,
-                             final EnhancedMimeType metaMimeType,
+                             @Nullable final EnhancedMimeType metaMimeType,
                              final EnhancedMimeType escMetaMimeType) {
 
         if (transferEncoding == null) {

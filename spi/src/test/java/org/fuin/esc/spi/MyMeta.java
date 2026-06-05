@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;

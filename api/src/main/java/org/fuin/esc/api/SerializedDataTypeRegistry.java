@@ -35,7 +35,7 @@ public interface SerializedDataTypeRegistry {
      * @return Class or throws a {@link IllegalArgumentException} if no class was found for that type.
      */
     @NotNull
-    Class<?> findClass(@NotNull SerializedDataType type);
+    Class<?> findClass(SerializedDataType type);
 
     /**
      * Returns all known type-class mappings.
@@ -68,7 +68,7 @@ public interface SerializedDataTypeRegistry {
          * @param clasz Class for the type.
          * @return The builder.
          */
-        B add(@NotNull final SerializedDataType type, final Class<?> clasz);
+        B add(final SerializedDataType type, final Class<?> clasz);
 
         /**
          * Adds a new type/class combination to the registry.
@@ -76,7 +76,7 @@ public interface SerializedDataTypeRegistry {
          * @param mapping Type to class mapping.
          * @return The builder.
          */
-        B add(@NotNull final SerializedDataType2ClassMapping mapping);
+        B add(final SerializedDataType2ClassMapping mapping);
 
         /**
          * Builds an instance of the registry.

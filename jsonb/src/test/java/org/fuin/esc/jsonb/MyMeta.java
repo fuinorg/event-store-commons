@@ -17,7 +17,7 @@
  */
 package org.fuin.esc.jsonb;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
