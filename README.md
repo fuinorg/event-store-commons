@@ -24,6 +24,7 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 | Module                 | Description                                                                                                                                                  |
 |:-----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [esc-api](api)         | Defines the event store commons API.                                                                                                                         |
+| [esc-bom](bom)         | Bill of Materials (BOM) that provides dependency management for all modules                                                                                  |
 | [esc-grpc](grpc)       | [Kurrent DB Client](https://github.com/kurrent-io/KurrentDB-Client-Java) - [Kurrent](https://www.kurrent.io/) founded as "Event Store" in 2019 by Greg Young |
 | [esc-jackson](jackson) | Jackson serialization support                                                                                                                                |
 | [esc-jacoco](jacoco)   | Helper module to collect JaCoco results                                                                                                                      |
@@ -33,6 +34,37 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 | [esc-mem](mem)         | In-memory implementation (events are not persisted)                                                                                                          |
 | [esc-spi](spi)         | Helper classes for adapters and implementations                                                                                                              |
 | [esc-test](test)       | Cucumber tests for adapters and implementations                                                                                                              |
+
+## Bill of Materials (BOM)
+
+The [esc-bom](bom) module provides dependency management for all event store commons modules. Import it in the
+`dependencyManagement` section of your project to keep the versions of the individual `org.fuin.esc` modules aligned,
+then declare the modules you need without specifying a version:
+
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.fuin.esc</groupId>
+            <artifactId>esc-bom</artifactId>
+            <version>0.10.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>org.fuin.esc</groupId>
+        <artifactId>esc-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.fuin.esc</groupId>
+        <artifactId>esc-mem</artifactId>
+    </dependency>
+</dependencies>
+```
 
 ## Architecture
 
