@@ -430,6 +430,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         private EnhancedMimeType targetContentType;
 
+        @Nullable
         private TenantContext tenantContext;
 
         /**
@@ -507,12 +508,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
          * @param tenantContext Unique tenant identifier.
          * @return Builder
          */
-        public Builder tenantContext(final TenantContext tenantContext) {
+        public Builder tenantContext(@Nullable final TenantContext tenantContext) {
             this.tenantContext = tenantContext;
             return this;
         }
 
-        private void verifyNotNull(final String name, final Object value) {
+        private void verifyNotNull(final String name, @Nullable final Object value) {
             if (value == null) {
                 throw new IllegalStateException(
                         "It is mandatory to set the value of '" + name + "' before calling the 'build()' method");
