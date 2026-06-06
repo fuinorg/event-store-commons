@@ -10,7 +10,7 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 [![Java Development Kit 17](https://img.shields.io/badge/JDK-17-green.svg)](https://openjdk.java.net/projects/jdk/17/)
 
 ## Versions
-- See [Release Notes](release-notes.md)
+- See [Release Notes](CHANGELOG.md)
 - 0.7.x = New **GRPC** client / Removed **http**/**esjc** modules
 - 0.6.x = **Java 17** and JUnit5
 - 0.5.x = **Java 11** with new **jakarta** namespace
