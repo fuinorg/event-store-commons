@@ -4,6 +4,7 @@
 - Extend new TypeConstantValidator base class
 - **Incompatible** Moved [TenantStreamId](api/src/main/java/org/fuin/esc/api/TenantStreamId.java) to API
 - **Incompatible** Changed [ProjectionJavaScriptBuilder](spi/src/main/java/org/fuin/esc/spi/ProjectionJavaScriptBuilder.java) for tenant projections
+- Added BOM to allow easier usage
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
