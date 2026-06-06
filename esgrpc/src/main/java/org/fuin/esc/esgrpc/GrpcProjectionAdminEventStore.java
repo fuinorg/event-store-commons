@@ -4,6 +4,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
+import io.kurrent.dbclient.DisableProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.ProjectionAdminEventStore;
@@ -32,7 +33,14 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     private static final Logger LOG = LoggerFactory.getLogger(GrpcProjectionAdminEventStore.class);
 
     /** Maximum time to wait for a freshly created projection to become disableable. */
-    private static final long DISABLE_TIMEOUT_MILLIS = 10_000;
+    private static final long DISABLE_TIMEOUT_MILLIS = 30_000;
+
+    /**
+     * Per-call gRPC deadline for a single disable attempt. Must be clearly shorter than
+     * {@link #DISABLE_TIMEOUT_MILLIS} so a call that hangs while the projection is still
+     * initializing fails fast and can be retried within the overall budget.
+     */
+    private static final long DISABLE_CALL_DEADLINE_MILLIS = 2_000;
 
     /** Delay between retries while waiting for a projection to become disableable. */
     private static final long DISABLE_RETRY_DELAY_MILLIS = 250;
@@ -103,15 +111,17 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final long deadline = System.currentTimeMillis() + DISABLE_TIMEOUT_MILLIS;
         while (true) {
             try {
-                es.disable(projectionName).get();
+                es.disable(projectionName, DisableProjectionOptions.get().deadline(DISABLE_CALL_DEADLINE_MILLIS)).get();
                 return;
             } catch (final InterruptedException ex) { // NOSONAR
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Interrupted waiting for disable(..) result", ex);
             } catch (final ExecutionException ex) { // NOSONAR
                 // A projection that has just been created is not immediately disableable: KurrentDB
-                // answers with a transient "OperationFailed" until it finished initializing the
-                // projection. Retry for a bounded time before giving up.
+                // either answers with a transient "OperationFailed" or lets the call block until the
+                // deadline (DEADLINE_EXCEEDED) until it finished initializing the projection. Each
+                // attempt uses a short per-call deadline so it fails fast and we can retry for a
+                // bounded time before giving up.
                 if (projectionNotReadyYet(ex) && System.currentTimeMillis() < deadline) {
                     LOG.debug("Projection '{}' not ready to be disabled yet, retrying...", projectionName);
                     sleepQuietly(DISABLE_RETRY_DELAY_MILLIS);
@@ -123,8 +133,16 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     }
 
     private static boolean projectionNotReadyYet(final ExecutionException ex) {
-        return ex.getCause() instanceof StatusRuntimeException sre
-                && sre.getStatus().getCode().equals(Status.UNKNOWN.getCode())
+        if (!(ex.getCause() instanceof StatusRuntimeException sre)) {
+            return false;
+        }
+        final Status.Code code = sre.getStatus().getCode();
+        // The call blocked until the per-call deadline because the projection is still initializing.
+        if (code.equals(Status.DEADLINE_EXCEEDED.getCode())) {
+            return true;
+        }
+        // The server rejected the disable with a transient failure while still initializing.
+        return code.equals(Status.UNKNOWN.getCode())
                 && sre.getMessage() != null
                 && sre.getMessage().contains("OperationFailed");
     }
