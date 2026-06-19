@@ -25,6 +25,7 @@ Young's [event store](https://www.geteventstore.com/)) and implementations (like
 |:-----------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [esc-api](api)         | Defines the event store commons API.                                                                                                                         |
 | [esc-bom](bom)         | Bill of Materials (BOM) that provides dependency management for all modules                                                                                  |
+| [esc-crypto](crypto)   | Transparent encryption of event data by wrapping any event store implementation                                                                              |
 | [esc-grpc](grpc)       | [Kurrent DB Client](https://github.com/kurrent-io/KurrentDB-Client-Java) - [Kurrent](https://www.kurrent.io/) founded as "Event Store" in 2019 by Greg Young |
 | [esc-jackson](jackson) | Jackson serialization support                                                                                                                                |
 | [esc-jacoco](jacoco)   | Helper module to collect JaCoco results                                                                                                                      |

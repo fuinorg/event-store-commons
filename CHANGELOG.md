@@ -6,6 +6,7 @@
 - **Incompatible** Changed [ProjectionJavaScriptBuilder](spi/src/main/java/org/fuin/esc/spi/ProjectionJavaScriptBuilder.java) for tenant projections
 - Added BOM to allow easier usage
 - Added [JSpecify](https://jspecify.dev/) and [NullAway](https://github.com/uber/nullaway)
+- Added new [Crypto](crypto) module
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)

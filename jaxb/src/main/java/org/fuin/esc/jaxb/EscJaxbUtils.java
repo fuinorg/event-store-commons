@@ -34,7 +34,8 @@ public final class EscJaxbUtils {
                 .add(EscEvents.class)
                 .add(EscEvent.class)
                 .add(EscMeta.class)
-                .add(Base64Data.class);
+                .add(Base64Data.class)
+                .add(EscEncryptedData.class);
     }
 
     /**
@@ -50,6 +51,7 @@ public final class EscJaxbUtils {
         builder.add(EscEvent.SER_TYPE, EscEvent.class);
         builder.add(EscMeta.SER_TYPE, EscMeta.class);
         builder.add(Base64Data.SER_TYPE, Base64Data.class);
+        builder.add(EscEncryptedData.SER_TYPE, EscEncryptedData.class);
         return builder;
     }
 
@@ -67,6 +69,7 @@ public final class EscJaxbUtils {
         builder.add(EscEvent.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
         builder.add(EscMeta.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
         builder.add(Base64Data.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
+        builder.add(EscEncryptedData.SER_TYPE, serDeserializer, serDeserializer.getMimeType());
         return builder;
     }
 

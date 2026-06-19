@@ -22,7 +22,8 @@ public class JaxbSerializedDataTypesRegistrationRequest implements SerializedDat
                 new SerializedDataType2ClassMapping(IBase64Data.SER_TYPE, Base64Data.class),
                 new SerializedDataType2ClassMapping(IEscEvent.SER_TYPE, EscEvent.class),
                 new SerializedDataType2ClassMapping(IEscEvents.SER_TYPE, EscEvents.class),
-                new SerializedDataType2ClassMapping(IEscMeta.SER_TYPE, EscMeta.class)
+                new SerializedDataType2ClassMapping(IEscMeta.SER_TYPE, EscMeta.class),
+                new SerializedDataType2ClassMapping(EscEncryptedData.SER_TYPE, EscEncryptedData.class)
         );
     }
 

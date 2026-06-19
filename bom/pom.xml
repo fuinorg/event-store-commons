@@ -41,6 +41,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-crypto</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-mem</artifactId>
                 <version>${project.version}</version>
             </dependency>
