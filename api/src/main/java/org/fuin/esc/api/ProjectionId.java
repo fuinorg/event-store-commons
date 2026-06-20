@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.api;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
 
@@ -40,8 +41,8 @@ public final class ProjectionId implements Serializable {
      *
      * @param name Unique name.
      */
-    public ProjectionId(final String name) {
-        Contract.requireArgNotNull("name", name);
+    public ProjectionId(@NotEmpty final String name) {
+        Contract.requireArgNotEmpty("name", name);
         this.name = name;
     }
 
