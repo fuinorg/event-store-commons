@@ -36,6 +36,55 @@ routing and projections. Use `Builder.encryptMeta(true)` to also encrypt the met
 The data type name is hidden at rest: an encrypted event is stored under the `EscEncryptedData` type, and the original
 type and content type are kept inside the `EncryptedData` so the event can be reconstructed on read.
 
+## Example: plain vs. encrypted at rest
+
+The examples below are taken from the OpenBao integration test
+([EncryptingEventStoreOpenBaoTest](src/test/java/org/fuin/esc/crypto/EncryptingEventStoreOpenBaoTest.java)), which wraps
+the store with the real [OpenBao](https://openbao.org/) Transit backend from
+[objects4j-openbao](https://github.com/fuinorg/objects4j/tree/master/openbao).
+
+The original event &ndash; as it is appended and as it is transparently restored on read:
+
+```json
+{
+    "id": "5f8d1c3a-9e2b-4a7c-8d6e-1f0a2b3c4d5e",
+    "data-type": "MyEvent",
+    "data": {
+        "value": "secret-payload"
+    },
+    "meta-type": "MyMeta",
+    "meta": {
+        "value": "plain-meta"
+    }
+}
+```
+
+The same event as the delegate store holds it at rest. Only the **data** is encrypted (default), so the `data-type`
+becomes `EscEncryptedData` and the payload is replaced by the ciphertext envelope, while the **metadata** stays readable:
+
+```json
+{
+    "id": "5f8d1c3a-9e2b-4a7c-8d6e-1f0a2b3c4d5e",
+    "data-type": "EscEncryptedData",
+    "data": {
+        "key-id": "key-1",
+        "key-version": "1",
+        "data-type": "MyEvent",
+        "content-type": "application/octet-stream; encoding=UTF-8",
+        "encrypted-data": "vault:v1:K7m9Qe2pX...truncated...g8Zr0A=="
+    },
+    "meta-type": "MyMeta",
+    "meta": {
+        "value": "plain-meta"
+    }
+}
+```
+
+The `encrypted-data` carries OpenBao's `vault:v<keyVersion>:` envelope and is non-deterministic, so it differs on every
+run. The `key-id` / `key-version` and the original `data-type` / `content-type` are kept alongside it so the event can be
+decrypted and reconstructed later, even after the key has been rotated. With `encryptMeta(true)` the `meta` is replaced
+by an identical envelope (its `data-type` then holds `MyMeta`).
+
 ## Usage
 
 ```java
