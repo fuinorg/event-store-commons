@@ -228,7 +228,6 @@
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>gherkin</artifactId>
-            <version>${gherkin.version}</version>
             <scope>test</scope>
         </dependency>
 
