@@ -22,6 +22,7 @@ cipher and key store of your choice.
 | [EncryptingEventStore](src/main/java/org/fuin/esc/crypto/EncryptingEventStore.java)   | Event store decorator that encrypts on write and decrypts on read. Created via its `Builder`.                |
 | [KeyIdResolver](src/main/java/org/fuin/esc/crypto/KeyIdResolver.java)                 | Selects the key identifier for an event. An empty `Optional` means the event is stored unencrypted.          |
 | [FixedKeyIdResolver](src/main/java/org/fuin/esc/crypto/FixedKeyIdResolver.java)       | Trivial resolver that uses the same key for every event. Mainly used for tests.                              |
+| [JandexKeyIdResolver](src/main/java/org/fuin/esc/crypto/JandexKeyIdResolver.java)     | Encrypts only events whose class implements a marker interface (discovered via Jandex), with a per-stream key.|
 | [EncryptedDataFactory](src/main/java/org/fuin/esc/crypto/EncryptedDataFactory.java)   | Creates the serializable `EncryptedData` representation for the binding in use (JSON-B, JAXB, Jackson).      |
 | [EscEncryptionException](src/main/java/org/fuin/esc/crypto/EscEncryptionException.java)| Unchecked wrapper for the checked encryption exceptions so the `EventStore` method signatures are preserved. |
 
@@ -112,6 +113,67 @@ final CommonEvent read = es.readEvent(streamId, 0); // transparently decrypted
 Make sure the `EscEncryptedData` type of the chosen binding is registered in the serializer/deserializer registries of
 the delegate store (the `addEscTypes` / `addEscSerDeserializer` helpers in `EscJsonbUtils` / `EscJaxbUtils` /
 `EscJacksonUtils` already include it).
+
+## Domain-driven key selection with `JandexKeyIdResolver`
+
+`FixedKeyIdResolver` encrypts every event with one key. The
+[JandexKeyIdResolver](src/main/java/org/fuin/esc/crypto/JandexKeyIdResolver.java) instead derives the decision from the
+**domain model**: an event is encrypted only if its class implements a configured marker interface &ndash; for example
+[`org.fuin.ddd4j.core.RequiresEncryptionAtRest`](https://github.com/fuinorg/ddd-4-java/blob/master/core/src/main/java/org/fuin/ddd4j/core/RequiresEncryptionAtRest.java)
+from [ddd-4-java](https://github.com/fuinorg/ddd-4-java) &ndash; and a **per-stream** key is used so a single aggregate's
+data can be crypto-shredded (e.g. GDPR right-to-erasure: destroy the key to render the data unrecoverable).
+
+How it works:
+
+- **Discovery (once, at construction)** &ndash; it scans the [Jandex](https://github.com/smallrye/jandex) index
+  (`META-INF/jandex.idx` resources on the classpath, plus any class directories you pass) for implementors of the marker
+  interface, and maps each to its event type name by reading a `public static final TYPE` constant (matching the
+  `public static final EventType TYPE` convention of ddd-4-java events). The result is cached as a set of type names.
+- **Resolution** &ndash; `getKeyId` returns a key only when the event's `TypeName` is in that set; otherwise it returns an
+  empty `Optional` and the event is stored in plain text (so flagged and unflagged events coexist in the same stream).
+- **keyId from the stream (and tenant)** &ndash; by default `"<tenant>/<stream>"` when the event carries a `TenantId`,
+  otherwise just `StreamId.asString()`. For a ddd-4-java `AggregateStreamId` the stream part is `"<Type>-<aggregateId>"`,
+  i.e. one key per aggregate instance (per tenant). Override it by passing a `KeyIdFunction` (stream + nullable tenant).
+- **Verify, never create** &ndash; before returning a keyId the resolver looks up the key's current version via
+  `EncryptedDataService.getKeyVersion(keyId)`. If the key does not exist it throws an
+  [EscEncryptionException](src/main/java/org/fuin/esc/crypto/EscEncryptionException.java); it never creates keys, so keys
+  must be provisioned out-of-band (or rotated/destroyed by your key-management process).
+
+The resolver has **no compile-time dependency** on ddd-4-java: the marker interface is referenced by its fully qualified
+name only, and the type name is read reflectively. This lets the encryption module stay independent of the domain model.
+
+```java
+final EncryptedDataService encryptionService = ...;
+
+final KeyIdResolver keyIdResolver = new JandexKeyIdResolver(
+        "org.fuin.ddd4j.core.RequiresEncryptionAtRest", // marker interface FQN to scan for
+        encryptionService);                             // used to verify the key / its version
+
+final EventStore es = new EncryptingEventStore.Builder()
+        .delegate(delegate)
+        .serRegistry(serializerRegistry)
+        .desRegistry(deserializerRegistry)
+        .encryptionService(encryptionService)
+        .keyIdResolver(keyIdResolver)
+        .encryptedDataFactory(new EscEncryptedDataFactory())
+        .build();
+```
+
+To customize the type-name constant or the keyId derivation, use the full constructor:
+
+```java
+final KeyIdResolver keyIdResolver = new JandexKeyIdResolver(
+        "org.fuin.ddd4j.core.RequiresEncryptionAtRest",
+        "TYPE",                                   // name of the static type-name constant on each event class
+        encryptionService,
+        (streamId, tenantId) ->                   // how to derive the keyId from the stream and optional tenant
+                tenantId == null ? streamId.asString() : tenantId.asString() + "/" + streamId.asString(),
+        new File("target/classes"));              // extra class dirs to index (besides the classpath jandex.idx)
+```
+
+Requirements: every event module must be indexed by the `jandex-maven-plugin` (already configured for this build), and
+each flagged event class must expose the type-name constant &ndash; otherwise construction fails fast with an
+`IllegalStateException`.
 
 ## Behaviour notes
 
