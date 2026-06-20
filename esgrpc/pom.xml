@@ -58,13 +58,11 @@
         <dependency>
             <groupId>io.kurrent</groupId>
             <artifactId>kurrentdb-client</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-api</artifactId>
-            <version>1.71.0</version>
         </dependency>
 
         <dependency>

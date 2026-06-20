@@ -228,21 +228,19 @@
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>gherkin</artifactId>
-            <version>2.12.2</version>
+            <version>${gherkin.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.kurrent</groupId>
             <artifactId>kurrentdb-client</artifactId>
-            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-api</artifactId>
-            <version>1.71.0</version>
             <scope>test</scope>
         </dependency>
 

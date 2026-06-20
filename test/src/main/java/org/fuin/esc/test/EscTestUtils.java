@@ -79,8 +79,10 @@ public final class EscTestUtils {
      *
      * @return Message.
      */
-    public static String createExceptionFailureMessage(final String identifier, @Nullable final Class<? extends Exception> expectedExceptionClass,
-                                                       @Nullable final String expectedExceptionMessage, final Exception exception) {
+    public static String createExceptionFailureMessage(final String identifier,
+                                                       @Nullable final Class<? extends Exception> expectedExceptionClass,
+                                                       @Nullable final String expectedExceptionMessage,
+                                                       @Nullable final Exception exception) {
         if (expectedExceptionClass == null) {
             if (exception == null) {
                 return "[" + identifier + "] OK";
@@ -206,8 +208,9 @@ public final class EscTestUtils {
      *
      * @return Exception message.
      */
-    public static String createExceptionFailureMessage(final String identifier, final CommonEvent expectedEvent,
-                                                       final CommonEvent actualEvent) {
+    public static String createExceptionFailureMessage(final String identifier,
+                                                       @Nullable final CommonEvent expectedEvent,
+                                                       @Nullable final CommonEvent actualEvent) {
         if (expectedEvent == null) {
             if (actualEvent == null) {
                 return "[" + identifier + "] OK";
