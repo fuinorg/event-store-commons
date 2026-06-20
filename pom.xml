@@ -38,6 +38,7 @@
         <error-prone.version>2.49.0</error-prone.version>
         <nullaway.version>0.13.5</nullaway.version>
         <auto-service.version>1.1.1</auto-service.version>
+        <testcontainers.version>1.20.6</testcontainers.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
@@ -59,6 +60,14 @@
                 <groupId>org.fuin.objects4j</groupId>
                 <artifactId>objects4j-bom</artifactId>
                 <version>${objects4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
