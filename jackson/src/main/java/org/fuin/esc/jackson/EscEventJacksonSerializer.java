@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Objects;
 /**
  * Serializes an {@link EscEvent} instance to JSON with Jackson.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscEventJacksonSerializer extends StdSerializer<EscEvent> {
 

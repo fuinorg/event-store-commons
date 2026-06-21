@@ -17,18 +17,20 @@
  */
 package org.fuin.esc.jaxb;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
 /**
  * An event structure.
  */
+@ImmutableAfterUnmarshal
 @HasSerializedDataTypeConstant
 @XmlRootElement(name = IEscEvent.EL_ROOT_NAME)
 public final class EscEvent implements IEscEvent {

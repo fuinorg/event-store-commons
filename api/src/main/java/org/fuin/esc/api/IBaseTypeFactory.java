@@ -1,10 +1,13 @@
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Creates the bases types that are only known as interfaces in this module.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface IBaseTypeFactory {
 
     /**

@@ -17,9 +17,14 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
+
 /**
  * Combines all event store features for synchronous access.
+ * <p>
+ * Implementations are expected to be thread-safe.
  */
+@ThreadSafe
 public interface EventStore extends WritableEventStore, ReadableEventStore {
 
 }

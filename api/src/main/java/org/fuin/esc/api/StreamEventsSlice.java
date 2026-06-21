@@ -17,10 +17,10 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.Immutable;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

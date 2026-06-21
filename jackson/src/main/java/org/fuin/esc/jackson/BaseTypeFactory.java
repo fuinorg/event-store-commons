@@ -1,15 +1,13 @@
 package org.fuin.esc.jackson;
 
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IBaseTypeFactory;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.TenantId;
 
 /**
  * Creates necessary implementations with Jackson.
  */
+@ThreadSafe
 public final class BaseTypeFactory implements IBaseTypeFactory {
 
     @Override

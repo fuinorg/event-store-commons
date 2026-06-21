@@ -17,10 +17,14 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Convenience interface that combines both registry types.
+ * <p>
+ * Implementors are expected to be thread-safe.
  */
+@ThreadSafe
 public interface SerDeserializerRegistry extends SerializerRegistry, DeserializerRegistry {
 
     /**

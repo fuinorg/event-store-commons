@@ -17,11 +17,13 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 /**
  * Common event store API constants.
  */
+@ThreadSafe
 @TestOmitted("Just constants for now")
 public final class EscApiUtils {
 

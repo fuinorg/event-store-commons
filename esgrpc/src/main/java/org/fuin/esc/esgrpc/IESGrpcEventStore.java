@@ -18,11 +18,14 @@
 package org.fuin.esc.esgrpc;
 
 import org.fuin.esc.api.EventStore;
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Interface for the implementation that connects to the <a href="http://www.geteventstore.com">Eventstore</a> via TCP API.
  * This allows dependency injections frameworks like CDI to use this interface rather than the (final) implementation.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface IESGrpcEventStore extends EventStore {
 
 }

@@ -22,6 +22,7 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
@@ -30,6 +31,7 @@ import java.util.Optional;
  * Always returns the same key identifier for every event. Useful for simple
  * setups and tests where a single key encrypts all events.
  */
+@Immutable
 public final class FixedKeyIdResolver implements KeyIdResolver {
 
     private final String keyId;

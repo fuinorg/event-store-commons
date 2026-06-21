@@ -3,12 +3,14 @@ package org.fuin.esc.jaxb;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializerRegistry;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.nio.charset.StandardCharsets;
 
 /**
  * Utilities for the JAX-B serialization module.
  */
+@ThreadSafe
 public final class EscJaxbUtils {
 
     /**

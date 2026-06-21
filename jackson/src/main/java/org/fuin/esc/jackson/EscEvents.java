@@ -21,6 +21,7 @@ import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.esc.api.IEscEvents;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.List;
 /**
  * A list of events.
  */
+@ImmutableAfterUnmarshal
 @HasSerializedDataTypeConstant
 public final class EscEvents implements IEscEvents {
 

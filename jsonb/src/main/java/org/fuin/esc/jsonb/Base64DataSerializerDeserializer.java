@@ -6,12 +6,14 @@ import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.lang.reflect.Type;
 
 /**
  * Adapter to use for JSON-B.
  */
+@ThreadSafe
 public final class Base64DataSerializerDeserializer implements JsonbSerializer<Base64Data>, JsonbDeserializer<Base64Data> {
 
     @Override

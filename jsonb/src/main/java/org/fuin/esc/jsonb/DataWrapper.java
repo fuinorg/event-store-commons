@@ -20,10 +20,12 @@ package org.fuin.esc.jsonb;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.IDataWrapper;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 /**
  * A structure that wraps another object of different types.
  */
+@ImmutableAfterUnmarshal
 public final class DataWrapper implements IDataWrapper {
 
     private Object obj;

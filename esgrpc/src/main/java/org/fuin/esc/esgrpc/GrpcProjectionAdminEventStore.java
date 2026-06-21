@@ -6,27 +6,22 @@ import io.kurrent.dbclient.CreateProjectionOptions;
 import io.kurrent.dbclient.DeleteProjectionOptions;
 import io.kurrent.dbclient.DisableProjectionOptions;
 import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
-import org.jspecify.annotations.Nullable;
-import org.fuin.esc.api.ProjectionAdminEventStore;
-import org.fuin.esc.api.ProjectionAlreadyExistsException;
-import org.fuin.esc.api.ProjectionId;
-import org.fuin.esc.api.ProjectionStreamId;
-import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.TenantContext;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.ProjectionJavaScriptBuilder;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 /**
  * GRPC based eventstore projection admin implementation.
  */
+@ThreadSafe
 @TestOmitted("Tested in the 'test' project")
 public final class GrpcProjectionAdminEventStore implements ProjectionAdminEventStore {
 

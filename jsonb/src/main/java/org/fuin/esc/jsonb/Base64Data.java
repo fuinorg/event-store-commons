@@ -20,18 +20,18 @@ package org.fuin.esc.jsonb;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IBase64Data;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 import java.util.Base64;
 
 /**
  * Contains some Base64 encoded data.
  */
+@ImmutableAfterUnmarshal
 @HasSerializedDataTypeConstant
 public final class Base64Data implements IBase64Data {
 
     private String base64Str;
-
-    private byte[] binaryData;
 
     /**
      * Default constructor for JAXB.
@@ -50,7 +50,6 @@ public final class Base64Data implements IBase64Data {
         super();
         Contract.requireArgNotNull("base64Str", base64Str);
         this.base64Str = base64Str;
-        this.binaryData = Base64.getDecoder().decode(base64Str);
     }
 
     /**
@@ -62,7 +61,6 @@ public final class Base64Data implements IBase64Data {
         super();
         Contract.requireArgNotNull("binaryData", binaryData);
         this.base64Str = Base64.getEncoder().encodeToString(binaryData);
-        this.binaryData = binaryData;
     }
 
     /**
@@ -80,10 +78,7 @@ public final class Base64Data implements IBase64Data {
      * @return Binary data.
      */
     public byte[] getDecoded() {
-        if (binaryData == null) {
-            binaryData = Base64.getDecoder().decode(base64Str);
-        }
-        return binaryData;
+        return Base64.getDecoder().decode(base64Str);
     }
 
 }

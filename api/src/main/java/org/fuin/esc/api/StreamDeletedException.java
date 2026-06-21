@@ -19,13 +19,12 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
-
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.NotThreadSafe;
 
 /**
  * Signals that a stream with that name previously existed but was deleted.
  */
-@Immutable
+@NotThreadSafe
 public final class StreamDeletedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

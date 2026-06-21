@@ -17,12 +17,7 @@
  */
 package org.fuin.esc.spi;
 
-import org.fuin.esc.api.ProjectionStreamId;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.SimpleTenantId;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

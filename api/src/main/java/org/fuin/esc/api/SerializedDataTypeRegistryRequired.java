@@ -1,9 +1,12 @@
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.NotThreadSafe;
+
 /**
  * Marker for instances that need to have a {@link SerializedDataTypeRegistry} to function correctly. Allows late configuration in some rare
  * edge cases where the configuration cannot be provided at construction time.
  */
+@NotThreadSafe
 public interface SerializedDataTypeRegistryRequired {
 
     /**

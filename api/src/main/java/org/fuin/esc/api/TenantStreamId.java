@@ -17,10 +17,11 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.core.KeyValue;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.List;
  * Represents a stream identifier that may belong to a tenant.
  * In case the tenant ID is {@literal null}, it's a normal stream.
  */
+@Immutable
 public final class TenantStreamId implements StreamId {
 
     /**

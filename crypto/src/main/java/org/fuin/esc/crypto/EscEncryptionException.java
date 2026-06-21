@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.crypto;
 
+import org.fuin.objects4j.common.NotThreadSafe;
+
 import java.io.Serial;
 
 /**
@@ -24,6 +26,7 @@ import java.io.Serial;
  * into an unchecked exception so the {@link EncryptingEventStore} can comply with the
  * {@link org.fuin.esc.api.EventStore} method signatures.
  */
+@NotThreadSafe
 public final class EscEncryptionException extends RuntimeException {
 
     @Serial

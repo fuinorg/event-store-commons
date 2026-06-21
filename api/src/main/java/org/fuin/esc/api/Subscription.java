@@ -17,8 +17,9 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.Immutable;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -26,6 +27,7 @@ import java.io.Serializable;
  * Result of subscribing to a stream. The subclasses will contain
  * implementation specific data that is required to handle unsubscribe requests.
  */
+@Immutable
 public abstract class Subscription implements Serializable {
 
     private static final long serialVersionUID = 1000L;

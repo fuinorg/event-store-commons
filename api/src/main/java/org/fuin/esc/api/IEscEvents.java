@@ -17,11 +17,16 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+
 import java.util.List;
 
 /**
  * A list of events.
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IEscEvents extends IBaseType {
 
     /**

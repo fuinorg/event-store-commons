@@ -2,36 +2,26 @@ package org.fuin.esc.client;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.HasSerializedDataTypeConstant;
-import org.fuin.esc.api.HasSerializedDataTypeConstantValidator;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
 import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.common.TypeConstantValidator;
 import org.fuin.utils4j.jandex.JandexIndexFileReader;
 import org.fuin.utils4j.jandex.JandexUtils;
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.CompositeIndex;
-import org.jboss.jandex.DotName;
-import org.jboss.jandex.IndexView;
-import org.jboss.jandex.Indexer;
+import org.jboss.jandex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Registry that is built up by scanning for classes that are annotated with {@link HasSerializedDataTypeConstant}.
  * Inner classes are ignored.
  */
+@ThreadSafe
 public final class JandexSerializedDataTypeRegistry implements SerializedDataTypeRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(JandexSerializedDataTypeRegistry.class);

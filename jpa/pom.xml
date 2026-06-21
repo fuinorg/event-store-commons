@@ -74,11 +74,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.fuin.objects4j</groupId>
             <artifactId>objects4j-common</artifactId>
         </dependency>

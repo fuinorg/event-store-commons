@@ -24,14 +24,8 @@ import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -42,6 +36,7 @@ import java.util.List;
 /**
  * Utilities for the JSON-B serialization module.
  */
+@ThreadSafe
 public final class EscJsonbUtils {
 
     /**

@@ -22,12 +22,14 @@ import org.fuin.esc.api.HasSerializedDataTypeConstant;
 import org.fuin.esc.api.IDataWrapper;
 import org.fuin.esc.api.IEscEvent;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 import java.util.UUID;
 
 /**
  * An event structure.
  */
+@ImmutableAfterUnmarshal
 @HasSerializedDataTypeConstant
 public final class EscEvent implements IEscEvent {
 

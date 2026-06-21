@@ -1,10 +1,10 @@
 package org.fuin.esc.test.examples;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 

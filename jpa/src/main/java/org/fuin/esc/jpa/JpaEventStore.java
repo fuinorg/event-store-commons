@@ -20,22 +20,11 @@ package org.fuin.esc.jpa;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.TypedQuery;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamReadOnlyException;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotThreadSafe;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +37,7 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
 /**
  * JPA Implementation of the event store.
  */
+@NotThreadSafe
 public final class JpaEventStore extends AbstractJpaEventStore implements EventStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaEventStore.class);

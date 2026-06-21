@@ -17,25 +17,18 @@
  */
 package org.fuin.esc.test;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.esc.jaxb.Data;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ValueObject;
 import org.fuin.utils4j.jaxb.MarshallerBuilder;
+import org.jspecify.annotations.Nullable;
 
 import javax.annotation.concurrent.Immutable;
 import java.io.Serial;

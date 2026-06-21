@@ -22,26 +22,19 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.crypto.EncryptedDataService;
 import org.fuin.objects4j.crypto.EncryptionKeyIdUnknownException;
 import org.fuin.utils4j.jandex.JandexIndexFileReader;
 import org.fuin.utils4j.jandex.JandexUtils;
-import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.CompositeIndex;
-import org.jboss.jandex.DotName;
-import org.jboss.jandex.IndexView;
-import org.jboss.jandex.Indexer;
+import org.jboss.jandex.*;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Resolves the encryption key based on the event type: an event is encrypted only if
@@ -64,6 +57,7 @@ import java.util.Set;
  * event classes; it refers to them only by name so it can live in the encryption module
  * without a dependency on the domain model.
  */
+@ThreadSafe
 public final class JandexKeyIdResolver implements KeyIdResolver {
 
     /** Default name of the public static constant that holds an event's type name. */

@@ -18,8 +18,7 @@
 package org.fuin.esc.api;
 
 import org.fuin.objects4j.common.Contract;
-
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.Immutable;
 
 /**
  * Tenant identifier that is based on a name.

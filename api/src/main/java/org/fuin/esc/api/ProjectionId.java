@@ -20,8 +20,8 @@ package org.fuin.esc.api;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
 

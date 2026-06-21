@@ -18,6 +18,7 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +26,10 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Interface for writing events to an event store asynchronously. Calling any
  * method on a non-open event store will implicitly {@link #open()} it.
+ * <p>
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface WritableEventStoreAsync extends EventStoreBasicsAsync {
 
     /**

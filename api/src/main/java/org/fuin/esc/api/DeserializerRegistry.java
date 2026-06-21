@@ -17,12 +17,14 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Locates a deserializer for a given type, version and encoding combination.
  */
+@ThreadSafe
 public interface DeserializerRegistry {
 
     /**

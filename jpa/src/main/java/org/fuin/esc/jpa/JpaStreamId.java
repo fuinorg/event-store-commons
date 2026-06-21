@@ -18,10 +18,13 @@
 package org.fuin.esc.jpa;
 
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Specialized version of a stream identifier that allows to configure table and JPA entity name.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface JpaStreamId extends StreamId {
 
     /**

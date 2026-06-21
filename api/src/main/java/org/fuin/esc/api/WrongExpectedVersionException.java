@@ -17,16 +17,15 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
-
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.NotThreadSafe;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Signals a conflict between an expected and an actual version.
  */
-@Immutable
+@NotThreadSafe
 public final class WrongExpectedVersionException extends RuntimeException {
 
     private static final long serialVersionUID = 1000L;

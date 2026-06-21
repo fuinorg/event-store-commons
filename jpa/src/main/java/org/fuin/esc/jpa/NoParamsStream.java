@@ -24,10 +24,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotThreadSafe;
 
 /**
  * Contains stream.
  */
+@NotThreadSafe
 @Table(name = "NO_PARAMS_STREAMS")
 @Entity
 public class NoParamsStream extends JpaStream {

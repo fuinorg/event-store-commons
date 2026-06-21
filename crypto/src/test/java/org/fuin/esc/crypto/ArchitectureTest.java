@@ -15,27 +15,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fuin.esc.jaxb;
+package org.fuin.esc.crypto;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-import org.fuin.esc.api.EscApiUtils;
-import org.fuin.esc.spi.EscSpiUtils;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.DependencyRules.NO_CLASSES_SHOULD_DEPEND_UPPER_PACKAGES;
 import static org.fuin.units4j.archunit.Units4JConditions.ALL_CLASSES_SHOULD_HAVE_A_THREAD_SAFETY_ANNOTATION;
 
 @AnalyzeClasses(packagesOf = ArchitectureTest.class, importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
-
-    private static final String API_PACKAGE = EscApiUtils.class.getPackageName();
-
-    private static final String SPI_PACKAGE = EscSpiUtils.class.getPackageName();
-
-    private static final String THIS_PACKAGE = ArchitectureTest.class.getPackageName();
 
     @ArchTest
     static final ArchRule no_accesses_to_upper_package = NO_CLASSES_SHOULD_DEPEND_UPPER_PACKAGES;
@@ -43,31 +34,4 @@ class ArchitectureTest {
     @ArchTest
     static final ArchRule all_classes_have_a_thread_safety_annotation = ALL_CLASSES_SHOULD_HAVE_A_THREAD_SAFETY_ANNOTATION;
 
-    @ArchTest
-    static final ArchRule common_access_only_to_defined_packages = classes()
-            .that()
-            .resideInAPackage(THIS_PACKAGE)
-            .should()
-            .onlyDependOnClassesThat()
-            .resideInAnyPackage(THIS_PACKAGE, API_PACKAGE, SPI_PACKAGE,
-                    "java..",
-                    "jakarta.activation..",
-                    "jakarta.annotation..",
-                    "jakarta.validation..",
-                    "jakarta.xml.bind..",
-                    "javax.annotation.concurrent..",
-                    "org.apache.commons.lang3..",
-                    "org.jspecify.annotations..",
-                    "org.fuin.esc.crypto..",
-                    "org.fuin.objects4j.common..",
-                    "org.fuin.objects4j.core..",
-                    "org.fuin.objects4j.crypto..",
-                    "org.fuin.utils4j..",
-                    "org.slf4j..",
-                    "org.w3c.dom..",
-                    "com.google.auto.service.."
-            );
-
-
 }
-

@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.jaxb;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -28,17 +27,14 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializer;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -50,6 +46,7 @@ import java.util.Objects;
  * "application/xml". This implementation supports {@link Node} and <code>byte[]</code> for unmarshalling
  * content.
  */
+@ThreadSafe
 @TestOmitted("Tested with other classes")
 public final class XmlDeSerializer implements SerDeserializer {
 

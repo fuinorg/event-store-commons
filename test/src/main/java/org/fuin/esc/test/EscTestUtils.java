@@ -17,15 +17,17 @@
  */
 package org.fuin.esc.test;
 
-import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Utilities that help testing with the event store commons.
  */
+@ThreadSafe
 public final class EscTestUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(EscTestUtils.class);

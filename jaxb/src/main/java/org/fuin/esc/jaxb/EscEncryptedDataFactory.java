@@ -19,11 +19,13 @@ package org.fuin.esc.jaxb;
 
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.crypto.EncryptedDataFactory;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.crypto.EncryptedData;
 
 /**
  * Creates JAXB {@link EscEncryptedData} instances for use with the {@link org.fuin.esc.crypto.EncryptingEventStore}.
  */
+@ThreadSafe
 public final class EscEncryptedDataFactory implements EncryptedDataFactory {
 
     @Override

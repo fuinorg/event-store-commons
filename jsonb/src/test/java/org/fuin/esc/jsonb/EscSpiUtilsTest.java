@@ -18,15 +18,7 @@
 package org.fuin.esc.jsonb;
 
 import jakarta.activation.MimeTypeParseException;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.junit.jupiter.api.Test;
 

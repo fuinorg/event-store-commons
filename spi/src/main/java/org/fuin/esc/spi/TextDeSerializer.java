@@ -20,6 +20,7 @@ package org.fuin.esc.spi;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializer;
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Serializes and deserializes a String object. The content type for serialization is always "text/plain".
  */
+@ThreadSafe
 public final class TextDeSerializer implements SerDeserializer {
 
     private final EnhancedMimeType mimeType;

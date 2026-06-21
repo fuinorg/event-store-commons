@@ -7,6 +7,7 @@ import org.fuin.esc.api.IBase64Data;
 import org.fuin.esc.api.IEscMeta;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.Objects;
 /**
  * Adapter to use for JSON-B.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscMetaJacksonSerializer extends StdSerializer<EscMeta> {
 

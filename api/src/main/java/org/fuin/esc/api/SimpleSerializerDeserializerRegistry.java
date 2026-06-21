@@ -18,6 +18,7 @@
 package org.fuin.esc.api;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.Objects;
 /**
  * Contains all known serializers and deserializers.
  */
+@Immutable
 public final class SimpleSerializerDeserializerRegistry implements SerDeserializerRegistry {
 
     private final EnhancedMimeType defaultMimeType;

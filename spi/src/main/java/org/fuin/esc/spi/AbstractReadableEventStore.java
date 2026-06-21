@@ -20,13 +20,14 @@ package org.fuin.esc.spi;
 import org.fuin.esc.api.ReadableEventStore;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Provides some basic functionality for event store implementations.
  */
+@ThreadSafe
 public abstract class AbstractReadableEventStore implements ReadableEventStore {
 
     private static final Logger LOG = LoggerFactory

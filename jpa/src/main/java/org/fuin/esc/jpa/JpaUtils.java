@@ -17,14 +17,16 @@
  */
 package org.fuin.esc.jpa;
 
-import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
  * Package utilities.
  */
+@ThreadSafe
 final class JpaUtils {
 
     private JpaUtils() {

@@ -25,10 +25,10 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IData;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.fuin.objects4j.common.ValueObject;
 import org.fuin.utils4j.jaxb.CDataXmlAdapter;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -38,7 +38,7 @@ import java.util.Objects;
  * event store. Represents a block of data in a serialized form. This class
  * might be useful for tests. It's not used in the 'esc-spi' code itself
  */
-@Immutable
+@ImmutableAfterUnmarshal
 @XmlRootElement(name = IData.EL_ROOT_NAME)
 public final class Data implements IData, ValueObject, Serializable {
 

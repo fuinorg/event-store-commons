@@ -19,13 +19,12 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
-
-import javax.annotation.concurrent.Immutable;
+import org.fuin.objects4j.common.NotThreadSafe;
 
 /**
  * Signals that an event with the given number was not found.
  */
-@Immutable
+@NotThreadSafe
 public final class EventNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

@@ -1,8 +1,7 @@
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
+import org.fuin.objects4j.common.ThreadSafe;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Optional;
 
 /**

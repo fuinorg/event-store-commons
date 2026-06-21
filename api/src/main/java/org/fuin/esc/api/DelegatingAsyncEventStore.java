@@ -18,6 +18,7 @@
 package org.fuin.esc.api;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executor;
 /**
  * Asynchronous event store that uses a synchronous one internally.
  */
+@ThreadSafe
 public final class DelegatingAsyncEventStore implements EventStoreAsync {
 
     private final Executor executor;

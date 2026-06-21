@@ -1,18 +1,15 @@
 package org.fuin.esc.jaxb;
 
 import com.google.auto.service.AutoService;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscEvent;
-import org.fuin.esc.api.IEscEvents;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType2ClassMapping;
-import org.fuin.esc.api.SerializedDataTypesRegistrationRequest;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.util.Set;
 
 /**
  * Request to register the JAX-B related {@link org.fuin.esc.api.SerializedDataType} to class mappings.
  */
+@ThreadSafe
 @AutoService(SerializedDataTypesRegistrationRequest.class)
 public class JaxbSerializedDataTypesRegistrationRequest implements SerializedDataTypesRegistrationRequest {
 

@@ -17,9 +17,13 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
+
 /**
  * Convenience interface that combined a serializer and deserializer.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface SerDeserializer extends Serializer, Deserializer {
 
 }

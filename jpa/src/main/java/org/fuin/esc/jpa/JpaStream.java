@@ -21,10 +21,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamState;
+import org.fuin.objects4j.common.NotThreadSafe;
 
 /**
  * Base class for all concrete streams.
  */
+@NotThreadSafe
 @MappedSuperclass
 public abstract class JpaStream {
 

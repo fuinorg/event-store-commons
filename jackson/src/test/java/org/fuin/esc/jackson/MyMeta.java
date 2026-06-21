@@ -18,12 +18,12 @@
 package org.fuin.esc.jackson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jspecify.annotations.Nullable;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;

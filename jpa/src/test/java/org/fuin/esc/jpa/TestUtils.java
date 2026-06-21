@@ -2,12 +2,7 @@ package org.fuin.esc.jpa;
 
 import jakarta.json.bind.JsonbConfig;
 import org.eclipse.yasson.FieldAccessStrategy;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.*;
 import org.fuin.esc.jsonb.EscJsonbUtils;
 import org.fuin.esc.jsonb.JsonbSerDeserializer;
 import org.fuin.objects4j.jsonb.JsonbProvider;
@@ -15,9 +10,7 @@ import org.fuin.utils4j.TestOmitted;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.fuin.esc.jsonb.EscJsonbUtils.MIME_TYPE;
-import static org.fuin.esc.jsonb.EscJsonbUtils.addEscSerDeserializer;
-import static org.fuin.esc.jsonb.EscJsonbUtils.addEscTypes;
+import static org.fuin.esc.jsonb.EscJsonbUtils.*;
 
 /**
  * Helper methods for the test package.

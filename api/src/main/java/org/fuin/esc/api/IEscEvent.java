@@ -17,12 +17,16 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An event structure.
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IEscEvent extends IBaseType {
 
     /** Unique XML/JSON root element name of the type. */

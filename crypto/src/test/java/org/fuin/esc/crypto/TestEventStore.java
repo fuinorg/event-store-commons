@@ -17,11 +17,7 @@
  */
 package org.fuin.esc.crypto;
 
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamState;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 
 import java.util.ArrayList;

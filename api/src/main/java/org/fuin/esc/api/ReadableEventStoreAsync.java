@@ -18,13 +18,16 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for reading events from an event store asynchronously. Calling any
  * method on a non-open event store will implicitly {@link #open()} it.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface ReadableEventStoreAsync extends EventStoreBasicsAsync {
 
     /**

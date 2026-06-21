@@ -17,21 +17,13 @@
  */
 package org.fuin.esc.jpa;
 
-import org.jspecify.annotations.Nullable;
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SimpleTenantId;
 import org.fuin.esc.api.TenantId;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+import org.jspecify.annotations.Nullable;
 
 import java.time.ZonedDateTime;
 
@@ -39,6 +31,7 @@ import java.time.ZonedDateTime;
 /**
  * Stores an event and it's meta data.
  */
+@ImmutableAfterUnmarshal
 @Table(name = JpaEvent.TABLE_NAME)
 @Entity
 @SequenceGenerator(name = "EventEntrySequenceGenerator", sequenceName = "EVENTS_SEQ", allocationSize = 1000)

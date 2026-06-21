@@ -18,18 +18,9 @@
 package org.fuin.esc.esgrpc;
 
 import io.kurrent.dbclient.RecordedEvent;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Converter;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
@@ -38,6 +29,7 @@ import java.util.Objects;
 /**
  * Converts a {@link RecordedEvent} into {@link CommonEvent}.
  */
+@ThreadSafe
 public final class RecordedEvent2CommonEventConverter implements Converter<RecordedEvent, CommonEvent> {
 
     private final DeserializerRegistry deserRegistry;

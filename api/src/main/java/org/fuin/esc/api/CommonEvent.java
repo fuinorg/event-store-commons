@@ -17,13 +17,16 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
  * <code>id</code>.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface CommonEvent {
 
     /**

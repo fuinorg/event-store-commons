@@ -18,10 +18,10 @@
 package org.fuin.esc.jpa.examples;
 
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.Immutable;
 import org.fuin.objects4j.core.KeyValue;
 import org.fuin.utils4j.TestOmitted;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;

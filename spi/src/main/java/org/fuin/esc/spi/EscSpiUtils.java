@@ -17,19 +17,11 @@
  */
 package org.fuin.esc.spi;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBaseTypeFactory;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.TenantId;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +30,7 @@ import java.util.Objects;
 /**
  * Utilities to ease the implementation of service provider implementations.
  */
+@ThreadSafe
 public final class EscSpiUtils {
 
     /**

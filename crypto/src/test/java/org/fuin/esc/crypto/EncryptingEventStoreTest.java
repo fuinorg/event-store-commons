@@ -17,17 +17,8 @@
  */
 package org.fuin.esc.crypto;
 
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.crypto.EncryptedData;
-import org.fuin.objects4j.crypto.EncryptionKeyIdUnknownException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +27,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test for {@link EncryptingEventStore}.

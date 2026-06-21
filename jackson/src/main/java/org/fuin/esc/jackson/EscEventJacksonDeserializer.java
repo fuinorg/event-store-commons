@@ -5,11 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscEvent;
-import org.fuin.esc.api.SerializedDataType;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.jackson.Objects4JacksonUtils;
 import org.fuin.utils4j.TestOmitted;
 
@@ -19,6 +16,7 @@ import java.util.Objects;
 /**
  * Deserializes JSON to an {@link EscEvent} instance with Jackson.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscEventJacksonDeserializer extends StdDeserializer<EscEvent> {
 

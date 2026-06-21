@@ -2,13 +2,7 @@ package org.fuin.esc.test;
 
 import jakarta.json.bind.JsonbConfig;
 import org.eclipse.yasson.FieldAccessStrategy;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SimpleSerializedDataTypeRegistry;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.*;
 import org.fuin.esc.jaxb.EscJaxbUtils;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.esc.jsonb.EscJsonbUtils;

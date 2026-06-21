@@ -22,10 +22,12 @@ import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.IDataWrapper;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 /**
  * A structure that wraps another object of different types.
  */
+@ImmutableAfterUnmarshal
 @XmlRootElement(name = IDataWrapper.EL_ROOT)
 public final class DataWrapper implements IDataWrapper {
 

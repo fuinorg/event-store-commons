@@ -19,43 +19,23 @@ package org.fuin.esc.esgrpc;
 
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import io.kurrent.dbclient.AppendToStreamOptions;
-import io.kurrent.dbclient.DeleteStreamOptions;
-import io.kurrent.dbclient.EventData;
-import io.kurrent.dbclient.KurrentDBClient;
-import io.kurrent.dbclient.ReadResult;
-import io.kurrent.dbclient.ReadStreamOptions;
-import io.kurrent.dbclient.ResolvedEvent;
-import io.kurrent.dbclient.WriteResult;
-import org.jspecify.annotations.Nullable;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.IBaseTypeFactory;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.StreamAlreadyExistsException;
+import io.kurrent.dbclient.*;
+import org.fuin.esc.api.*;
 import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.TenantContext;
-import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.WrongExpectedVersionException;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.fuin.esc.api.ExpectedVersion.ANY;
@@ -63,6 +43,7 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
 /**
  * Implementation that connects to the event store (<a href="http://www.geteventstore.com">Eventstore</a>) using the GRPC API.
  */
+@ThreadSafe
 @TestOmitted("Tested in the 'test' project")
 public final class ESGrpcEventStore extends AbstractReadableEventStore implements IESGrpcEventStore {
 

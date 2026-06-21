@@ -17,21 +17,22 @@
  */
 package org.fuin.esc.spi;
 
-import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TenantStreamId;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotThreadSafe;
 import org.fuin.utils4j.Utils4J;
-
 import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * Builds the JavaScript for a 'fromCategory' projection.
  */
+@NotThreadSafe
 public final class ProjectionJavaScriptBuilder {
 
     private final boolean tenantProjection;

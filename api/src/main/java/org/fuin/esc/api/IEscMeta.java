@@ -17,12 +17,16 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A structure that contains the user's metadata and the system's meta information.
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IEscMeta extends IBaseType {
 
     /** Unique name of the type. */

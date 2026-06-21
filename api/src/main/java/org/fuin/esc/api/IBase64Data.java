@@ -17,9 +17,14 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+
 /**
  * Contains some Base64 encoded data.
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IBase64Data extends IBaseType {
 
     /**

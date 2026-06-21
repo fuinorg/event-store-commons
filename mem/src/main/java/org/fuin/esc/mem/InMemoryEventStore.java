@@ -17,36 +17,21 @@
  */
 package org.fuin.esc.mem;
 
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventNotFoundException;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.StreamAlreadyExistsException;
-import org.fuin.esc.api.StreamDeletedException;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamNotFoundException;
-import org.fuin.esc.api.StreamReadOnlyException;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.Subscription;
-import org.fuin.esc.api.WrongExpectedVersionException;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotThreadSafe;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
 /**
  * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
  */
+@NotThreadSafe // TODO Make thread-safe
 public final class InMemoryEventStore extends AbstractReadableEventStore implements IInMemoryEventStore {
 
     private final Executor executor;

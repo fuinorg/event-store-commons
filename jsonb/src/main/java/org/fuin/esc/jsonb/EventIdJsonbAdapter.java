@@ -18,9 +18,8 @@
 package org.fuin.esc.jsonb;
 
 import org.fuin.esc.api.EventId;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.jsonb.ValueObjectStringJsonbAdapter;
-
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Converts a {@link EventId} into a String and back.

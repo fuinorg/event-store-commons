@@ -17,13 +17,17 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
+
 import java.io.Serializable;
 
 /**
  * Unique tenant identifier<br>
  * <br>
  * CAUTION: Tenant identifier should only be compared based on their {@link #asString()} method.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface TenantId extends Serializable {
 
     /**

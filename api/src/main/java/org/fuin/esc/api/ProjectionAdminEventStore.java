@@ -18,13 +18,17 @@
 package org.fuin.esc.api;
 
 
+import org.fuin.objects4j.common.ThreadSafe;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * An event store that provides a projection administration API.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface ProjectionAdminEventStore extends AutoCloseable {
 
     /**

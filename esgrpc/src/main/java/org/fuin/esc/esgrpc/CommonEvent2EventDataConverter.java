@@ -19,17 +19,10 @@ package org.fuin.esc.esgrpc;
 
 import io.kurrent.dbclient.EventData;
 import io.kurrent.dbclient.EventDataBuilder;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.Converter;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IBaseTypeFactory;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -37,6 +30,7 @@ import java.util.Objects;
 /**
  * Converts a {@link CommonEvent} into {@link EventData}.
  */
+@ThreadSafe
 public final class CommonEvent2EventDataConverter implements Converter<CommonEvent, EventData> {
 
     private static final EnhancedMimeType XML_UTF8 = EnhancedMimeType.create("application", "xml",

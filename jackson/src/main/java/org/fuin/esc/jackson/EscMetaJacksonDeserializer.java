@@ -5,12 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SimpleTenantId;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
@@ -19,6 +15,7 @@ import java.util.Objects;
 /**
  * Adapter to use for JSON-B.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
 

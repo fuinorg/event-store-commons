@@ -24,6 +24,7 @@ import org.fuin.esc.api.IBaseType;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.fuin.objects4j.crypto.EncryptedData;
 
 import java.io.Serial;
@@ -33,6 +34,7 @@ import java.util.Arrays;
  * JSON-B representation of {@link EncryptedData}. It wraps the encrypted bytes of an event together with the information needed to
  * decrypt it again (key identifier, key version, original data type and content type). Equals and hash code are based on all data.
  */
+@ImmutableAfterUnmarshal
 @HasSerializedDataTypeConstant
 @SuppressWarnings("NullAway.Init") // Fields are populated by the JSON-B deserializer
 public final class EscEncryptedData implements EncryptedData, IBaseType {

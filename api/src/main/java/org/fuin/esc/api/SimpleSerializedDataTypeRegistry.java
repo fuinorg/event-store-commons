@@ -19,6 +19,7 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Contains all known types and the corresponding class.
  */
+@Immutable
 public final class SimpleSerializedDataTypeRegistry implements SerializedDataTypeRegistry {
 
     private final Map<SerializedDataType, Class<?>> map;

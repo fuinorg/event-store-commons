@@ -18,11 +18,13 @@
 package org.fuin.esc.jpa;
 
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.Immutable;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Defines a native SQL 'where' condition.
  */
+@Immutable
 public final class NativeSqlCondition {
 
     @Nullable

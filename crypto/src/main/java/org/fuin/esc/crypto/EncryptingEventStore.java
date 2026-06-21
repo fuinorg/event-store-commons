@@ -17,32 +17,15 @@
  */
 package org.fuin.esc.crypto;
 
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.StreamState;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.spi.SerializedData;
-import org.fuin.objects4j.crypto.DecryptionFailedException;
-import org.fuin.objects4j.crypto.EncryptedData;
-import org.fuin.objects4j.crypto.EncryptedDataService;
-import org.fuin.objects4j.crypto.EncryptionKeyIdUnknownException;
-import org.fuin.objects4j.crypto.EncryptionKeyVersionUnknownException;
+import org.fuin.objects4j.common.ThreadSafe;
+import org.fuin.objects4j.crypto.*;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Event store that transparently encrypts the event data before it is passed to an underlying {@link EventStore}
@@ -56,6 +39,7 @@ import java.util.Optional;
  * By default, only the event data is encrypted while the metadata stays in plain text so it remains usable
  * for routing and projections. Set {@link Builder#encryptMeta(boolean)} to also encrypt the metadata.
  */
+@ThreadSafe
 public final class EncryptingEventStore extends AbstractReadableEventStore implements EventStore {
 
     private final EventStore delegate;

@@ -17,13 +17,13 @@
  */
 package org.fuin.esc.jsonb;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.utils4j.TestOmitted;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;

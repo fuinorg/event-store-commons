@@ -12,9 +12,7 @@ import org.fuin.utils4j.TestOmitted;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.fuin.esc.jackson.EscJacksonUtils.MIME_TYPE;
-import static org.fuin.esc.jackson.EscJacksonUtils.addEscSerDeserializer;
-import static org.fuin.esc.jackson.EscJacksonUtils.addEscTypes;
+import static org.fuin.esc.jackson.EscJacksonUtils.*;
 
 /**
  * Helper methods for the test package.

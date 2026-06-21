@@ -19,14 +19,14 @@ package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.NotThreadSafe;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 
 /**
  * Signals that a projection with that ID already exist and cannot be created.
  */
-@Immutable
+@NotThreadSafe
 public final class ProjectionAlreadyExistsException extends RuntimeException {
 
     @Serial

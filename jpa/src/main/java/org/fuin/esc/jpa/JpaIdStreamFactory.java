@@ -18,10 +18,13 @@
 package org.fuin.esc.jpa;
 
 import org.fuin.esc.api.StreamId;
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Factory for that creates a stream based on a stream identifier.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface JpaIdStreamFactory {
 
     /**

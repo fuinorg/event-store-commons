@@ -8,6 +8,7 @@ import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EventId;
 import org.fuin.esc.api.SerializerRegistry;
 import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.jackson.ValueObjectStringJacksonDeserializer;
 import org.fuin.objects4j.jackson.ValueObjectStringJacksonSerializer;
 import org.fuin.utils4j.TestOmitted;
@@ -17,6 +18,7 @@ import java.util.Objects;
 /**
  * Module that registers the adapters for the package.
  */
+@ThreadSafe
 @TestOmitted("Trivial")
 public class EscJacksonModule extends Module {
 

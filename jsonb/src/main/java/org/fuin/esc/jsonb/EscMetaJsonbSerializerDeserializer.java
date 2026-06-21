@@ -7,13 +7,8 @@ import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.IBase64Data;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializerRegistry;
-import org.fuin.esc.api.SimpleTenantId;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
@@ -22,6 +17,7 @@ import java.util.Objects;
 /**
  * Adapter to use for JSON-B.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer<EscMeta>, JsonbDeserializer<EscMeta> {
 

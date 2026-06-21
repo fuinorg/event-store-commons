@@ -17,18 +17,12 @@
  */
 package org.fuin.esc.test;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ExpectedVersion;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.*;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.utils4j.TestCommand;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;

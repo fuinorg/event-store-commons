@@ -25,9 +25,9 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.spi.SerializedData;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.fuin.objects4j.common.ValueObject;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
@@ -35,7 +35,7 @@ import java.util.Objects;
 /**
  * Represents a block of data in a serialized form.
  */
-@Immutable
+@ImmutableAfterUnmarshal
 @Embeddable
 public class JpaData implements ValueObject, Serializable {
 

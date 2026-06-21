@@ -21,9 +21,9 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.IData;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.fuin.objects4j.common.ValueObject;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -33,7 +33,7 @@ import java.util.Objects;
  * event store. Represents a block of data in a serialized form. This class
  * might be useful for tests. It's not used in the 'esc-spi' code itself
  */
-@Immutable
+@ImmutableAfterUnmarshal
 public final class Data implements IData, ValueObject, Serializable {
 
     @Serial

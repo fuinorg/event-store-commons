@@ -20,6 +20,7 @@ package org.fuin.esc.crypto;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TenantId;
 import org.fuin.esc.api.TypeName;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
@@ -28,7 +29,10 @@ import java.util.Optional;
  * Selects the encryption key identifier to use for an event. Returning an empty {@link Optional}
  * means the event will be stored unencrypted, which allows selective encryption (for example only
  * for certain tenants or data types) and mixed plaintext/encrypted streams.
+ * <p>
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface KeyIdResolver {
 
     /**

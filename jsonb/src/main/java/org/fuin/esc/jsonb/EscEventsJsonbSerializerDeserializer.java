@@ -7,6 +7,7 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 import org.fuin.esc.api.IEscEvent;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * Adapter to use for JSON-B.
  */
+@ThreadSafe
 @TestOmitted("Already tested along with the other tests in this package")
 public final class EscEventsJsonbSerializerDeserializer implements JsonbSerializer<EscEvents>, JsonbDeserializer<EscEvents> {
 

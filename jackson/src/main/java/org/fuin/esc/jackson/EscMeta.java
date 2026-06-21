@@ -17,21 +17,17 @@
  */
 package org.fuin.esc.jackson;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.HasSerializedDataTypeConstant;
-import org.fuin.esc.api.IEscMeta;
-import org.fuin.esc.api.SimpleTenantId;
-import org.fuin.esc.api.TenantId;
-import org.fuin.objects4j.common.ConstraintViolationException;
-import org.fuin.objects4j.common.Contract;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.*;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
  * A structure that contains the user's metadata and the system's meta information.
  */
+@ImmutableAfterUnmarshal // Setters only called during deserialization in {@link EscMetaJacksonDeserializer}
 @HasSerializedDataTypeConstant
 public final class EscMeta implements IEscMeta {
 

@@ -18,11 +18,15 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Interface for reading events from an event store synchronously. Calling any
  * method on a non-open event store will implicitly {@link #open()} it.
+ * <p>
+ * Implementations are expected to be thread-safe.
  */
+@ThreadSafe
 public interface ReadableEventStore extends EventStoreBasics {
 
     /**

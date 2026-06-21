@@ -17,14 +17,7 @@
  */
 package org.fuin.esc.crypto;
 
-import org.fuin.esc.api.CommonEvent;
-import org.fuin.esc.api.EventId;
-import org.fuin.esc.api.SimpleCommonEvent;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.SimpleTenantId;
-import org.fuin.esc.api.StreamId;
-import org.fuin.esc.api.TenantId;
-import org.fuin.esc.api.TypeName;
+import org.fuin.esc.api.*;
 import org.fuin.objects4j.crypto.EncryptedData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

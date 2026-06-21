@@ -18,6 +18,7 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.fuin.objects4j.common.ValueObject;
 
 import java.io.Serializable;
@@ -26,7 +27,10 @@ import java.io.Serializable;
  * Helper class that allows sending the data of an event as XML directly to the
  * event store. Represents a block of data in a serialized form. This class
  * might be useful for tests. It's not used in the 'esc-spi' code itself
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IData extends IBaseType, ValueObject, Serializable {
 
     /**

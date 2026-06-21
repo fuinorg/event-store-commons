@@ -17,9 +17,14 @@
  */
 package org.fuin.esc.api;
 
+import org.fuin.objects4j.common.ThreadSafe;
+
 /**
  * Basic synchronous operations shared by all event store types.
+ * <p>
+ * Implementations are expected to be thread-safe.
  */
+@ThreadSafe
 public interface EventStoreBasics extends AutoCloseable {
 
     /**

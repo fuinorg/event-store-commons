@@ -20,12 +20,14 @@ package org.fuin.esc.jpa;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 import java.io.Serializable;
 
 /**
  * Identifies a stream event based on a stream name and an event number.
  */
+@ImmutableAfterUnmarshal
 public final class NoParamsEventPrimaryKey implements Serializable {
 
     private static final long serialVersionUID = 1000L;

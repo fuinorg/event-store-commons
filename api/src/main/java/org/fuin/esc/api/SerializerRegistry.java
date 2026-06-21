@@ -18,10 +18,14 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 
 /**
  * Locates a serializer for a given type.
+ * <p>
+ * Implementors are expected to be thread-safe.
  */
+@ThreadSafe
 public interface SerializerRegistry {
 
     /**

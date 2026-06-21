@@ -19,11 +19,13 @@ package org.fuin.esc.mem;
 
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.Subscription;
+import org.fuin.objects4j.common.Immutable;
 
 /**
  * Result of subscribing to an in-memory event store. Hash code and equals are
  * based on the subscriber ID.
  */
+@Immutable
 public final class InMemorySubscription extends Subscription implements
         Comparable<InMemorySubscription> {
 

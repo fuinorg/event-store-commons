@@ -18,11 +18,7 @@
 package org.fuin.esc.test;
 
 import jakarta.validation.constraints.NotNull;
-import org.fuin.esc.api.EventStore;
-import org.fuin.esc.api.ReadableEventStore;
-import org.fuin.esc.api.SimpleStreamId;
-import org.fuin.esc.api.StreamEventsSlice;
-import org.fuin.esc.api.StreamId;
+import org.fuin.esc.api.*;
 import org.fuin.utils4j.TestCommand;
 
 import java.util.ArrayList;

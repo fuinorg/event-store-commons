@@ -25,17 +25,11 @@ import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.SerDeserializer;
 import org.fuin.esc.api.SerializedDataType;
 import org.fuin.esc.api.SerializedDataTypeRegistry;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.fuin.utils4j.TestOmitted;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
@@ -43,6 +37,7 @@ import java.util.Objects;
  * Serializes and deserializes an object from/to JSON using JSON-B. The content type for serialization is always "application/json". This
  * implementation supports only <code>byte[]</code> for unmarshalling content. Trying to use something else will result in an exception.
  */
+@ThreadSafe
 @TestOmitted("Test implicitly with other tests")
 public final class JsonbSerDeserializer implements SerDeserializer, Closeable {
 

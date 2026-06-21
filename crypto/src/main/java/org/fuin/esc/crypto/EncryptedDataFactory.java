@@ -18,13 +18,17 @@
 package org.fuin.esc.crypto;
 
 import org.fuin.esc.api.SerializedDataType;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.crypto.EncryptedData;
 
 /**
  * Converts the contract {@link EncryptedData} returned by the {@link org.fuin.objects4j.crypto.EncryptedDataService} into a
  * representation that can be serialized by the underlying event store. This is the seam that keeps the {@link EncryptingEventStore}
  * independent of the concrete serialization format (JSON-B, JAXB, Jackson, ...).
+ * <p>
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface EncryptedDataFactory {
 
     /**

@@ -18,6 +18,7 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.core.KeyValue;
 
 import java.io.Serializable;
@@ -27,7 +28,9 @@ import java.util.List;
  * Name of a stream that is unique within the event store.<br>
  * <br>
  * CAUTION: Stream identifier should only be compared based on their {@link #asString()} method.
+ * All implementations are expected to be thread safe.
  */
+@ThreadSafe
 public interface StreamId extends Serializable {
 
     /**

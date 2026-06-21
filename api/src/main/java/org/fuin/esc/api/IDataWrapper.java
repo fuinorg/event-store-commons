@@ -18,10 +18,14 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 /**
  * A structure that wraps another object of different types.
+ * <p>
+ * Alle implementors must at least be immutable after unmarshalling.
  */
+@ImmutableAfterUnmarshal
 public interface IDataWrapper extends IBaseType {
 
     /** Unique name of the type. */

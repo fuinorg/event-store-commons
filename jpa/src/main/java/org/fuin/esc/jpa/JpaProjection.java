@@ -23,10 +23,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
+import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 
 /**
  * Projection.
  */
+@ImmutableAfterUnmarshal
 @Table(name = "PROJECTIONS")
 @Entity
 public class JpaProjection {

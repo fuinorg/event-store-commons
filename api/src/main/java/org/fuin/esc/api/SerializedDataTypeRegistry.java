@@ -18,12 +18,14 @@
 package org.fuin.esc.api;
 
 import jakarta.validation.constraints.NotNull;
+import org.fuin.objects4j.common.ThreadSafe;
 
 import java.util.Set;
 
 /**
  * Locates a class for a given type.
  */
+@ThreadSafe
 public interface SerializedDataTypeRegistry {
 
     /**

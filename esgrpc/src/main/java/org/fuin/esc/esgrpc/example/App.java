@@ -1,21 +1,14 @@
 package org.fuin.esc.esgrpc.example;
 
-import io.kurrent.dbclient.DeleteResult;
-import io.kurrent.dbclient.DeleteStreamOptions;
-import io.kurrent.dbclient.EventData;
-import io.kurrent.dbclient.KurrentDBClient;
-import io.kurrent.dbclient.KurrentDBClientSettings;
-import io.kurrent.dbclient.KurrentDBConnectionString;
-import io.kurrent.dbclient.ReadResult;
-import io.kurrent.dbclient.ReadStreamOptions;
-import io.kurrent.dbclient.ResolvedEvent;
-import io.kurrent.dbclient.WriteResult;
+import io.kurrent.dbclient.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
+@ThreadSafe
 @TestOmitted("Example class")
 @SuppressWarnings("java:S106")
 public class App {

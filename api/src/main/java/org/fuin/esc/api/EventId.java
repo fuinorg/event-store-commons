@@ -17,20 +17,16 @@
  */
 package org.fuin.esc.api;
 
-import org.jspecify.annotations.Nullable;
 import jakarta.validation.constraints.NotNull;
-import org.fuin.objects4j.common.AsStringCapable;
-import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.HasPublicStaticIsValidMethod;
-import org.fuin.objects4j.common.HasPublicStaticValueOfMethod;
+import org.fuin.objects4j.common.*;
 import org.fuin.objects4j.core.AbstractUuidValueObject;
 import org.fuin.objects4j.ui.Label;
 import org.fuin.objects4j.ui.Prompt;
 import org.fuin.objects4j.ui.ShortLabel;
 import org.fuin.objects4j.ui.Tooltip;
 import org.fuin.utils4j.TechnicalId;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.Serial;
 import java.util.UUID;
 

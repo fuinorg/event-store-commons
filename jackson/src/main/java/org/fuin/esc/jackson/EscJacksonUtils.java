@@ -20,14 +20,8 @@ package org.fuin.esc.jackson;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import org.fuin.esc.api.Deserializer;
-import org.fuin.esc.api.DeserializerRegistry;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataType;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.Serializer;
-import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.*;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
@@ -37,6 +31,7 @@ import java.util.Base64;
 /**
  * Utilities for the Jackson serialization module.
  */
+@ThreadSafe
 @TestOmitted("Currently no methods worth to test")
 public final class EscJacksonUtils {
 

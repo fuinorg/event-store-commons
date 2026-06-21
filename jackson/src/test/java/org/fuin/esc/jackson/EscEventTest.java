@@ -18,11 +18,7 @@
 package org.fuin.esc.jackson;
 
 import jakarta.activation.MimeTypeParseException;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
-import org.fuin.esc.api.SimpleTenantId;
+import org.fuin.esc.api.*;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.objects4j.jackson.ImmutableObjectMapper;
 import org.junit.jupiter.api.Test;

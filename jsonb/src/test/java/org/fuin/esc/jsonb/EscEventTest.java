@@ -19,12 +19,7 @@ package org.fuin.esc.jsonb;
 
 import jakarta.activation.MimeTypeParseException;
 import jakarta.json.bind.JsonbConfig;
-import org.fuin.esc.api.EnhancedMimeType;
-import org.fuin.esc.api.SerDeserializerRegistry;
-import org.fuin.esc.api.SerializedDataTypeRegistry;
-import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
-import org.fuin.esc.api.SimpleTenantId;
-import org.fuin.esc.api.TenantId;
+import org.fuin.esc.api.*;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.junit.jupiter.api.Test;
