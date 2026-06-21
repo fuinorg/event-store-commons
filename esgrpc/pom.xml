@@ -245,13 +245,13 @@
                         <image>
                             <name>eventstore/eventstore:${eventstore.version}</name>
                             <run>
+                                <!-- Host networking: the container shares the host network namespace, so EventStoreDB
+                                     binds 1113/2113 directly on the host and there is no per-container rootless netns
+                                     for Podman to tear down (avoids "rootless netns: kill network process: permission
+                                     denied" on stop). Port mappings are not applicable with host mode. -->
                                 <network>
-                                    <mode>bridge</mode>
+                                    <mode>host</mode>
                                 </network>
-                                <ports>
-                                    <port>1113:1113</port>
-                                    <port>2113:2113</port>
-                                </ports>
                                 <env>
                                     <EVENTSTORE_MEM_DB>TRUE</EVENTSTORE_MEM_DB>
                                     <EVENTSTORE_RUN_PROJECTIONS>All</EVENTSTORE_RUN_PROJECTIONS>
