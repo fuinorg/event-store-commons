@@ -57,7 +57,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     private final DeserializerRegistry desRegistry;
 
-    private boolean open;
+    private volatile boolean open;
 
     /**
      * Constructor with all mandatory data.
