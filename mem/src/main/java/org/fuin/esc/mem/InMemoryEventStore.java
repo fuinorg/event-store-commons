@@ -21,7 +21,7 @@ import org.fuin.esc.api.*;
 import org.fuin.esc.spi.AbstractReadableEventStore;
 import org.fuin.esc.spi.EscSpiUtils;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.NotThreadSafe;
+import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -29,9 +29,11 @@ import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 
 /**
- * In-memory implementation for unit testing. This implementation is **NOT** thread-safe.
+ * In-memory implementation for unit testing. This implementation is thread-safe: all access to the internal stream and subscription state
+ * is guarded by the instance's intrinsic lock. Event notifications are dispatched through the configured {@link Executor} and therefore run
+ * outside the critical section.
  */
-@NotThreadSafe // TODO Make thread-safe
+@ThreadSafe
 public final class InMemoryEventStore extends AbstractReadableEventStore implements IInMemoryEventStore {
 
     private final Executor executor;
@@ -40,7 +42,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
 
     private final Map<String, List<InternalSubscription>> subscriptions;
 
-    private boolean open;
+    private volatile boolean open;
 
     /**
      * Constructor with all mandatory data.
@@ -59,7 +61,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public InMemoryEventStore open() {
+    public synchronized InMemoryEventStore open() {
         if (open) {
             // Ignore
             return this;
@@ -69,7 +71,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (!open) {
             // Ignore
             return;
@@ -88,7 +90,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public boolean streamExists(final StreamId streamId) {
+    public synchronized boolean streamExists(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
@@ -99,7 +101,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public CommonEvent readEvent(final StreamId streamId, final long eventNumber) {
+    public synchronized CommonEvent readEvent(final StreamId streamId, final long eventNumber) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("eventNumber", eventNumber, 0);
@@ -114,7 +116,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public StreamEventsSlice readEventsForward(final StreamId streamId, final long start, final int count) {
+    public synchronized StreamEventsSlice readEventsForward(final StreamId streamId, final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -136,7 +138,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public StreamEventsSlice readEventsBackward(final StreamId streamId, final long start, final int count) {
+    public synchronized StreamEventsSlice readEventsBackward(final StreamId streamId, final long start, final int count) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("start", start, 0);
@@ -163,7 +165,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public void deleteStream(final StreamId streamId, final long expected, final boolean hardDelete) {
+    public synchronized void deleteStream(final StreamId streamId, final long expected, final boolean hardDelete) {
 
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
@@ -209,7 +211,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public long appendToStream(final StreamId streamId, final long expectedVersion, final List<CommonEvent> toAppend) {
+    public synchronized long appendToStream(final StreamId streamId, final long expectedVersion, final List<CommonEvent> toAppend) {
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgNotNull("toAppend", toAppend);
@@ -272,7 +274,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public Subscription subscribeToStream(final StreamId streamId, final long eventNumber,
+    public synchronized Subscription subscribeToStream(final StreamId streamId, final long eventNumber,
                                           final BiConsumer<Subscription, CommonEvent> onEvent, final BiConsumer<Subscription, Exception> onDrop) {
 
         Contract.requireArgNotNull("streamId", streamId);
@@ -300,7 +302,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public void unsubscribeFromStream(final Subscription subscription) {
+    public synchronized void unsubscribeFromStream(final Subscription subscription) {
 
         Contract.requireArgNotNull("subscription", subscription);
         ensureOpen();
@@ -321,7 +323,7 @@ public final class InMemoryEventStore extends AbstractReadableEventStore impleme
     }
 
     @Override
-    public StreamState streamState(final StreamId streamId) {
+    public synchronized StreamState streamState(final StreamId streamId) {
 
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
