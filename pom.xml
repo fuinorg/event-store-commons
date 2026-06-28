@@ -45,6 +45,10 @@
         <auto-service.version>1.1.1</auto-service.version>
         <testcontainers.version>1.20.6</testcontainers.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <!-- Extra JVM args that silence the grpc-netty-shaded (bundled Netty) warnings on JDK 24+
+             (sun.misc.Unsafe + native library loading). Only the integration tests (failsafe) start
+             the gRPC client, so this is applied to failsafe only. -->
+        <esc.grpc.argLine>--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow</esc.grpc.argLine>
     </properties>
 
     <dependencyManagement>
@@ -256,7 +260,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.6</version>
                     <configuration>
-                        <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+                        <argLine>--add-opens java.base/java.util=ALL-UNNAMED ${esc.grpc.argLine}</argLine>
                     </configuration>
                     <executions>
                         <execution>

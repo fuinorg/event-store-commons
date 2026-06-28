@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.mem.example;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EscApiUtils;
 import org.fuin.esc.api.EventId;
@@ -29,6 +31,7 @@ import org.fuin.esc.api.Subscription;
 import org.fuin.esc.api.TypeName;
 import org.fuin.esc.mem.InMemoryEventStoreAsync;
 import org.fuin.utils4j.TestOmitted;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,6 @@ import java.util.concurrent.Future;
  * No external server is required - just run the {@link #main(String[])} method (Java 21+).
  */
 @TestOmitted("Example class")
-@SuppressWarnings("java:S106") // System.out is fine for an example
 public final class AsyncVirtualThreadsExample {
 
     private AsyncVirtualThreadsExample() {
@@ -57,7 +59,12 @@ public final class AsyncVirtualThreadsExample {
      */
     public static void main(final String[] args) throws ExecutionException, InterruptedException {
 
-        System.out.println("BEGIN");
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
+
+        Logger log = (Logger) LoggerFactory.getLogger(AsyncVirtualThreadsExample.class);
+
+        log.info("BEGIN");
 
         // 'callbackExecutor' is used by the in-memory store to DELIVER subscription callbacks: with a
         // virtual-thread-per-task executor every 'onEvent' runs on its own virtual thread.
@@ -73,13 +80,13 @@ public final class AsyncVirtualThreadsExample {
             final long version = es.appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
                     event("OrderPlaced", "order-1")).get();
             final StreamEventsSlice slice = es.readEventsForward(streamId, 0, 100).get();
-            System.out.println("version=" + version + " events=" + slice.getEvents().size());
+            log.info("version={} events={}", version, slice.getEvents().size());
 
             // 2) Subscribe to NEW events - the callbacks are delivered on 'callbackExecutor' (virtual threads)
             final List<CommonEvent> received = new CopyOnWriteArrayList<>();
             final Subscription subscription = es.subscribeToStream(streamId, EscApiUtils.SUBSCRIBE_TO_NEW_EVENTS,
                     (sub, ce) -> received.add(ce), // runs on a virtual thread - blocking work here is fine
-                    (sub, ex) -> { /* dropped */ }).get();
+                    (sub, ex) -> log.error("Error processing subscription", ex)).get();
 
             // 3) Fan out many independent appends, each blocking on its own virtual thread
             final List<Future<Long>> futures = new ArrayList<>();
@@ -91,18 +98,18 @@ public final class AsyncVirtualThreadsExample {
             for (final Future<Long> future : futures) {
                 future.get();
             }
-            System.out.println("appended events to " + futures.size() + " streams concurrently");
+            log.info("appended events to {} streams concurrently", futures.size());
 
             // 4) Append to the subscribed stream so the (virtual-thread) subscription delivers it
             es.appendToStream(streamId, event("OrderShipped", "order-1")).get();
             waitFor(received, 1);
-            System.out.println("subscription received " + received.size() + " new event(s)");
+            log.info("subscription received {} new event(s)", received.size());
 
             es.unsubscribeFromStream(subscription).get();
             es.close();
         }
 
-        System.out.println("END");
+        log.info("END");
     }
 
     private static CommonEvent event(final String type, final String id) {

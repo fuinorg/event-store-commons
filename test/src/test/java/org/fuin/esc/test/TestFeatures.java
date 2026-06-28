@@ -174,7 +174,7 @@ public class TestFeatures {
                 eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry);
             } else {
                 final KurrentDBClientSettings setts = KurrentDBConnectionString
-                        .parseOrThrow("esdb://localhost:2113?tls=false");
+                        .parseOrThrow("kurrentdb://localhost:2113?tls=false");
                 client = KurrentDBClient.create(setts);
                 eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(serDeserializerRegistry)
                         .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
@@ -184,7 +184,7 @@ public class TestFeatures {
 
         } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_ASYNC_IMPLEMENTATION)) {
             final KurrentDBClientSettings setts = KurrentDBConnectionString
-                    .parseOrThrow("esdb://localhost:2113?tls=false");
+                    .parseOrThrow("kurrentdb://localhost:2113?tls=false");
             client = KurrentDBClient.create(setts);
             final ESGrpcEventStoreAsync asyncEventStore = new ESGrpcEventStoreAsync.Builder()
                     .eventStore(client).serDesRegistry(serDeserializerRegistry)

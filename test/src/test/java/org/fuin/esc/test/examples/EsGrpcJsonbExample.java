@@ -128,7 +128,7 @@ public final class EsGrpcJsonbExample {
         credentialsProvider.setCredentials(AuthScope.ANY, credentials);
 
         final KurrentDBClientSettings setts = KurrentDBConnectionString
-                .parseOrThrow("esdb://localhost:2113?tls=false");
+                .parseOrThrow("kurrentdb://localhost:2113?tls=false");
         final KurrentDBClient client = KurrentDBClient.create(setts);
         try (final EventStore eventStore = new ESGrpcEventStore.Builder()
                 .baseTypeFactory(new BaseTypeFactory())

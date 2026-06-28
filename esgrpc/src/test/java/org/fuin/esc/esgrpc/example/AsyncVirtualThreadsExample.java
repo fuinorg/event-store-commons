@@ -17,6 +17,8 @@
  */
 package org.fuin.esc.esgrpc.example;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import io.kurrent.dbclient.KurrentDBClient;
 import io.kurrent.dbclient.KurrentDBConnectionString;
 import jakarta.json.bind.JsonbConfig;
@@ -42,6 +44,7 @@ import org.fuin.esc.jsonb.EscJsonbUtils;
 import org.fuin.esc.jsonb.JsonbSerDeserializer;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 import org.fuin.utils4j.TestOmitted;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -55,7 +58,6 @@ import java.util.concurrent.Future;
  * it requires a running KurrentDB / EventStoreDB on {@code localhost:2113} (just like the {@code App} example).
  */
 @TestOmitted("Example class")
-@SuppressWarnings("java:S106") // System.out is fine for an example
 public final class AsyncVirtualThreadsExample {
 
     private AsyncVirtualThreadsExample() {
@@ -69,7 +71,12 @@ public final class AsyncVirtualThreadsExample {
      */
     public static void main(final String[] args) throws Exception {
 
-        System.out.println("BEGIN");
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
+
+        Logger log = (Logger) LoggerFactory.getLogger(AsyncVirtualThreadsExample.class);
+
+        log.info("BEGIN");
 
         final EnhancedMimeType xmlUtf8 = EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8);
 
@@ -93,7 +100,7 @@ public final class AsyncVirtualThreadsExample {
 
         // Async gRPC event store (requires a running KurrentDB / EventStoreDB on localhost:2113)
         final KurrentDBClient client = KurrentDBClient.create(
-                KurrentDBConnectionString.parseOrThrow("esdb://localhost:2113?tls=false"));
+                KurrentDBConnectionString.parseOrThrow("kurrentdb://localhost:2113?tls=false"));
         final ESGrpcEventStoreAsync es = new ESGrpcEventStoreAsync.Builder()
                 .eventStore(client)
                 .serDesRegistry(registry)
@@ -115,7 +122,7 @@ public final class AsyncVirtualThreadsExample {
                     .appendToStream(streamId, ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(), event)
                     .thenComposeAsync(v -> es.readEventsForward(streamId, 0, 10), vexec)
                     .get();
-            System.out.println("read " + slice.getEvents().size() + " event(s)");
+            log.info("read {} event(s)", + slice.getEvents().size());
 
             // 2) Fan out concurrent reads, each blocking on its own virtual thread
             final List<Future<Boolean>> futures = new ArrayList<>();
@@ -128,7 +135,7 @@ public final class AsyncVirtualThreadsExample {
                     existing++;
                 }
             }
-            System.out.println("streamExists true for " + existing + "/" + futures.size() + " concurrent checks");
+            log.info("streamExists true for {}/{} concurrent checks", existing, futures.size());
 
             es.deleteStream(streamId, true).get();
         } finally {
@@ -136,7 +143,7 @@ public final class AsyncVirtualThreadsExample {
             client.shutdown();
         }
 
-        System.out.println("END");
+        log.info("END");
     }
 
 }

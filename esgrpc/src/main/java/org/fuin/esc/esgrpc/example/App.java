@@ -20,7 +20,7 @@ public class App {
 
         System.out.println("BEGIN");
 
-        KurrentDBClientSettings setts = KurrentDBConnectionString.parseOrThrow("esdb://localhost:2113?tls=false");
+        KurrentDBClientSettings setts = KurrentDBConnectionString.parseOrThrow("kurrentdb://localhost:2113?tls=false");
         KurrentDBClient client = KurrentDBClient.create(setts);
 
         String json = """
