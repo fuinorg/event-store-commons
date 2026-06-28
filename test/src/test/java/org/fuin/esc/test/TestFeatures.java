@@ -43,7 +43,8 @@ import org.fuin.esc.jaxb.EscJaxbUtils;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.esc.jpa.JpaEventStore;
 import org.fuin.esc.jsonb.JsonbSerDeserializer;
-import org.fuin.esc.mem.InMemoryEventStore;
+import org.fuin.esc.mem.InMemoryEventStoreAsync;
+import org.fuin.esc.spi.DelegatingSyncEventStore;
 import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.esc.test.examples.MyMeta;
@@ -86,6 +87,8 @@ public class TestFeatures {
     private Connection connection;
 
     private Subscription subscription;
+
+    private SubscribableEventStoreAsync subscribableAsync;
 
     private final List<CommonEvent> receivedEvents = new CopyOnWriteArrayList<>();
 
@@ -158,9 +161,12 @@ public class TestFeatures {
 
         // Use the property to select the correct implementation:
         final String currentEventStoreImplType = System.getProperty(TestUtils.IMPLEMENTATION_KEY,TestUtils.MEM_IMPLEMENTATION);
+        subscribableAsync = null;
         final EventStore eventStore;
         if (currentEventStoreImplType.equals(TestUtils.MEM_IMPLEMENTATION)) {
-            eventStore = new InMemoryEventStore(Executors.newCachedThreadPool());
+            final InMemoryEventStoreAsync memAsync = new InMemoryEventStoreAsync(Executors.newCachedThreadPool());
+            subscribableAsync = memAsync;
+            eventStore = new DelegatingSyncEventStore(memAsync);
         } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION) || currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)) {
 
             if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
@@ -185,7 +191,8 @@ public class TestFeatures {
                     .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
                     .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
                     .build();
-            eventStore = new SyncFromAsyncEventStore(asyncEventStore);
+            subscribableAsync = asyncEventStore;
+            eventStore = new DelegatingSyncEventStore(asyncEventStore);
         } else {
             throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
         }
@@ -198,10 +205,9 @@ public class TestFeatures {
 
     @After
     public void afterFeature() {
-        if (subscription != null && testContext != null
-                && testContext.getEventStore() instanceof SubscribableEventStore subscribable) {
+        if (subscription != null && subscribableAsync != null) {
             try {
-                subscribable.unsubscribeFromStream(subscription);
+                subscribableAsync.unsubscribeFromStream(subscription).join();
             } catch (final RuntimeException ex) { // NOSONAR - best effort cleanup
                 // Ignore cleanup failures
             }
@@ -410,16 +416,14 @@ public class TestFeatures {
     }
 
     private void subscribeToStream(final String streamName, final long eventNumber) {
-        final EventStore es = testContext.getEventStore();
         // Skip the scenario for implementations that don't support subscriptions (e.g. jpa, sync esgrpc)
-        Assumptions.assumeTrue(es instanceof SubscribableEventStore, "Implementation '"
+        Assumptions.assumeTrue(subscribableAsync != null, "Implementation '"
                 + testContext.getCurrentEventStoreImplType() + "' does not support subscriptions");
-        final SubscribableEventStore subscribable = (SubscribableEventStore) es;
         final StreamId streamId = new SimpleStreamId(
                 testContext.getCurrentEventStoreImplType() + "_" + streamName);
-        subscription = subscribable.subscribeToStream(streamId, eventNumber,
+        subscription = subscribableAsync.subscribeToStream(streamId, eventNumber,
                 (sub, event) -> receivedEvents.add(event),
-                (sub, ex) -> { /* Drops are ignored in this test */ });
+                (sub, ex) -> { /* Drops are ignored in this test */ }).join();
     }
 
     @Then("^the subscription should receive the following events$")

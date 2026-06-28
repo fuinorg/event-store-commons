@@ -23,12 +23,10 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.core.KeyValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -160,101 +158,12 @@ public class InMemoryEventStoreTest {
 
     }
 
-    @Test
-    public void testSubscribeToStreamNewEvents() {
-
-        // PREPARE
-        final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = event("One");
-        final CommonEvent eventTwo = event("Two");
-        final CommonEvent eventThree = event("Three");
-        testee.appendToStream(streamId, eventOne);
-        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
-
-        // TEST
-        testee.subscribeToStream(streamId, EscApiUtils.SUBSCRIBE_TO_NEW_EVENTS, (subscription, event) -> {
-            result.add(event);
-        }, (subscription, exception) -> {
-            // Not used
-        });
-        testee.appendToStream(streamId, eventTwo, eventThree);
-        waitForResult(result, 1);
-
-        // VERIFY
-        assertThat(result).containsExactly(eventTwo, eventThree);
-
-    }
-
-    @Test
-    public void testSubscribeToStreamFromFirst() {
-
-        // PREPARE
-        final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = event("Eins");
-        final CommonEvent eventTwo = event("Zwei");
-        final CommonEvent eventThree = event("Drei");
-        testee.appendToStream(streamId, eventOne, eventTwo, eventThree);
-        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
-
-        // TEST
-        testee.subscribeToStream(streamId, 0, (subscription, event) -> {
-            result.add(event);
-        }, (subscription, exception) -> {
-            // Not used
-        });
-        waitForResult(result, 3);
-
-        // VERIFY
-        assertThat(result).containsExactly(eventOne, eventTwo, eventThree);
-
-    }
-
-    // TODO Fix test
-    @Disabled("Unstable - Fails sometimes")
-    @Test
-    public void testSubscribeToStreamFromX() {
-
-        // PREPARE
-        final StreamId streamId = new SimpleStreamId("MyStream");
-        final CommonEvent eventOne = event("Eins");
-        final CommonEvent eventTwo = event("Zwei");
-        final CommonEvent eventThree = event("Drei");
-        testee.appendToStream(streamId, eventOne, eventTwo);
-        final List<CommonEvent> result = new CopyOnWriteArrayList<>();
-
-        // TEST
-        testee.subscribeToStream(streamId, 1, (subscription, event) -> {
-            result.add(event);
-        }, (subscription, exception) -> {
-            // Not used
-        });
-        testee.appendToStream(streamId, eventThree);
-        waitForResult(result, 2);
-
-        // VERIFY
-        assertThat(result).containsExactly(eventTwo, eventThree);
-
-    }
-
     @SuppressWarnings("unused")
     private void println(String prefix, List<CommonEvent> events) {
         System.out.println(prefix);
         for (CommonEvent event : events) {
             System.out.println(event + " {" + event.getData() + "}");
         }
-    }
-
-    private void waitForResult(final List<CommonEvent> result, final int expected) {
-        int count = 0;
-        while (result.size() != expected && (count < 10)) {
-            try {
-                Thread.sleep(100);
-            } catch (final InterruptedException ex) {// NOSONAR
-                throw new RuntimeException(ex);
-            }
-            count++;
-        }
-
     }
 
     private static CommonEvent event(final String name) {

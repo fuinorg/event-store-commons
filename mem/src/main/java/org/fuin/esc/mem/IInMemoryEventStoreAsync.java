@@ -17,14 +17,15 @@
  */
 package org.fuin.esc.mem;
 
-import org.fuin.esc.api.EventStore;
+import org.fuin.esc.api.EventStoreAsync;
+import org.fuin.esc.api.SubscribableEventStoreAsync;
 import org.fuin.objects4j.common.ThreadSafe;
 
 /**
- * Interface for the In-memory implementation for unit testing. This allows dependency injections frameworks like CDI to use this interface
- * rather than the (final) implementation.
+ * Interface for the asynchronous in-memory implementation for unit testing. This allows dependency injection frameworks like CDI to use this
+ * interface rather than the (final) implementation.
  */
 @ThreadSafe
-public interface IInMemoryEventStore extends EventStore {
+public interface IInMemoryEventStoreAsync extends EventStoreAsync, SubscribableEventStoreAsync {
 
 }
