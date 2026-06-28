@@ -30,6 +30,12 @@
         <url>https://github.com/fuinorg/event-store-commons/issues</url>
     </issueManagement>
 
+    <properties>
+        <!-- Main code stays at the library's release level; tests compile at 21 so the
+             virtual-threads example (org.fuin.esc.esgrpc.example) can use the Java 21+ API. -->
+        <maven.compiler.testRelease>21</maven.compiler.testRelease>
+    </properties>
+
     <dependencies>
 
         <!-- compile -->
