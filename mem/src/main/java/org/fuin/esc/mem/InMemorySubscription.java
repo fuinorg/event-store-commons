@@ -21,6 +21,8 @@ import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.Subscription;
 import org.fuin.objects4j.common.Immutable;
 
+import java.io.Serial;
+
 /**
  * Result of subscribing to an in-memory event store. Hash code and equals are
  * based on the subscriber ID.
@@ -29,6 +31,7 @@ import org.fuin.objects4j.common.Immutable;
 public final class InMemorySubscription extends Subscription implements
         Comparable<InMemorySubscription> {
 
+    @Serial
     private static final long serialVersionUID = 1000L;
 
     private final int subscriberId;

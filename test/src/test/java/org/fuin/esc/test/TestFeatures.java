@@ -38,6 +38,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.fuin.esc.api.*;
 import org.fuin.esc.esgrpc.ESGrpcEventStore;
+import org.fuin.esc.esgrpc.ESGrpcEventStoreAsync;
 import org.fuin.esc.jaxb.EscJaxbUtils;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.esc.jpa.JpaEventStore;
@@ -48,19 +49,25 @@ import org.fuin.esc.test.examples.BookAddedEvent;
 import org.fuin.esc.test.examples.MyMeta;
 import org.fuin.esc.test.jpa.TestIdStreamFactory;
 import org.fuin.objects4j.jsonb.JsonbProvider;
+import org.awaitility.Awaitility;
 import org.fuin.utils4j.MultipleCommands;
 import org.fuin.utils4j.TestCommand;
 import org.fuin.utils4j.jaxb.UnmarshallerBuilder;
+import org.junit.jupiter.api.Assumptions;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.fuin.utils4j.jaxb.JaxbUtils.unmarshal;
 
 
@@ -77,6 +84,10 @@ public class TestFeatures {
     private KurrentDBClient client;
 
     private Connection connection;
+
+    private Subscription subscription;
+
+    private final List<CommonEvent> receivedEvents = new CopyOnWriteArrayList<>();
 
     @DataTableType
     public AppendToStreamCommand createAppendToStreamCommand(Map<String, String> entry) {
@@ -165,16 +176,37 @@ public class TestFeatures {
                         .build();
             }
 
+        } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_ASYNC_IMPLEMENTATION)) {
+            final KurrentDBClientSettings setts = KurrentDBConnectionString
+                    .parseOrThrow("esdb://localhost:2113?tls=false");
+            client = KurrentDBClient.create(setts);
+            final ESGrpcEventStoreAsync asyncEventStore = new ESGrpcEventStoreAsync.Builder()
+                    .eventStore(client).serDesRegistry(serDeserializerRegistry)
+                    .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
+                    .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
+                    .build();
+            eventStore = new SyncFromAsyncEventStore(asyncEventStore);
         } else {
             throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
         }
         eventStore.open();
         testContext = new TestContext(currentEventStoreImplType, eventStore, serDeserializerRegistry);
         lastCommand = null;
+        subscription = null;
+        receivedEvents.clear();
     }
 
     @After
     public void afterFeature() {
+        if (subscription != null && testContext != null
+                && testContext.getEventStore() instanceof SubscribableEventStore subscribable) {
+            try {
+                subscribable.unsubscribeFromStream(subscription);
+            } catch (final RuntimeException ex) { // NOSONAR - best effort cleanup
+                // Ignore cleanup failures
+            }
+            subscription = null;
+        }
         if (testContext != null) {
             testContext.getEventStore().close();
             teardownDb();
@@ -365,6 +397,51 @@ public class TestFeatures {
         command.init(testContext);
         executeThen(command);
 
+    }
+
+    @When("^I subscribe to stream \"(.*?)\" from the beginning$")
+    public void whenSubscribeToStreamFromBeginning(final String streamName) {
+        subscribeToStream(streamName, 0);
+    }
+
+    @When("^I subscribe to stream \"(.*?)\" from event number (\\d+)$")
+    public void whenSubscribeToStreamFromEventNumber(final String streamName, final long eventNumber) {
+        subscribeToStream(streamName, eventNumber);
+    }
+
+    private void subscribeToStream(final String streamName, final long eventNumber) {
+        final EventStore es = testContext.getEventStore();
+        // Skip the scenario for implementations that don't support subscriptions (e.g. jpa, sync esgrpc)
+        Assumptions.assumeTrue(es instanceof SubscribableEventStore, "Implementation '"
+                + testContext.getCurrentEventStoreImplType() + "' does not support subscriptions");
+        final SubscribableEventStore subscribable = (SubscribableEventStore) es;
+        final StreamId streamId = new SimpleStreamId(
+                testContext.getCurrentEventStoreImplType() + "_" + streamName);
+        subscription = subscribable.subscribeToStream(streamId, eventNumber,
+                (sub, event) -> receivedEvents.add(event),
+                (sub, ex) -> { /* Drops are ignored in this test */ });
+    }
+
+    @Then("^the subscription should receive the following events$")
+    public void thenSubscriptionShouldReceiveEvents(final List<String> rows) {
+
+        // The first row contains the table header
+        final List<EventId> expected = new ArrayList<>();
+        for (int i = 1; i < rows.size(); i++) {
+            expected.add(new EventId(rows.get(i)));
+        }
+
+        // Delivery is asynchronous (background threads), so wait until the expected events arrive
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(50))
+                .untilAsserted(() -> {
+                    final List<EventId> actual = new ArrayList<>();
+                    for (final CommonEvent event : receivedEvents) {
+                        actual.add(event.getId());
+                    }
+                    assertThat(actual).isEqualTo(expected);
+                });
     }
 
     private void setupDb() {

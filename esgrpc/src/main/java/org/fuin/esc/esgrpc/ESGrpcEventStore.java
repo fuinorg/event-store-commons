@@ -17,7 +17,6 @@
  */
 package org.fuin.esc.esgrpc;
 
-import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.*;
 import org.fuin.esc.api.*;
@@ -32,7 +31,6 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -49,11 +47,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     private final KurrentDBClient es;
 
-    private final CommonEvent2EventDataConverter ce2edConv;
-
-    private final RecordedEvent2CommonEventConverter ed2ceConv;
-
-    private final TenantContext tenantContext;
+    private final ESGrpcEventStoreSupport support;
 
     /**
      * Private constructor with all data used by the builder.
@@ -74,15 +68,15 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
                              final TenantContext tenantContext) {
         super();
         Contract.requireArgNotNull("es", es);
-        Contract.requireArgNotNull("serRegistry", serRegistry);
-        Contract.requireArgNotNull("desRegistry", desRegistry);
-        Contract.requireArgNotNull("baseTypeFactory", baseTypeFactory);
-        Contract.requireArgNotNull("targetContentType", targetContentType);
-        Contract.requireArgNotNull("tenantContext", tenantContext);
         this.es = es;
-        this.ce2edConv = new CommonEvent2EventDataConverter(serRegistry, baseTypeFactory, targetContentType);
-        this.ed2ceConv = new RecordedEvent2CommonEventConverter(desRegistry);
-        this.tenantContext = tenantContext;
+        this.support = new ESGrpcEventStoreSupport(serRegistry, desRegistry, baseTypeFactory,
+                targetContentType, tenantContext);
+    }
+
+    private void ensureOpen() {
+        if (es.isShutdown()) {
+            throw new IllegalStateException("The event store has already been closed");
+        }
     }
 
     @Override
@@ -134,27 +128,19 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
         Contract.requireArgNotNull("commonEvents", commonEvents);
-        ensureStreamNoProjection(streamId);
+        ESGrpcEventStoreSupport.ensureStreamNoProjection(streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
 
         try {
-            final Iterator<EventData> eventDataIt = asEventData(commonEvents).iterator();
+            final Iterator<EventData> eventDataIt = support.asEventData(commonEvents).iterator();
             final WriteResult result = es.appendToStream(sid.asString(),
-                    AppendToStreamOptions.get().streamState(version2State(expectedVersion)), eventDataIt).get();
+                    AppendToStreamOptions.get().streamState(ESGrpcEventStoreSupport.version2State(expectedVersion)),
+                    eventDataIt).get();
             return result.getNextExpectedRevision().toRawLong();
         } catch (final ExecutionException ex) {
-            if (ex.getCause() instanceof io.kurrent.dbclient.WrongExpectedVersionException cause) {
-                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualState().toRawLong());
-            }
-            if (statusIsDeleted(ex)) {
-                throw new StreamDeletedException(sid);
-            }
-            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
-                throw new StreamNotFoundException(sid);
-            }
-            throw new RuntimeException("Error executing appendToStream(..)", ex);
+            throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, expectedVersion);
         } catch (InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for appendToStream(..) result", ex);
         }
@@ -167,29 +153,20 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("expectedVersion", expectedVersion, ExpectedVersion.ANY.getNo());
-        ensureStreamNoProjection(streamId);
+        ESGrpcEventStoreSupport.ensureStreamNoProjection(streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
         try {
             final DeleteStreamOptions options = DeleteStreamOptions.get()
-                    .streamState(version2State(expectedVersion));
+                    .streamState(ESGrpcEventStoreSupport.version2State(expectedVersion));
             if (hardDelete) {
                 es.tombstoneStream(sid.asString(), options).get();
             } else {
                 es.deleteStream(sid.asString(), options).get();
             }
         } catch (final ExecutionException ex) {
-            if (ex.getCause() instanceof io.kurrent.dbclient.WrongExpectedVersionException cause) {
-                throw new WrongExpectedVersionException(sid, expectedVersion, cause.getActualState().toRawLong());
-            }
-            if (statusIsDeleted(ex)) {
-                throw new StreamDeletedException(sid);
-            }
-            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
-                throw new StreamNotFoundException(sid);
-            }
-            throw new RuntimeException("Error executing deleteStream(..)", ex);
+            throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, expectedVersion);
         } catch (final InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for deleteStream(..) result", ex);
         }
@@ -212,24 +189,18 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
         try {
 
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
 
             final ReadResult readResult = es.readStream(sid.asString(), options).get();
-            final List<CommonEvent> events = asCommonEvents(readResult.getEvents());
+            final List<CommonEvent> events = support.asCommonEvents(readResult.getEvents());
             final boolean endOfStream = count > events.size();
             return new StreamEventsSlice(start, events, start + events.size(), endOfStream);
         } catch (ExecutionException ex) {
-            if (statusIsDeleted(ex)) {
-                throw new StreamDeletedException(sid);
-            }
-            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
-                throw new StreamNotFoundException(sid);
-            }
-            throw new RuntimeException("Error executing readEventsForward(..)", ex);
+            throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, ANY.getNo());
         } catch (InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for readEventsForward(..) result", ex);
         }
@@ -244,12 +215,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
             final ReadResult slice = es.readStream(sid.asString(), options).get();
-            final List<CommonEvent> events = asCommonEvents(slice.getEvents());
+            final List<CommonEvent> events = support.asCommonEvents(slice.getEvents());
             long nextEventNumber = start - events.size();
             final boolean endOfStream = (start - count < 0);
             if (endOfStream) {
@@ -257,13 +228,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             }
             return new StreamEventsSlice(start, events, nextEventNumber, endOfStream);
         } catch (ExecutionException ex) {
-            if (statusIsDeleted(ex)) {
-                throw new StreamDeletedException(sid);
-            }
-            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
-                throw new StreamNotFoundException(sid);
-            }
-            throw new RuntimeException("Error executing readEventsBackward(..)", ex);
+            throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, ANY.getNo());
         } catch (InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for readEventsBackward(..) result", ex);
         }
@@ -285,7 +250,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(0).maxCount(1);
             es.readStream(sid.asString(), options).get();
@@ -310,12 +275,12 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
 
-        final TenantStreamId sid = new TenantStreamId(tenantContext.getTenantId().orElse(null), streamId);
+        final TenantStreamId sid = support.sid(streamId);
         try {
             es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
             return StreamState.ACTIVE;
         } catch (ExecutionException ex) {
-            if (statusIsDeleted(ex)) {
+            if (ESGrpcEventStoreSupport.statusIsDeleted(ex.getCause())) {
                 return StreamState.HARD_DELETED;
             }
             if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
@@ -332,7 +297,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         // Workaround for reading metadata because of:
         // https://github.com/EventStore/KurrentDB-Client-Java/issues/240
         try {
-            es.readStream("$$" + streamId.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
+            es.readStream(ESGrpcEventStoreSupport.metaStreamName(streamId),
+                    ReadStreamOptions.get().forwards().fromRevision(0)).get();
             throw new StreamNotFoundException(streamId);
         } catch (ExecutionException ex) {
             if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
@@ -342,57 +308,6 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         } catch (InterruptedException ex) { // NOSONAR
             throw new RuntimeException("Error reading stream status", ex);
         }
-    }
-
-    private List<EventData> asEventData(final List<CommonEvent> commonEvents) {
-        final List<EventData> list = new ArrayList<>(commonEvents.size());
-        for (final CommonEvent commonEvent : commonEvents) {
-            list.add(ce2edConv.convert(commonEvent));
-        }
-        return list;
-    }
-
-    private List<CommonEvent> asCommonEvents(final List<ResolvedEvent> resolvedEvents) {
-        final List<CommonEvent> list = new ArrayList<>(resolvedEvents.size());
-        for (final ResolvedEvent resolvedEvent : resolvedEvents) {
-            list.add(asCommonEvent(resolvedEvent));
-        }
-        return list;
-    }
-
-    private CommonEvent asCommonEvent(final ResolvedEvent resolvedEvent) {
-        return ed2ceConv.convert(resolvedEvent.getEvent());
-    }
-
-    private void ensureOpen() {
-        if (es.isShutdown()) {
-            throw new IllegalStateException("The event store has already been closed");
-        }
-    }
-
-    private static void ensureStreamNoProjection(StreamId streamId) {
-        if (streamId.isProjection()) {
-            throw new StreamReadOnlyException(streamId);
-        }
-    }
-
-    private static boolean statusIsDeleted(ExecutionException ex) {
-        if (ex.getCause() instanceof StatusRuntimeException sre) {
-            return sre.getStatus().getCode().equals(Status.FAILED_PRECONDITION.getCode())
-                    && sre.getStatus().getDescription() != null
-                    && sre.getStatus().getDescription().contains("is deleted");
-        }
-        return ex.getCause() instanceof io.kurrent.dbclient.StreamDeletedException;
-    }
-
-    private static io.kurrent.dbclient.StreamState version2State(long version) {
-        if (version == ANY.getNo()) {
-            return io.kurrent.dbclient.StreamState.any();
-        }
-        if (version == ExpectedVersion.NO_OR_EMPTY_STREAM.getNo()) {
-            return io.kurrent.dbclient.StreamState.noStream();
-        }
-        return io.kurrent.dbclient.StreamState.streamRevision(version);
     }
 
     /**

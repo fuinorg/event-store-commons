@@ -29,6 +29,8 @@ public final class TestUtils {
 
     public static final String ESGRPC_IMPLEMENTATION = "esgrpc";
 
+    public static final String ESGRPC_ASYNC_IMPLEMENTATION = "esgrpc-async";
+
     private TestUtils() {
     }
 
