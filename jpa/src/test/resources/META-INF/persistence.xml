@@ -11,6 +11,7 @@
         <class>org.fuin.esc.jpa.JpaEvent</class>
         <class>org.fuin.esc.jpa.JpaStream</class>
         <class>org.fuin.esc.jpa.JpaProjection</class>
+        <class>org.fuin.esc.jpa.JpaCheckpoint</class>
         <class>org.fuin.esc.jpa.JpaData</class>
         <class>org.fuin.esc.jpa.NoParamsEvent</class>
         <class>org.fuin.esc.jpa.NoParamsStream</class>

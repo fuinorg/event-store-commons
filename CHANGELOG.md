@@ -8,6 +8,8 @@
 - Added [JSpecify](https://jspecify.dev/) and [NullAway](https://github.com/uber/nullaway)
 - Added new [Crypto](crypto) module
 - Make event store capabilities explicit with [EventStoreCapabilities](api/src/main/java/org/fuin/esc/api/EventStoreCapabilities.java)
+- Upcaster/converter chain wired into the read path
+- Added portable catch-up + CheckpointStore SPI + WakeupSource
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
