@@ -389,6 +389,9 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
 
         private DeserializerRegistry desRegistry;
 
+        @Nullable
+        private ConverterRegistry converters;
+
         private IBaseTypeFactory baseTypeFactory;
 
         private EnhancedMimeType targetContentType;
@@ -438,6 +441,19 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
         public Builder serDesRegistry(final SerDeserializerRegistry registry) {
             this.serRegistry = registry;
             this.desRegistry = registry;
+            return this;
+        }
+
+        /**
+         * Sets the version up-caster registry. When set, events read from this store are up-cast from their
+         * stored version to the latest in-memory representation (the deserializer registry is wrapped in an
+         * {@link UpcastingDeserializerRegistry}); {@literal null} or an empty registry leaves reads unchanged.
+         *
+         * @param converters Registry of version up-casters applied after deserialization.
+         * @return Builder.
+         */
+        public Builder converters(@Nullable final ConverterRegistry converters) {
+            this.converters = converters;
             return this;
         }
 
@@ -496,7 +512,9 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
             if (tenantContext == null) {
                 tenantContext = new TenantContext.NoopTenantContext();
             }
-            return new ESGrpcEventStoreAsync(eventStore, serRegistry, desRegistry,
+            final DeserializerRegistry effectiveDesRegistry = converters == null
+                    ? desRegistry : new UpcastingDeserializerRegistry(desRegistry, converters);
+            return new ESGrpcEventStoreAsync(eventStore, serRegistry, effectiveDesRegistry,
                     baseTypeFactory, targetContentType, tenantContext);
         }
 

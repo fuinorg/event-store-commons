@@ -63,6 +63,29 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         this.streamFactory = streamFactory;
     }
 
+    /**
+     * Constructor that additionally up-casts events on read: the deserializer registry is wrapped in an
+     * {@link UpcastingDeserializerRegistry} using the given converters, so every event read from this store is
+     * lifted from its stored version to the latest in-memory representation (weak-schema across a rolling deploy)
+     * without any caller having to wrap the registry itself. An empty {@link ConverterRegistry} is a no-op.
+     *
+     * @param em
+     *            Entity manager.
+     * @param streamFactory
+     *            Stream factory.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param converters
+     *            Registry of version up-casters applied after deserialization.
+     */
+    public JpaEventStore(final EntityManager em, final JpaIdStreamFactory streamFactory,
+                         final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry,
+                         final ConverterRegistry converters) {
+        this(em, streamFactory, serRegistry, new UpcastingDeserializerRegistry(desRegistry, converters));
+    }
+
     @Override
     public EventStoreCapabilities capabilities() {
         // Relational append/read store: durable and supports hard delete, but no subscriptions or projections.

@@ -18,8 +18,10 @@
 package org.fuin.esc.jpa;
 
 import jakarta.persistence.EntityManager;
+import org.fuin.esc.api.ConverterRegistry;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.SerializerRegistry;
+import org.fuin.esc.api.UpcastingDeserializerRegistry;
 import org.fuin.objects4j.common.NotThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
@@ -43,6 +45,26 @@ public final class ReadableJpaEventStore extends AbstractJpaEventStore {
     public ReadableJpaEventStore(final EntityManager em,
                                  final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
         super(em, serRegistry, desRegistry);
+    }
+
+    /**
+     * Constructor that additionally up-casts events on read: the deserializer registry is wrapped in an
+     * {@link UpcastingDeserializerRegistry} using the given converters, so every event read from this store is
+     * lifted from its stored version to the latest in-memory representation without any caller having to wrap the
+     * registry itself. An empty {@link ConverterRegistry} is a no-op.
+     *
+     * @param em
+     *            Entity manager.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param converters
+     *            Registry of version up-casters applied after deserialization.
+     */
+    public ReadableJpaEventStore(final EntityManager em, final SerializerRegistry serRegistry,
+                                 final DeserializerRegistry desRegistry, final ConverterRegistry converters) {
+        super(em, serRegistry, new UpcastingDeserializerRegistry(desRegistry, converters));
     }
 
 }

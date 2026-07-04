@@ -289,6 +289,9 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
         private DeserializerRegistry desRegistry;
 
         @Nullable
+        private ConverterRegistry converters;
+
+        @Nullable
         private EncryptedDataService encryptionService;
 
         @Nullable
@@ -331,6 +334,20 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
          */
         public Builder desRegistry(final DeserializerRegistry desRegistry) {
             this.desRegistry = desRegistry;
+            return this;
+        }
+
+        /**
+         * Sets the version up-caster registry. When set, events read (and decrypted) through this store are
+         * up-cast from their stored version to the latest in-memory representation (the deserializer registry is
+         * wrapped in an {@link UpcastingDeserializerRegistry}); {@literal null} or an empty registry leaves reads
+         * unchanged.
+         *
+         * @param converters Registry of version up-casters applied after deserialization.
+         * @return This builder.
+         */
+        public Builder converters(@Nullable final ConverterRegistry converters) {
+            this.converters = converters;
             return this;
         }
 
@@ -396,6 +413,9 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
          * @return New encrypting event store.
          */
         public EncryptingEventStore build() {
+            if (converters != null && desRegistry != null) {
+                desRegistry = new UpcastingDeserializerRegistry(desRegistry, converters);
+            }
             return new EncryptingEventStore(this);
         }
 
