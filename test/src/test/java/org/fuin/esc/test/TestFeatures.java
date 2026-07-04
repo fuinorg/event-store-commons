@@ -154,6 +154,9 @@ public class TestFeatures {
         // Finalize initialization of JSON-B
         TestUtils.register(jsonbConfig, serDeserializerRegistry, serDeserializerRegistry);
 
+        // Up-cast registry: lifts a stored version 1 "GreetEvent" to version 2 on read (see upcast-event.feature).
+        final ConverterRegistry converters = TestUtils.converterRegistry();
+
         // Start with tests
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         final UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "changeit");
@@ -171,7 +174,7 @@ public class TestFeatures {
 
             if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
                 setupDb();
-                eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry);
+                eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry, converters);
             } else {
                 final KurrentDBClientSettings setts = KurrentDBConnectionString
                         .parseOrThrow("kurrentdb://localhost:2113?tls=false");
@@ -179,6 +182,7 @@ public class TestFeatures {
                 eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(serDeserializerRegistry)
                         .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
                         .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
+                        .converters(converters)
                         .build();
             }
 
@@ -190,6 +194,7 @@ public class TestFeatures {
                     .eventStore(client).serDesRegistry(serDeserializerRegistry)
                     .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
                     .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
+                    .converters(converters)
                     .build();
             subscribableAsync = asyncEventStore;
             eventStore = new DelegatingSyncEventStore(asyncEventStore);
@@ -330,6 +335,15 @@ public class TestFeatures {
         final TestCommand<TestContext> command = new MultipleCommands<TestContext>(commands);
         command.init(testContext);
         executeThen(command);
+    }
+
+    @Given("^the backend deserializes stored events$")
+    public void givenBackendDeserializesStoredEvents() {
+        // The in-memory store keeps the live event objects and never serializes/deserializes, so it never
+        // up-casts. Skip up-cast scenarios for it (jpa and esgrpc round-trip through the (de)serializers).
+        Assumptions.assumeTrue(!TestUtils.MEM_IMPLEMENTATION.equals(testContext.getCurrentEventStoreImplType()),
+                "Implementation '" + testContext.getCurrentEventStoreImplType()
+                        + "' does not deserialize stored events");
     }
 
     @When("^I append the following events to stream \"(.*?)\"$")

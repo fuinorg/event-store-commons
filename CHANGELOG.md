@@ -9,6 +9,7 @@
 - Added new [Crypto](crypto) module
 - Make event store capabilities explicit with [EventStoreCapabilities](api/src/main/java/org/fuin/esc/api/EventStoreCapabilities.java)
 - Upcaster/converter chain wired into the read path
+- Added [VersionNegotiator](api/src/main/java/org/fuin/esc/api/VersionNegotiator.java) for down-cast/version negotiation with older consumers
 - Added portable catch-up + CheckpointStore SPI + WakeupSource
 
 ## 0.9.0

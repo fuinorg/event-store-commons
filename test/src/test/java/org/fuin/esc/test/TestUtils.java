@@ -9,6 +9,9 @@ import org.fuin.esc.jsonb.EscJsonbUtils;
 import org.fuin.esc.jsonb.JsonbSerDeserializer;
 import org.fuin.esc.spi.TextDeSerializer;
 import org.fuin.esc.test.examples.BookAddedEvent;
+import org.fuin.esc.test.examples.GreetV1;
+import org.fuin.esc.test.examples.GreetV1ToV2Converter;
+import org.fuin.esc.test.examples.GreetV2;
 import org.fuin.esc.test.examples.MyMeta;
 import org.fuin.objects4j.jsonb.JsonbProvider;
 
@@ -114,10 +117,32 @@ public final class TestUtils {
     public static SerDeserializerRegistry serDeserializerRegistry(final XmlDeSerializer xmlDeSer,
                                                                   final JsonbSerDeserializer jsonbDeSer,
                                                                   final TextDeSerializer textDeSer) {
+
+        // A "GreetEvent" is stored at version 1 (serializer + v1 deserializer) but understood at version 2 by
+        // consumers: register the v2 XmlDeSerializer as a deserializer-ONLY (cast to Deserializer) so it does
+        // not overwrite the type-keyed v1 serializer. On read the ConverterRegistry (see converterRegistry())
+        // up-casts the deserialized v1 to v2.
+        final XmlDeSerializer greetV1 = XmlDeSerializer.builder().add(GreetV1.class).version("1").build();
+        final XmlDeSerializer greetV2 = XmlDeSerializer.builder().add(GreetV2.class).version("2").build();
+
         return EscJaxbUtils.addEscSerDeserializer(new SimpleSerializerDeserializerRegistry.Builder(EscJaxbUtils.MIME_TYPE), xmlDeSer)
                 .add(new SerializedDataType(BookAddedEvent.TYPE.asBaseType()), xmlDeSer, xmlDeSer.getMimeType())
                 .add(new SerializedDataType(MyMeta.TYPE.asBaseType()), jsonbDeSer, jsonbDeSer.getMimeType())
                 .add(new SerializedDataType("TextEvent"), textDeSer, textDeSer.getMimeType())
+                .add(GreetV1.SER_TYPE, greetV1, greetV1.getMimeType())
+                .add(GreetV1.SER_TYPE, (Deserializer) greetV2, greetV2.getMimeType())
+                .build();
+    }
+
+    /**
+     * Creates a converter registry that up-casts a stored version 1 "GreetEvent" ({@link GreetV1}) to the
+     * latest version 2 ({@link GreetV2}) on read.
+     *
+     * @return New instance.
+     */
+    public static ConverterRegistry converterRegistry() {
+        return new SimpleConverterRegistry.Builder()
+                .add(GreetV1.SER_TYPE, "1", "2", new GreetV1ToV2Converter())
                 .build();
     }
 
