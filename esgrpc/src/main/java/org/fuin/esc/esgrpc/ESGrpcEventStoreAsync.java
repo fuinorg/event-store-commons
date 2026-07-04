@@ -97,6 +97,11 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
     }
 
     @Override
+    public EventStoreCapabilities capabilities() {
+        return ESGrpcCapabilities.INSTANCE;
+    }
+
+    @Override
     public boolean isSupportsCreateStream() {
         return false;
     }

@@ -20,6 +20,7 @@ package org.fuin.esc.spi;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.EventStore;
 import org.fuin.esc.api.EventStoreAsync;
+import org.fuin.esc.api.EventStoreCapabilities;
 import org.fuin.esc.api.StreamAlreadyExistsException;
 import org.fuin.esc.api.StreamEventsSlice;
 import org.fuin.esc.api.StreamId;
@@ -65,6 +66,11 @@ public class DelegatingSyncEventStore extends AbstractReadableEventStore impleme
     @Override
     public void close() {
         delegate.close();
+    }
+
+    @Override
+    public EventStoreCapabilities capabilities() {
+        return delegate.capabilities();
     }
 
     @Override

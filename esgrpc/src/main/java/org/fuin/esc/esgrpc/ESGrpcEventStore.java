@@ -92,6 +92,11 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
     }
 
     @Override
+    public EventStoreCapabilities capabilities() {
+        return ESGrpcCapabilities.INSTANCE;
+    }
+
+    @Override
     public boolean isSupportsCreateStream() {
         return false;
     }

@@ -51,6 +51,21 @@ public class InMemoryEventStoreTest {
     }
 
     @Test
+    public void testCapabilities() {
+
+        // TEST
+        final EventStoreCapabilities capabilities = testee.capabilities();
+
+        // VERIFY (in-memory backend: catch-up/live subscriptions + hard delete, but volatile and no projections)
+        assertThat(capabilities.subscriptions()).isTrue();
+        assertThat(capabilities.persistentSubscriptions()).isFalse();
+        assertThat(capabilities.projections()).isFalse();
+        assertThat(capabilities.hardDelete()).isTrue();
+        assertThat(capabilities.durablePersistence()).isFalse();
+
+    }
+
+    @Test
     public void testSameStreamId() {
 
         // PREPARE

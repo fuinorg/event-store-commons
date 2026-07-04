@@ -64,6 +64,12 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
     }
 
     @Override
+    public EventStoreCapabilities capabilities() {
+        // Relational append/read store: durable and supports hard delete, but no subscriptions or projections.
+        return EventStoreCapabilities.builder().hardDelete(true).durablePersistence(true).build();
+    }
+
+    @Override
     public void createStream(final StreamId streamId) throws StreamAlreadyExistsException {
         // Do nothing as the operation is not supported
     }

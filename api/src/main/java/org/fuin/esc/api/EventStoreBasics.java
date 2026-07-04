@@ -41,4 +41,16 @@ public interface EventStoreBasics extends AutoCloseable {
      */
     void close();
 
+    /**
+     * Returns the optional capabilities this backend provides. Consumers can use the descriptor to detect at
+     * wiring time whether the store supports the features they need (subscriptions, projections, ...) instead
+     * of discovering gaps by runtime failure. The default is {@link EventStoreCapabilities#NONE}; concrete
+     * backends override it to report their true capabilities.
+     *
+     * @return Backend capabilities (never {@literal null}).
+     */
+    default EventStoreCapabilities capabilities() {
+        return EventStoreCapabilities.NONE;
+    }
+
 }

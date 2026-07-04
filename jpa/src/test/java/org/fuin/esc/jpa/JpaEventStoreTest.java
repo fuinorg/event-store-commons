@@ -37,6 +37,38 @@ public final class JpaEventStoreTest extends AbstractPersistenceTest {
     private static final EnhancedMimeType XML_MIME_TYPE = EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8);
 
     @Test
+    public void testCapabilities() {
+
+        // PREPARE
+        final SimpleSerializerDeserializerRegistry registry = new SimpleSerializerDeserializerRegistry.Builder(XML_MIME_TYPE)
+                .build();
+        try (final JpaEventStore testee = new JpaEventStore(getEm(), new JpaIdStreamFactory() {
+            @Override
+            public JpaStream createStream(final StreamId streamId) {
+                return new NoParamsStream(streamId);
+            }
+
+            @Override
+            public boolean containsType(final StreamId streamId) {
+                return true;
+            }
+        }, registry, registry)) {
+
+            // TEST
+            final EventStoreCapabilities capabilities = testee.capabilities();
+
+            // VERIFY (relational backend: durable + hard delete, but no subscriptions or projections)
+            assertThat(capabilities.subscriptions()).isFalse();
+            assertThat(capabilities.persistentSubscriptions()).isFalse();
+            assertThat(capabilities.projections()).isFalse();
+            assertThat(capabilities.hardDelete()).isTrue();
+            assertThat(capabilities.durablePersistence()).isTrue();
+
+        }
+
+    }
+
+    @Test
     public void testAppendSingleSuccess() throws Exception {
 
         // PREPARE

@@ -89,6 +89,12 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
         delegate.close();
     }
 
+    @Override
+    public EventStoreCapabilities capabilities() {
+        // Transparent decorator: capabilities are those of the wrapped store.
+        return delegate.capabilities();
+    }
+
     // ----- WritableEventStore -----
 
     @Override

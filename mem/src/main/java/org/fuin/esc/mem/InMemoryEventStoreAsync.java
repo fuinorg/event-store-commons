@@ -74,6 +74,12 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
     }
 
     @Override
+    public EventStoreCapabilities capabilities() {
+        // Volatile store with catch-up/live subscriptions, hard delete, but no projections or persistence.
+        return EventStoreCapabilities.builder().subscriptions(true).hardDelete(true).build();
+    }
+
+    @Override
     public boolean isSupportsCreateStream() {
         return false;
     }
