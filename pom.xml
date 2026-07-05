@@ -44,6 +44,7 @@
         <nullaway.version>0.13.5</nullaway.version>
         <auto-service.version>1.1.1</auto-service.version>
         <testcontainers.version>1.20.6</testcontainers.version>
+        <postgresql.version>42.7.7</postgresql.version>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../jacoco/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <!-- Extra JVM args that silence the grpc-netty-shaded (bundled Netty) warnings on JDK 24+
              (sun.misc.Unsafe + native library loading). Only the integration tests (failsafe) start
@@ -127,6 +128,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-pg</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-jsonb</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -150,6 +157,14 @@
             </dependency>
 
             <!-- org.fuin -->
+
+            <!-- Third party -->
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.fuin</groupId>
@@ -176,6 +191,7 @@
         <module>mem</module>
         <module>jaxb</module>
         <module>jpa</module>
+        <module>pg</module>
         <module>jsonb</module>
         <module>jackson</module>
         <module>esgrpc</module>

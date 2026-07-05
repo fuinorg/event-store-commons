@@ -65,6 +65,12 @@
 
             <dependency>
                 <groupId>org.fuin.esc</groupId>
+                <artifactId>esc-pg</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.fuin.esc</groupId>
                 <artifactId>esc-jsonb</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -11,6 +11,7 @@
 - Upcaster/converter chain wired into the read path
 - Added [VersionNegotiator](api/src/main/java/org/fuin/esc/api/VersionNegotiator.java) for down-cast/version negotiation with older consumers
 - Added portable catch-up + CheckpointStore SPI + WakeupSource
+- Added PostgreSQL `LISTEN/NOTIFY` [WakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) in the new [wac-pg](pg) module
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
