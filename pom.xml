@@ -30,7 +30,7 @@
     </issueManagement>
 
     <properties>
-        <eventstore.version>24.10</eventstore.version>
+        <kurrentdb.version>26.1.0</kurrentdb.version>
         <!-- Network mode for the EventStoreDB test container. Defaults to 'host' because rootless
              Podman fails to tear down the bridge network namespace on container removal ('rootless
              netns: kill network process: permission denied'). Use '-Ddocker.network.mode=bridge' on
