@@ -136,9 +136,15 @@ public final class ProjectionJavaScriptBuilder {
 
     private void initTenant(TenantId tenantId) {
         sb = new StringBuilder();
+        // try/catch guards against events whose metadata is not JSON (accessing 'ev.metadata' would otherwise
+        // throw a JSON parse error and fault the whole projection) - see buildWithCategories() for details.
         sb.append(Utils4J.replaceVars("""
                 isTenant = (ev) => {
-                  return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "${tenantId}" );
+                  try {
+                    return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "${tenantId}" );
+                  } catch (e) {
+                    return false;
+                  }
                 }
 
                 fromCategory('${tenantId}').foreachStream().when({
@@ -256,13 +262,22 @@ public final class ProjectionJavaScriptBuilder {
         if (tenantProjection) {
             b.append(Utils4J.replaceVars("""
                     isTenant = (ev) => {
-                      return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "${tenantId}" );
+                      try {
+                        return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "${tenantId}" );
+                      } catch (e) {
+                        return false;
+                      }
                     }
                     """, Map.of("tenantId", tenantId)));
             b.append("\n");
         }
+        // The metadata access is wrapped in try/catch: a 'fromAll' projection also sees events whose metadata
+        // is not JSON (e.g. XML-serialized events from another backend on a shared store). Accessing
+        // 'ev.metadata' on such an event throws a JSON parse error which would otherwise fault (stop) the whole
+        // projection. Catching it lets the projection simply skip the non-matching event and keep running.
         b.append("hasCategory = (ev) => {\n");
-        b.append("  return (ev.metadata && ev.metadata.categories && (");
+        b.append("  try {\n");
+        b.append("    return (ev.metadata && ev.metadata.categories && (");
         for (int i = 0; i < categoryList.size(); i++) {
             if (i > 0) {
                 b.append(" || ");
@@ -270,6 +285,9 @@ public final class ProjectionJavaScriptBuilder {
             b.append("ev.metadata.categories.indexOf('").append(categoryList.get(i)).append("') !== -1");
         }
         b.append("));\n");
+        b.append("  } catch (e) {\n");
+        b.append("    return false;\n");
+        b.append("  }\n");
         b.append("}\n\n");
 
         if (tenantProjection) {

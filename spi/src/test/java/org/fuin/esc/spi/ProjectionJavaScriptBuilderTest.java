@@ -84,9 +84,13 @@ public class ProjectionJavaScriptBuilderTest {
         testee.type("AccountDebited");
         assertThat(testee.build()).isEqualTo("""
                   isTenant = (ev) => {
-                    return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "foo" );
+                    try {
+                      return (ev.metadata && ev.metadata.tenant && ev.metadata.tenant === "foo" );
+                    } catch (e) {
+                      return false;
+                    }
                   }
-                
+
                   fromCategory('foo').foreachStream().when({
                     'AccountDebited': function (state, ev) {
                        if (isTenant(ev)) {
@@ -141,7 +145,11 @@ public class ProjectionJavaScriptBuilderTest {
         testee.category("ExodusEvent");
         assertThat(testee.build()).isEqualTo("""
                 hasCategory = (ev) => {
-                  return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1 || ev.metadata.categories.indexOf('ExodusEvent') !== -1));
+                  try {
+                    return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1 || ev.metadata.categories.indexOf('ExodusEvent') !== -1));
+                  } catch (e) {
+                    return false;
+                  }
                 }
 
                 fromAll().foreachStream().when({
@@ -165,7 +173,11 @@ public class ProjectionJavaScriptBuilderTest {
         // linked at most once (single $any handler).
         assertThat(testee.build()).isEqualTo("""
                 hasCategory = (ev) => {
-                  return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1));
+                  try {
+                    return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1));
+                  } catch (e) {
+                    return false;
+                  }
                 }
 
                 fromAll().foreachStream().when({
