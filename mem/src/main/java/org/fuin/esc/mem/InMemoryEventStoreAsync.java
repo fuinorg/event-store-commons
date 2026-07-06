@@ -42,6 +42,12 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
 
     private final Map<String, InternalStream> streams;
 
+    /** Global append-ordered log of every event (across all streams) - the source a projection filters. */
+    private final List<CommonEvent> globalLog;
+
+    /** Projection definitions, shared with the {@link InMemoryProjectionAdminEventStore}. */
+    private final InMemoryProjections projections;
+
     private final Map<String, List<InternalSubscription>> subscriptions;
 
     private volatile boolean open;
@@ -58,8 +64,21 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
 
         this.executor = executor;
         streams = new HashMap<>();
+        globalLog = new ArrayList<>();
+        projections = new InMemoryProjections();
         subscriptions = new HashMap<>();
         this.open = false;
+    }
+
+    /**
+     * Returns a projection admin store sharing this event store's projection registry. Projections created,
+     * enabled or disabled through it are immediately reflected when reading the corresponding projection stream
+     * from this event store (see {@link #readEventsForward(StreamId, long, int)} with a {@code ProjectionStreamId}).
+     *
+     * @return New projection admin store bound to this event store.
+     */
+    public ProjectionAdminEventStore getProjectionAdmin() {
+        return new InMemoryProjectionAdminEventStore(projections);
     }
 
     @Override
@@ -75,8 +94,8 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
 
     @Override
     public EventStoreCapabilities capabilities() {
-        // Volatile store with catch-up/live subscriptions, hard delete, but no projections or persistence.
-        return EventStoreCapabilities.builder().subscriptions(true).hardDelete(true).build();
+        // Volatile store with catch-up/live subscriptions, hard delete and (Java-predicate) projections, but no persistence.
+        return EventStoreCapabilities.builder().subscriptions(true).hardDelete(true).projections(true).build();
     }
 
     @Override
@@ -188,6 +207,10 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
 
+        if (streamId.isProjection()) {
+            return doReadProjectionEventsForward(streamId, start, count);
+        }
+
         final List<CommonEvent> events = getStream(streamId, ExpectedVersion.ANY.getNo()).getEvents();
 
         final List<CommonEvent> result = new ArrayList<>();
@@ -199,6 +222,40 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
         final boolean endOfStream = (result.size() < count);
 
         return new StreamEventsSlice(fromEventNumber, result, nextEventNumber, endOfStream);
+
+    }
+
+    /**
+     * Reads a projection stream: filters the global event log with the projection's Java predicate (type name
+     * and/or category) and returns a slice, using {@code start} as a zero-based offset into the filtered
+     * sequence. Mirrors the JPA backend semantics: an unknown projection throws {@link StreamNotFoundException},
+     * a disabled or empty-selection projection returns an empty end-of-stream slice.
+     */
+    private StreamEventsSlice doReadProjectionEventsForward(final StreamId streamId, final long start, final int count) {
+
+        final InMemoryProjections.InMemoryProjection projection = projections.get(streamId.asString());
+        if (projection == null) {
+            throw new StreamNotFoundException(streamId);
+        }
+        if (!projection.isEnabled() || projection.selectsNothing()) {
+            return new StreamEventsSlice(start, new ArrayList<>(), start, true);
+        }
+
+        final List<CommonEvent> selected = new ArrayList<>();
+        for (final CommonEvent event : globalLog) {
+            if (projection.matches(event)) {
+                selected.add(event);
+            }
+        }
+
+        final List<CommonEvent> result = new ArrayList<>();
+        for (int i = (int) start; (i < (start + count)) && (i < selected.size()); i++) {
+            result.add(selected.get(i));
+        }
+        final long nextEventNumber = (start + result.size());
+        final boolean endOfStream = (result.size() < count);
+
+        return new StreamEventsSlice(start, result, nextEventNumber, endOfStream);
 
     }
 
@@ -298,6 +355,8 @@ public final class InMemoryEventStoreAsync implements IInMemoryEventStoreAsync {
         }
 
         stream.addAll(toAppend);
+        // Keep the global append-ordered log in sync so projections can filter it (same references, no copy).
+        globalLog.addAll(toAppend);
 
         notifyListeners(streamId, toAppend, 0);
 

@@ -59,7 +59,7 @@ public class InMemoryEventStoreTest {
         // VERIFY (in-memory backend: catch-up/live subscriptions + hard delete, but volatile and no projections)
         assertThat(capabilities.subscriptions()).isTrue();
         assertThat(capabilities.persistentSubscriptions()).isFalse();
-        assertThat(capabilities.projections()).isFalse();
+        assertThat(capabilities.projections()).isTrue();
         assertThat(capabilities.hardDelete()).isTrue();
         assertThat(capabilities.durablePersistence()).isFalse();
 

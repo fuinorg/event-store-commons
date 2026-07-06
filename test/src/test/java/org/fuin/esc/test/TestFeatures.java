@@ -183,10 +183,13 @@ public class TestFeatures {
         final EventStore eventStore;
         // Deserializer registry handed to the TestContext: the JSON variant for esgrpc (see below), else XML.
         DeserializerRegistry contextRegistry = serDeserializerRegistry;
+        // Projection admin for the in-memory store (shares its registry); set only in the mem branch.
+        ProjectionAdminEventStore memProjectionAdmin = null;
         if (currentEventStoreImplType.equals(TestUtils.MEM_IMPLEMENTATION)) {
             final InMemoryEventStoreAsync memAsync = new InMemoryEventStoreAsync(Executors.newCachedThreadPool());
             subscribableAsync = memAsync;
             eventStore = new DelegatingSyncEventStore(memAsync);
+            memProjectionAdmin = memAsync.getProjectionAdmin();
         } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
             setupDb();
             eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry, converters);
@@ -231,9 +234,11 @@ public class TestFeatures {
         eventStore.open();
         testContext = new TestContext(currentEventStoreImplType, eventStore, contextRegistry);
 
-        // Projection admin store for backends that support projections (jpa + esgrpc); null otherwise, so
-        // projection scenarios self-skip on mem / esgrpc-async (see the "supports projections" gate step).
-        if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
+        // Projection admin store for backends that support projections (mem + jpa + esgrpc); null otherwise, so
+        // projection scenarios self-skip on esgrpc-async (see the "supports projections" gate step).
+        if (currentEventStoreImplType.equals(TestUtils.MEM_IMPLEMENTATION)) {
+            testContext.setProjectionAdmin(memProjectionAdmin.open());
+        } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
             testContext.setProjectionAdmin(new JpaProjectionAdminEventStore(em));
         } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)
                 || currentEventStoreImplType.equals(TestUtils.ESGRPC_JACKSON_IMPLEMENTATION)) {

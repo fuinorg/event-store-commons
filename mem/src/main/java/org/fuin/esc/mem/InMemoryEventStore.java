@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.mem;
 
+import org.fuin.esc.api.ProjectionAdminEventStore;
 import org.fuin.esc.spi.DelegatingSyncEventStore;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ThreadSafe;
@@ -30,6 +31,8 @@ import java.util.concurrent.Executor;
 @ThreadSafe
 public final class InMemoryEventStore extends DelegatingSyncEventStore implements IInMemoryEventStore {
 
+    private final InMemoryEventStoreAsync delegate;
+
     /**
      * Constructor with all mandatory data.
      *
@@ -37,13 +40,28 @@ public final class InMemoryEventStore extends DelegatingSyncEventStore implement
      *            Executor used to create the necessary threads for event notifications.
      */
     public InMemoryEventStore(final Executor executor) {
-        super(new InMemoryEventStoreAsync(requireExecutor(executor)));
+        this(new InMemoryEventStoreAsync(requireExecutor(executor)));
+    }
+
+    private InMemoryEventStore(final InMemoryEventStoreAsync delegate) {
+        super(delegate);
+        this.delegate = delegate;
     }
 
     @Override
     public InMemoryEventStore open() {
         super.open();
         return this;
+    }
+
+    /**
+     * Returns a projection admin store sharing this event store's projection registry. Projections created
+     * through it are immediately readable as projection streams from this event store.
+     *
+     * @return New projection admin store bound to this event store.
+     */
+    public ProjectionAdminEventStore getProjectionAdmin() {
+        return delegate.getProjectionAdmin();
     }
 
     private static Executor requireExecutor(final Executor executor) {

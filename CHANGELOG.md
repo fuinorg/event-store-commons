@@ -12,7 +12,7 @@
 - Added [VersionNegotiator](api/src/main/java/org/fuin/esc/api/VersionNegotiator.java) for down-cast/version negotiation with older consumers
 - Added portable catch-up + CheckpointStore SPI + WakeupSource
 - Added PostgreSQL `LISTEN/NOTIFY` [WakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) in the new [wac-pg](pg) module
-- Added JPA projections
+- Added JPA and In-Memory projections
 - Select projection events by category (marker interfaces the events implement), not just by exact type name
 
 ## 0.9.0
