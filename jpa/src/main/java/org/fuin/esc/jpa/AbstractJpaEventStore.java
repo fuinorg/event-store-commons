@@ -163,22 +163,15 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         Contract.requireArgMin("start", start, 0);
         Contract.requireArgMin("count", count, 1);
         ensureOpen();
-        verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
-            final JpaProjection projection = em.find(JpaProjection.class, streamEntityName(streamId));
-            if (projection == null) {
-                throw new StreamNotFoundException(streamId);
-            }
-            if (!projection.isEnabled()) {
-                // The projection does exist, but is not ready yet
-                return new StreamEventsSlice(start, new ArrayList<>(), start, true);
-            }
-        } else {
-            final JpaStream stream = findStream(streamId);
-            if (stream.getState() == StreamState.HARD_DELETED) {
-                throw new StreamDeletedException(streamId);
-            }
+            return readProjectionEventsForward(streamId, start, count);
+        }
+
+        verifyStreamEntityExists(streamId);
+        final JpaStream stream = findStream(streamId);
+        if (stream.getState() == StreamState.HARD_DELETED) {
+            throw new StreamDeletedException(streamId);
         }
 
         // Prepare SQL
@@ -201,6 +194,48 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         return new StreamEventsSlice(fromEventNumber, events, nextEventNumber, endOfStream);
 
+    }
+
+    /**
+     * Reads events from a projection stream. A projection is a type filter over the global event log: all
+     * events whose type is part of the projection are returned in their global insertion order (the
+     * {@link JpaEvent} sequence id). The "event number" is the zero-based index within that filtered
+     * sequence, so {@code start} is used as a plain offset. An empty (end-of-stream) slice is returned while
+     * the projection is not enabled yet or selects no types.
+     *
+     * @param streamId
+     *            Projection stream to read.
+     * @param start
+     *            Zero-based offset within the projection.
+     * @param count
+     *            Maximum number of events to read.
+     *
+     * @return Slice of events.
+     */
+    @SuppressWarnings("unchecked")
+    private StreamEventsSlice readProjectionEventsForward(final StreamId streamId, final long start,
+                                                          final int count) {
+        final JpaProjection projection = em.find(JpaProjection.class, streamId.getName());
+        if (projection == null) {
+            throw new StreamNotFoundException(streamId);
+        }
+        final Set<String> types = projection.getEventTypes();
+        if (!projection.isEnabled() || types.isEmpty()) {
+            // The projection does exist, but is not ready yet (or selects no event types)
+            return new StreamEventsSlice(start, new ArrayList<>(), start, true);
+        }
+        final String sql = "SELECT ev.* FROM " + JpaEvent.TABLE_NAME + " ev WHERE ev." + JpaData.COLUMN_DATA_TYPE
+                + " IN (:types) ORDER BY ev." + JpaEvent.COLUMN_ID + " ASC";
+        LOG.debug(sql);
+        final Query query = em.createNativeQuery(sql, JpaEvent.class);
+        query.setParameter("types", types);
+        query.setFirstResult((int) start);
+        query.setMaxResults(count);
+        final List<JpaEvent> resultList = query.getResultList();
+        final List<CommonEvent> events = asCommonEvents(resultList);
+        final long nextEventNumber = start + events.size();
+        final boolean endOfStream = events.size() < count;
+        return new StreamEventsSlice(start, events, nextEventNumber, endOfStream);
     }
 
     @SuppressWarnings("unchecked")
@@ -260,6 +295,12 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         Contract.requireArgNotNull("streamId", streamId);
         ensureOpen();
+
+        if (streamId.isProjection()) {
+            final JpaProjection projection = em.find(JpaProjection.class, streamId.getName());
+            return projection != null && projection.isEnabled();
+        }
+
         if (!streamEntityExists(streamId)) {
             return false;
         }

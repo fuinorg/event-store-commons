@@ -17,18 +17,28 @@
  */
 package org.fuin.esc.jpa;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.Contract;
-import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
+import org.fuin.objects4j.common.NotThreadSafe;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Projection.
+ * A projection selects events from the global event log by their type. It has a unique name and a set of
+ * event type names that define which events belong to it. As long as it is not enabled, reads return an
+ * empty result (the projection is considered "not ready yet").
  */
-@ImmutableAfterUnmarshal
+@NotThreadSafe
 @Table(name = "PROJECTIONS")
 @Entity
 public class JpaProjection {
@@ -40,6 +50,11 @@ public class JpaProjection {
 
     @Column(name = "ENABLED", nullable = false)
     private boolean enabled = false;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "PROJECTION_EVENT_TYPES", joinColumns = @JoinColumn(name = "PROJECTION_NAME"))
+    @Column(name = "EVENT_TYPE", length = 255, nullable = false)
+    private Set<String> eventTypes = new HashSet<>();
 
     /**
      * Protected default constructor for JPA.
@@ -77,12 +92,65 @@ public class JpaProjection {
     }
 
     /**
+     * Constructor with name, enabled flag and event type filter.
+     *
+     * @param name
+     *            Unique name for the projection.
+     * @param enabled
+     *            FALSE if the projection is being created, else TRUE.
+     * @param eventTypes
+     *            Unique type names of the events selected by this projection.
+     */
+    public JpaProjection(final String name, final boolean enabled, final Collection<String> eventTypes) {
+        super();
+        Contract.requireArgNotNull("name", name);
+        Contract.requireArgNotNull("eventTypes", eventTypes);
+        this.name = name;
+        this.enabled = enabled;
+        this.eventTypes = new HashSet<>(eventTypes);
+    }
+
+    /**
+     * Returns the unique name of the projection.
+     *
+     * @return Projection name.
+     */
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Returns the information if the query is enabled.
      *
      * @return FALSE if the query is being created, else TRUE.
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Returns the type names of the events selected by this projection.
+     *
+     * @return Unmodifiable set of unique event type names.
+     */
+    @NotNull
+    public Set<String> getEventTypes() {
+        return new HashSet<>(eventTypes);
+    }
+
+    /**
+     * Enables the projection (makes reads return its events).
+     */
+    public void enable() {
+        this.enabled = true;
+    }
+
+    /**
+     * Disables the projection (reads return an empty result).
+     */
+    public void disable() {
+        this.enabled = false;
     }
 
     @Override

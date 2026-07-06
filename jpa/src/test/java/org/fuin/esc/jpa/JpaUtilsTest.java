@@ -40,9 +40,13 @@ public final class JpaUtilsTest {
         assertThat(JpaUtils.camel2Underscore("a")).isEqualTo("a");
         assertThat(JpaUtils.camel2Underscore("ab")).isEqualTo("ab");
         assertThat(JpaUtils.camel2Underscore("A")).isEqualTo("a");
-        assertThat(JpaUtils.camel2Underscore("AB")).isEqualTo("a_b");
+        // A run of upper-case letters is one word (acronym / all-upper-case name), so no internal underscores.
+        assertThat(JpaUtils.camel2Underscore("AB")).isEqualTo("ab");
+        assertThat(JpaUtils.camel2Underscore("PERSON")).isEqualTo("person");
         assertThat(JpaUtils.camel2Underscore("Ab")).isEqualTo("ab");
         assertThat(JpaUtils.camel2Underscore("aB")).isEqualTo("a_b");
+        assertThat(JpaUtils.camel2Underscore("PersonName")).isEqualTo("person_name");
+        assertThat(JpaUtils.camel2Underscore("personId")).isEqualTo("person_id");
         assertThat(JpaUtils.camel2Underscore("aBcDeF")).isEqualTo("a_bc_de_f");
 
     }

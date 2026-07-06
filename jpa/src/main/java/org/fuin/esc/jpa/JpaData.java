@@ -41,9 +41,12 @@ public class JpaData implements ValueObject, Serializable {
 
     private static final long serialVersionUID = 1000L;
 
+    /** SQL column name of the data type. */
+    public static final String COLUMN_DATA_TYPE = "DATA_TYPE";
+
     /** Unique type of the data. */
     @NotNull
-    @Column(name = "DATA_TYPE", length = 255, nullable = false)
+    @Column(name = COLUMN_DATA_TYPE, length = 255, nullable = false)
     private String type;
 
     /** Internet Media Type that classifies the raw event data. */

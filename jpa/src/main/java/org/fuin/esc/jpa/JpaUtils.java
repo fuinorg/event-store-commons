@@ -80,7 +80,10 @@ final class JpaUtils {
     }
 
     /**
-     * Converts the given camel case name into a name with underscores.
+     * Converts the given camel case name into a lower-case name with underscores. An underscore is inserted
+     * only at a lower-case/digit to upper-case boundary, so a run of upper-case letters (an acronym or an
+     * all-upper-case name) is treated as a single word: {@code "PersonName"} becomes {@code "person_name"},
+     * {@code "personId"} becomes {@code "person_id"} and {@code "PERSON"} becomes {@code "person"}.
      *
      * @param name Name to convert.
      *
@@ -91,7 +94,7 @@ final class JpaUtils {
         if (name == null) {
             return null;
         }
-        return name.replaceAll("(.)(\\p{Upper})", "$1_$2").toLowerCase();
+        return name.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toLowerCase();
     }
 
 
