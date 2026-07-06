@@ -43,6 +43,8 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
 
     private String expectedException;
 
+    private String categories;
+
     // Initialization
 
     private EventStore es;
@@ -113,6 +115,7 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
         this.expectedVersion = cucumberTable.get("Expected Version");
         this.eventId = cucumberTable.get("Event Id");
         this.expectedException = cucumberTable.get("Expected Exception");
+        this.categories = cucumberTable.get("Categories"); // Optional - only present in the projection feature
     }
 
     @Override
@@ -133,8 +136,21 @@ public final class AppendToStreamCommand implements TestCommand<TestContext> {
             }
         } else {
             events = new ArrayList<>();
-            final CommonEvent ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
-                    new BookAddedEvent("Any", "John Doe"), null);
+            final String cats = EscTestUtils.emptyAsNull(categories);
+            final CommonEvent ce;
+            if (cats == null) {
+                ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
+                        new BookAddedEvent("Any", "John Doe"), null);
+            } else {
+                // Prefix categories with the implementation type - like the stream names - so the "from all"
+                // projections of the two esgrpc runs (JSON-B / Jackson) on the shared KurrentDB stay isolated.
+                final List<String> categoryList = new ArrayList<>();
+                for (final String category : cats.split(",")) {
+                    categoryList.add(context.getCurrentEventStoreImplType() + "_" + category.trim());
+                }
+                ce = new SimpleCommonEvent(new EventId(eventId), BookAddedEvent.TYPE,
+                        new BookAddedEvent("Any", "John Doe"), null, null, null, categoryList);
+            }
             events.add(ce);
         }
 

@@ -62,4 +62,31 @@ public class EscMetaTest {
 
     }
 
+    @Test
+    public final void testMarshalUnmarshalJaxbCategories() throws Exception {
+
+        // PREPARE - an event carrying categories (data only, no meta)
+        final String expectedXml = """
+                <esc-meta>
+                    <data-type>BookAddedEvent</data-type>
+                    <data-content-type>application/xml; encoding=utf-8</data-content-type>
+                    <categories>Borrowed</categories>
+                    <categories>Reserved</categories>
+                </esc-meta>
+                """;
+
+        // TEST
+        final Unmarshaller unmarshaller = new UnmarshallerBuilder().addClassesToBeBound(EscMeta.class, MyMeta.class, Base64Data.class).build();
+        final EscMeta testee = unmarshal(unmarshaller, expectedXml);
+        final Marshaller marshaller = new MarshallerBuilder().addClassesToBeBound(EscMeta.class, MyMeta.class, Base64Data.class).build();
+        final String actualXml = marshal(marshaller, testee);
+
+        // VERIFY
+        assertThat(testee.getDataType()).isEqualTo("BookAddedEvent");
+        assertThat(testee.getCategories()).containsExactly("Borrowed", "Reserved");
+        final Diff documentDiff = DiffBuilder.compare(expectedXml).withTest(actualXml).ignoreWhitespace().build();
+        assertThat(documentDiff.hasDifferences()).describedAs(documentDiff.toString()).isFalse();
+
+    }
+
 }

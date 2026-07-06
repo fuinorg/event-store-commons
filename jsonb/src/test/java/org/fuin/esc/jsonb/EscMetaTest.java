@@ -112,6 +112,30 @@ public class EscMetaTest extends AbstractTest {
     }
 
     @Test
+    public final void testUnmarshalJsonBCategories() throws Exception {
+
+        // PREPARE - exactly what KurrentDB returns for an event carrying categories (data only, no meta)
+        final String json = """
+                {"data-type":"BookAddedEvent","data-content-type":"application/json; encoding=UTF-8","categories":["Borrowed","Reserved"]}
+                """;
+
+        final EnhancedMimeType dataContentType = EnhancedMimeType.create("application/json; encoding=UTF-8");
+
+        try (final JsonbProvider provider = getJsonbProvider()) {
+
+            // TEST
+            final IEscMeta testee = provider.jsonb().fromJson(json, EscMeta.class);
+
+            // VERIFY
+            assertThat(testee.getDataType()).isEqualTo("BookAddedEvent");
+            assertThat(testee.getDataContentType()).isEqualTo(dataContentType);
+            assertThat(testee.getCategories()).containsExactly("Borrowed", "Reserved");
+
+        }
+
+    }
+
+    @Test
     public final void testMarshalJsonBBase64() throws Exception {
 
         // PREPARE

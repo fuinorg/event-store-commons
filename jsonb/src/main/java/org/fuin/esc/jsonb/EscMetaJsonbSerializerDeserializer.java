@@ -59,21 +59,24 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
                         case IEscMeta.EL_META_CONTENT_TYPE:
                             escMeta.setMetaContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
                             break;
-                        case IEscMeta.EL_CATEGORIES:
-                            final JsonValue categoriesValue = ctx.deserialize(JsonValue.class, parser);
-                            final List<String> categories = new ArrayList<>();
-                            if (categoriesValue instanceof JsonArray array) {
-                                for (final JsonValue element : array) {
-                                    if (element instanceof JsonString str) {
-                                        categories.add(str.getString());
+                        default:
+                            if (field.equals(IEscMeta.EL_CATEGORIES)) {
+                                // Consume the array tokens directly (cursor is at the key): relying on
+                                // ctx.deserialize(JsonValue) here overshoots and skips the following field.
+                                final List<String> categories = new ArrayList<>();
+                                if (parser.next() == JsonParser.Event.START_ARRAY) {
+                                    while (parser.hasNext()) {
+                                        final JsonParser.Event element = parser.next();
+                                        if (element == JsonParser.Event.END_ARRAY) {
+                                            break;
+                                        }
+                                        if (element == JsonParser.Event.VALUE_STRING) {
+                                            categories.add(parser.getString());
+                                        }
                                     }
                                 }
-                            }
-                            escMeta.setCategories(categories);
-                            break;
-                        default:
-                            // meta
-                            if (field.equals(IBase64Data.EL_ROOT_NAME)) {
+                                escMeta.setCategories(categories);
+                            } else if (field.equals(IBase64Data.EL_ROOT_NAME)) {
                                 escMeta.setMeta(new Base64Data(ctx.deserialize(String.class, parser)));
                             } else {
                                 if (escMeta.getMetaContentType() == null) {

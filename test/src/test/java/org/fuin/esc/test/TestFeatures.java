@@ -26,6 +26,7 @@ import io.cucumber.java.en.When;
 import io.kurrent.dbclient.KurrentDBClient;
 import io.kurrent.dbclient.KurrentDBClientSettings;
 import io.kurrent.dbclient.KurrentDBConnectionString;
+import io.kurrent.dbclient.KurrentDBProjectionManagementClient;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -39,9 +40,11 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.fuin.esc.api.*;
 import org.fuin.esc.esgrpc.ESGrpcEventStore;
 import org.fuin.esc.esgrpc.ESGrpcEventStoreAsync;
+import org.fuin.esc.esgrpc.GrpcProjectionAdminEventStore;
 import org.fuin.esc.jaxb.EscJaxbUtils;
 import org.fuin.esc.jaxb.XmlDeSerializer;
 import org.fuin.esc.jpa.JpaEventStore;
+import org.fuin.esc.jpa.JpaProjectionAdminEventStore;
 import org.fuin.esc.jsonb.JsonbSerDeserializer;
 import org.fuin.esc.mem.InMemoryEventStoreAsync;
 import org.fuin.esc.spi.DelegatingSyncEventStore;
@@ -83,6 +86,8 @@ public class TestFeatures {
     private EntityManager em;
 
     private KurrentDBClient client;
+
+    private KurrentDBProjectionManagementClient projMgmtClient;
 
     private Connection connection;
 
@@ -133,6 +138,16 @@ public class TestFeatures {
     }
 
     @DataTableType
+    public CreateProjectionCommand createCreateProjectionCommand(Map<String, String> entry) {
+        return new CreateProjectionCommand(entry);
+    }
+
+    @DataTableType
+    public ReadProjectionStreamCommand createReadProjectionStreamCommand(Map<String, String> entry) {
+        return new ReadProjectionStreamCommand(entry);
+    }
+
+    @DataTableType
     public ReadAllForwardChunk createReadAllForwardChunk(Map<String, String> entry) {
         return new ReadAllForwardChunk(entry);
     }
@@ -166,26 +181,38 @@ public class TestFeatures {
         final String currentEventStoreImplType = System.getProperty(TestUtils.IMPLEMENTATION_KEY,TestUtils.MEM_IMPLEMENTATION);
         subscribableAsync = null;
         final EventStore eventStore;
+        // Deserializer registry handed to the TestContext: the JSON variant for esgrpc (see below), else XML.
+        DeserializerRegistry contextRegistry = serDeserializerRegistry;
         if (currentEventStoreImplType.equals(TestUtils.MEM_IMPLEMENTATION)) {
             final InMemoryEventStoreAsync memAsync = new InMemoryEventStoreAsync(Executors.newCachedThreadPool());
             subscribableAsync = memAsync;
             eventStore = new DelegatingSyncEventStore(memAsync);
-        } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION) || currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)) {
-
-            if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
-                setupDb();
-                eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry, converters);
+        } else if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
+            setupDb();
+            eventStore = new JpaEventStore(em, new TestIdStreamFactory(), serDeserializerRegistry, serDeserializerRegistry, converters);
+        } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)
+                || currentEventStoreImplType.equals(TestUtils.ESGRPC_JACKSON_IMPLEMENTATION)) {
+            final KurrentDBClientSettings setts = KurrentDBConnectionString
+                    .parseOrThrow("kurrentdb://localhost:2113?tls=false");
+            client = KurrentDBClient.create(setts);
+            // KurrentDB uses JSON so its projection engine can read the event metadata (payload + EscMeta);
+            // category projections select on ev.metadata.categories, which is opaque when stored as XML. The
+            // same features run once with JSON-B and once with Jackson to cover both serializers.
+            final SerDeserializerRegistry jsonRegistry;
+            final IBaseTypeFactory baseTypeFactory;
+            if (currentEventStoreImplType.equals(TestUtils.ESGRPC_JACKSON_IMPLEMENTATION)) {
+                jsonRegistry = TestUtils.jacksonSerDeserializerRegistry();
+                baseTypeFactory = new org.fuin.esc.jackson.BaseTypeFactory();
             } else {
-                final KurrentDBClientSettings setts = KurrentDBConnectionString
-                        .parseOrThrow("kurrentdb://localhost:2113?tls=false");
-                client = KurrentDBClient.create(setts);
-                eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(serDeserializerRegistry)
-                        .baseTypeFactory(new org.fuin.esc.jaxb.BaseTypeFactory())
-                        .targetContentType(EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8))
-                        .converters(converters)
-                        .build();
+                jsonRegistry = TestUtils.jsonSerDeserializerRegistry();
+                baseTypeFactory = new org.fuin.esc.jsonb.BaseTypeFactory();
             }
-
+            contextRegistry = jsonRegistry;
+            eventStore = new ESGrpcEventStore.Builder().eventStore(client).serDesRegistry(jsonRegistry)
+                    .baseTypeFactory(baseTypeFactory)
+                    .targetContentType(EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8))
+                    .converters(converters)
+                    .build();
         } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_ASYNC_IMPLEMENTATION)) {
             final KurrentDBClientSettings setts = KurrentDBConnectionString
                     .parseOrThrow("kurrentdb://localhost:2113?tls=false");
@@ -202,7 +229,20 @@ public class TestFeatures {
             throw new IllegalStateException("Unknown type: " + currentEventStoreImplType);
         }
         eventStore.open();
-        testContext = new TestContext(currentEventStoreImplType, eventStore, serDeserializerRegistry);
+        testContext = new TestContext(currentEventStoreImplType, eventStore, contextRegistry);
+
+        // Projection admin store for backends that support projections (jpa + esgrpc); null otherwise, so
+        // projection scenarios self-skip on mem / esgrpc-async (see the "supports projections" gate step).
+        if (currentEventStoreImplType.equals(TestUtils.JPA_IMPLEMENTATION)) {
+            testContext.setProjectionAdmin(new JpaProjectionAdminEventStore(em));
+        } else if (currentEventStoreImplType.equals(TestUtils.ESGRPC_IMPLEMENTATION)
+                || currentEventStoreImplType.equals(TestUtils.ESGRPC_JACKSON_IMPLEMENTATION)) {
+            final KurrentDBClientSettings projSetts = KurrentDBConnectionString
+                    .parseOrThrow("kurrentdb://localhost:2113?tls=false");
+            projMgmtClient = KurrentDBProjectionManagementClient.create(projSetts);
+            testContext.setProjectionAdmin(new GrpcProjectionAdminEventStore(projMgmtClient, null).open());
+        }
+
         lastCommand = null;
         subscription = null;
         receivedEvents.clear();
@@ -219,9 +259,20 @@ public class TestFeatures {
             subscription = null;
         }
         if (testContext != null) {
+            if (testContext.getProjectionAdmin() != null) {
+                testContext.getProjectionAdmin().close();
+            }
             testContext.getEventStore().close();
             teardownDb();
             testContext = null;
+        }
+        if (projMgmtClient != null) {
+            try {
+                projMgmtClient.shutdown();
+            } catch (final RuntimeException ex) { // NOSONAR - best effort cleanup
+                // Ignore cleanup failures
+            }
+            projMgmtClient = null;
         }
         if (lastCommand != null) {
             throw new IllegalStateException("Last command was set, but not verified!");
@@ -325,6 +376,26 @@ public class TestFeatures {
 
     @Then("^reading forward from stream should have the following results$")
     public void thenReadForward(final List<ReadForwardCommand> commands) throws Exception {
+        final TestCommand<TestContext> command = new MultipleCommands<TestContext>(commands);
+        command.init(testContext);
+        executeThen(command);
+    }
+
+    @Given("^the backend supports projections$")
+    public void givenBackendSupportsProjections() {
+        Assumptions.assumeTrue(testContext.getProjectionAdmin() != null,
+                "Implementation '" + testContext.getCurrentEventStoreImplType() + "' does not support projections");
+    }
+
+    @When("^I create the following projections$")
+    public void whenCreateProjections(final List<CreateProjectionCommand> commands) {
+        final TestCommand<TestContext> command = new MultipleCommands<TestContext>(commands);
+        command.init(testContext);
+        executeWhen(command);
+    }
+
+    @Then("^reading forward from projection should have the following results$")
+    public void thenReadProjection(final List<ReadProjectionStreamCommand> commands) {
         final TestCommand<TestContext> command = new MultipleCommands<TestContext>(commands);
         command.init(testContext);
         executeThen(command);
