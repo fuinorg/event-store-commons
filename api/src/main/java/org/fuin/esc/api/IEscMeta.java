@@ -21,6 +21,8 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * A structure that contains the user's metadata and the system's meta information.
  * <p>
@@ -52,6 +54,9 @@ public interface IEscMeta extends IBaseType {
 
     /** XML/JSON tag name of the {@link #getMetaContentType()}. */
     String EL_META_CONTENT_TYPE = "meta-content-type";
+
+    /** XML/JSON tag name of the {@link #getCategories()}. */
+    String EL_CATEGORIES = "categories";
 
     /**
      * Returns the unique name of the data type.
@@ -100,5 +105,16 @@ public interface IEscMeta extends IBaseType {
      */
     @Nullable
     Object getMeta();
+
+    /**
+     * Returns the category names the event belongs to. Written as a top-level array so a projection (e.g. a
+     * KurrentDB projection reading {@code ev.metadata.categories}) can select events by category.
+     *
+     * @return Immutable list of category names, never {@literal null} (empty if none).
+     */
+    @NotNull
+    default List<String> getCategories() {
+        return List.of();
+    }
 
 }

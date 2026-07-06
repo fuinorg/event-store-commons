@@ -37,6 +37,13 @@ public final class EscMetaJacksonSerializer extends StdSerializer<EscMeta> {
         if (escMeta.getTenantId() != null) {
             generator.writeStringField(IEscMeta.EL_TENANT, escMeta.getTenantId().asString());
         }
+        if (!escMeta.getCategories().isEmpty()) {
+            generator.writeArrayFieldStart(IEscMeta.EL_CATEGORIES);
+            for (final String category : escMeta.getCategories()) {
+                generator.writeString(category);
+            }
+            generator.writeEndArray();
+        }
         if (escMeta.getMeta() != null) {
             generator.writeStringField(IEscMeta.EL_META_TYPE, escMeta.getMetaType());
             generator.writeStringField(IEscMeta.EL_META_CONTENT_TYPE, Objects.requireNonNull(escMeta.getMetaContentType()).toString());

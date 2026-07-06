@@ -4,6 +4,8 @@ import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Creates necessary implementations in the JAX-B module.
  */
@@ -21,8 +23,9 @@ public final class BaseTypeFactory implements IBaseTypeFactory {
                                   @Nullable String metaType,
                                   @Nullable EnhancedMimeType metaContentType,
                                   @Nullable Object meta,
-                                  @Nullable TenantId tenantId) {
-        return new EscMeta(dataType, dataContentType, metaType, metaContentType, meta, tenantId);
+                                  @Nullable TenantId tenantId,
+                                  List<String> categories) {
+        return new EscMeta(dataType, dataContentType, metaType, metaContentType, meta, tenantId, categories);
     }
 
 }

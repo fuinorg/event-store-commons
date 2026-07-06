@@ -85,18 +85,20 @@ public class JpaProjectionAdminEventStore implements ProjectionAdminEventStore {
     public void createProjection(final ProjectionId projectionId,
                                  final ProjectionStreamId targetStreamId,
                                  final boolean enable,
-                                 final List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
+                                 final List<TypeName> eventTypes,
+                                 final List<String> categoryNames) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
         Contract.requireArgNotNull("targetStreamId", targetStreamId);
         Contract.requireArgNotNull("eventTypes", eventTypes);
+        Contract.requireArgNotNull("categoryNames", categoryNames);
 
         final String name = targetStreamId.getName();
         if (em.find(JpaProjection.class, name) != null) {
             throw new ProjectionAlreadyExistsException(projectionId);
         }
         final List<String> typeNames = eventTypes.stream().map(TypeName::asBaseType).toList();
-        LOG.info("Create projection '{}' selecting events: {}", name, typeNames);
-        em.persist(new JpaProjection(name, enable, typeNames));
+        LOG.info("Create projection '{}' selecting events: {} / categories: {}", name, typeNames, categoryNames);
+        em.persist(new JpaProjection(name, enable, typeNames, categoryNames));
     }
 
     @Override

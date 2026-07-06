@@ -134,6 +134,52 @@ public class ProjectionJavaScriptBuilderTest {
     }
 
     @Test
+    public void testCategoryOnly() {
+
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(new SimpleStreamId("CensusView"));
+        testee.category("GenesisEvent");
+        testee.category("ExodusEvent");
+        assertThat(testee.build()).isEqualTo("""
+                hasCategory = (ev) => {
+                  return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1 || ev.metadata.categories.indexOf('ExodusEvent') !== -1));
+                }
+
+                fromAll().foreachStream().when({
+                  $any: function(state, ev) {
+                    if (hasCategory(ev)) {
+                      linkTo('CensusView', ev);
+                    }
+                  }
+                })
+                """);
+
+    }
+
+    @Test
+    public void testTypeAndCategory() {
+
+        final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder(new SimpleStreamId("MixedView"));
+        testee.type("PersonRenamedEvent");
+        testee.category("GenesisEvent");
+        // An event is selected if its type is in the type list OR it carries one of the categories, and it is
+        // linked at most once (single $any handler).
+        assertThat(testee.build()).isEqualTo("""
+                hasCategory = (ev) => {
+                  return (ev.metadata && ev.metadata.categories && (ev.metadata.categories.indexOf('GenesisEvent') !== -1));
+                }
+
+                fromAll().foreachStream().when({
+                  $any: function(state, ev) {
+                    if ((['PersonRenamedEvent'].indexOf(ev.eventType) !== -1 || hasCategory(ev))) {
+                      linkTo('MixedView', ev);
+                    }
+                  }
+                })
+                """);
+
+    }
+
+    @Test
     public void testEventTypes() {
 
         final ProjectionJavaScriptBuilder testee = new ProjectionJavaScriptBuilder("account", new SimpleStreamId("AccountsView"));;

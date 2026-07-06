@@ -1,5 +1,7 @@
 package org.fuin.esc.jsonb;
 
+import jakarta.json.JsonArray;
+import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -12,6 +14,8 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -55,6 +59,18 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
                         case IEscMeta.EL_META_CONTENT_TYPE:
                             escMeta.setMetaContentType(EnhancedMimeType.create(ctx.deserialize(String.class, parser)));
                             break;
+                        case IEscMeta.EL_CATEGORIES:
+                            final JsonValue categoriesValue = ctx.deserialize(JsonValue.class, parser);
+                            final List<String> categories = new ArrayList<>();
+                            if (categoriesValue instanceof JsonArray array) {
+                                for (final JsonValue element : array) {
+                                    if (element instanceof JsonString str) {
+                                        categories.add(str.getString());
+                                    }
+                                }
+                            }
+                            escMeta.setCategories(categories);
+                            break;
                         default:
                             // meta
                             if (field.equals(IBase64Data.EL_ROOT_NAME)) {
@@ -86,6 +102,13 @@ public final class EscMetaJsonbSerializerDeserializer implements JsonbSerializer
         generator.write(IEscMeta.EL_DATA_CONTENT_TYPE, escMeta.getDataContentType().toString());
         if (escMeta.getTenantId() != null) {
             generator.write(IEscMeta.EL_TENANT, escMeta.getTenantId().asString());
+        }
+        if (!escMeta.getCategories().isEmpty()) {
+            generator.writeStartArray(IEscMeta.EL_CATEGORIES);
+            for (final String category : escMeta.getCategories()) {
+                generator.write(category);
+            }
+            generator.writeEnd();
         }
         if (escMeta.getMeta() != null) { //NOSONAR Can unfortunately be null because it's not set above...
             generator.write(IEscMeta.EL_META_TYPE, escMeta.getMetaType());

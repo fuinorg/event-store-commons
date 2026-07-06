@@ -3,6 +3,8 @@ package org.fuin.esc.api;
 import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Creates the bases types that are only known as interfaces in this module.
  * All implementations are expected to be thread safe.
@@ -27,12 +29,14 @@ public interface IBaseTypeFactory {
      * @param metaContentType Type of the metadata if metadata is available.
      * @param meta            Meta data object if available.
      * @param tenantId        Optional unique tenant identifier.
+     * @param categories      Category names the event belongs to (never {@literal null}, may be empty).
      */
     IEscMeta createEscMeta(final String dataType,
                            final EnhancedMimeType dataContentType,
                            @Nullable final String metaType,
                            @Nullable final EnhancedMimeType metaContentType,
                            @Nullable final Object meta,
-                           @Nullable final TenantId tenantId);
+                           @Nullable final TenantId tenantId,
+                           final List<String> categories);
 
 }

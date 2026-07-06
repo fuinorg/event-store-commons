@@ -24,7 +24,8 @@ public class BaseTypeFactoryTest {
                 "MetaY",
                 new EnhancedMimeType("application", "json", StandardCharsets.UTF_8, "1"),
                 "Meta",
-                null)).isInstanceOf(EscMeta.class);
+                null,
+                java.util.List.of())).isInstanceOf(EscMeta.class);
     }
 
 }

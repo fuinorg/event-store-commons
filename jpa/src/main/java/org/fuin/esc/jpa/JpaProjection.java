@@ -56,6 +56,11 @@ public class JpaProjection {
     @Column(name = "EVENT_TYPE", length = 255, nullable = false)
     private Set<String> eventTypes = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "PROJECTION_EVENT_CATEGORIES", joinColumns = @JoinColumn(name = "PROJECTION_NAME"))
+    @Column(name = "EVENT_CATEGORY", length = 255, nullable = false)
+    private Set<String> categories = new HashSet<>();
+
     /**
      * Protected default constructor for JPA.
      */
@@ -102,12 +107,31 @@ public class JpaProjection {
      *            Unique type names of the events selected by this projection.
      */
     public JpaProjection(final String name, final boolean enabled, final Collection<String> eventTypes) {
+        this(name, enabled, eventTypes, Set.of());
+    }
+
+    /**
+     * Constructor with name, enabled flag, event type filter and category filter.
+     *
+     * @param name
+     *            Unique name for the projection.
+     * @param enabled
+     *            FALSE if the projection is being created, else TRUE.
+     * @param eventTypes
+     *            Unique type names of the events selected by this projection.
+     * @param categories
+     *            Category names selected by this projection.
+     */
+    public JpaProjection(final String name, final boolean enabled, final Collection<String> eventTypes,
+                         final Collection<String> categories) {
         super();
         Contract.requireArgNotNull("name", name);
         Contract.requireArgNotNull("eventTypes", eventTypes);
+        Contract.requireArgNotNull("categories", categories);
         this.name = name;
         this.enabled = enabled;
         this.eventTypes = new HashSet<>(eventTypes);
+        this.categories = new HashSet<>(categories);
     }
 
     /**
@@ -137,6 +161,16 @@ public class JpaProjection {
     @NotNull
     public Set<String> getEventTypes() {
         return new HashSet<>(eventTypes);
+    }
+
+    /**
+     * Returns the category names selected by this projection.
+     *
+     * @return Unmodifiable set of category names.
+     */
+    @NotNull
+    public Set<String> getCategories() {
+        return new HashSet<>(categories);
     }
 
     /**

@@ -13,6 +13,7 @@
 - Added portable catch-up + CheckpointStore SPI + WakeupSource
 - Added PostgreSQL `LISTEN/NOTIFY` [WakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) in the new [wac-pg](pg) module
 - Added JPA projections
+- Select projection events by category (marker interfaces the events implement), not just by exact type name
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)

@@ -22,6 +22,7 @@ import org.fuin.esc.api.*;
 import org.fuin.objects4j.common.*;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -46,6 +47,9 @@ public final class EscMeta implements IEscMeta {
 
     @Nullable
     private Object meta;
+
+    @Nullable
+    private List<String> categories;
 
     private transient EnhancedMimeType dataContentType;
 
@@ -103,9 +107,31 @@ public final class EscMeta implements IEscMeta {
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta,
                    @Nullable final TenantId tenantId) {
+        this(dataType, dataContentType, metaType, metaContentType, meta, tenantId, List.of());
+    }
+
+    /**
+     * Constructor with all data including categories.
+     *
+     * @param dataType        Type of the data.
+     * @param dataContentType Type of the data.
+     * @param metaType        Unique name of the metadata. Must be non-null if 'meta' is not null.
+     * @param metaContentType Type of the metadata. Must be non-null if 'meta' is not null.
+     * @param meta            Metadata object, if available.
+     * @param tenantId        Optional unique tenant identifier.
+     * @param categories      Category names the event belongs to (never {@literal null}, may be empty).
+     */
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
+                   @Nullable final String metaType,
+                   @Nullable final EnhancedMimeType metaContentType,
+                   @Nullable final Object meta,
+                   @Nullable final TenantId tenantId,
+                   final List<String> categories) {
         super();
         Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("dataContentType", dataContentType);
+        Contract.requireArgNotNull("categories", categories);
         if (meta != null) {
             if (metaType == null) {
                 throw new ConstraintViolationException("The argument 'metaType' cannot be null");
@@ -125,6 +151,7 @@ public final class EscMeta implements IEscMeta {
         }
         this.meta = meta;
         this.tenantId = tenantId == null ? null : tenantId.asString();
+        this.categories = categories.isEmpty() ? null : List.copyOf(categories);
     }
 
     /**
@@ -256,6 +283,20 @@ public final class EscMeta implements IEscMeta {
      */
     void setMeta(@Nullable final Object meta) {
         this.meta = meta;
+    }
+
+    @Override
+    public List<String> getCategories() {
+        return categories == null ? List.of() : categories;
+    }
+
+    /**
+     * Sets the category names.
+     *
+     * @param categories Category names (or {@literal null} / empty for none).
+     */
+    void setCategories(@Nullable final List<String> categories) {
+        this.categories = (categories == null || categories.isEmpty()) ? null : List.copyOf(categories);
     }
 
 }

@@ -206,20 +206,22 @@ public final class EscSpiUtils {
         final Serializer dataSerializer = registry.getSerializer(new SerializedDataType(dataType));
         final EnhancedMimeType dataContentType = contentType(dataSerializer.getMimeType(), targetContentType);
 
+        final List<String> categories = commonEvent.getCategories();
+
         if (commonEvent.getMeta() == null) {
-            return baseTypeFactory.createEscMeta(dataType, dataContentType, null, null, null, commonEvent.getTenantId());
+            return baseTypeFactory.createEscMeta(dataType, dataContentType, null, null, null, commonEvent.getTenantId(), categories);
         }
 
         final String metaType = Objects.requireNonNull(commonEvent.getMetaType(), "metaType").asBaseType();
         final SerializedDataType serDataType = new SerializedDataType(metaType);
         final Serializer metaSerializer = registry.getSerializer(serDataType);
         if (metaSerializer.getMimeType().matchEncoding(targetContentType)) {
-            return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(), commonEvent.getMeta(), commonEvent.getTenantId());
+            return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaSerializer.getMimeType(), commonEvent.getMeta(), commonEvent.getTenantId(), categories);
         }
 
         final byte[] serMeta = metaSerializer.marshal(commonEvent.getMeta(), serDataType);
         final EnhancedMimeType metaContentType = contentType(metaSerializer.getMimeType(), targetContentType);
-        return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaContentType, baseTypeFactory.createBase64Data(serMeta), commonEvent.getTenantId());
+        return baseTypeFactory.createEscMeta(dataType, dataContentType, metaType, metaContentType, baseTypeFactory.createBase64Data(serMeta), commonEvent.getTenantId(), categories);
 
     }
 

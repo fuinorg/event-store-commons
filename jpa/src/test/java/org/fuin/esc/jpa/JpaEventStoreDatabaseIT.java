@@ -138,7 +138,23 @@ class JpaEventStoreDatabaseIT extends AbstractTest {
             final StreamEventsSlice page1 = es.readEventsForward(projectionStreamId, page0.getNextEventNumber(), 1);
             assertThat(page1.getEvents()).extracting(CommonEvent::getId).containsExactly(idA2);
 
-            // 3) Catch-up checkpoint store round trip.
+            // 3) Category projection: an event carrying a category is selected by category (not by type name),
+            //    proving the queryable EVENT_CATEGORIES side table + the category filter work on the real DB.
+            final EventId idCat = new EventId();
+            final ProjectionId categoryProjectionId = new ProjectionId("DeletionProjection");
+            final ProjectionStreamId categoryProjectionStreamId = new ProjectionStreamId("DeletionProjection");
+            inTransaction(em, () -> {
+                es.appendToStream(new SimpleStreamId("S-CAT"), ExpectedVersion.NO_OR_EMPTY_STREAM.getNo(),
+                        new SimpleCommonEvent(idCat, EventB.TYPE, new EventB("cat"), null, null, null,
+                                List.of("Deletion")));
+                new JpaProjectionAdminEventStore(em).createProjection(categoryProjectionId, categoryProjectionStreamId,
+                        true, List.of(), List.of("Deletion"));
+            });
+            assertThat(es.streamExists(categoryProjectionStreamId)).isTrue();
+            final StreamEventsSlice byCategory = es.readEventsForward(categoryProjectionStreamId, 0, 10);
+            assertThat(byCategory.getEvents()).extracting(CommonEvent::getId).containsExactly(idCat);
+
+            // 4) Catch-up checkpoint store round trip.
             final JpaCheckpointStore checkpoints = new JpaCheckpointStore(em);
             final StreamId checkpointStream = new SimpleStreamId("S-A1");
             inTransaction(em, () -> checkpoints.updateCheckpoint(checkpointStream, 7));

@@ -76,7 +76,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         final EventId eventId = new EventId(eventData.getEventId());
         final TypeName dataType = new TypeName(eventData.getEventType());
         if (escMeta.getMetaType() == null) {
-            return new SimpleCommonEvent(eventId, dataType, data, escMeta.getTenantId());
+            return new SimpleCommonEvent(eventId, dataType, data, null, null, escMeta.getTenantId(), escMeta.getCategories());
         }
         final TypeName metaType = new TypeName(escMeta.getMetaType());
         final SerializedDataType serMetaType = new SerializedDataType(escMeta.getMetaType());
@@ -84,7 +84,7 @@ public final class RecordedEvent2CommonEventConverter implements Converter<Recor
         final Deserializer metaDeserializer = deserRegistry.getDeserializer(serMetaType, nonNullMetaMimeType);
         final Object meta = unmarshal(metaTransferEncoding, serMetaType, metaDeserializer, nonNullMetaMimeType,
                 Objects.requireNonNull(escMeta.getMeta()), nonNullMetaMimeType, escMetaMimeType);
-        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta, escMeta.getTenantId());
+        return new SimpleCommonEvent(eventId, dataType, data, metaType, meta, escMeta.getTenantId(), escMeta.getCategories());
     }
 
     private Object unmarshal(@Nullable final String transferEncoding,

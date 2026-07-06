@@ -154,16 +154,18 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     public void createProjection(ProjectionId projectionId,
                                  ProjectionStreamId targetStreamId,
                                  boolean enable,
-                                 List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
+                                 List<TypeName> eventTypes,
+                                 List<String> categoryNames) throws ProjectionAlreadyExistsException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
         final String projectionName = projectionName(projectionId);
-        LOG.info("Create projection '{}' with stream '{}' listening to events: {}", projectionName,  targetStreamId, eventTypes);
+        LOG.info("Create projection '{}' with stream '{}' listening to events: {} / categories: {}", projectionName,
+                targetStreamId, eventTypes, categoryNames);
 
         final ProjectionJavaScriptBuilder builder = new ProjectionJavaScriptBuilder(
                 tenantContext.getTenantId().orElse(null),
                 targetStreamId);
-        final String javascript = builder.types(eventTypes).build();
+        final String javascript = builder.types(eventTypes).categories(categoryNames).build();
 
         try {
             es.create(projectionName, javascript,

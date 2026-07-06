@@ -29,6 +29,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -258,7 +259,8 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         } else {
             jpaMeta = new JpaData(serMeta);
         }
-        return new JpaEvent(commonEvent.getId(), commonEvent.getTenantId(), jpaData, jpaMeta);
+        return new JpaEvent(commonEvent.getId(), commonEvent.getTenantId(), jpaData, jpaMeta,
+                new HashSet<>(commonEvent.getCategories()));
 
     }
 

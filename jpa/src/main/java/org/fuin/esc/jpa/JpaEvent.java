@@ -26,6 +26,8 @@ import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.jspecify.annotations.Nullable;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -76,6 +78,15 @@ public class JpaEvent {
     private JpaData meta;
 
     /**
+     * Category names of the event (typically the simple names of marker interfaces it implements). Stored in
+     * a queryable side table so a projection can select events by category with plain SQL.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "EVENT_CATEGORIES", joinColumns = @JoinColumn(name = "EVENT_ID"))
+    @Column(name = "CATEGORY", length = 255, nullable = false)
+    private Set<String> categories = new HashSet<>();
+
+    /**
      * Protected default constructor only required for JPA.
      */
     @SuppressWarnings("NullAway.Init") // Fields are populated by JPA
@@ -116,11 +127,40 @@ public class JpaEvent {
                     @Nullable final TenantId tenantId,
                     final JpaData data,
                     @Nullable final JpaData meta) {
+        this(eventId, tenantId, data, meta, Set.of());
+    }
+
+    /**
+     * Constructor with all data including categories.
+     *
+     * @param eventId    Unique identifier of the event.
+     * @param tenantId   Optional unique tenant identifier.
+     * @param data       Data of the event.
+     * @param meta       Meta data (Optional).
+     * @param categories Category names the event belongs to (never {@literal null}, may be empty).
+     */
+    @SuppressWarnings("NullAway.Init") // id and created are populated by JPA / @PrePersist
+    public JpaEvent(final EventId eventId,
+                    @Nullable final TenantId tenantId,
+                    final JpaData data,
+                    @Nullable final JpaData meta,
+                    final Set<String> categories) {
         super();
         this.eventId = eventId.asBaseType().toString();
         this.tenantId = tenantId == null ? null : tenantId.asString();
         this.data = data;
         this.meta = meta;
+        this.categories = new HashSet<>(categories);
+    }
+
+    /**
+     * Returns the category names of the event.
+     *
+     * @return Unmodifiable set of category names.
+     */
+    @NotNull
+    public Set<String> getCategories() {
+        return categories == null ? Set.of() : Set.copyOf(categories);
     }
 
     /**

@@ -22,6 +22,8 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.Immutable;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
  * <code>id</code>.
@@ -52,6 +54,11 @@ public final class SimpleCommonEvent implements CommonEvent {
     /** The meta data. */
     @Nullable
     private Object meta;
+
+    /** Provider-neutral category names (e.g. simple names of marker interfaces the event implements). Kept
+     *  {@literal null} rather than an empty list when there are none, so it is omitted from serialized output. */
+    @Nullable
+    private List<String> categories;
 
     /**
      * Protected constructor for deserialization.
@@ -104,11 +111,41 @@ public final class SimpleCommonEvent implements CommonEvent {
                              @Nullable final TypeName metaType,
                              @Nullable final Object meta,
                              @Nullable final TenantId tenantId) {//NOSONAR
+        this(id, dataType, data, metaType, meta, tenantId, List.of());
+    }
+
+    /**
+     * Constructor with metadata and categories.
+     *
+     * @param id
+     *            The ID of the event, used as part of the idempotent write check. This is type string to
+     *            allow different UUID implementations. It has to be a valid UUID string representation.
+     * @param dataType
+     *            Unique name of the type of data.
+     * @param data
+     *            Event data.
+     * @param metaType
+     *            Unique name of the type of metadata.
+     * @param meta
+     *            Meta data.
+     * @param tenantId
+     *            Optional unique tenant identifier.
+     * @param categories
+     *            Category names the event belongs to (never {@literal null}, may be empty).
+     */
+    public SimpleCommonEvent(final EventId id,
+                             final TypeName dataType,
+                             final Object data,
+                             @Nullable final TypeName metaType,
+                             @Nullable final Object meta,
+                             @Nullable final TenantId tenantId,
+                             final List<String> categories) {//NOSONAR
         super();
 
         Contract.requireArgNotNull("id", id);
         Contract.requireArgNotNull("type", dataType);
         Contract.requireArgNotNull("data", data);
+        Contract.requireArgNotNull("categories", categories);
 
         this.id = id;
         this.dataType = dataType;
@@ -116,6 +153,7 @@ public final class SimpleCommonEvent implements CommonEvent {
         this.metaType = metaType;
         this.meta = meta;
         this.tenantId = tenantId;
+        this.categories = categories.isEmpty() ? null : List.copyOf(categories);
 
     }
 
@@ -150,6 +188,11 @@ public final class SimpleCommonEvent implements CommonEvent {
     @Override
     public Object getMeta() {
         return meta;
+    }
+
+    @Override
+    public List<String> getCategories() {
+        return categories == null ? List.of() : categories;
     }
 
     @Override

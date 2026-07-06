@@ -21,6 +21,8 @@ import jakarta.validation.constraints.NotNull;
 import org.fuin.objects4j.common.ThreadSafe;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * Event that is uniquely identified by a UUID. It's equals and hash code methods are defined on the
  * <code>id</code>.
@@ -77,5 +79,17 @@ public interface CommonEvent {
      */
     @Nullable
     Object getMeta();
+
+    /**
+     * Returns the category names of the event. Categories are provider-neutral tags (typically the simple
+     * names of marker interfaces the event implements) that allow a projection to select the event by
+     * category instead of by its exact type name.
+     *
+     * @return Immutable list of category names, never {@literal null} (empty if the event has no categories).
+     */
+    @NotNull
+    default List<String> getCategories() {
+        return List.of();
+    }
 
 }

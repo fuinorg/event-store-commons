@@ -220,15 +220,31 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
             throw new StreamNotFoundException(streamId);
         }
         final Set<String> types = projection.getEventTypes();
-        if (!projection.isEnabled() || types.isEmpty()) {
-            // The projection does exist, but is not ready yet (or selects no event types)
+        final Set<String> categories = projection.getCategories();
+        if (!projection.isEnabled() || (types.isEmpty() && categories.isEmpty())) {
+            // The projection does exist, but is not ready yet (or selects nothing)
             return new StreamEventsSlice(start, new ArrayList<>(), start, true);
         }
-        final String sql = "SELECT ev.* FROM " + JpaEvent.TABLE_NAME + " ev WHERE ev." + JpaData.COLUMN_DATA_TYPE
-                + " IN (:types) ORDER BY ev." + JpaEvent.COLUMN_ID + " ASC";
+        // Select events whose type name is in the projection's type set OR that carry one of its
+        // categories (stored in the queryable EVENT_CATEGORIES side table), in global insertion order.
+        final List<String> conditions = new ArrayList<>();
+        if (!types.isEmpty()) {
+            conditions.add("ev." + JpaData.COLUMN_DATA_TYPE + " IN (:types)");
+        }
+        if (!categories.isEmpty()) {
+            conditions.add("EXISTS (SELECT 1 FROM EVENT_CATEGORIES c WHERE c.EVENT_ID = ev." + JpaEvent.COLUMN_ID
+                    + " AND c.CATEGORY IN (:categories))");
+        }
+        final String sql = "SELECT ev.* FROM " + JpaEvent.TABLE_NAME + " ev WHERE " + String.join(" OR ", conditions)
+                + " ORDER BY ev." + JpaEvent.COLUMN_ID + " ASC";
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
-        query.setParameter("types", types);
+        if (!types.isEmpty()) {
+            query.setParameter("types", types);
+        }
+        if (!categories.isEmpty()) {
+            query.setParameter("categories", categories);
+        }
         query.setFirstResult((int) start);
         query.setMaxResults(count);
         final List<JpaEvent> resultList = query.getResultList();
@@ -571,13 +587,15 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final Object data = Objects.requireNonNull(deserialize(jpaEvent.getData()));
         final JpaData jpaMeta = jpaEvent.getMeta();
         final Object meta = deserialize(jpaMeta);
+        final List<String> categories = new ArrayList<>(jpaEvent.getCategories());
         if (meta == null) {
-            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, jpaEvent.getTenantId());
+            return new SimpleCommonEvent(jpaEvent.getEventId(), jpaEvent.getData().getTypeName(), data, null, null,
+                    jpaEvent.getTenantId(), categories);
         }
         return new SimpleCommonEvent(jpaEvent.getEventId(),
                 jpaEvent.getData().getTypeName(), data,
                 Objects.requireNonNull(jpaMeta).getTypeName(), meta,
-                jpaEvent.getTenantId());
+                jpaEvent.getTenantId(), categories);
     }
 
     @Nullable

@@ -26,6 +26,7 @@ import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.ImmutableAfterUnmarshal;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -57,6 +58,10 @@ public final class EscMeta implements IEscMeta {
     @XmlAnyElement(lax = true)
     @Nullable
     private Object meta;
+
+    @XmlElement(name = IEscMeta.EL_CATEGORIES)
+    @Nullable
+    private List<String> categories;
 
     /**
      * Default constructor for JAXB.
@@ -110,9 +115,31 @@ public final class EscMeta implements IEscMeta {
                    @Nullable final EnhancedMimeType metaContentType,
                    @Nullable final Object meta,
                    @Nullable final TenantId tenantId) {
+        this(dataType, dataContentType, metaType, metaContentType, meta, tenantId, List.of());
+    }
+
+    /**
+     * Constructor with all data including categories.
+     *
+     * @param dataType        Type of the data.
+     * @param dataContentType Type of the data.
+     * @param metaType        Unique name of the metadata type if available.
+     * @param metaContentType Type of the metadata if metadata is available.
+     * @param meta            Meta data object if available.
+     * @param tenantId        Optional unique tenant identifier.
+     * @param categories      Category names the event belongs to (never {@literal null}, may be empty).
+     */
+    public EscMeta(final String dataType,
+                   final EnhancedMimeType dataContentType,
+                   @Nullable final String metaType,
+                   @Nullable final EnhancedMimeType metaContentType,
+                   @Nullable final Object meta,
+                   @Nullable final TenantId tenantId,
+                   final List<String> categories) {
         super();
         Contract.requireArgNotNull("dataType", dataType);
         Contract.requireArgNotNull("dataContentType", dataContentType);
+        Contract.requireArgNotNull("categories", categories);
 
         this.dataType = dataType;
         this.dataContentTypeStr = dataContentType.toString();
@@ -122,6 +149,7 @@ public final class EscMeta implements IEscMeta {
         }
         this.meta = meta;
         this.tenantId = tenantId == null ? null : tenantId.asString();
+        this.categories = categories.isEmpty() ? null : List.copyOf(categories);
     }
 
     /**
@@ -185,6 +213,11 @@ public final class EscMeta implements IEscMeta {
     @Nullable
     public Object getMeta() {
         return meta;
+    }
+
+    @Override
+    public List<String> getCategories() {
+        return categories == null ? List.of() : categories;
     }
 
 }

@@ -101,10 +101,33 @@ public interface ProjectionAdminEventStore extends AutoCloseable {
      * @throws ProjectionAlreadyExistsException The given projection could not be created because it already
      *                                      exists.
      */
+    default void createProjection(ProjectionId projectionId,
+                                  ProjectionStreamId targetStreamId,
+                                  boolean enable,
+                                  List<TypeName> eventTypes) throws ProjectionAlreadyExistsException {
+        createProjection(projectionId, targetStreamId, enable, eventTypes, List.of());
+    }
+
+    /**
+     * Creates a new projection that selects events by their type name and/or by category. An event is
+     * selected if its type name is in {@code eventTypes} <em>or</em> it belongs to one of the given
+     * {@code categoryNames} (the categories carried on the event, e.g. the simple names of marker interfaces
+     * it implements). This lets a projection pick up events by category without knowing every concrete type.
+     *
+     * @param projectionId Unique name of the projection to create.
+     * @param targetStreamId Unique name of the stream the projection should create.
+     * @param enable       Enable the projection (<code>true</code>) or not
+     *                     (<code>false</code>).
+     * @param eventTypes   Unique type names of events to select (may be empty).
+     * @param categoryNames Category names to select (may be empty).
+     * @throws ProjectionAlreadyExistsException The given projection could not be created because it already
+     *                                      exists.
+     */
     void createProjection(ProjectionId projectionId,
                           ProjectionStreamId targetStreamId,
                           boolean enable,
-                          List<TypeName> eventTypes) throws ProjectionAlreadyExistsException;
+                          List<TypeName> eventTypes,
+                          List<String> categoryNames) throws ProjectionAlreadyExistsException;
 
     /**
      * Deletes an existing projection.

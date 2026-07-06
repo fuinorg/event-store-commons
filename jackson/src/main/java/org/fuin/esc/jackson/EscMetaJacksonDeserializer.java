@@ -10,6 +10,8 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +37,13 @@ public final class EscMetaJacksonDeserializer extends StdDeserializer<EscMeta> {
         escMeta.setDataContentType(Objects.requireNonNull(EnhancedMimeType.create(node.get(IEscMeta.EL_DATA_CONTENT_TYPE).asText())));
         if (node.has(IEscMeta.EL_TENANT)) {
             escMeta.setTenantId(new SimpleTenantId(node.get(IEscMeta.EL_TENANT).asText()));
+        }
+        if (node.has(IEscMeta.EL_CATEGORIES)) {
+            final List<String> categories = new ArrayList<>();
+            for (final JsonNode element : node.get(IEscMeta.EL_CATEGORIES)) {
+                categories.add(element.asText());
+            }
+            escMeta.setCategories(categories);
         }
         if (node.has(IEscMeta.EL_META_TYPE)) {
             escMeta.setMetaType(node.get(IEscMeta.EL_META_TYPE).asText());
