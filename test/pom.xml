@@ -353,11 +353,10 @@
                                     <KURRENTDB_INSECURE>true</KURRENTDB_INSECURE>
                                     <KURRENTDB_LOG>/tmp/log-kurrentdb</KURRENTDB_LOG>
                                 </env>
-                                <!-- Enabled so the CI build captures the KurrentDB server log (projection
-                                     subsystem: created/running/faulted, emit errors) - needed to diagnose the
-                                     projection scenarios that pass locally but fail on CI. -->
+                                <!-- Flip 'enabled' to true to capture the KurrentDB server log (projection
+                                     subsystem: created/running/faulted, emit errors) when debugging projections. -->
                                 <log>
-                                    <enabled>true</enabled>
+                                    <enabled>false</enabled>
                                     <prefix>KURRENTDB</prefix>
                                 </log>
                                 <wait>
