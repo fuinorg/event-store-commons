@@ -17,11 +17,23 @@
  */
 package org.fuin.esc.jpa;
 
+import jakarta.persistence.LockTimeoutException;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.PessimisticLockException;
+import jakarta.persistence.Query;
+import jakarta.persistence.QueryTimeoutException;
+import org.fuin.esc.api.EscConnectionException;
 import org.fuin.esc.api.StreamId;
 import org.fuin.objects4j.common.ThreadSafe;
+
+import java.io.IOException;
+import java.sql.SQLNonTransientConnectionException;
+import java.sql.SQLRecoverableException;
+import java.sql.SQLTransientException;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Package utilities.
@@ -31,6 +43,87 @@ final class JpaUtils {
 
     private JpaUtils() {
         // Never used
+    }
+
+    /**
+     * Bounds how long the given query may run.
+     *
+     * @param <T>   Type of the query.
+     * @param query Query to bound.
+     * @return The same query, for chaining.
+     */
+    static <T extends Query> T withQueryTimeout(final JpaTimeouts timeouts, final T query) {
+        query.setHint("jakarta.persistence.query.timeout", timeouts.queryTimeoutMillis());
+        return query;
+    }
+
+    /**
+     * Bounds how long the given query waits for a pessimistic lock.
+     *
+     * @param <T>   Type of the query.
+     * @param query Query to bound.
+     * @return The same query, for chaining.
+     */
+    static <T extends Query> T withLockTimeout(final JpaTimeouts timeouts, final T query) {
+        query.setHint("jakarta.persistence.lock.timeout", timeouts.lockTimeoutMillis());
+        return query;
+    }
+
+    /**
+     * Executes a database operation and translates a transient failure into an
+     * {@link EscConnectionException}. Applied where the query is actually executed, so every caller gets the
+     * typed exception without repeating the mapping.
+     *
+     * @param <T>       Type of the result.
+     * @param operation Operation to execute.
+     * @return Result of the operation.
+     */
+    static <T> T execute(final Supplier<T> operation) {
+        try {
+            return operation.get();
+        } catch (final RuntimeException ex) {
+            throw mapPersistenceException(ex);
+        }
+    }
+
+    /**
+     * Translates a database failure into an {@link EscConnectionException} if it is transient - the database
+     * could not be reached, the query or the lock ran into its timeout, or a lock could not be obtained.
+     * Anything else is returned unchanged, especially {@link jakarta.persistence.NoResultException} (the
+     * callers map it to a business exception) and {@link jakarta.persistence.OptimisticLockException} (a
+     * concurrency conflict, which is a business answer and must not be retried blindly).
+     *
+     * @param ex Failure to inspect.
+     * @return Either an {@link EscConnectionException} or the original failure.
+     */
+    static RuntimeException mapPersistenceException(final RuntimeException ex) {
+        if (ex instanceof QueryTimeoutException || ex instanceof LockTimeoutException
+                || ex instanceof PessimisticLockException) {
+            return new EscConnectionException("The database did not answer in time: " + ex.getMessage(), ex);
+        }
+        if (ex instanceof PersistenceException && hasConnectivityCause(ex)) {
+            return new EscConnectionException("Could not reach the database: " + ex.getMessage(), ex);
+        }
+        return ex;
+    }
+
+    /**
+     * Walks the cause chain looking for a JDBC or network level connectivity failure.
+     *
+     * @param error Failure to inspect.
+     * @return {@literal true} if the database was not reachable.
+     */
+    private static boolean hasConnectivityCause(final Throwable error) {
+        for (Throwable t = error; t != null; t = t.getCause()) {
+            if (t instanceof SQLTransientException || t instanceof SQLRecoverableException
+                    || t instanceof SQLNonTransientConnectionException || t instanceof IOException) {
+                return true;
+            }
+            if (t.getCause() == t) {
+                break;
+            }
+        }
+        return false;
     }
 
     /**

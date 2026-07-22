@@ -18,6 +18,7 @@
 package org.fuin.esc.esgrpc;
 
 import io.grpc.Status;
+import org.fuin.esc.api.EscConnectionException;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
@@ -122,6 +123,60 @@ public final class ESGrpcEventStoreSupportTest {
             throw ESGrpcEventStoreSupport.mapException(null, sid, ExpectedVersion.ANY.getNo());
         });
         assertThat(result).isExactlyInstanceOf(RuntimeException.class);
+    }
+
+
+    @Test
+    void testStatusIsConnectivityProblem() {
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.UNAVAILABLE.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.DEADLINE_EXCEEDED.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.RESOURCE_EXHAUSTED.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.ABORTED.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(new InterruptedException())).isTrue();
+
+        // A business answer is not a connectivity problem.
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.NOT_FOUND.asRuntimeException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(
+                Status.FAILED_PRECONDITION.asRuntimeException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(new IllegalStateException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(null)).isFalse();
+    }
+
+    @Test
+    void testDeletedIsNeitherNotFoundNorConnectivity() {
+        // A hard deleted stream reports FAILED_PRECONDITION. streamExists(..) must answer "false" for it
+        // (it does not exist any more), so it must be recognised as a business answer, not as a
+        // connectivity problem - getting this wrong makes "read after hard delete" throw.
+        final io.grpc.StatusRuntimeException deleted = io.grpc.Status.FAILED_PRECONDITION
+                .withDescription("Event stream 'MyStream' is deleted.").asRuntimeException();
+
+        assertThat(ESGrpcEventStoreSupport.statusIsDeleted(deleted)).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsNotFound(deleted)).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsConnectivityProblem(deleted)).isFalse();
+    }
+
+    @Test
+    void testStatusIsNotFound() {
+        assertThat(ESGrpcEventStoreSupport.statusIsNotFound(Status.NOT_FOUND.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsNotFound(Status.UNAVAILABLE.asRuntimeException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsNotFound(null)).isFalse();
+    }
+
+    @Test
+    void testMapExceptionConnectivity() {
+        // A store that cannot be reached must be mapped to the transient type, not to the catch-all
+        // RuntimeException, so retry / circuit breaker predicates recognise it.
+        final TenantStreamId sid = new TenantStreamId(null, new SimpleStreamId("MyStream"));
+
+        final RuntimeException result = ESGrpcEventStoreSupport.mapException(
+                Status.UNAVAILABLE.asRuntimeException(), sid, ExpectedVersion.ANY.getNo());
+
+        assertThat(result).isInstanceOf(EscConnectionException.class);
     }
 
 }

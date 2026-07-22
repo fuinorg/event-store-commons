@@ -21,11 +21,20 @@ import org.fuin.esc.api.ProjectionStreamId;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.jpa.examples.AggregateStreamId;
+import jakarta.persistence.LockTimeoutException;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.QueryTimeoutException;
+import org.fuin.esc.api.EscConnectionException;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLTransientConnectionException;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 public final class JpaUtilsTest {
@@ -174,5 +183,44 @@ public final class JpaUtilsTest {
 
     }
 
-}
 
+    @Test
+    void testMapPersistenceExceptionTransient() {
+        // The database did not answer in time - retryable, so it must become the typed transient exception.
+        assertThat(JpaUtils.mapPersistenceException(new QueryTimeoutException("timeout")))
+                .isInstanceOf(EscConnectionException.class);
+        assertThat(JpaUtils.mapPersistenceException(new LockTimeoutException("lock")))
+                .isInstanceOf(EscConnectionException.class);
+    }
+
+    @Test
+    void testMapPersistenceExceptionConnectivityCause() {
+        final PersistenceException ex = new PersistenceException("wrapped",
+                new SQLTransientConnectionException("connection refused"));
+
+        assertThat(JpaUtils.mapPersistenceException(ex)).isInstanceOf(EscConnectionException.class);
+    }
+
+    @Test
+    void testMapPersistenceExceptionBusinessFailuresUnchanged() {
+        // NoResultException is mapped to a business exception by the callers, and an optimistic lock
+        // conflict is a business answer - neither may be reported as "could not reach the database".
+        final NoResultException noResult = new NoResultException("none");
+        final OptimisticLockException optimistic = new OptimisticLockException("conflict");
+        final IllegalStateException other = new IllegalStateException("boom");
+
+        assertThat(JpaUtils.mapPersistenceException(noResult)).isSameAs(noResult);
+        assertThat(JpaUtils.mapPersistenceException(optimistic)).isSameAs(optimistic);
+        assertThat(JpaUtils.mapPersistenceException(other)).isSameAs(other);
+    }
+
+    @Test
+    void testExecuteMapsFailure() {
+        assertThatThrownBy(() -> JpaUtils.execute(() -> {
+            throw new QueryTimeoutException("timeout");
+        })).isInstanceOf(EscConnectionException.class);
+
+        assertThat(JpaUtils.<String>execute(() -> "ok")).isEqualTo("ok");
+    }
+
+}

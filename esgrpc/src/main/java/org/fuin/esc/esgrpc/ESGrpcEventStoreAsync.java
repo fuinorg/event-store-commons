@@ -244,9 +244,17 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                 return Boolean.TRUE;
             }
             final Throwable cause = unwrap(ex);
-            if (cause instanceof StatusRuntimeException
-                    || cause instanceof io.kurrent.dbclient.StreamNotFoundException) {
+            // Only "not found" means the stream does not exist. A connectivity failure must NOT be
+            // reported as "false" - that would silently turn "no answer" into a business answer.
+            if (cause instanceof io.kurrent.dbclient.StreamNotFoundException
+                    || ESGrpcEventStoreSupport.statusIsNotFound(cause)
+                    // A hard deleted stream does not exist any more either.
+                    || ESGrpcEventStoreSupport.statusIsDeleted(cause)) {
                 return Boolean.FALSE;
+            }
+            if (ESGrpcEventStoreSupport.statusIsConnectivityProblem(cause)) {
+                throw new CompletionException(new EscConnectionException(
+                        "Could not reach the event store executing streamExists(..) on stream '" + sid + "'", cause));
             }
             throw new CompletionException("Error executing streamExists(..)", cause);
         });

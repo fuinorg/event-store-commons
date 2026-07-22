@@ -25,6 +25,7 @@ import io.kurrent.dbclient.ResolvedEvent;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.DeserializerRegistry;
 import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.EscConnectionException;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.IBaseTypeFactory;
 import org.fuin.esc.api.SerializerRegistry;
@@ -187,6 +188,45 @@ final class ESGrpcEventStoreSupport {
     }
 
     /**
+     * Determines if a given (already unwrapped) failure cause signals that the stream does not exist.
+     *
+     * @param cause Cause to inspect (may be {@code null}).
+     * @return {@code true} if the cause indicates a missing stream.
+     */
+    static boolean statusIsNotFound(@Nullable final Throwable cause) {
+        if (cause instanceof StatusRuntimeException sre) {
+            return sre.getStatus().getCode().equals(Status.NOT_FOUND.getCode());
+        }
+        return cause instanceof io.kurrent.dbclient.StreamNotFoundException;
+    }
+
+    /**
+     * Determines if a given (already unwrapped) failure cause signals that the store could not be reached
+     * or is currently unable to answer, as opposed to an answer that states a business outcome.
+     *
+     * @param cause Cause to inspect (may be {@code null}).
+     * @return {@code true} if the cause indicates a connectivity / availability problem.
+     */
+    static boolean statusIsConnectivityProblem(@Nullable final Throwable cause) {
+        if (cause instanceof EventStoreCallTimeoutException) {
+            return true;
+        }
+        if (cause instanceof InterruptedException) {
+            return true;
+        }
+        if (cause instanceof StatusRuntimeException sre) {
+            // A deleted stream is reported as FAILED_PRECONDITION and is a business answer, not a
+            // connectivity problem - it is checked before this method is reached.
+            final Status.Code code = sre.getStatus().getCode();
+            return code.equals(Status.UNAVAILABLE.getCode())
+                    || code.equals(Status.DEADLINE_EXCEEDED.getCode())
+                    || code.equals(Status.RESOURCE_EXHAUSTED.getCode())
+                    || code.equals(Status.ABORTED.getCode());
+        }
+        return false;
+    }
+
+    /**
      * Translates a gRPC client failure into the matching event-store-commons exception. The returned
      * exception is meant to be thrown (synchronous) or to complete a future exceptionally (asynchronous).
      *
@@ -205,6 +245,11 @@ final class ESGrpcEventStoreSupport {
         }
         if (cause instanceof io.kurrent.dbclient.StreamNotFoundException) {
             return new StreamNotFoundException(sid);
+        }
+        if (statusIsConnectivityProblem(cause)) {
+            // Transient: the caller may retry (subject to idempotency for writes).
+            return new EscConnectionException("Could not reach the event store executing an operation on stream '"
+                    + sid + "'", cause);
         }
         return new RuntimeException("Error executing event store operation", cause);
     }

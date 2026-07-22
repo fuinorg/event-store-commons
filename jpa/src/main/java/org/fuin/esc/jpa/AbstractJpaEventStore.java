@@ -57,6 +57,8 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
     private final DeserializerRegistry desRegistry;
 
+    private final JpaTimeouts timeouts;
+
     private volatile boolean open;
 
     /**
@@ -71,14 +73,43 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      */
     public AbstractJpaEventStore(final EntityManager em,
                                  final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
+        this(em, serRegistry, desRegistry, JpaTimeouts.DEFAULT);
+    }
+
+    /**
+     * Constructor with timeouts.
+     *
+     * @param em
+     *            Entity manager.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param timeouts
+     *            How long database operations may take.
+     */
+    public AbstractJpaEventStore(final EntityManager em,
+                                 final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry,
+                                 final JpaTimeouts timeouts) {
         super();
         Contract.requireArgNotNull("em", em);
         Contract.requireArgNotNull("serRegistry", serRegistry);
         Contract.requireArgNotNull("desRegistry", desRegistry);
+        Contract.requireArgNotNull("timeouts", timeouts);
         this.em = em;
         this.serRegistry = serRegistry;
         this.desRegistry = desRegistry;
+        this.timeouts = timeouts;
         this.open = false;
+    }
+
+    /**
+     * Returns how long database operations may take.
+     *
+     * @return Timeouts.
+     */
+    protected final JpaTimeouts getTimeouts() {
+        return timeouts;
     }
 
     /**
@@ -144,10 +175,11 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final String nativeSql = createNativeSqlEventSelect(streamId, conditions);
 
         final Query query = em.createNativeQuery(nativeSql, JpaEvent.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         setNativeSqlParameters(query, conditions);
 
         try {
-            final JpaEvent result = (JpaEvent) query.getSingleResult();
+            final JpaEvent result = (JpaEvent) JpaUtils.execute(query::getSingleResult);
             return asCommonEvent(result);
         } catch (final NoResultException ex) {
             throw new EventNotFoundException(streamId, eventNumber);
@@ -182,9 +214,10 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(true);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         setNativeSqlParameters(query, conditions);
         query.setMaxResults(count);
-        final List<JpaEvent> resultList = query.getResultList();
+        final List<JpaEvent> resultList = JpaUtils.execute(query::getResultList);
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
@@ -239,6 +272,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
                 + " ORDER BY ev." + JpaEvent.COLUMN_ID + " ASC";
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         if (!types.isEmpty()) {
             query.setParameter("types", types);
         }
@@ -247,7 +281,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         }
         query.setFirstResult((int) start);
         query.setMaxResults(count);
-        final List<JpaEvent> resultList = query.getResultList();
+        final List<JpaEvent> resultList = JpaUtils.execute(query::getResultList);
         final List<CommonEvent> events = asCommonEvents(resultList);
         final long nextEventNumber = start + events.size();
         final boolean endOfStream = events.size() < count;
@@ -289,9 +323,10 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         final String sql = createNativeSqlEventSelect(streamId, conditions) + createOrderBy(false);
         LOG.debug(sql);
         final Query query = em.createNativeQuery(sql, JpaEvent.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         setNativeSqlParameters(query, conditions);
         query.setMaxResults(count);
-        final List<JpaEvent> resultList = query.getResultList();
+        final List<JpaEvent> resultList = JpaUtils.execute(query::getResultList);
 
         // Return result
         final List<CommonEvent> events = asCommonEvents(resultList);
@@ -323,8 +358,9 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         final String sql = createJpqlStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         setJpqlParameters(query, streamId);
-        final List<JpaStream> streams = query.getResultList();
+        final List<JpaStream> streams = JpaUtils.execute(query::getResultList);
         if (streams.isEmpty()) {
             return false;
         }
@@ -469,8 +505,9 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
 
         final String sql = createJpqlStreamSelect(streamId);
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
+        JpaUtils.withQueryTimeout(timeouts, query);
         setJpqlParameters(query, streamId);
-        final List<JpaStream> streams = query.getResultList();
+        final List<JpaStream> streams = JpaUtils.execute(query::getResultList);
         if (streams.isEmpty()) {
             throw new StreamNotFoundException(streamId);
         }

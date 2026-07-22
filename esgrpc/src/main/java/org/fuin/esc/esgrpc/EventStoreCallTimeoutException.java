@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.esgrpc;
 
+import org.fuin.esc.api.EscConnectionException;
 import org.fuin.objects4j.common.NotThreadSafe;
 
 import java.io.Serial;
@@ -33,7 +34,7 @@ import java.time.Duration;
  * the operation is unknown - for a write it may or may not have been applied.
  */
 @NotThreadSafe
-public final class EventStoreCallTimeoutException extends RuntimeException {
+public final class EventStoreCallTimeoutException extends EscConnectionException {
 
     @Serial
     private static final long serialVersionUID = 1000L;

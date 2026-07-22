@@ -70,7 +70,7 @@ class GrpcCallsTest {
 
     @Test
     void testDefaultCallTimeout() {
-        assertThat(GrpcCalls.DEFAULT_CALL_TIMEOUT).isEqualTo(Duration.ofSeconds(30));
+        assertThat(GrpcCalls.DEFAULT_CALL_TIMEOUT).isEqualTo(Duration.ofSeconds(5));
     }
 
 }

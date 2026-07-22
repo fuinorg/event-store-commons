@@ -38,10 +38,12 @@ import java.util.concurrent.TimeoutException;
 final class GrpcCalls {
 
     /**
-     * Default time to wait for a single event store call. Generous enough for a slow network or a
-     * large batch of events, short enough that a stuck call surfaces as an error rather than a hang.
+     * Default time to wait for a single event store call. A healthy store answers in milliseconds, so a
+     * call that is still pending after this long is treated as a connectivity problem rather than as slow
+     * progress. Raise it via the builder if a deployment genuinely needs longer (very large batches, a
+     * slow link).
      */
-    static final Duration DEFAULT_CALL_TIMEOUT = Duration.ofSeconds(30);
+    static final Duration DEFAULT_CALL_TIMEOUT = Duration.ofSeconds(5);
 
     private GrpcCalls() {
         throw new UnsupportedOperationException("It is not allowed to create an instance of this utility class");

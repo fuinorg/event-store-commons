@@ -59,7 +59,27 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
      */
     public JpaEventStore(final EntityManager em, final JpaIdStreamFactory streamFactory,
                          final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry) {
-        super(em, serRegistry, desRegistry);
+        this(em, streamFactory, serRegistry, desRegistry, JpaTimeouts.DEFAULT);
+    }
+
+    /**
+     * Constructor with timeouts. Prefer {@link #builder()} when more than the mandatory data is needed.
+     *
+     * @param em
+     *            Entity manager.
+     * @param streamFactory
+     *            Stream factory.
+     * @param serRegistry
+     *            Registry used to locate serializers.
+     * @param desRegistry
+     *            Registry used to locate deserializers.
+     * @param timeouts
+     *            How long database operations may take.
+     */
+    public JpaEventStore(final EntityManager em, final JpaIdStreamFactory streamFactory,
+                         final SerializerRegistry serRegistry, final DeserializerRegistry desRegistry,
+                         final JpaTimeouts timeouts) {
+        super(em, serRegistry, desRegistry, timeouts);
         Contract.requireArgNotNull("streamFactory", streamFactory);
         this.streamFactory = streamFactory;
     }
@@ -221,7 +241,9 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         final TypedQuery<JpaStream> query = getEm().createQuery(sql, JpaStream.class);
         setJpqlParameters(query, streamId);
         query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
-        final List<JpaStream> streams = query.getResultList();
+        // Without a lock timeout this waits forever behind a writer that never commits.
+        JpaUtils.withQueryTimeout(getTimeouts(), JpaUtils.withLockTimeout(getTimeouts(), query));
+        final List<JpaStream> streams = JpaUtils.execute(query::getResultList);
         if (streams.isEmpty()) {
             return null;
         }
@@ -261,6 +283,141 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         }
         return new JpaEvent(commonEvent.getId(), commonEvent.getTenantId(), jpaData, jpaMeta,
                 new HashSet<>(commonEvent.getCategories()));
+
+    }
+
+
+    /**
+     * Returns a builder for this event store. Preferred over the constructors as soon as more than the
+     * mandatory data is needed - the constructors cannot grow further without becoming unreadable.
+     *
+     * @return New builder.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder used to create a new instance of the event store.
+     */
+    @SuppressWarnings("NullAway.Init") // Required fields are populated through the builder setters
+    public static final class Builder {
+
+        private EntityManager em;
+
+        private JpaIdStreamFactory streamFactory;
+
+        private SerializerRegistry serRegistry;
+
+        private DeserializerRegistry desRegistry;
+
+        @Nullable
+        private ConverterRegistry converters;
+
+        @Nullable
+        private JpaTimeouts timeouts;
+
+        /**
+         * Sets the entity manager.
+         *
+         * @param em Entity manager.
+         * @return Builder.
+         */
+        public Builder em(final EntityManager em) {
+            this.em = em;
+            return this;
+        }
+
+        /**
+         * Sets the stream factory.
+         *
+         * @param streamFactory Stream factory.
+         * @return Builder.
+         */
+        public Builder streamFactory(final JpaIdStreamFactory streamFactory) {
+            this.streamFactory = streamFactory;
+            return this;
+        }
+
+        /**
+         * Sets the serializer registry.
+         *
+         * @param serRegistry Registry used to locate serializers.
+         * @return Builder.
+         */
+        public Builder serRegistry(final SerializerRegistry serRegistry) {
+            this.serRegistry = serRegistry;
+            return this;
+        }
+
+        /**
+         * Sets the deserializer registry.
+         *
+         * @param desRegistry Registry used to locate deserializers.
+         * @return Builder.
+         */
+        public Builder desRegistry(final DeserializerRegistry desRegistry) {
+            this.desRegistry = desRegistry;
+            return this;
+        }
+
+        /**
+         * Sets both types of registries in one call.
+         *
+         * @param registry Serializer/Deserializer registry to set.
+         * @return Builder.
+         */
+        public Builder serDesRegistry(final SerDeserializerRegistry registry) {
+            this.serRegistry = registry;
+            this.desRegistry = registry;
+            return this;
+        }
+
+        /**
+         * Sets the version up-caster registry. When set, events read from this store are up-cast from their
+         * stored version to the latest in-memory representation.
+         *
+         * @param converters Registry of version up-casters applied after deserialization.
+         * @return Builder.
+         */
+        public Builder converters(@Nullable final ConverterRegistry converters) {
+            this.converters = converters;
+            return this;
+        }
+
+        /**
+         * Sets how long database operations may take. Defaults to {@link JpaTimeouts#DEFAULT}.
+         *
+         * @param timeouts Query and lock timeouts.
+         * @return Builder.
+         */
+        public Builder timeouts(@Nullable final JpaTimeouts timeouts) {
+            this.timeouts = timeouts;
+            return this;
+        }
+
+        private void verifyNotNull(final String name, @Nullable final Object value) {
+            if (value == null) {
+                throw new IllegalStateException(
+                        "It is mandatory to set the value of '" + name + "' before calling the 'build()' method");
+            }
+        }
+
+        /**
+         * Creates a new instance of the event store from the attributes set via the builder.
+         *
+         * @return New event store instance.
+         */
+        public JpaEventStore build() {
+            verifyNotNull("em", em);
+            verifyNotNull("streamFactory", streamFactory);
+            verifyNotNull("serRegistry", serRegistry);
+            verifyNotNull("desRegistry", desRegistry);
+            final DeserializerRegistry effectiveDesRegistry = converters == null
+                    ? desRegistry : new UpcastingDeserializerRegistry(desRegistry, converters);
+            return new JpaEventStore(em, streamFactory, serRegistry, effectiveDesRegistry,
+                    timeouts == null ? JpaTimeouts.DEFAULT : timeouts);
+        }
 
     }
 

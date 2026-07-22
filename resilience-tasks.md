@@ -17,44 +17,73 @@ Legend: `[ ]` todo · scenario tags **S1** (event store) / **S2** (database) / *
 ## Phase 0 — Foundation (blocking; everything downstream needs this)
 
 ### F1. Typed transient/unavailable exception in `esc-api` — **S1/S2**
-- [ ] Add `org.fuin.esc.api.EscConnectionException extends RuntimeException` (marker for "store not
-      reachable / transient infrastructure failure"), clearly distinct from the existing *business*
-      exceptions (`WrongExpectedVersionException`, `StreamNotFoundException`, `StreamDeletedException`,
-      `StreamAlreadyExistsException`, `StreamReadOnlyException`, `ProjectionAlreadyExistsException`,
-      `EventNotFoundException`). Consider a common base/marker interface so retry/CB predicates can do a
-      single `instanceof`.
-- [ ] Javadoc the contract: transient = safe to retry (subject to idempotency); business = never retry.
+- [x] `org.fuin.esc.api.EscConnectionException extends RuntimeException` added (NOT final, so
+      implementations can specialise it). A single `instanceof EscConnectionException` is enough for
+      retry/CB predicates - no extra marker interface was introduced.
+      `esgrpc`'s `EventStoreCallTimeoutException` now extends it, so the F3 timeout is covered by the same
+      predicate.
+- [x] Javadoc states the contract: transient = may be retried, but the outcome is unknown, so a write is
+      only safe to retry with an expected version or deduplication; business exceptions never retry.
 
 ### F2. Classify & map connectivity errors in `esc-esgrpc` — **S1**
 File: `esgrpc/src/main/java/org/fuin/esc/esgrpc/ESGrpcEventStoreSupport.java` (`mapException`, ~198–210).
-- [ ] Map `io.grpc.StatusRuntimeException` with `UNAVAILABLE`, `DEADLINE_EXCEEDED`, `RESOURCE_EXHAUSTED`,
-      `ABORTED` (and `InterruptedException`) to `EscConnectionException` instead of the catch-all
-      `new RuntimeException("Error executing event store operation", cause)`.
-- [ ] Keep business mappings unchanged (`WrongExpectedVersionException`, deleted, not-found).
-- [ ] **Bug fix:** `ESGrpcEventStore.streamExists` (~253–275) and `ESGrpcEventStoreAsync.streamExists`
-      (~235–253) currently return `false` for **any** `StatusRuntimeException` — a connectivity failure is
-      silently reported as "stream does not exist". Only treat the not-found status as `false`; rethrow a
-      connectivity `StatusRuntimeException` as `EscConnectionException`.
+- [x] New `ESGrpcEventStoreSupport.statusIsConnectivityProblem(..)` matches `UNAVAILABLE`,
+      `DEADLINE_EXCEEDED`, `RESOURCE_EXHAUSTED`, `ABORTED`, `InterruptedException` and
+      `EventStoreCallTimeoutException`; `mapException` returns `EscConnectionException` for those instead
+      of the catch-all `RuntimeException`.
+- [x] Business mappings unchanged - they are still checked first, so a deleted/not-found/wrong-version
+      answer can never be reported as a connectivity problem.
+- [x] **Bug fixed** in both `ESGrpcEventStore.streamExists` and `ESGrpcEventStoreAsync.streamExists`:
+      only `NOT_FOUND` / `StreamNotFoundException` yields `false` (new helper
+      `ESGrpcEventStoreSupport.statusIsNotFound(..)`); a connectivity failure now throws
+      `EscConnectionException` instead of silently reporting "stream does not exist".
 
 ### F3. Per-call timeouts (deadlines) in `esc-esgrpc` — **S1**
-- [ ] Give every blocking `.get()` in `ESGrpcEventStore` a bounded wait / gRPC deadline (append, delete,
-      read forward/backward, streamExists, streamState). Today they block indefinitely. Model on
-      `GrpcProjectionAdminEventStore.disableProjection`'s `options.deadline(DISABLE_CALL_DEADLINE_MILLIS)`
-      + `while` loop bounded by `DISABLE_TIMEOUT_MILLIS`.
-- [ ] Make the deadline configurable (default e.g. 5 s) via a small config object / builder param
-      (`org.fuin.esc.eventstore.call-timeout-ms`); no framework dependency.
-- [ ] Do the same for `ESGrpcEventStoreAsync` futures (`orTimeout(...)` / `completeOnTimeout(...)` mapping
-      to `EscConnectionException`).
+- [x] All 13 blocking `.get()` calls are bounded: 8 in `ESGrpcEventStore` (append, delete, read
+      forward/backward, streamExists, streamState, stream meta data) and 5 in
+      `GrpcProjectionAdminEventStore` (getStatus, enable, disable, create, delete). They now go through
+      `GrpcCalls.await(future, timeout, operation)`, which fails with `EventStoreCallTimeoutException`
+      and cancels the future. Covered by `GrpcCallsTest` (a never-completed future fails in 200 ms).
+      NB: the client-side wait is what actually helps here — the gRPC deadline does not fire when the work
+      item is never scheduled at all, which was the observed hang (the client queued it behind a dead
+      connection and nothing ever completed the future).
+- [x] Configurable via `ESGrpcEventStore.Builder.callTimeout(Duration)` and a new
+      `GrpcProjectionAdminEventStore(client, tenantContext, Duration)` constructor; no framework
+      dependency. The old constructor delegates, so this is backwards compatible.
+- [x] Default is **5 s** (`GrpcCalls.DEFAULT_CALL_TIMEOUT`), as suggested here.
+- [ ] No `org.fuin.esc.eventstore.call-timeout-ms` config property: the timeout is builder/constructor
+      only, so an application cannot change it without touching code.
+- [ ] `ESGrpcEventStoreAsync` futures are still unbounded (`orTimeout(...)` / `completeOnTimeout(...)` not
+      applied). Only the synchronous API is protected.
+- [x] Reconciled with F1: `EventStoreCallTimeoutException` (still in `esc-esgrpc`, it is a gRPC client
+      detail) now **extends `org.fuin.esc.api.EscConnectionException`**, so one `instanceof` covers it.
+- [ ] `cqrs-4-java` `CqrsUtils.isTransientInfrastructureFailure` still keys on the
+      `java.util.concurrent.TimeoutException` cause; it can be simplified to `EscConnectionException` once
+      it depends on an esc version that has it.
 
 ### F4. JDBC/JPA timeouts & typed mapping in `esc-jpa` — **S2**
 Files: `jpa/.../JpaEventStore.java`, `jpa/.../AbstractJpaEventStore.java`.
-- [ ] Set query/lock timeouts on the JPA operations: `query.setHint("jakarta.persistence.query.timeout", ms)`
-      and a lock timeout for the `PESSIMISTIC_WRITE` acquisition in `findAndLockJpaStream` (avoid
-      unbounded lock waits).
-- [ ] Map transient `PersistenceException`/`LockTimeoutException`/`QueryTimeoutException`/JDBC connectivity
-      failures to `EscConnectionException` (leave `NoResultException → EventNotFoundException` as-is).
-- [ ] Document the pool `connection-timeout` expectation (owned by the app's datasource, but reference it
-      here so retry has a bounded worst case).
+- [x] All 7 query sites are bounded with `jakarta.persistence.query.timeout`, and the
+      `PESSIMISTIC_WRITE` acquisition in `findAndLockJpaStream` additionally with
+      `jakarta.persistence.lock.timeout` (helpers `JpaUtils.withQueryTimeout/withLockTimeout`).
+- [x] Configurable through the new immutable `JpaTimeouts` (query + lock, default 5s each, rejects
+      zero/negative because some providers read that as "no limit"). Injected via
+      `AbstractJpaEventStore(em, ser, des, timeouts)` or the new `JpaEventStore.builder()`.
+- [x] **`JpaEventStore.builder()` added** (mirrors `ESGrpcEventStore.Builder`) so the constructors do not
+      have to keep growing; the existing constructors stay and default to `JpaTimeouts.DEFAULT`.
+- [x] `JpaUtils.mapPersistenceException(..)` maps `QueryTimeoutException`, `LockTimeoutException`,
+      `PessimisticLockException` and any `PersistenceException` with a JDBC/network cause
+      (`SQLTransientException`, `SQLRecoverableException`, `SQLNonTransientConnectionException`,
+      `IOException`) to `EscConnectionException`. Applied at the query execution points via
+      `JpaUtils.execute(..)`.
+- [x] `NoResultException` is deliberately left unchanged (callers map it to `EventNotFoundException`), and
+      so is `OptimisticLockException` - a concurrency conflict is a business answer and must not be
+      retried blindly. Both pinned by tests.
+- [x] Pool `connection-timeout` expectation documented in the `JpaTimeouts` javadoc: obtaining a
+      connection happens before any query runs and is owned by the application's datasource, so the worst
+      case is pool wait + query timeout.
+- [ ] `em.persist` / `em.remove` in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` are not wrapped
+      yet - a connectivity failure on those writes still surfaces as a raw `PersistenceException`.
 
 ---
 

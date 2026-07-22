@@ -267,11 +267,18 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "streamExists");
             return true;
         } catch (ExecutionException ex) {
-            if (ex.getCause() instanceof StatusRuntimeException) {
+            // Only "not found" means the stream does not exist. A connectivity failure must NOT be
+            // reported as "false" - that would silently turn "no answer" into a business answer.
+            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException
+                    || ESGrpcEventStoreSupport.statusIsNotFound(ex.getCause())
+                    // A hard deleted stream does not exist any more either.
+                    || ESGrpcEventStoreSupport.statusIsDeleted(ex.getCause())) {
                 return false;
             }
-            if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
-                return false;
+            if (ESGrpcEventStoreSupport.statusIsConnectivityProblem(ex.getCause())) {
+                throw new EscConnectionException(
+                        "Could not reach the event store executing streamExists(..) on stream '" + sid + "'",
+                        ex.getCause());
             }
             throw new RuntimeException("Error executing streamExists(..)", ex);
         } catch (InterruptedException ex) { // NOSONAR
