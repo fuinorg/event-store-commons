@@ -14,6 +14,38 @@ Legend: `[ ]` todo · scenario tags **S1** (event store) / **S2** (database) / *
 
 ---
 
+## Phase 0 — DONE (2026-07-22)
+
+Implemented and released as `0.10.0-20260722.180737-40` (CI run
+[29945235290](https://github.com/fuinorg/event-store-commons/actions/runs/29945235290) green).
+The foundation the framework layers need is in place:
+
+| | Delivered |
+|---|---|
+| **F1** | `org.fuin.esc.api.EscConnectionException` - one `instanceof` identifies every "store/database not reachable" failure |
+| **F2** | gRPC connectivity statuses mapped to it; the `streamExists` bug fixed (a connectivity failure no longer reads as "stream does not exist") |
+| **F3** | all 13 blocking gRPC calls bounded (5s default, configurable); `EventStoreCallTimeoutException` extends `EscConnectionException` |
+| **F4** | JPA query + pessimistic-lock timeouts (`JpaTimeouts`, 5s default, `JpaEventStore.builder()`); transient JDBC/JPA failures mapped to `EscConnectionException` |
+
+**Consumers can now classify with a single `instanceof EscConnectionException`.** `cqrs-4-java`
+(`CqrsUtils.isTransientInfrastructureFailure`) still keys on the `java.util.concurrent.TimeoutException`
+cause because it predates this release; it can be simplified once it builds against this version.
+
+**Deliberately carried forward** (not blockers for the framework layers, but real gaps):
+
+- `ESGrpcEventStoreAsync` futures are still unbounded - only the synchronous API is protected.
+- `em.persist` / `em.remove` in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` are not wrapped, so
+  a connectivity failure on those writes still surfaces as a raw `PersistenceException`.
+- No config-property surface (`org.fuin.esc.eventstore.call-timeout-ms`); timeouts are set through the
+  builder/constructor only, by design - no framework dependency in these modules.
+
+**Behavioural changes to note when consuming this version:** `streamExists(..)` now *throws* on a
+connectivity failure where it previously returned `false`, and paths that threw a plain `RuntimeException`
+now throw `EscConnectionException`. A hard-deleted stream still answers `false` - that contract is pinned
+by a test after it regressed once during F2.
+
+---
+
 ## Phase 0 — Foundation (blocking; everything downstream needs this)
 
 ### F1. Typed transient/unavailable exception in `esc-api` — **S1/S2**
