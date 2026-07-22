@@ -31,6 +31,7 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
     private final ESGrpcEventStoreSupport support;
 
+    private final Duration callTimeout;
+
     /**
      * Private constructor with all data used by the builder.
      *
@@ -59,16 +62,19 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
      * @param targetContentType Target content type (Allows only 'application/xml'
      *                          or 'application/json' with 'utf-8' encoding).
      * @param tenantContext     Provides the current tenant.
+     * @param callTimeout       Maximum time to wait for a single event store call.
      */
     private ESGrpcEventStore(final KurrentDBClient es,
                              final SerializerRegistry serRegistry,
                              final DeserializerRegistry desRegistry,
                              final IBaseTypeFactory baseTypeFactory,
                              final EnhancedMimeType targetContentType,
-                             final TenantContext tenantContext) {
+                             final TenantContext tenantContext,
+                             final Duration callTimeout) {
         super();
         Contract.requireArgNotNull("es", es);
         this.es = es;
+        this.callTimeout = callTimeout;
         this.support = new ESGrpcEventStoreSupport(serRegistry, desRegistry, baseTypeFactory,
                 targetContentType, tenantContext);
     }
@@ -140,9 +146,9 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         try {
             final Iterator<EventData> eventDataIt = support.asEventData(commonEvents).iterator();
-            final WriteResult result = es.appendToStream(sid.asString(),
+            final WriteResult result = GrpcCalls.await(es.appendToStream(sid.asString(),
                     AppendToStreamOptions.get().streamState(ESGrpcEventStoreSupport.version2State(expectedVersion)),
-                    eventDataIt).get();
+                    eventDataIt), callTimeout, "appendToStream");
             return result.getNextExpectedRevision().toRawLong();
         } catch (final ExecutionException ex) {
             throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, expectedVersion);
@@ -166,9 +172,9 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             final DeleteStreamOptions options = DeleteStreamOptions.get()
                     .streamState(ESGrpcEventStoreSupport.version2State(expectedVersion));
             if (hardDelete) {
-                es.tombstoneStream(sid.asString(), options).get();
+                GrpcCalls.await(es.tombstoneStream(sid.asString(), options), callTimeout, "tombstoneStream");
             } else {
-                es.deleteStream(sid.asString(), options).get();
+                GrpcCalls.await(es.deleteStream(sid.asString(), options), callTimeout, "deleteStream");
             }
         } catch (final ExecutionException ex) {
             throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, expectedVersion);
@@ -200,7 +206,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
 
-            final ReadResult readResult = es.readStream(sid.asString(), options).get();
+            final ReadResult readResult = GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "readEventsForward");
             final List<CommonEvent> events = support.asCommonEvents(readResult.getEvents());
             final boolean endOfStream = count > events.size();
             return new StreamEventsSlice(start, events, start + events.size(), endOfStream);
@@ -224,7 +230,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
-            final ReadResult slice = es.readStream(sid.asString(), options).get();
+            final ReadResult slice = GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "readEventsBackward");
             final List<CommonEvent> events = support.asCommonEvents(slice.getEvents());
             long nextEventNumber = start - events.size();
             final boolean endOfStream = (start - count < 0);
@@ -258,7 +264,7 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         final TenantStreamId sid = support.sid(streamId);
         try {
             final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(0).maxCount(1);
-            es.readStream(sid.asString(), options).get();
+            GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "streamExists");
             return true;
         } catch (ExecutionException ex) {
             if (ex.getCause() instanceof StatusRuntimeException) {
@@ -282,7 +288,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         final TenantStreamId sid = support.sid(streamId);
         try {
-            es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)).get();
+            GrpcCalls.await(es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)),
+                    callTimeout, "streamState");
             return StreamState.ACTIVE;
         } catch (ExecutionException ex) {
             if (ESGrpcEventStoreSupport.statusIsDeleted(ex.getCause())) {
@@ -302,8 +309,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
         // Workaround for reading metadata because of:
         // https://github.com/EventStore/KurrentDB-Client-Java/issues/240
         try {
-            es.readStream(ESGrpcEventStoreSupport.metaStreamName(streamId),
-                    ReadStreamOptions.get().forwards().fromRevision(0)).get();
+            GrpcCalls.await(es.readStream(ESGrpcEventStoreSupport.metaStreamName(streamId),
+                    ReadStreamOptions.get().forwards().fromRevision(0)), callTimeout, "readStreamMetaData");
             throw new StreamNotFoundException(streamId);
         } catch (ExecutionException ex) {
             if (ex.getCause() instanceof io.kurrent.dbclient.StreamNotFoundException) {
@@ -336,6 +343,9 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
 
         @Nullable
         private TenantContext tenantContext;
+
+        @Nullable
+        private Duration callTimeout;
 
         /**
          * Sets the event store to use internally.
@@ -430,6 +440,19 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             return this;
         }
 
+        /**
+         * Sets the maximum time to wait for a single event store call. Without a timeout a call whose
+         * future is never completed (for example because the connection is broken) blocks the calling
+         * thread forever. Defaults to {@link GrpcCalls#DEFAULT_CALL_TIMEOUT}.
+         *
+         * @param callTimeout Maximum time to wait for a single call.
+         * @return Builder.
+         */
+        public Builder callTimeout(@Nullable final Duration callTimeout) {
+            this.callTimeout = callTimeout;
+            return this;
+        }
+
         private void verifyNotNull(final String name, @Nullable final Object value) {
             if (value == null) {
                 throw new IllegalStateException(
@@ -455,7 +478,8 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             final DeserializerRegistry effectiveDesRegistry = converters == null
                     ? desRegistry : new UpcastingDeserializerRegistry(desRegistry, converters);
             return new ESGrpcEventStore(eventStore, serRegistry, effectiveDesRegistry,
-                    baseTypeFactory, targetContentType, tenantContext);
+                    baseTypeFactory, targetContentType, tenantContext,
+                    callTimeout == null ? GrpcCalls.DEFAULT_CALL_TIMEOUT : callTimeout);
         }
 
     }

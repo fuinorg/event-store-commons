@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -44,6 +45,8 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     private final TenantContext tenantContext;
 
+    private final Duration callTimeout;
+
     /**
      * Constructor with mandatory data.
      *
@@ -52,9 +55,25 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
      */
     public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es,
                                          @Nullable TenantContext tenantContext) {
+        this(es, tenantContext, GrpcCalls.DEFAULT_CALL_TIMEOUT);
+    }
+
+    /**
+     * Constructor with call timeout.
+     *
+     * @param es            Connection that is maintained outside. Opening/Closing is up to the caller!
+     * @param tenantContext Optional tenant context.
+     * @param callTimeout   Maximum time to wait for a single call. Without a timeout a call whose future
+     *                      is never completed blocks the calling thread forever.
+     */
+    public GrpcProjectionAdminEventStore(KurrentDBProjectionManagementClient es,
+                                         @Nullable TenantContext tenantContext,
+                                         Duration callTimeout) {
         Contract.requireArgNotNull("es", es);
+        Contract.requireArgNotNull("callTimeout", callTimeout);
         this.es = es;
         this.tenantContext = tenantContext == null ? new TenantContext.NoopTenantContext() : tenantContext;
+        this.callTimeout = callTimeout;
     }
 
     @Override
@@ -74,7 +93,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         Contract.requireArgNotNull("projectionId", projectionId);
 
         try {
-            es.getStatus(projectionName(projectionId)).get();
+            GrpcCalls.await(es.getStatus(projectionName(projectionId)), callTimeout, "getStatus");
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
@@ -92,7 +111,7 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         Contract.requireArgNotNull("projectionId", projectionId);
 
         try {
-            es.enable(projectionName(projectionId)).get();
+            GrpcCalls.await(es.enable(projectionName(projectionId)), callTimeout, "enable");
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for enable(..) result", ex);
         }
@@ -106,7 +125,8 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final long deadline = System.currentTimeMillis() + DISABLE_TIMEOUT_MILLIS;
         while (true) {
             try {
-                es.disable(projectionName, DisableProjectionOptions.get().deadline(DISABLE_CALL_DEADLINE_MILLIS)).get();
+                GrpcCalls.await(es.disable(projectionName,
+                        DisableProjectionOptions.get().deadline(DISABLE_CALL_DEADLINE_MILLIS)), callTimeout, "disable");
                 return;
             } catch (final InterruptedException ex) { // NOSONAR
                 Thread.currentThread().interrupt();
@@ -168,11 +188,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final String javascript = builder.types(eventTypes).categories(categoryNames).build();
 
         try {
-            es.create(projectionName, javascript,
+            GrpcCalls.await(es.create(projectionName, javascript,
                             CreateProjectionOptions.get()
                                     .emitEnabled(true)
-                                    .trackEmittedStreams(true))
-                    .get();
+                                    .trackEmittedStreams(true)),
+                    callTimeout, "create");
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
                     // TODO Are there better ways than parsing the text?
@@ -199,11 +219,11 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
         disableProjection(projectionId);
         try {
-            es.delete(projectionName,
+            GrpcCalls.await(es.delete(projectionName,
                     DeleteProjectionOptions.get()
                             .deleteCheckpointStream()
                             .deleteStateStream()
-                            .deleteEmittedStreams()).get();
+                            .deleteEmittedStreams()), callTimeout, "delete");
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for delete(..) result", ex);
         }
