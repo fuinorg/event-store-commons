@@ -3,7 +3,7 @@ version: '2.4'
 services:
 
   eventstore:
-    image: kurrentplatform/kurrentdb:26.1.0
+    image: kurrentplatform/kurrentdb:26.1
     container_name: "eventstore-commons-test"
     ports:
       - "1113:1113"
