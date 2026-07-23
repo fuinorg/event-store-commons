@@ -9,8 +9,9 @@ Resilience4j on Spring) can apply Retry/CircuitBreaker/Bulkhead/Fallback intelli
 framework-agnostic Resilience4j *core* modules could decorate the store programmatically — see the last
 section; keep it opt-in.)
 
-Legend: `[ ]` todo · scenario tags **S1** (event store) / **S2** (database) / **S5** (crypto/vault, the
-`EncryptingEventStore` half).
+Legend: `[ ]` todo · **Decided:** settled behaviour, not open work (kept here so the reasoning is not lost
+and can be revisited deliberately) · scenario tags **S1** (event store) / **S2** (database) / **S5**
+(crypto/vault, the `EncryptingEventStore` half).
 
 ---
 
@@ -186,12 +187,18 @@ Reconnect and retry now share one `Backoff` and one set of rules about what may 
       `onEvent` returns makes delivery at-least-once - an event whose handler threw is redelivered.
 - [x] Reconnect config exposed through `Backoff` (initial/max delay, multiplier, jitter, max attempts);
       the scheduler is supplied and owned by the caller, as with `ViewSubscriptions`.
-- [ ] `SUBSCRIBE_TO_NEW_EVENTS` has no absolute anchor, so such a subscription is re-established as "new
-      events" again and events written during the outage are not redelivered. Correct for a wake-up
-      subscription (the catch-up pass reads them from its checkpoint), but it is not gap-free delivery.
-- [ ] The **initial** subscribe is deliberately not retried - a failure there fails the returned future so
-      the caller sees why its wiring did not come up. Revisit if a consumer wants "wait for the store to
-      appear" at startup.
+- **Decided (2026-07-23): a `SUBSCRIBE_TO_NEW_EVENTS` subscription resumes as "new events", not gap-free.**
+  It has no absolute anchor to count from, so events written during an outage are not redelivered. This is
+  correct for the only consumer shape that uses it - a wake-up subscription, whose payload is ignored and
+  whose catch-up pass reads from its checkpoint. Making it exact would require a stream position on
+  `CommonEvent` or `Subscription`, i.e. an `esc-api` change every backend has to implement; that is not
+  worth it for a signal that is explicitly allowed to be lossy. Revisit only if a consumer starts relying
+  on subscription delivery itself for completeness.
+- **Decided (2026-07-23): the initial subscribe is not retried.** A failure there fails the returned future
+  so the caller sees why its wiring did not come up; only a subscription that was once established is
+  re-established. Retrying it would also make the returned future hang forever under the default unlimited
+  `Backoff`, which is a worse failure mode than an honest error. A consumer that wants "wait for the store
+  to appear" can retry the call itself - `cqrs-4-java` `ViewSubscriptions` already does.
 
 ### E2. Idempotency notes for append retries
 - [x] `WritableEventStore` (and the async twin) now document the contract: an `EscConnectionException`
@@ -295,10 +302,15 @@ only makes the failure classifiable.
 - [x] Optional `Builder.keyServiceTimeout(Duration)` bounds how long a single key service call may block the
       appending or reading thread; `keyServiceTimeout(Duration, ExecutorService)` takes a caller-owned
       executor instead of the daemon pool the store otherwise creates and shuts down in `close()`.
-- [ ] The timeout is **opt-in and does not abort the request**: the call runs on an executor and keeps
-      running after the timeout (nothing can interrupt a socket read from outside). What is bounded is the
-      wait of the thread that appends or reads - the same reasoning as F3. The key service client's own
-      connect/read timeout remains the better primary bound and is documented as such.
+- **Limitation (inherent): the timeout does not abort the request.** The call runs on an executor and keeps
+  running after the timeout, because nothing can interrupt a blocking socket read from outside. What is
+  bounded is the wait of the thread that appends or reads - the one that must not hang - which is the same
+  reasoning as F3. The key service client's own connect/read timeout remains the better primary bound and
+  is documented as such on the builder method. Not fixable in this layer.
+- **Decided (2026-07-23): the timeout stays opt-in (default off).** Switching it on creates a daemon thread
+  pool inside every `EncryptingEventStore`, which is a behavioural change for existing users in exchange for
+  a backstop that a correctly configured vault client does not need. Defaulting it to 5 s for consistency
+  with the gRPC and JPA timeouts was considered and rejected on those grounds.
 
 ---
 
@@ -353,3 +365,7 @@ it, hoist it into a shared test-jar rather than copying it.
       via a `Decorators.ofSupplier(...)` wrapper keyed on `EscConnectionException`. Keep it behind a
       builder flag so consumers can opt out. **Default remains: no resilience framework in esc** — policy
       lives in cqrs-4-java's Quarkus/Spring modules and the apps.
+
+**Reaffirmed 2026-07-23: not doing this.** These modules' selling point is that they carry no resilience
+framework; everything the framework layers need (typed transient exceptions, bounded calls, a reusable
+`Backoff`) is now in place without one.
