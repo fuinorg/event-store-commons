@@ -302,12 +302,47 @@ only makes the failure classifiable.
 
 ---
 
-## Testing (esc-test TCK + esgrpc ITs)
-- [ ] Add fault-injection ITs: with the KurrentDB/EventStoreDB Testcontainer, `pause()`/`stop()` mid-call
-      (or Toxiproxy latency/blackhole) and assert: calls **time out** (not hang), `EscConnectionException`
-      is thrown (not a bare `RuntimeException`, not a false `streamExists`), and the store recovers when the
-      container returns.
-- [ ] JPA transient-failure test: drop/stall the DB connection and assert `EscConnectionException` + timeout.
+## Testing — DONE (2026-07-23)
+
+Every guarantee the earlier phases claim is now checked against a **real** store and a **real** database,
+with the failure injected rather than mocked.
+
+### `ESGrpcFaultInjectionIT` (esc-esgrpc, 5 tests)
+- [x] Fault injection is done with a small in-process TCP forwarder (`FaultInjectingProxy`) instead of
+      Testcontainer `pause()`/`stop()` or Toxiproxy. The KurrentDB these ITs run against is started by the
+      docker-maven-plugin **on the host network**, so there is no container handle to pause; a socket
+      forwarder needs no container engine at all and gives exact control. gRPC is HTTP/2 over TCP, so
+      forwarding bytes is enough. Modes: `forward()`, `blackhole()` (accept and swallow - the call is sent
+      but never answered), `cut()` (drop open connections, refuse new ones).
+- [x] **Calls time out, they do not hang.** A blackholed `appendToStream` fails with
+      `EventStoreCallTimeoutException`, and the test asserts the elapsed time is **at least** the configured
+      call timeout - proving it really waited for an answer and was cut short by F3, rather than failing
+      early for some unrelated reason.
+- [x] **Failures are typed.** A cut connection makes `readEventsForward` throw `EscConnectionException`, not
+      a bare `RuntimeException`.
+- [x] **`streamExists(..)` never turns "no answer" into "no stream"** (the F2 bug): on a cut connection it
+      throws instead of answering `false`, and a companion test keeps the business answer honest - a stream
+      that was really never written still answers `false`.
+- [x] **The store recovers** once the connection is restored: reads and writes both work again after
+      `forward()` (with an awaitility loop, because the gRPC client backs off before reconnecting).
+
+### `JpaFaultInjectionIT` (esc-jpa, 2 tests, PostgreSQL via Testcontainers)
+- [x] **Stall:** one transaction holds the `PESSIMISTIC_WRITE` lock on the stream row while another appends
+      to the same stream. The blocked append fails with `EscConnectionException` after the configured lock
+      timeout, and the test asserts it waited at least that long - which also **confirms Hibernate and the
+      PostgreSQL dialect actually honour `jakarta.persistence.lock.timeout`**. That was the open question
+      behind F4: setting the hint is not the same as the backend enforcing it.
+      NB the stream row has to be **committed** before the contention starts - an uncommitted `INSERT` is
+      invisible to the other transaction, which then simply creates its own row and never contends. An
+      earlier version of this test passed without proving anything for exactly that reason.
+- [x] **Drop:** the database container is stopped under an open connection; the next read fails with
+      `EscConnectionException` rather than a raw `PersistenceException`. Uses `hbm2ddl.auto=create` (not
+      `create-drop`), because a drop at factory shutdown would otherwise fail the test in its teardown.
+- [x] Both are wrapped in `assertTimeoutPreemptively`, so a regression that makes the store wait forever
+      fails the build instead of hanging it.
+
+Still open here: the `FaultInjectingProxy` lives in the esgrpc test sources. If a third module ever needs
+it, hoist it into a shared test-jar rather than copying it.
 
 ---
 
