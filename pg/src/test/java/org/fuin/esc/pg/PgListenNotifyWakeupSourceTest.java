@@ -17,6 +17,7 @@
  */
 package org.fuin.esc.pg;
 
+import org.fuin.esc.api.Backoff;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -123,6 +128,74 @@ class PgListenNotifyWakeupSourceTest {
         source.close(); // idempotent
 
         assertThat(listenConn.isClosed()).as("caller-owned connection stays open after close()").isFalse();
+    }
+
+    @Test
+    void keepsPollingAfterTheListenConnectionDropped() throws Exception {
+        // Correctness rests on the poll, not on the notification, so losing the connection may cost latency
+        // but must never stop the wake-ups - before this the loop went silent for good.
+        final BlockingQueue<Object> wakeups = new LinkedBlockingQueue<>();
+        try (PgListenNotifyWakeupSource source =
+                     new PgListenNotifyWakeupSource(listenConn, CHANNEL, 200, TimeUnit.MILLISECONDS)) {
+            source.start(() -> wakeups.add(Boolean.TRUE));
+            assertThat(wakeups.poll(2, TimeUnit.SECONDS)).as("initial wake").isNotNull();
+
+            // TEST: the connection dies under the listening thread
+            listenConn.close();
+
+            // VERIFY: the safety-net keeps running on the poll interval
+            wakeups.clear();
+            assertThat(wakeups.poll(3, TimeUnit.SECONDS)).as("degraded poll wake 1").isNotNull();
+            assertThat(wakeups.poll(3, TimeUnit.SECONDS)).as("degraded poll wake 2").isNotNull();
+        }
+    }
+
+    @Test
+    void reconnectsAndListensAgain() throws Exception {
+        final BlockingQueue<Object> wakeups = new LinkedBlockingQueue<>();
+        final List<Connection> created = Collections.synchronizedList(new ArrayList<>());
+        final PgListenConnectionFactory factory = () -> {
+            final Connection conn = newConnection();
+            created.add(conn);
+            return conn;
+        };
+        // Long poll interval: every wake within a few seconds is reconnect- or notify-driven, not polled.
+        final Backoff fast = new Backoff(Duration.ofMillis(50), Duration.ofMillis(200), 2.0, 0.0,
+                Backoff.UNLIMITED_ATTEMPTS);
+        try (PgListenNotifyWakeupSource source =
+                     new PgListenNotifyWakeupSource(factory, CHANNEL, 30, TimeUnit.SECONDS, fast)) {
+            source.start(() -> wakeups.add(Boolean.TRUE));
+            assertThat(wakeups.poll(3, TimeUnit.SECONDS)).as("initial wake").isNotNull();
+            assertThat(created).hasSize(1);
+
+            // TEST: the connection dies under the listening thread
+            created.get(0).close();
+
+            // VERIFY: a fresh connection is opened and the callback fires at once, because notifications
+            // sent while nothing was listening are gone for good
+            assertThat(wakeups.poll(10, TimeUnit.SECONDS)).as("wake right after the reconnect").isNotNull();
+            assertThat(created.size()).as("a new connection was opened").isGreaterThan(1);
+
+            // VERIFY: LISTEN was re-issued, so the notification latency is back
+            insertRow();
+            assertThat(wakeups.poll(5, TimeUnit.SECONDS)).as("notify-driven wake on the new connection")
+                    .isNotNull();
+        }
+        assertThat(created.get(created.size() - 1).isClosed())
+                .as("a connection this source opened is closed by close()").isTrue();
+    }
+
+    @Test
+    void failsFastWhenTheFirstConnectionCannotBeOpened() {
+        // A store that cannot be reached at wiring time is a startup problem the caller should see.
+        final PgListenConnectionFactory broken = () -> {
+            throw new SQLException("Connection refused");
+        };
+        final PgListenNotifyWakeupSource source =
+                new PgListenNotifyWakeupSource(broken, CHANNEL, 1, TimeUnit.SECONDS);
+
+        assertThatThrownBy(() -> source.start(() -> {
+        })).isInstanceOf(RuntimeException.class).hasCauseInstanceOf(SQLException.class);
     }
 
     private void insertRow() throws SQLException {

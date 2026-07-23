@@ -19,15 +19,18 @@ package org.fuin.esc.jpa;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
+import org.fuin.esc.api.EnhancedMimeType;
 import org.fuin.esc.api.EscConnectionException;
 import org.fuin.esc.api.ProjectionId;
 import org.fuin.esc.api.ProjectionStreamId;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
 import org.fuin.esc.api.SimpleStreamId;
 import org.fuin.esc.api.StreamId;
 import org.fuin.esc.api.TypeName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLTransientConnectionException;
 import java.util.List;
 
@@ -95,6 +98,43 @@ public final class JpaStoreConnectionFailureTest {
     public void testDeleteProjection() {
         assertThatThrownBy(() -> new JpaProjectionAdminEventStore(brokenEm()).deleteProjection(PROJECTION))
                 .isInstanceOf(EscConnectionException.class);
+    }
+
+    @Test
+    public void testStreamExistsOnAProjection() {
+        // A connectivity failure must not be answered with "the projection does not exist" - the same trap
+        // that streamExists(..) fell into on the gRPC side before it was fixed.
+        assertThatThrownBy(() -> eventStore().streamExists(new ProjectionStreamId("MyProjection")))
+                .isInstanceOf(EscConnectionException.class);
+    }
+
+    @Test
+    public void testReadProjectionEventsForward() {
+        assertThatThrownBy(() -> eventStore().readEventsForward(new ProjectionStreamId("MyProjection"), 0, 10))
+                .isInstanceOf(EscConnectionException.class);
+    }
+
+    /**
+     * Returns an event store that cannot reach the database. The registries are never used because every
+     * call fails before an event is serialized.
+     *
+     * @return Event store on a broken connection.
+     */
+    private static JpaEventStore eventStore() {
+        final SimpleSerializerDeserializerRegistry registry =
+                new SimpleSerializerDeserializerRegistry.Builder(
+                        EnhancedMimeType.create("application", "xml", StandardCharsets.UTF_8)).build();
+        return new JpaEventStore(brokenEm(), new JpaIdStreamFactory() {
+            @Override
+            public JpaStream createStream(final StreamId streamId) {
+                return new NoParamsStream(streamId);
+            }
+
+            @Override
+            public boolean containsType(final StreamId streamId) {
+                return true;
+            }
+        }, registry, registry);
     }
 
 }

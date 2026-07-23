@@ -156,7 +156,8 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         if (stream == null) {
             LOG.debug("Stream '{}' not found, creating it", streamId);
             stream = streamFactory.createStream(streamId);
-            getEm().persist(stream);
+            final JpaStream newStream = stream;
+            JpaUtils.execute(() -> getEm().persist(newStream));
         } else {
             LOG.debug("Stream '{}' found, reading it", streamId);
             if (stream.isDeleted()) {
@@ -176,9 +177,9 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
         for (int i = 0; i < toAppend.size(); i++) {
             final JpaEvent eventEntry = asJpaEvent(toAppend.get(i));
             if (eventEntry != null) {
-                getEm().persist(eventEntry);
+                JpaUtils.execute(() -> getEm().persist(eventEntry));
                 final JpaStreamEvent streamEvent = stream.createEvent(streamId, eventEntry);
-                getEm().persist(streamEvent);
+                JpaUtils.execute(() -> getEm().persist(streamEvent));
             }
         }
         return stream.getVersion();
@@ -209,7 +210,7 @@ public final class JpaEventStore extends AbstractJpaEventStore implements EventS
                 if (hardDelete) {
                     final JpaStream newStream = streamFactory.createStream(streamId);
                     newStream.delete(true);
-                    getEm().persist(newStream);
+                    JpaUtils.execute(() -> getEm().persist(newStream));
                 }
                 // Ignore
                 return;

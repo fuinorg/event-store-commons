@@ -20,6 +20,8 @@
 - Added [Backoff](api/src/main/java/org/fuin/esc/api/Backoff.java) - exponential retry delay with cap, jitter and attempt limit
 - Added [ReconnectingSubscribableEventStore](spi/src/main/java/org/fuin/esc/spi/ReconnectingSubscribableEventStore.java) that re-establishes a dropped subscription of any backend with backoff, resuming after the last delivered event
 - Projection admin calls are retried with a bounded budget; `createProjection`/`deleteProjection` only when the server certainly never took the request
+- Bugfix: [PgListenNotifyWakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) stopped firing wake-ups for good once its `LISTEN` connection dropped; it now degrades to the poll safety-net and reconnects with backoff via the new [PgListenConnectionFactory](pg/src/main/java/org/fuin/esc/pg/PgListenConnectionFactory.java)
+- **Incompatible** `streamExists(..)` on a JPA projection stream now throws an `EscConnectionException` on a connectivity failure instead of returning `false`
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)

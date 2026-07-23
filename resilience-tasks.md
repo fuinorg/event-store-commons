@@ -222,15 +222,48 @@ Reconnect and retry now share one `Backoff` and one set of rules about what may 
 
 ---
 
-## Phase 3 — Database hardening (`esc-jpa`, `esc-pg`) — **S2**
+## Phase 3 — Database hardening — DONE (2026-07-23)
+
+| | Delivered |
+|---|---|
+| **D1** | The last unwrapped `EntityManager` calls in the event store itself are mapped - no path out of `esc-jpa` can still emit a raw `PersistenceException` |
+| **D2** | A dropped `LISTEN` connection no longer silences the wake-up: it degrades to polling and reconnects with backoff |
 
 ### D1. Transient-classify and bound all DB access
-- [ ] Ensure every `EntityManager`/native query path in `AbstractJpaEventStore` (append, read, projection
-      position) has a timeout and maps transient failures to `EscConnectionException`.
+- [x] Audited every `EntityManager` and native query path. The seven query executions were already bounded
+      and mapped (F4); what was still bare were **three `em.find(JpaProjection.class, ..)` in
+      `AbstractJpaEventStore`** (projection read forward/backward, `streamExists`) and **four
+      `getEm().persist(..)` in `JpaEventStore`** - including the append path itself. All now go through
+      `JpaUtils.execute(..)` (new `AbstractJpaEventStore.findProjection(..)` helper).
+- [x] `streamExists(projectionStreamId)` used to answer `false` when the database was unreachable - the same
+      trap the gRPC `streamExists` fell into in F2. It now throws `EscConnectionException`. Pinned by
+      `JpaStoreConnectionFailureTest` (now 8 entry points).
+- [x] `createQuery` / `createNativeQuery` and `entityExists(..)` need no wrapping: they build the query resp.
+      read the in-memory metamodel and never touch the database.
+
 ### D2. `esc-pg` LISTEN/NOTIFY resilience
-File: `pg/.../PgListenNotifyWakeupSource.java`.
-- [ ] The JDBC `LISTEN` connection is long-lived; add reconnect-with-backoff if the notify connection drops,
-      and a bounded poll fallback so wake-ups degrade to polling when NOTIFY is unavailable.
+- [x] **Bug fixed:** on an `SQLException` from `getNotifications(..)` the loop logged, slept a slice and
+      continued *without ever decrementing the poll budget or re-establishing anything*. On a dead connection
+      that meant the wake-up never fired again - the projector went silent until the process restarted,
+      even though the poll safety-net was supposed to carry it.
+- [x] The loop now runs on explicit `nextPollAt` / `nextReconnectAt` deadlines. While the channel is down it
+      keeps firing the callback every poll interval (the consumer's catch-up pass runs on its own connection
+      and is unaffected), so the source degrades to exactly the plain poll it was documented to fall back to.
+- [x] New `PgListenConnectionFactory` (deliberately not a `DataSource`: a listening connection is held for
+      the lifetime of the source and would permanently remove one connection from the application's pool).
+      Given one, the source re-opens the connection and re-issues `LISTEN` with `Backoff` (exponential +
+      jitter, `Backoff.DEFAULT`, configurable). Once the backoff's attempts are used up it logs and continues
+      as a plain poll rather than giving up entirely.
+- [x] Every successful reconnect fires the callback immediately - notifications sent while nothing was
+      listening are gone for good (PostgreSQL notifications are at-most-once and non-durable).
+- [x] Connections the source opened are owned and closed by `close()`; a caller-supplied `Connection` is
+      still never closed. The old constructor keeps working unchanged and simply has nothing to reconnect
+      with, so it stays in poll-only mode after a drop.
+- [x] The **first** connection is deliberately not retried: a store unreachable at wiring time is a startup
+      problem the caller should see (same rule as the `ReconnectingSubscribableEventStore` in E1).
+- [x] Covered by three new Testcontainer tests: wake-ups continue after the connection is closed under the
+      listening thread, a reconnect opens a fresh connection and the notification latency comes back
+      (proven by an `INSERT` after the reconnect), and a factory that cannot connect fails `start(..)`.
 
 ---
 

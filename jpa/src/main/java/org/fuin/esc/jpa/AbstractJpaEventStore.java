@@ -248,7 +248,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
     @SuppressWarnings("unchecked")
     private StreamEventsSlice readProjectionEventsForward(final StreamId streamId, final long start,
                                                           final int count) {
-        final JpaProjection projection = em.find(JpaProjection.class, streamId.getName());
+        final JpaProjection projection = findProjection(streamId.getName());
         if (projection == null) {
             throw new StreamNotFoundException(streamId);
         }
@@ -300,7 +300,7 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         verifyStreamEntityExists(streamId);
 
         if (streamId.isProjection()) {
-            final JpaProjection projection = em.find(JpaProjection.class, streamEntityName(streamId));
+            final JpaProjection projection = findProjection(streamEntityName(streamId));
             if (projection == null) {
                 throw new StreamNotFoundException(streamId);
             }
@@ -348,7 +348,9 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
         ensureOpen();
 
         if (streamId.isProjection()) {
-            final JpaProjection projection = em.find(JpaProjection.class, streamId.getName());
+            // A connectivity failure must not be reported as "the projection does not exist" - the same
+            // trap that streamExists(..) fell into on the gRPC side.
+            final JpaProjection projection = findProjection(streamId.getName());
             return projection != null && projection.isEnabled();
         }
 
@@ -407,6 +409,20 @@ public abstract class AbstractJpaEventStore extends AbstractReadableEventStore i
      */
     protected final boolean streamEntityExists(final StreamId streamId) {
         return entityExists(streamEntityName(streamId));
+    }
+
+    /**
+     * Looks up a projection definition, mapping a connectivity failure to an
+     * {@link org.fuin.esc.api.EscConnectionException} like every other database access here does.
+     *
+     * @param name
+     *            Name of the projection.
+     *
+     * @return Projection or {@literal null} if there is no such projection.
+     */
+    @Nullable
+    protected final JpaProjection findProjection(final String name) {
+        return JpaUtils.execute(() -> em.find(JpaProjection.class, name));
     }
 
     /**
