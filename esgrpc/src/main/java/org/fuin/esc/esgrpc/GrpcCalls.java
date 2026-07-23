@@ -17,7 +17,10 @@
  */
 package org.fuin.esc.esgrpc;
 
+import org.fuin.esc.api.Backoff;
 import org.fuin.objects4j.common.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +28,8 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Helper for waiting on the futures returned by the KurrentDB client.
@@ -37,6 +42,8 @@ import java.util.concurrent.TimeoutException;
  */
 @ThreadSafe
 final class GrpcCalls {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GrpcCalls.class);
 
     /**
      * Default time to wait for a single event store call. A healthy store answers in milliseconds, so a
@@ -98,6 +105,53 @@ final class GrpcCalls {
             }
             return CompletableFuture.failedFuture(ex);
         });
+    }
+
+    /**
+     * Waits for the result of an event store call and repeats it while it fails in a way the caller
+     * classified as worth retrying, until the retry budget is used up.
+     * <p>
+     * The call itself is bounded by {@code timeout} on every attempt, and the whole sequence by
+     * {@code overallTimeout}: an operation that is retried must not extend a caller's wait without limit,
+     * and a per-attempt timeout alone does not bound the sum of the attempts.
+     *
+     * @param <T>            Type of the result.
+     * @param call           Produces a fresh future per attempt (the previous one is spent).
+     * @param timeout        Maximum time for a single attempt.
+     * @param operation      Name of the operation, used in the error message.
+     * @param overallTimeout Maximum time for all attempts together.
+     * @param backoff        Delay schedule between the attempts.
+     * @param retryable      Decides whether a failure is worth another attempt.
+     * @return Result of the call.
+     * @throws ExecutionException             The call failed and the failure is not retryable, or the budget
+     *                                        was used up - the last failure is reported.
+     * @throws InterruptedException           The waiting thread was interrupted.
+     * @throws EventStoreCallTimeoutException An attempt did not complete within the timeout.
+     */
+    static <T> T awaitWithRetry(final Supplier<CompletableFuture<T>> call, final Duration timeout,
+                                final String operation, final Duration overallTimeout, final Backoff backoff,
+                                final Predicate<ExecutionException> retryable)
+            throws ExecutionException, InterruptedException {
+
+        final long deadline = System.currentTimeMillis() + overallTimeout.toMillis();
+        int attempt = 0;
+        while (true) {
+            try {
+                return await(call.get(), timeout, operation);
+            } catch (final ExecutionException ex) {
+                attempt++;
+                if (!retryable.test(ex) || !backoff.allowsAttempt(attempt)) {
+                    throw ex;
+                }
+                final long delayMillis = backoff.delay(attempt).toMillis();
+                if (System.currentTimeMillis() + delayMillis >= deadline) {
+                    throw ex;
+                }
+                LOG.debug("Event store call '{}' failed transiently, attempt {} in {} ms: {}", operation, attempt,
+                        delayMillis, ex.getCause() == null ? ex.toString() : ex.getCause().toString());
+                Thread.sleep(delayMillis);
+            }
+        }
     }
 
     /**

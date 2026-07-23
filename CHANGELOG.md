@@ -17,6 +17,9 @@
 - Added [EscConnectionException](api/src/main/java/org/fuin/esc/api/EscConnectionException.java) so a consumer can identify every "store/database not reachable" failure with a single `instanceof` and apply retry/circuit breaker
 - Bounded all event store calls (5s default, `ESGrpcEventStore.Builder.callTimeout(..)` / `ESGrpcEventStoreAsync.Builder.callTimeout(..)`) and all JPA queries and pessimistic locks ([JpaTimeouts](jpa/src/main/java/org/fuin/esc/jpa/JpaTimeouts.java), 5s default, `JpaEventStore.builder()`)
 - **Incompatible** `streamExists(..)` now throws an `EscConnectionException` on a connectivity failure instead of returning `false` (a hard-deleted stream still answers `false`)
+- Added [Backoff](api/src/main/java/org/fuin/esc/api/Backoff.java) - exponential retry delay with cap, jitter and attempt limit
+- Added [ReconnectingSubscribableEventStore](spi/src/main/java/org/fuin/esc/spi/ReconnectingSubscribableEventStore.java) that re-establishes a dropped subscription of any backend with backoff, resuming after the last delivered event
+- Projection admin calls are retried with a bounded budget; `createProjection`/`deleteProjection` only when the server certainly never took the request
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)

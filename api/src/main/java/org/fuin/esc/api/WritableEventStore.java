@@ -27,6 +27,19 @@ import java.util.List;
  * method on a non-open event store will implicitly {@link #open()} it.
  * <p>
  * Implementations are expected to be thread-safe.
+ * <p>
+ * <b>Retrying an append.</b> An {@link EscConnectionException} means the outcome is unknown - the failure
+ * can happen before the store ever saw the request, but also after it accepted and persisted the events and
+ * only the acknowledgement was lost. Repeating the call with {@link ExpectedVersion#ANY} therefore appends
+ * the events a second time. Pass the concrete version the stream is expected to have instead; the
+ * repetition of an append that did get through is then not applied again.
+ * <p>
+ * How that is reported differs between backends and a retrying caller must cope with both: an
+ * implementation may answer with a {@link WrongExpectedVersionException} (the version no longer matches), or
+ * it may recognize that the stream already ends with exactly these events and answer with the current
+ * version as if the call had just succeeded. Either way the stream stays free of duplicates. A caller that
+ * cannot know the expected version needs a deduplication mechanism of its own; there is no other way to make
+ * a retry safe.
  */
 @ThreadSafe
 public interface WritableEventStore extends EventStoreBasics {

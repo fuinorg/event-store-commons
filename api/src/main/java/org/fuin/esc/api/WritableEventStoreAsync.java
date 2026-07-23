@@ -28,6 +28,9 @@ import java.util.concurrent.CompletableFuture;
  * method on a non-open event store will implicitly {@link #open()} it.
  * <p>
  * All implementations are expected to be thread safe.
+ * <p>
+ * <b>Retrying an append</b> is only safe with a concrete {@link ExpectedVersion} - see
+ * {@link WritableEventStore} for the reasoning.
  */
 @ThreadSafe
 public interface WritableEventStoreAsync extends EventStoreBasicsAsync {

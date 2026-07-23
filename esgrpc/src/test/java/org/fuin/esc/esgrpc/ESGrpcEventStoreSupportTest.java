@@ -182,6 +182,26 @@ public final class ESGrpcEventStoreSupportTest {
     }
 
     @Test
+    void testStatusIsUnreachable() {
+        // "The server never took the request" - the only case where repeating a create or a delete is safe.
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(
+                Status.UNAVAILABLE.asRuntimeException())).isTrue();
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(
+                Status.RESOURCE_EXHAUSTED.asRuntimeException())).isTrue();
+    }
+
+    @Test
+    void testStatusIsUnreachableIsNarrowerThanConnectivityProblem() {
+        // These leave the outcome unknown, so they are transient but must not be repeated blindly.
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(
+                Status.DEADLINE_EXCEEDED.asRuntimeException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(
+                Status.ABORTED.asRuntimeException())).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(new IllegalStateException("boom"))).isFalse();
+        assertThat(ESGrpcEventStoreSupport.statusIsUnreachable(null)).isFalse();
+    }
+
+    @Test
     void testMapExceptionKeepsAnAlreadyClassifiedFailure() {
 
         // PREPARE: this is what the asynchronous store sees once GrpcCalls.within(..) bounded the call.

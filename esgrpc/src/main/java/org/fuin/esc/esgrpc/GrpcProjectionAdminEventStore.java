@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 /**
  * GRPC based eventstore projection admin implementation.
@@ -28,18 +29,50 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
     private static final Logger LOG = LoggerFactory.getLogger(GrpcProjectionAdminEventStore.class);
 
-    /** Maximum time to wait for a freshly created projection to become disableable. */
-    private static final long DISABLE_TIMEOUT_MILLIS = 30_000;
+    /**
+     * Maximum time a projection admin call may spend on retries before it reports the last failure. Also
+     * covers waiting for a freshly created projection to become disableable, which is the longest of these
+     * waits.
+     */
+    private static final Duration RETRY_BUDGET = Duration.ofSeconds(30);
 
     /**
      * Per-call gRPC deadline for a single disable attempt. Must be clearly shorter than
-     * {@link #DISABLE_TIMEOUT_MILLIS} so a call that hangs while the projection is still
-     * initializing fails fast and can be retried within the overall budget.
+     * {@link #RETRY_BUDGET} so a call that hangs while the projection is still initializing fails fast and
+     * can be retried within the overall budget.
      */
     private static final long DISABLE_CALL_DEADLINE_MILLIS = 2_000;
 
-    /** Delay between retries while waiting for a projection to become disableable. */
-    private static final long DISABLE_RETRY_DELAY_MILLIS = 250;
+    /**
+     * Delay schedule between retries of a projection admin call. The jitter keeps several instances that
+     * start against the same store from retrying in lockstep.
+     */
+    private static final Backoff RETRY_BACKOFF = new Backoff(Duration.ofMillis(250), Duration.ofSeconds(2), 2.0,
+            0.5, Backoff.UNLIMITED_ATTEMPTS);
+
+    /**
+     * A repetition of these operations cannot be observed, so any failure that leaves the outcome unknown
+     * is worth another attempt.
+     */
+    private static final Predicate<ExecutionException> RETRY_IF_TRANSIENT =
+            ex -> ESGrpcEventStoreSupport.statusIsConnectivityProblem(ex.getCause());
+
+    /**
+     * Repeating these operations <em>is</em> observable - a second create answers "Conflict", a second
+     * delete answers "not found" - so they are only repeated when the server certainly never took the
+     * request.
+     */
+    private static final Predicate<ExecutionException> RETRY_IF_UNREACHABLE =
+            ex -> ESGrpcEventStoreSupport.statusIsUnreachable(ex.getCause());
+
+    /**
+     * A projection that has just been created is not immediately disableable: KurrentDB either answers with
+     * a transient "OperationFailed" or lets the call block until the deadline (DEADLINE_EXCEEDED) until it
+     * finished initializing the projection. Each attempt uses a short per-call deadline so it fails fast and
+     * can be retried within the overall budget.
+     */
+    private static final Predicate<ExecutionException> RETRY_IF_NOT_READY_YET =
+            ex -> projectionNotReadyYet(ex) || ESGrpcEventStoreSupport.statusIsConnectivityProblem(ex.getCause());
 
     private final KurrentDBProjectionManagementClient es;
 
@@ -92,8 +125,10 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     public boolean projectionExists(ProjectionId projectionId) {
         Contract.requireArgNotNull("projectionId", projectionId);
 
+        final String projectionName = projectionName(projectionId);
         try {
-            GrpcCalls.await(es.getStatus(projectionName(projectionId)), callTimeout, "getStatus");
+            GrpcCalls.awaitWithRetry(() -> es.getStatus(projectionName), callTimeout, "getStatus",
+                    RETRY_BUDGET, RETRY_BACKOFF, RETRY_IF_TRANSIENT);
             return true;
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
@@ -110,9 +145,15 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
     public void enableProjection(ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
 
+        final String projectionName = projectionName(projectionId);
         try {
-            GrpcCalls.await(es.enable(projectionName(projectionId)), callTimeout, "enable");
-        } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
+            // Enabling an already enabled projection is a no-op, so any transient failure may be repeated.
+            GrpcCalls.awaitWithRetry(() -> es.enable(projectionName), callTimeout, "enable",
+                    RETRY_BUDGET, RETRY_BACKOFF, RETRY_IF_TRANSIENT);
+        } catch (final InterruptedException ex) { // NOSONAR
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted waiting for enable(..) result", ex);
+        } catch (final ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for enable(..) result", ex);
         }
     }
@@ -122,28 +163,16 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         Contract.requireArgNotNull("projectionId", projectionId);
 
         final String projectionName = projectionName(projectionId);
-        final long deadline = System.currentTimeMillis() + DISABLE_TIMEOUT_MILLIS;
-        while (true) {
-            try {
-                GrpcCalls.await(es.disable(projectionName,
-                        DisableProjectionOptions.get().deadline(DISABLE_CALL_DEADLINE_MILLIS)), callTimeout, "disable");
-                return;
-            } catch (final InterruptedException ex) { // NOSONAR
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted waiting for disable(..) result", ex);
-            } catch (final ExecutionException ex) { // NOSONAR
-                // A projection that has just been created is not immediately disableable: KurrentDB
-                // either answers with a transient "OperationFailed" or lets the call block until the
-                // deadline (DEADLINE_EXCEEDED) until it finished initializing the projection. Each
-                // attempt uses a short per-call deadline so it fails fast and we can retry for a
-                // bounded time before giving up.
-                if (projectionNotReadyYet(ex) && System.currentTimeMillis() < deadline) {
-                    LOG.debug("Projection '{}' not ready to be disabled yet, retrying...", projectionName);
-                    sleepQuietly(DISABLE_RETRY_DELAY_MILLIS);
-                    continue;
-                }
-                throw new RuntimeException("Error waiting for disable(..) result", ex);
-            }
+        try {
+            GrpcCalls.awaitWithRetry(
+                    () -> es.disable(projectionName,
+                            DisableProjectionOptions.get().deadline(DISABLE_CALL_DEADLINE_MILLIS)),
+                    callTimeout, "disable", RETRY_BUDGET, RETRY_BACKOFF, RETRY_IF_NOT_READY_YET);
+        } catch (final InterruptedException ex) { // NOSONAR
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted waiting for disable(..) result", ex);
+        } catch (final ExecutionException ex) { // NOSONAR
+            throw new RuntimeException("Error waiting for disable(..) result", ex);
         }
     }
 
@@ -160,14 +189,6 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         return code.equals(Status.UNKNOWN.getCode())
                 && sre.getMessage() != null
                 && sre.getMessage().contains("OperationFailed");
-    }
-
-    private static void sleepQuietly(final long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (final InterruptedException ex) { // NOSONAR
-            Thread.currentThread().interrupt();
-        }
     }
 
     @Override
@@ -188,11 +209,13 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
         final String javascript = builder.types(eventTypes).categories(categoryNames).build();
 
         try {
-            GrpcCalls.await(es.create(projectionName, javascript,
+            // Only retried while the server certainly never took the request - a repetition of a create that
+            // did arrive answers "Conflict", which would be reported as ProjectionAlreadyExistsException.
+            GrpcCalls.awaitWithRetry(() -> es.create(projectionName, javascript,
                             CreateProjectionOptions.get()
                                     .emitEnabled(true)
                                     .trackEmittedStreams(true)),
-                    callTimeout, "create");
+                    callTimeout, "create", RETRY_BUDGET, RETRY_BACKOFF, RETRY_IF_UNREACHABLE);
         } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
             if (ex.getCause() instanceof StatusRuntimeException sre
                     // TODO Are there better ways than parsing the text?
@@ -219,12 +242,18 @@ public final class GrpcProjectionAdminEventStore implements ProjectionAdminEvent
 
         disableProjection(projectionId);
         try {
-            GrpcCalls.await(es.delete(projectionName,
+            // Like create: a repetition of a delete that did arrive answers "not found", so only a request
+            // that certainly never reached the server is repeated.
+            GrpcCalls.awaitWithRetry(() -> es.delete(projectionName,
                     DeleteProjectionOptions.get()
                             .deleteCheckpointStream()
                             .deleteStateStream()
-                            .deleteEmittedStreams()), callTimeout, "delete");
-        } catch (final InterruptedException | ExecutionException ex) { // NOSONAR
+                            .deleteEmittedStreams()), callTimeout, "delete", RETRY_BUDGET, RETRY_BACKOFF,
+                    RETRY_IF_UNREACHABLE);
+        } catch (final InterruptedException ex) { // NOSONAR
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted waiting for delete(..) result", ex);
+        } catch (final ExecutionException ex) { // NOSONAR
             throw new RuntimeException("Error waiting for delete(..) result", ex);
         }
 

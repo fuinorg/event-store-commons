@@ -158,27 +158,67 @@ Files: `jpa/.../JpaEventStore.java`, `jpa/.../AbstractJpaEventStore.java`.
 
 ---
 
-## Phase 2 — Event store hardening (`esc-esgrpc`) — **S1**
+## Phase 2 — Event store hardening — DONE (2026-07-23)
+
+Reconnect and retry now share one `Backoff` and one set of rules about what may be repeated.
+
+| | Delivered |
+|---|---|
+| **E1** | `Backoff` in `esc-api` + `ReconnectingSubscribableEventStore` decorator in `esc-spi` - store-agnostic auto-resubscribe with exponential backoff and jitter |
+| **E2** | The retry contract for `appendToStream` documented on `WritableEventStore`, pinned by `AppendRetryIdempotencyTest` |
+| **E3** | `GrpcCalls.awaitWithRetry(..)` replaces the hand-rolled `disableProjection` loop and now covers all five projection-admin calls |
 
 ### E1. Subscription auto-reconnect with backoff
-File: `esgrpc/.../ESGrpcEventStoreAsync.java` (`subscribeToStream`, ~294–338; `onDrop`/`onCancelled`).
-- [ ] Today a dropped subscription just delivers an error via `onDrop`/`onCancelled` (no reconnect).
-      Add optional auto-resubscribe with **exponential backoff + jitter** (resume from the last delivered
-      position). This complements `cqrs-4-java` `ViewSubscriptions` (fixed 5 s) — decide whether reconnect
-      lives in the store (reusable for all consumers) or stays in cqrs4j; generalize the backoff either
-      way.
-- [ ] Expose reconnect config (initial/max backoff, max attempts, jitter).
+- [x] New `org.fuin.esc.api.Backoff` (record): exponential delay, cap, jitter factor, attempt limit.
+      `baseDelay(n)` is the deterministic schedule, `delay(n)` applies the jitter, `allowsAttempt(n)`
+      answers the budget question. The cap keeps a long outage from turning into an even longer recovery;
+      the jitter keeps several consumers of the same store from retrying in lockstep.
+- [x] New `org.fuin.esc.spi.ReconnectingSubscribableEventStore` decorates **any**
+      `SubscribableEventStoreAsync` (so `esc-mem` and `esc-esgrpc` alike) rather than living inside the gRPC
+      store. That also makes it unit-testable against a fake store without a KurrentDB container -
+      `ReconnectingSubscribableEventStoreTest` drives drops and unreachable-store phases on demand.
+      Decision on the fork in the original task: **reconnect lives in the store layer**, and `cqrs-4-java`
+      `ViewSubscriptions` can drop its own fixed-5 s loop once it builds against this version.
+- [x] The `Subscription` handed to the consumer stays valid across reconnects (`ReconnectingSubscription`);
+      `unsubscribeFromStream(..)` on it stops both the inner subscription and any pending reconnect.
+- [x] Resume position: neither `CommonEvent` nor `Subscription` carries a stream position, so the decorator
+      counts what the consumer accepted and resumes at `eventNumber + delivered`. Advancing only *after*
+      `onEvent` returns makes delivery at-least-once - an event whose handler threw is redelivered.
+- [x] Reconnect config exposed through `Backoff` (initial/max delay, multiplier, jitter, max attempts);
+      the scheduler is supplied and owned by the caller, as with `ViewSubscriptions`.
+- [ ] `SUBSCRIBE_TO_NEW_EVENTS` has no absolute anchor, so such a subscription is re-established as "new
+      events" again and events written during the outage are not redelivered. Correct for a wake-up
+      subscription (the catch-up pass reads them from its checkpoint), but it is not gap-free delivery.
+- [ ] The **initial** subscribe is deliberately not retried - a failure there fails the returned future so
+      the caller sees why its wiring did not come up. Revisit if a consumer wants "wait for the store to
+      appear" at startup.
 
 ### E2. Idempotency notes for append retries
-- [ ] Document/guard: `appendToStream` retries are only safe on `EscConnectionException` raised *before*
-      the server acknowledges; rely on `ExpectedVersion` to reject duplicates. Add a test proving no
-      double-append under retry.
+- [x] `WritableEventStore` (and the async twin) now document the contract: an `EscConnectionException`
+      leaves the outcome unknown, so a retry with `ExpectedVersion.ANY` appends the events twice; only a
+      concrete expected version makes the retry safe.
+- [x] `AppendRetryIdempotencyTest` (in `esc-mem`) proves no double-append when the expected version is
+      concrete, that `ANY` *does* duplicate, and that a genuine conflict is still rejected.
+- [x] **Backends report the rejected repetition differently** and a retrying caller must handle both:
+      `esc-mem` recognizes that the stream already ends with exactly those events and answers with the
+      current version (a silent no-op), KurrentDB answers with `WrongExpectedVersionException`. Both keep
+      the stream free of duplicates - that is the invariant, not the exception type. This surfaced while
+      writing the test and is now stated in the javadoc.
 
 ### E3. Generalize the projection-admin retry model
-File: `esgrpc/.../GrpcProjectionAdminEventStore.java`.
-- [ ] Extract the `disableProjection` deadline+backoff+`projectionNotReadyYet` pattern into a small reusable
-      helper and apply the same bounded-retry to `enableProjection`, `createProjection`, `deleteProjection`,
-      `projectionExists` where a transient status warrants it.
+- [x] New `GrpcCalls.awaitWithRetry(call, timeout, operation, overallTimeout, backoff, retryable)`: each
+      attempt is bounded by the call timeout, the sequence by an overall budget (30 s), the delays come from
+      `Backoff`. The hand-rolled `disableProjection` loop, its fixed 250 ms delay and `sleepQuietly` are
+      gone.
+- [x] Applied to all five calls, with the retry rule chosen per operation rather than one blanket policy:
+      - `projectionExists`, `enableProjection`, `disableProjection` are idempotent, so they retry on any
+        transient status (`statusIsConnectivityProblem`). `disableProjection` additionally keeps its
+        `projectionNotReadyYet` rule and its short per-call deadline.
+      - `createProjection` and `deleteProjection` are **not** safely repeatable: a second create answers
+        "Conflict" (reported as `ProjectionAlreadyExistsException`) and a second delete answers "not found",
+        so a repetition of a request that did arrive would be reported as a wrong business outcome. They
+        retry only on the new, narrower `ESGrpcEventStoreSupport.statusIsUnreachable(..)`
+        (`UNAVAILABLE` / `RESOURCE_EXHAUSTED` = the server never took the request).
 
 ---
 

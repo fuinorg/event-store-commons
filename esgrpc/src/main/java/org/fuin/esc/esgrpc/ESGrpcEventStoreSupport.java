@@ -227,6 +227,27 @@ final class ESGrpcEventStoreSupport {
     }
 
     /**
+     * Determines if a given (already unwrapped) failure cause signals that the server never took the
+     * request, so repeating it cannot apply the same operation twice.
+     * <p>
+     * This is deliberately narrower than {@link #statusIsConnectivityProblem(Throwable)}: a
+     * {@code DEADLINE_EXCEEDED} or {@code ABORTED} leaves the outcome unknown, which is fine to retry for an
+     * idempotent operation but not for one whose repetition is observable (creating a projection that then
+     * answers "already exists").
+     *
+     * @param cause Cause to inspect (may be {@code null}).
+     * @return {@code true} if the request certainly did not reach the server.
+     */
+    static boolean statusIsUnreachable(@Nullable final Throwable cause) {
+        if (cause instanceof StatusRuntimeException sre) {
+            final Status.Code code = sre.getStatus().getCode();
+            return code.equals(Status.UNAVAILABLE.getCode())
+                    || code.equals(Status.RESOURCE_EXHAUSTED.getCode());
+        }
+        return false;
+    }
+
+    /**
      * Translates a gRPC client failure into the matching event-store-commons exception. The returned
      * exception is meant to be thrown (synchronous) or to complete a future exceptionally (asynchronous).
      *

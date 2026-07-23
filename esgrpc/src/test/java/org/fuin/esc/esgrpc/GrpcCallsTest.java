@@ -1,5 +1,6 @@
 package org.fuin.esc.esgrpc;
 
+import org.fuin.esc.api.Backoff;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -7,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +19,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class GrpcCallsTest {
 
     private static final Duration SHORT_TIMEOUT = Duration.ofMillis(200);
+
+    /** Fast schedule without jitter so the retry assertions stay deterministic and quick. */
+    private static final Backoff FAST_BACKOFF = new Backoff(Duration.ofMillis(5), Duration.ofMillis(20), 2.0, 0.0,
+            Backoff.UNLIMITED_ATTEMPTS);
 
     @Test
     void testAwaitReturnsResult() throws Exception {
@@ -123,6 +129,65 @@ class GrpcCallsTest {
         slow.complete("abc");
 
         assertThat(bounded).isCompletedWithValue("abc");
+    }
+
+    @Test
+    void testAwaitWithRetryReturnsTheFirstSuccessfulResult() throws Exception {
+        final AtomicInteger calls = new AtomicInteger();
+
+        final String result = GrpcCalls.awaitWithRetry(() -> {
+            if (calls.incrementAndGet() < 3) {
+                return CompletableFuture.failedFuture(new IllegalStateException("not yet"));
+            }
+            return CompletableFuture.completedFuture("abc");
+        }, SHORT_TIMEOUT, "op", Duration.ofSeconds(5), FAST_BACKOFF, ex -> true);
+
+        assertThat(result).isEqualTo("abc");
+        assertThat(calls).hasValue(3);
+    }
+
+    @Test
+    void testAwaitWithRetryDoesNotRepeatANonRetryableFailure() {
+        // A business answer must reach the caller at once - repeating it would only delay the error.
+        final AtomicInteger calls = new AtomicInteger();
+
+        assertThatThrownBy(() -> GrpcCalls.awaitWithRetry(() -> {
+            calls.incrementAndGet();
+            return CompletableFuture.failedFuture(new IllegalStateException("wrong version"));
+        }, SHORT_TIMEOUT, "op", Duration.ofSeconds(5), FAST_BACKOFF, ex -> false))
+                .isInstanceOf(ExecutionException.class);
+
+        assertThat(calls).hasValue(1);
+    }
+
+    @Test
+    void testAwaitWithRetryStopsAfterTheAllowedAttempts() {
+        final AtomicInteger calls = new AtomicInteger();
+
+        assertThatThrownBy(() -> GrpcCalls.awaitWithRetry(() -> {
+            calls.incrementAndGet();
+            return CompletableFuture.failedFuture(new IllegalStateException("still down"));
+        }, SHORT_TIMEOUT, "op", Duration.ofSeconds(5), FAST_BACKOFF.withMaxAttempts(3), ex -> true))
+                .isInstanceOf(ExecutionException.class);
+
+        // 1 initial call plus 3 retries
+        assertThat(calls).hasValue(4);
+    }
+
+    @Test
+    void testAwaitWithRetryStaysWithinTheOverallBudget() {
+        // Retrying must not extend the caller's wait without limit, however long the store stays down.
+        final AtomicInteger calls = new AtomicInteger();
+        final long start = System.currentTimeMillis();
+
+        assertThatThrownBy(() -> GrpcCalls.awaitWithRetry(() -> {
+            calls.incrementAndGet();
+            return CompletableFuture.failedFuture(new IllegalStateException("still down"));
+        }, SHORT_TIMEOUT, "op", Duration.ofMillis(300), FAST_BACKOFF, ex -> true))
+                .isInstanceOf(ExecutionException.class);
+
+        assertThat(System.currentTimeMillis() - start).isLessThan(3_000);
+        assertThat(calls.get()).isGreaterThan(1);
     }
 
     @Test
