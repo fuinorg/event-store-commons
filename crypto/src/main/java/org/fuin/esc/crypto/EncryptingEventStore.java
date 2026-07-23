@@ -25,7 +25,10 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.objects4j.crypto.*;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Event store that transparently encrypts the event data before it is passed to an underlying {@link EventStore}
@@ -38,6 +41,19 @@ import java.util.*;
  * <p>
  * By default, only the event data is encrypted while the metadata stays in plain text so it remains usable
  * for routing and projections. Set {@link Builder#encryptMeta(boolean)} to also encrypt the metadata.
+ * <p>
+ * <b>A key service outage is transient and never silently degrades.</b> Failures of the external key service
+ * are reported as {@link EscEncryptionConnectionException}, which extends
+ * {@link org.fuin.esc.api.EscConnectionException}, so an application can apply the same retry / circuit
+ * breaker / fallback policy it applies to the store itself. This is deliberately kept apart from
+ * {@link Builder#failOnUndecryptable(boolean)}: that flag decides what happens to an event that is
+ * <em>permanently</em> undecryptable (its key or key version is gone), and it must not turn "the vault did
+ * not answer" into "here is your ciphertext" - a caller would take the wrapper for data. A transient failure
+ * therefore always propagates, whatever the flag says.
+ * <p>
+ * Set {@link Builder#keyServiceTimeout(java.time.Duration)} to also bound how long a single key service call
+ * may block the calling thread. The primary bound should be the key service client's own connect/read
+ * timeout; this is the backstop for a client that has none.
  */
 @ThreadSafe
 public final class EncryptingEventStore extends AbstractReadableEventStore implements EventStore {
@@ -62,6 +78,14 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
 
     private final boolean failOnUndecryptable;
 
+    @Nullable
+    private final Duration keyServiceTimeout;
+
+    @Nullable
+    private final ExecutorService keyServiceExecutor;
+
+    private final boolean ownsKeyServiceExecutor;
+
     private EncryptingEventStore(final Builder builder) {
         super();
         this.delegate = Objects.requireNonNull(builder.delegate, "delegate");
@@ -74,6 +98,22 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
         this.encryptedTypeName = new TypeName(encryptedDataType.asBaseType());
         this.encryptMeta = builder.encryptMeta;
         this.failOnUndecryptable = builder.failOnUndecryptable;
+        this.keyServiceTimeout = builder.keyServiceTimeout;
+        if (builder.keyServiceTimeout == null) {
+            this.keyServiceExecutor = null;
+            this.ownsKeyServiceExecutor = false;
+        } else if (builder.keyServiceExecutor == null) {
+            this.keyServiceExecutor = Executors.newCachedThreadPool(runnable -> {
+                final Thread thread = new Thread(runnable, "esc-crypto-key-service");
+                // Daemon: a worker still stuck in an unreachable vault must not keep the JVM alive.
+                thread.setDaemon(true);
+                return thread;
+            });
+            this.ownsKeyServiceExecutor = true;
+        } else {
+            this.keyServiceExecutor = builder.keyServiceExecutor;
+            this.ownsKeyServiceExecutor = false;
+        }
     }
 
     // ----- EventStoreBasics -----
@@ -86,7 +126,13 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
 
     @Override
     public void close() {
-        delegate.close();
+        try {
+            delegate.close();
+        } finally {
+            if (ownsKeyServiceExecutor && keyServiceExecutor != null) {
+                keyServiceExecutor.shutdownNow();
+            }
+        }
     }
 
     @Override
@@ -181,7 +227,14 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
             return event;
         }
 
-        final Optional<String> keyId = keyIdResolver.getKeyId(streamId, event.getTenantId(), event.getDataType());
+        // A custom resolver may have to ask an external service which key applies, so it gets the same
+        // classification as the key service calls themselves.
+        final Optional<String> keyId;
+        try {
+            keyId = keyIdResolver.getKeyId(streamId, event.getTenantId(), event.getDataType());
+        } catch (final RuntimeException ex) {
+            throw KeyServiceCalls.mapIfTransient(ex, "getKeyId");
+        }
         if (keyId.isEmpty()) {
             // Selective encryption: store this event in plain text
             return event;
@@ -211,8 +264,16 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
             throws EncryptionKeyIdUnknownException {
         final SerializedData serialized = Objects.requireNonNull(
                 EscSpiUtils.serialize(serRegistry, new SerializedDataType(dataType), obj), "serialized");
-        final EncryptedData encrypted = encryptionService.encrypt(keyId, dataType,
-                serialized.getMimeType().toString(), serialized.getRaw());
+        final EncryptedData encrypted;
+        try {
+            encrypted = KeyServiceCalls.execute(
+                    () -> encryptionService.encrypt(keyId, dataType, serialized.getMimeType().toString(),
+                            serialized.getRaw()),
+                    "encrypt", keyServiceTimeout, keyServiceExecutor);
+        } catch (final EncryptionKeyVersionUnknownException | DecryptionFailedException ex) {
+            // encrypt(..) does not declare these - a service that answers with one of them is broken.
+            throw new EscEncryptionException("Unexpected failure encrypting data of type " + dataType, ex);
+        }
         return encryptedDataFactory.create(encrypted);
     }
 
@@ -256,6 +317,11 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
             return new SimpleCommonEvent(event.getId(), dataType, data, metaType, meta, event.getTenantId());
         } catch (final EncryptionKeyIdUnknownException | EncryptionKeyVersionUnknownException
                        | DecryptionFailedException ex) {
+            // Only these three: they are definite answers from the key service, so the event is
+            // permanently undecryptable and returning the wrapper is a deliberate choice. An
+            // EscEncryptionConnectionException must NOT be handled here - the vault not answering says
+            // nothing about the event, and passing the ciphertext wrapper off as the payload would let a
+            // caller take it for data. It is unchecked and therefore propagates past this block.
             if (failOnUndecryptable) {
                 throw new EscEncryptionException("Failed to decrypt event " + event.getId(), ex);
             }
@@ -266,7 +332,8 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
 
     private Object decrypt(final EncryptedData encrypted)
             throws EncryptionKeyIdUnknownException, EncryptionKeyVersionUnknownException, DecryptionFailedException {
-        final byte[] clear = encryptionService.decrypt(encrypted);
+        final byte[] clear = KeyServiceCalls.execute(() -> encryptionService.decrypt(encrypted), "decrypt",
+                keyServiceTimeout, keyServiceExecutor);
         final EnhancedMimeType mimeType = Objects.requireNonNull(
                 EnhancedMimeType.create(encrypted.getContentType()), "mimeType");
         final SerializedData serialized = new SerializedData(
@@ -303,6 +370,12 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
         private boolean encryptMeta;
 
         private boolean failOnUndecryptable = true;
+
+        @Nullable
+        private Duration keyServiceTimeout;
+
+        @Nullable
+        private ExecutorService keyServiceExecutor;
 
         /**
          * Sets the event store to decorate.
@@ -404,6 +477,44 @@ public final class EncryptingEventStore extends AbstractReadableEventStore imple
          */
         public Builder failOnUndecryptable(final boolean failOnUndecryptable) {
             this.failOnUndecryptable = failOnUndecryptable;
+            return this;
+        }
+
+        /**
+         * Bounds how long a single key service call may block the calling thread. Without it an append or a
+         * read waits as long as the key service client does, which is forever if that client has no
+         * connect/read timeout of its own - and that client timeout remains the better place to set the
+         * bound, because it can actually abort the request. This one only stops the appending or reading
+         * thread from waiting: the call itself runs on an executor and keeps running after the timeout, so
+         * do not set it so low that healthy calls are abandoned. Defaults to no timeout.
+         * <p>
+         * The store creates and owns a daemon thread pool for this and shuts it down in {@link #close()};
+         * use {@link #keyServiceTimeout(Duration, ExecutorService)} to supply your own.
+         *
+         * @param keyServiceTimeout Maximum time for a single key service call, or {@literal null} for none.
+         * @return This builder.
+         */
+        public Builder keyServiceTimeout(@Nullable final Duration keyServiceTimeout) {
+            if (keyServiceTimeout != null && (keyServiceTimeout.isNegative() || keyServiceTimeout.isZero())) {
+                throw new IllegalArgumentException(
+                        "keyServiceTimeout must be positive, but was: " + keyServiceTimeout);
+            }
+            this.keyServiceTimeout = keyServiceTimeout;
+            return this;
+        }
+
+        /**
+         * Bounds a key service call like {@link #keyServiceTimeout(Duration)}, but runs the calls on an
+         * executor supplied and owned by the caller - {@link #close()} does not shut it down.
+         *
+         * @param keyServiceTimeout  Maximum time for a single key service call.
+         * @param keyServiceExecutor Executor used to run the key service calls.
+         * @return This builder.
+         */
+        public Builder keyServiceTimeout(final Duration keyServiceTimeout,
+                                         final ExecutorService keyServiceExecutor) {
+            keyServiceTimeout(keyServiceTimeout);
+            this.keyServiceExecutor = Objects.requireNonNull(keyServiceExecutor, "keyServiceExecutor");
             return this;
         }
 

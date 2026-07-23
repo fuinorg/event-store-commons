@@ -267,13 +267,38 @@ Reconnect and retry now share one `Backoff` and one set of rules about what may 
 
 ---
 
-## Phase 5 — Crypto store decorator (`esc-crypto`) — **S5**
-File: `crypto/.../EncryptingEventStore.java` (+ `KeyIdResolver`, `EncryptedDataFactory`).
-- [ ] The encrypt/decrypt decorator calls the external key service; a vault outage must not corrupt or hang
-      the store. Ensure key-service failures surface as a typed transient exception (or `EscEncryptionException`
-      subtype) so the app layer can apply retry/CB/fallback (the actual policy is applied in `ddd-4-java` /
-      the app — see [ddd-4-java tasks](https://github.com/fuinorg/ddd-4-java/blob/develop/resilience-tasks.md) S5). Bound any key-service call
-      with a timeout here.
+## Phase 5 — Crypto store decorator — DONE (2026-07-23)
+
+A vault outage is now a typed, transient failure that can neither be mistaken for data nor hang the caller.
+The *policy* still lives in `ddd-4-java` / the app (see
+[ddd-4-java tasks](https://github.com/fuinorg/ddd-4-java/blob/develop/resilience-tasks.md) S5); this layer
+only makes the failure classifiable.
+
+- [x] New `EscEncryptionConnectionException extends org.fuin.esc.api.EscConnectionException`. Extending the
+      general type rather than `EscEncryptionException` is the point: a store whose key service is
+      unavailable *is* unavailable, so the single `instanceof EscConnectionException` predicate from F1 keeps
+      working, and the dedicated type is only there for a consumer that wants to tell "the vault is down"
+      from "the store is down". (`EscEncryptionException` is `final`, and it means the opposite - a definite
+      answer that must never be retried.)
+- [x] New package-private `KeyServiceCalls` wraps every call into the key service. Classification walks the
+      cause chain for `IOException` / `TimeoutException`, which is what an HTTP client reports for an
+      unreachable, refusing or timed-out vault; a client that can classify better should throw an
+      `EscConnectionException` itself and is passed through untouched. The three checked exceptions of
+      `EncryptedDataService` are definite answers and pass through with their original type.
+- [x] Applied to `encrypt`, `decrypt` and `KeyIdResolver.getKeyId(..)` - the shipped resolvers are local, but
+      a custom one may have to ask a service which key applies, and it sits on the append path.
+- [x] **A transient failure never degrades to "undecryptable".** `failOnUndecryptable(false)` returns the
+      ciphertext wrapper for an event whose key or key version is *permanently* gone. Had a vault outage
+      been routed into that path, a caller would have received the wrapper and taken it for data. The
+      transient exception is unchecked and deliberately not in that catch block; pinned by a test, and the
+      catch carries a comment saying why nothing may be added to it.
+- [x] Optional `Builder.keyServiceTimeout(Duration)` bounds how long a single key service call may block the
+      appending or reading thread; `keyServiceTimeout(Duration, ExecutorService)` takes a caller-owned
+      executor instead of the daemon pool the store otherwise creates and shuts down in `close()`.
+- [ ] The timeout is **opt-in and does not abort the request**: the call runs on an executor and keeps
+      running after the timeout (nothing can interrupt a socket read from outside). What is bounded is the
+      wait of the thread that appends or reads - the same reasoning as F3. The key service client's own
+      connect/read timeout remains the better primary bound and is documented as such.
 
 ---
 

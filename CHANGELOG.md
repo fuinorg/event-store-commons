@@ -22,6 +22,8 @@
 - Projection admin calls are retried with a bounded budget; `createProjection`/`deleteProjection` only when the server certainly never took the request
 - Bugfix: [PgListenNotifyWakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) stopped firing wake-ups for good once its `LISTEN` connection dropped; it now degrades to the poll safety-net and reconnects with backoff via the new [PgListenConnectionFactory](pg/src/main/java/org/fuin/esc/pg/PgListenConnectionFactory.java)
 - **Incompatible** `streamExists(..)` on a JPA projection stream now throws an `EscConnectionException` on a connectivity failure instead of returning `false`
+- Added [EscEncryptionConnectionException](crypto/src/main/java/org/fuin/esc/crypto/EscEncryptionConnectionException.java): a key service outage is reported as a transient `EscConnectionException` and is never turned into an "undecryptable" event by `failOnUndecryptable(false)`
+- Added optional `EncryptingEventStore.Builder.keyServiceTimeout(..)` so a hanging key service cannot block the appending or reading thread
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)
