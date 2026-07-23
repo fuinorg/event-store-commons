@@ -26,6 +26,7 @@ import org.fuin.esc.api.StreamNotFoundException;
 import org.fuin.esc.api.TypeName;
 import org.fuin.objects4j.common.Contract;
 import org.fuin.objects4j.common.NotThreadSafe;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class JpaProjectionAdminEventStore implements ProjectionAdminEventStore {
     @Override
     public boolean projectionExists(final ProjectionId projectionId) {
         Contract.requireArgNotNull("projectionId", projectionId);
-        return em.find(JpaProjection.class, projectionId.getName()) != null;
+        return findOrNull(projectionId.getName()) != null;
     }
 
     @Override
@@ -93,12 +94,12 @@ public class JpaProjectionAdminEventStore implements ProjectionAdminEventStore {
         Contract.requireArgNotNull("categoryNames", categoryNames);
 
         final String name = targetStreamId.getName();
-        if (em.find(JpaProjection.class, name) != null) {
+        if (findOrNull(name) != null) {
             throw new ProjectionAlreadyExistsException(projectionId);
         }
         final List<String> typeNames = eventTypes.stream().map(TypeName::asBaseType).toList();
         LOG.info("Create projection '{}' selecting events: {} / categories: {}", name, typeNames, categoryNames);
-        em.persist(new JpaProjection(name, enable, typeNames, categoryNames));
+        JpaUtils.execute(() -> em.persist(new JpaProjection(name, enable, typeNames, categoryNames)));
     }
 
     @Override
@@ -116,15 +117,28 @@ public class JpaProjectionAdminEventStore implements ProjectionAdminEventStore {
     @Override
     public void deleteProjection(final ProjectionId projectionId) throws StreamNotFoundException {
         Contract.requireArgNotNull("projectionId", projectionId);
-        em.remove(find(projectionId));
+        final JpaProjection projection = find(projectionId);
+        JpaUtils.execute(() -> em.remove(projection));
     }
 
     private JpaProjection find(final ProjectionId projectionId) throws StreamNotFoundException {
-        final JpaProjection projection = em.find(JpaProjection.class, projectionId.getName());
+        final JpaProjection projection = findOrNull(projectionId.getName());
         if (projection == null) {
             throw new StreamNotFoundException(new ProjectionStreamId(projectionId.getName()));
         }
         return projection;
+    }
+
+    /**
+     * Looks up a projection row, mapping a connectivity failure to an
+     * {@link org.fuin.esc.api.EscConnectionException} like all other database access does.
+     *
+     * @param name Name of the projection.
+     * @return Projection or {@literal null} if there is no such projection.
+     */
+    @Nullable
+    private JpaProjection findOrNull(final String name) {
+        return JpaUtils.execute(() -> em.find(JpaProjection.class, name));
     }
 
 }

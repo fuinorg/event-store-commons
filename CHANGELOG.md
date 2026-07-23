@@ -14,6 +14,9 @@
 - Added PostgreSQL `LISTEN/NOTIFY` [WakeupSource](pg/src/main/java/org/fuin/esc/pg/PgListenNotifyWakeupSource.java) in the new [wac-pg](pg) module
 - Added JPA and In-Memory projections
 - Select projection events by category (marker interfaces the events implement), not just by exact type name
+- Added [EscConnectionException](api/src/main/java/org/fuin/esc/api/EscConnectionException.java) so a consumer can identify every "store/database not reachable" failure with a single `instanceof` and apply retry/circuit breaker
+- Bounded all event store calls (5s default, `ESGrpcEventStore.Builder.callTimeout(..)` / `ESGrpcEventStoreAsync.Builder.callTimeout(..)`) and all JPA queries and pessimistic locks ([JpaTimeouts](jpa/src/main/java/org/fuin/esc/jpa/JpaTimeouts.java), 5s default, `JpaEventStore.builder()`)
+- **Incompatible** `streamExists(..)` now throws an `EscConnectionException` on a connectivity failure instead of returning `false` (a hard-deleted stream still answers `false`)
 
 ## 0.9.0
 - Added new `findAll()` method to [SerializedDataTypeRegistry](api/src/main/java/org/fuin/esc/api/SerializedDataTypeRegistry.java)

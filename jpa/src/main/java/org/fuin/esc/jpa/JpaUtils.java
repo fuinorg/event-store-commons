@@ -87,6 +87,20 @@ final class JpaUtils {
     }
 
     /**
+     * Executes a database operation without a result and translates a transient failure into an
+     * {@link EscConnectionException}.
+     *
+     * @param operation Operation to execute.
+     */
+    static void execute(final Runnable operation) {
+        try {
+            operation.run();
+        } catch (final RuntimeException ex) {
+            throw mapPersistenceException(ex);
+        }
+    }
+
+    /**
      * Translates a database failure into an {@link EscConnectionException} if it is transient - the database
      * could not be reached, the query or the lock ran into its timeout, or a lock could not be obtained.
      * Anything else is returned unchanged, especially {@link jakarta.persistence.NoResultException} (the

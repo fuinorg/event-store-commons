@@ -33,11 +33,47 @@ cause because it predates this release; it can be simplified once it builds agai
 
 **Deliberately carried forward** (not blockers for the framework layers, but real gaps):
 
-- `ESGrpcEventStoreAsync` futures are still unbounded - only the synchronous API is protected.
-- `em.persist` / `em.remove` in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` are not wrapped, so
-  a connectivity failure on those writes still surfaces as a raw `PersistenceException`.
+- ~~`ESGrpcEventStoreAsync` futures are still unbounded~~ - closed in Phase 0b.
+- ~~`em.persist` / `em.remove` in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` are not wrapped~~ -
+  closed in Phase 0b.
 - No config-property surface (`org.fuin.esc.eventstore.call-timeout-ms`); timeouts are set through the
   builder/constructor only, by design - no framework dependency in these modules.
+
+---
+
+## Phase 0b — DONE (2026-07-23)
+
+The two gaps that Phase 0 carried forward are closed; the whole public surface of both stores is now bounded
+and typed.
+
+| | Delivered |
+|---|---|
+| **F3b** | `ESGrpcEventStoreAsync` is bounded exactly like the synchronous store - every returned future completes within `callTimeout` |
+| **F4b** | All `EntityManager` access in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` maps a connectivity failure to `EscConnectionException` |
+
+**F3b** — new `GrpcCalls.within(future, timeout, operation)` bounds a client future: it works on a `copy()`
+so the client's own future is untouched, fails the returned stage with `EventStoreCallTimeoutException`, and
+cancels the original because nothing consumes it anymore. Applied to all 8 asynchronous calls
+(`appendToStream`, `deleteStream`/`tombstoneStream`, `readEventsForward`, `readEventsBackward`,
+`streamExists`, `streamState`, `readStreamMetaData`, `subscribeToStream`); `readEvent` is bounded through
+`readEventsForward`. Configurable via the new `ESGrpcEventStoreAsync.Builder.callTimeout(Duration)`, default
+`GrpcCalls.DEFAULT_CALL_TIMEOUT` (5 s) - same default and same builder name as the synchronous store.
+
+`ESGrpcEventStoreSupport.mapException(..)` now returns an already-classified `EscConnectionException`
+unchanged instead of wrapping it again, so a timeout keeps its operation name and elapsed duration; the
+handlers in `streamExists`/`streamState`/`softDeleted` that do not go through `mapException` do the same.
+A `subscribeToStream` that is established *after* its timeout fired is stopped right away - otherwise it
+would deliver events to a listener whose subscription holder was never set.
+
+**F4b** — `JpaUtils.execute(..)` got a `Runnable` overload for the void operations. `JpaCheckpointStore`
+(`find`/`persist`/`remove`) and `JpaProjectionAdminEventStore` (`find`/`persist`/`remove`) route every
+`EntityManager` call through it, so a broken connection surfaces as `EscConnectionException` there too - not
+just on the writes, the reads had the same gap. `JpaStoreConnectionFailureTest` pins all six entry points
+with an `EntityManager` proxy that fails like a closed connection.
+
+NB `em.persist` usually only queues the insert until flush/commit, so the mapping fires where the provider
+actually touches the database; the value is that *no* path out of these two classes can still emit a raw
+`PersistenceException`.
 
 **Behavioural changes to note when consuming this version:** `streamExists(..)` now *throws* on a
 connectivity failure where it previously returned `false`, and paths that threw a plain `RuntimeException`
@@ -85,8 +121,9 @@ File: `esgrpc/src/main/java/org/fuin/esc/esgrpc/ESGrpcEventStoreSupport.java` (`
 - [x] Default is **5 s** (`GrpcCalls.DEFAULT_CALL_TIMEOUT`), as suggested here.
 - [ ] No `org.fuin.esc.eventstore.call-timeout-ms` config property: the timeout is builder/constructor
       only, so an application cannot change it without touching code.
-- [ ] `ESGrpcEventStoreAsync` futures are still unbounded (`orTimeout(...)` / `completeOnTimeout(...)` not
-      applied). Only the synchronous API is protected.
+- [x] `ESGrpcEventStoreAsync` futures are bounded too (Phase 0b): `GrpcCalls.within(..)` wraps all 8
+      asynchronous calls, configurable via `ESGrpcEventStoreAsync.Builder.callTimeout(Duration)` with the
+      same 5 s default. Covered by `GrpcCallsTest`.
 - [x] Reconciled with F1: `EventStoreCallTimeoutException` (still in `esc-esgrpc`, it is a gRPC client
       detail) now **extends `org.fuin.esc.api.EscConnectionException`**, so one `instanceof` covers it.
 - [ ] `cqrs-4-java` `CqrsUtils.isTransientInfrastructureFailure` still keys on the
@@ -114,8 +151,10 @@ Files: `jpa/.../JpaEventStore.java`, `jpa/.../AbstractJpaEventStore.java`.
 - [x] Pool `connection-timeout` expectation documented in the `JpaTimeouts` javadoc: obtaining a
       connection happens before any query runs and is owned by the application's datasource, so the worst
       case is pool wait + query timeout.
-- [ ] `em.persist` / `em.remove` in `JpaCheckpointStore` and `JpaProjectionAdminEventStore` are not wrapped
-      yet - a connectivity failure on those writes still surfaces as a raw `PersistenceException`.
+- [x] `JpaCheckpointStore` and `JpaProjectionAdminEventStore` route every `EntityManager` call - the reads
+      as well as `em.persist` / `em.remove` - through the new `JpaUtils.execute(Runnable)` /
+      `execute(Supplier)` (Phase 0b), so a connectivity failure surfaces as `EscConnectionException`
+      instead of a raw `PersistenceException`. Covered by `JpaStoreConnectionFailureTest`.
 
 ---
 

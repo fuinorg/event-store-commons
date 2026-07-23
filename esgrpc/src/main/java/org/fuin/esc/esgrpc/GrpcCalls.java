@@ -21,6 +21,7 @@ import org.fuin.objects4j.common.ThreadSafe;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -70,6 +71,48 @@ final class GrpcCalls {
             future.cancel(true);
             throw new EventStoreCallTimeoutException(operation, timeout, ex);
         }
+    }
+
+    /**
+     * Bounds an asynchronous event store call. The returned stage fails with an
+     * {@link EventStoreCallTimeoutException} if the call did not complete within the given timeout, which
+     * makes the asynchronous API fail exactly like the synchronous one instead of handing the caller a
+     * future that is never completed. The client's own future is only copied, not modified, so the client
+     * remains free to complete it later; it is cancelled on a timeout because nobody consumes it anymore.
+     *
+     * @param <T>       Type of the result.
+     * @param future    Future returned by the client.
+     * @param timeout   Maximum time to wait.
+     * @param operation Name of the operation, used in the error message.
+     * @return Future that is guaranteed to complete within the timeout.
+     */
+    static <T> CompletableFuture<T> within(final CompletableFuture<T> future, final Duration timeout,
+                                           final String operation) {
+        final CompletableFuture<T> bounded = future.copy();
+        bounded.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        return bounded.exceptionallyCompose(ex -> {
+            if (rootCause(ex) instanceof TimeoutException cause) {
+                // Nothing is going to consume the result anymore.
+                future.cancel(true);
+                return CompletableFuture.failedFuture(new EventStoreCallTimeoutException(operation, timeout, cause));
+            }
+            return CompletableFuture.failedFuture(ex);
+        });
+    }
+
+    /**
+     * Unwraps the cause from the wrapper exceptions added by the {@link CompletableFuture} chain.
+     *
+     * @param throwable Throwable to unwrap.
+     * @return Root cause to translate.
+     */
+    static Throwable rootCause(final Throwable throwable) {
+        Throwable cause = throwable;
+        while ((cause instanceof CompletionException || cause instanceof ExecutionException)
+                && cause.getCause() != null && cause.getCause() != cause) {
+            cause = cause.getCause();
+        }
+        return cause;
     }
 
 }

@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -66,6 +68,61 @@ class GrpcCallsTest {
 
         assertThatThrownBy(() -> GrpcCalls.await(neverCompleted, SHORT_TIMEOUT, "streamExists"))
                 .isNotInstanceOf(ExecutionException.class);
+    }
+
+    @Test
+    void testWithinReturnsResult() {
+        final CompletableFuture<String> future = CompletableFuture.completedFuture("abc");
+
+        assertThat(GrpcCalls.within(future, SHORT_TIMEOUT, "op")).isCompletedWithValue("abc");
+    }
+
+    @Test
+    void testWithinNeverCompletedFutureFailsWithTimeout() {
+        // The asynchronous counterpart of the hang: the caller used to get a future that is never
+        // completed, so a "wait for the result" further up the chain blocked forever.
+        final CompletableFuture<String> neverCompleted = new CompletableFuture<>();
+
+        assertThatThrownBy(() -> GrpcCalls.within(neverCompleted, SHORT_TIMEOUT, "appendToStream").join())
+                .isInstanceOf(CompletionException.class)
+                .cause()
+                .isInstanceOf(EventStoreCallTimeoutException.class)
+                .hasMessageContaining("appendToStream")
+                .hasMessageContaining("200")
+                .hasCauseInstanceOf(TimeoutException.class);
+    }
+
+    @Test
+    void testWithinCancelsTheFutureOnTimeout() {
+        final CompletableFuture<String> neverCompleted = new CompletableFuture<>();
+
+        assertThatThrownBy(() -> GrpcCalls.within(neverCompleted, SHORT_TIMEOUT, "op").join())
+                .isInstanceOf(CompletionException.class);
+
+        assertThat(neverCompleted).isCancelled();
+    }
+
+    @Test
+    void testWithinPropagatesTheOriginalFailure() {
+        // A failure answered by the server must reach the caller unchanged, because the callers map it
+        // to the matching event store exception.
+        final IllegalStateException cause = new IllegalStateException("boom");
+        final CompletableFuture<String> failed = CompletableFuture.failedFuture(cause);
+
+        assertThatThrownBy(() -> GrpcCalls.within(failed, SHORT_TIMEOUT, "op").join())
+                .isInstanceOf(CompletionException.class)
+                .hasRootCause(cause);
+    }
+
+    @Test
+    void testWithinDoesNotCompleteTheClientFuture() {
+        // Only a copy is bounded, so the client remains free to complete its own future later.
+        final CompletableFuture<String> slow = new CompletableFuture<>();
+        final CompletableFuture<String> bounded = GrpcCalls.within(slow, Duration.ofHours(1), "op");
+
+        slow.complete("abc");
+
+        assertThat(bounded).isCompletedWithValue("abc");
     }
 
     @Test

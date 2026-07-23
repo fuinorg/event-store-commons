@@ -27,6 +27,8 @@ import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.TenantStreamId;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -177,6 +179,21 @@ public final class ESGrpcEventStoreSupportTest {
                 Status.UNAVAILABLE.asRuntimeException(), sid, ExpectedVersion.ANY.getNo());
 
         assertThat(result).isInstanceOf(EscConnectionException.class);
+    }
+
+    @Test
+    void testMapExceptionKeepsAnAlreadyClassifiedFailure() {
+
+        // PREPARE: this is what the asynchronous store sees once GrpcCalls.within(..) bounded the call.
+        final TenantStreamId sid = new TenantStreamId(null, new SimpleStreamId("foo"));
+        final EventStoreCallTimeoutException cause = new EventStoreCallTimeoutException(
+                "appendToStream", Duration.ofSeconds(5), new java.util.concurrent.TimeoutException());
+
+        // TEST
+        final RuntimeException result = ESGrpcEventStoreSupport.mapException(cause, sid, ExpectedVersion.ANY.getNo());
+
+        // VERIFY: not wrapped again - the operation name and the elapsed timeout stay visible.
+        assertThat(result).isSameAs(cause);
     }
 
 }

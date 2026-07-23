@@ -237,6 +237,11 @@ final class ESGrpcEventStoreSupport {
      */
     static RuntimeException mapException(@Nullable final Throwable cause, final TenantStreamId sid,
                                          final long expectedVersion) {
+        if (cause instanceof EscConnectionException escEx) {
+            // Already classified (for example an EventStoreCallTimeoutException raised by GrpcCalls) -
+            // wrapping it again would only hide the operation name and the elapsed timeout.
+            return escEx;
+        }
         if (cause instanceof io.kurrent.dbclient.WrongExpectedVersionException wevex) {
             return new WrongExpectedVersionException(sid, expectedVersion, wevex.getActualState().toRawLong());
         }

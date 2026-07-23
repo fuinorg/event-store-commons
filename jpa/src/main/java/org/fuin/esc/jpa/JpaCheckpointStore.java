@@ -49,7 +49,7 @@ public class JpaCheckpointStore implements CheckpointStore {
     @Override
     public long readCheckpoint(final StreamId streamId) {
         Contract.requireArgNotNull("streamId", streamId);
-        final JpaCheckpoint checkpoint = em.find(JpaCheckpoint.class, streamId.asString());
+        final JpaCheckpoint checkpoint = find(streamId);
         return checkpoint == null ? 0L : checkpoint.getNextPos();
     }
 
@@ -57,9 +57,9 @@ public class JpaCheckpointStore implements CheckpointStore {
     public void updateCheckpoint(final StreamId streamId, final long nextEventNumber) {
         Contract.requireArgNotNull("streamId", streamId);
         Contract.requireArgMin("nextEventNumber", nextEventNumber, 0);
-        final JpaCheckpoint checkpoint = em.find(JpaCheckpoint.class, streamId.asString());
+        final JpaCheckpoint checkpoint = find(streamId);
         if (checkpoint == null) {
-            em.persist(new JpaCheckpoint(streamId.asString(), nextEventNumber));
+            JpaUtils.execute(() -> em.persist(new JpaCheckpoint(streamId.asString(), nextEventNumber)));
         } else {
             checkpoint.setNextPos(nextEventNumber);
         }
@@ -68,10 +68,22 @@ public class JpaCheckpointStore implements CheckpointStore {
     @Override
     public void resetCheckpoint(final StreamId streamId) {
         Contract.requireArgNotNull("streamId", streamId);
-        @Nullable final JpaCheckpoint checkpoint = em.find(JpaCheckpoint.class, streamId.asString());
+        @Nullable final JpaCheckpoint checkpoint = find(streamId);
         if (checkpoint != null) {
-            em.remove(checkpoint);
+            JpaUtils.execute(() -> em.remove(checkpoint));
         }
+    }
+
+    /**
+     * Looks up the checkpoint row, mapping a connectivity failure to an
+     * {@link org.fuin.esc.api.EscConnectionException} like all other database access does.
+     *
+     * @param streamId Identifier of the stream to read the checkpoint for.
+     * @return Checkpoint or {@literal null} if the stream has no checkpoint yet.
+     */
+    @Nullable
+    private JpaCheckpoint find(final StreamId streamId) {
+        return JpaUtils.execute(() -> em.find(JpaCheckpoint.class, streamId.asString()));
     }
 
 }

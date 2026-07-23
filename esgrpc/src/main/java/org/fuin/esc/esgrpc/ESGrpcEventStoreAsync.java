@@ -29,12 +29,12 @@ import org.fuin.objects4j.common.ThreadSafe;
 import org.fuin.utils4j.TestOmitted;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -55,6 +55,8 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
 
     private final ESGrpcEventStoreSupport support;
 
+    private final Duration callTimeout;
+
     /**
      * Private constructor with all data used by the builder.
      *
@@ -65,17 +67,34 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
      * @param targetContentType Target content type (Allows only 'application/xml'
      *                          or 'application/json' with 'utf-8' encoding).
      * @param tenantContext     Provides the current tenant.
+     * @param callTimeout       Maximum time a single event store call may take before the returned future
+     *                          fails with an {@link EventStoreCallTimeoutException}.
      */
     private ESGrpcEventStoreAsync(final KurrentDBClient es,
                                   final SerializerRegistry serRegistry,
                                   final DeserializerRegistry desRegistry,
                                   final IBaseTypeFactory baseTypeFactory,
                                   final EnhancedMimeType targetContentType,
-                                  final TenantContext tenantContext) {
+                                  final TenantContext tenantContext,
+                                  final Duration callTimeout) {
         Contract.requireArgNotNull("es", es);
+        Contract.requireArgNotNull("callTimeout", callTimeout);
         this.es = es;
         this.support = new ESGrpcEventStoreSupport(serRegistry, desRegistry, baseTypeFactory,
                 targetContentType, tenantContext);
+        this.callTimeout = callTimeout;
+    }
+
+    /**
+     * Bounds a call with the configured timeout.
+     *
+     * @param <T>       Type of the result.
+     * @param future    Future returned by the client.
+     * @param operation Name of the operation, used in the error message.
+     * @return Future that is guaranteed to complete within the timeout.
+     */
+    private <T> CompletableFuture<T> bounded(final CompletableFuture<T> future, final String operation) {
+        return GrpcCalls.within(future, callTimeout, operation);
     }
 
     private void ensureOpen() {
@@ -140,9 +159,9 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
 
         final TenantStreamId sid = support.sid(streamId);
         final Iterator<EventData> eventDataIt = support.asEventData(commonEvents).iterator();
-        return es.appendToStream(sid.asString(),
+        return bounded(es.appendToStream(sid.asString(),
                         AppendToStreamOptions.get().streamState(ESGrpcEventStoreSupport.version2State(expectedVersion)),
-                        eventDataIt)
+                        eventDataIt), "appendToStream")
                 .thenApply(result -> result.getNextExpectedRevision().toRawLong())
                 .exceptionallyCompose(ex ->
                         CompletableFuture.failedFuture(ESGrpcEventStoreSupport.mapException(unwrap(ex), sid, expectedVersion)));
@@ -161,8 +180,8 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
         final DeleteStreamOptions options = DeleteStreamOptions.get()
                 .streamState(ESGrpcEventStoreSupport.version2State(expectedVersion));
         final CompletableFuture<DeleteResult> future = hardDelete
-                ? es.tombstoneStream(sid.asString(), options)
-                : es.deleteStream(sid.asString(), options);
+                ? bounded(es.tombstoneStream(sid.asString(), options), "tombstoneStream")
+                : bounded(es.deleteStream(sid.asString(), options), "deleteStream");
         return future.<Void>thenApply(result -> null)
                 .exceptionallyCompose(ex ->
                         CompletableFuture.failedFuture(ESGrpcEventStoreSupport.mapException(unwrap(ex), sid, expectedVersion)));
@@ -185,7 +204,7 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
         final TenantStreamId sid = support.sid(streamId);
         final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(start).maxCount(count)
                 .resolveLinkTos();
-        return es.readStream(sid.asString(), options)
+        return bounded(es.readStream(sid.asString(), options), "readEventsForward")
                 .thenApply(readResult -> {
                     final List<CommonEvent> events = support.asCommonEvents(readResult.getEvents());
                     final boolean endOfStream = count > events.size();
@@ -207,7 +226,7 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
         final TenantStreamId sid = support.sid(streamId);
         final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                 .resolveLinkTos();
-        return es.readStream(sid.asString(), options)
+        return bounded(es.readStream(sid.asString(), options), "readEventsBackward")
                 .thenApply(slice -> {
                     final List<CommonEvent> events = support.asCommonEvents(slice.getEvents());
                     long nextEventNumber = start - events.size();
@@ -239,7 +258,7 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
 
         final TenantStreamId sid = support.sid(streamId);
         final ReadStreamOptions options = ReadStreamOptions.get().forwards().fromRevision(0).maxCount(1);
-        return es.readStream(sid.asString(), options).handle((readResult, ex) -> {
+        return bounded(es.readStream(sid.asString(), options), "streamExists").handle((readResult, ex) -> {
             if (ex == null) {
                 return Boolean.TRUE;
             }
@@ -251,6 +270,10 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                     // A hard deleted stream does not exist any more either.
                     || ESGrpcEventStoreSupport.statusIsDeleted(cause)) {
                 return Boolean.FALSE;
+            }
+            if (cause instanceof EscConnectionException escEx) {
+                // Already classified (a call timeout) - keep the operation name and the elapsed timeout.
+                throw new CompletionException(escEx);
             }
             if (ESGrpcEventStoreSupport.statusIsConnectivityProblem(cause)) {
                 throw new CompletionException(new EscConnectionException(
@@ -267,7 +290,8 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
         ensureOpen();
 
         final TenantStreamId sid = support.sid(streamId);
-        return es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0))
+        return bounded(es.readStream(sid.asString(), ReadStreamOptions.get().forwards().fromRevision(0)),
+                        "streamState")
                 .<StreamState>thenApply(readResult -> StreamState.ACTIVE)
                 .exceptionallyCompose(ex -> {
                     final Throwable cause = unwrap(ex);
@@ -277,6 +301,9 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                     if (cause instanceof io.kurrent.dbclient.StreamNotFoundException) {
                         return softDeleted(streamId);
                     }
+                    if (cause instanceof EscConnectionException escEx) {
+                        return CompletableFuture.failedFuture(escEx);
+                    }
                     return CompletableFuture.failedFuture(
                             new RuntimeException("Error executing streamState(..)", cause));
                 });
@@ -285,8 +312,8 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
     private CompletableFuture<StreamState> softDeleted(final StreamId streamId) {
         // Workaround for reading metadata because of:
         // https://github.com/EventStore/KurrentDB-Client-Java/issues/240
-        return es.readStream(ESGrpcEventStoreSupport.metaStreamName(streamId),
-                        ReadStreamOptions.get().forwards().fromRevision(0))
+        return bounded(es.readStream(ESGrpcEventStoreSupport.metaStreamName(streamId),
+                        ReadStreamOptions.get().forwards().fromRevision(0)), "readStreamMetaData")
                 .<StreamState>handle((readResult, ex) -> {
                     if (ex == null) {
                         throw new CompletionException(new StreamNotFoundException(streamId));
@@ -294,6 +321,9 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                     final Throwable cause = unwrap(ex);
                     if (cause instanceof io.kurrent.dbclient.StreamNotFoundException) {
                         throw new CompletionException(new StreamNotFoundException(streamId));
+                    }
+                    if (cause instanceof EscConnectionException escEx) {
+                        throw new CompletionException(escEx);
                     }
                     throw new CompletionException(new RuntimeException("Error reading stream meta data", cause));
                 });
@@ -338,11 +368,22 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
             }
         };
 
-        return es.subscribeToStream(sid.asString(), listener, options).thenApply(nativeSub -> {
-            final ESGrpcSubscription subscription = new ESGrpcSubscription(streamId, null, nativeSub);
-            ref.set(subscription);
-            return subscription;
+        final CompletableFuture<io.kurrent.dbclient.Subscription> nativeFuture =
+                es.subscribeToStream(sid.asString(), listener, options);
+        final CompletableFuture<Subscription> result = bounded(nativeFuture, "subscribeToStream")
+                .thenApply(nativeSub -> {
+                    final ESGrpcSubscription subscription = new ESGrpcSubscription(streamId, null, nativeSub);
+                    ref.set(subscription);
+                    return subscription;
+                });
+        // Should the subscription still be established after the timeout has fired, nobody would ever stop
+        // it and it would deliver events to a listener whose holder was never set.
+        nativeFuture.whenComplete((nativeSub, ex) -> {
+            if (nativeSub != null && result.isCompletedExceptionally()) {
+                nativeSub.stop();
+            }
         });
+        return result;
     }
 
     @Override
@@ -367,12 +408,7 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
      * @return Root cause to translate.
      */
     private static Throwable unwrap(final Throwable throwable) {
-        Throwable cause = throwable;
-        while ((cause instanceof CompletionException || cause instanceof ExecutionException)
-                && cause.getCause() != null && cause.getCause() != cause) {
-            cause = cause.getCause();
-        }
-        return cause;
+        return GrpcCalls.rootCause(throwable);
     }
 
     private static Exception asException(@Nullable final Throwable throwable) {
@@ -406,6 +442,8 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
 
         @Nullable
         private TenantContext tenantContext;
+
+        private Duration callTimeout = GrpcCalls.DEFAULT_CALL_TIMEOUT;
 
         /**
          * Sets the event store to use internally.
@@ -499,6 +537,19 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
             return this;
         }
 
+        /**
+         * Sets the maximum time a single event store call may take. Without a timeout a call whose future
+         * is never completed (for example because the connection is broken) leaves the caller with a future
+         * that never completes. Defaults to {@link GrpcCalls#DEFAULT_CALL_TIMEOUT}.
+         *
+         * @param callTimeout Maximum time for a single call. A {@literal null} value selects the default.
+         * @return Builder.
+         */
+        public Builder callTimeout(@Nullable final Duration callTimeout) {
+            this.callTimeout = callTimeout == null ? GrpcCalls.DEFAULT_CALL_TIMEOUT : callTimeout;
+            return this;
+        }
+
         private void verifyNotNull(final String name, @Nullable final Object value) {
             if (value == null) {
                 throw new IllegalStateException(
@@ -523,7 +574,7 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
             final DeserializerRegistry effectiveDesRegistry = converters == null
                     ? desRegistry : new UpcastingDeserializerRegistry(desRegistry, converters);
             return new ESGrpcEventStoreAsync(eventStore, serRegistry, effectiveDesRegistry,
-                    baseTypeFactory, targetContentType, tenantContext);
+                    baseTypeFactory, targetContentType, tenantContext, callTimeout);
         }
 
     }
