@@ -21,6 +21,8 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.kurrent.dbclient.EventData;
 import io.kurrent.dbclient.RecordedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kurrent.dbclient.ResolvedEvent;
 import org.fuin.esc.api.CommonEvent;
 import org.fuin.esc.api.DeserializerRegistry;
@@ -53,6 +55,8 @@ import static org.fuin.esc.api.ExpectedVersion.ANY;
  */
 @ThreadSafe
 final class ESGrpcEventStoreSupport {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ESGrpcEventStoreSupport.class);
 
     private final CommonEvent2EventDataConverter ce2edConv;
 
@@ -111,14 +115,27 @@ final class ESGrpcEventStoreSupport {
 
     /**
      * Converts a list of resolved gRPC events into a list of common events.
+     * <p>
+     * <b>A link whose target no longer exists is skipped.</b> Reads use {@code resolveLinkTos()}, and a
+     * projection stream keeps its links after the stream they point at has been deleted or scavenged - for
+     * such an entry the server returns a resolved event whose {@code getEvent()} is {@code null}.
+     * Dereferencing it throws, and because a projection re-reads the same slice on every run, one dangling
+     * link stops that projection for good: the read model silently stops updating for <em>every</em>
+     * aggregate, not just the deleted one.
      *
      * @param resolvedEvents Events to convert.
-     * @return Converted events.
+     * @return Converted events, without the ones whose target is gone.
      */
     List<CommonEvent> asCommonEvents(final List<ResolvedEvent> resolvedEvents) {
         final List<CommonEvent> list = new ArrayList<>(resolvedEvents.size());
         for (final ResolvedEvent resolvedEvent : resolvedEvents) {
-            list.add(asCommonEvent(resolvedEvent.getEvent()));
+            final RecordedEvent recordedEvent = resolvedEvent.getEvent();
+            if (recordedEvent == null) {
+                LOG.debug("Skipped a link pointing at an event that no longer exists (deleted or scavenged"
+                        + " stream): {}", resolvedEvent.getLink());
+            } else {
+                list.add(asCommonEvent(recordedEvent));
+            }
         }
         return list;
     }

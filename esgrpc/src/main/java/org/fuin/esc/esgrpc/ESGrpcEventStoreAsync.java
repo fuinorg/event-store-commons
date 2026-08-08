@@ -206,9 +206,14 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                 .resolveLinkTos();
         return bounded(es.readStream(sid.asString(), options), "readEventsForward")
                 .thenApply(readResult -> {
-                    final List<CommonEvent> events = support.asCommonEvents(readResult.getEvents());
-                    final boolean endOfStream = count > events.size();
-                    return new StreamEventsSlice(start, events, start + events.size(), endOfStream);
+                    final List<ResolvedEvent> resolvedEvents = readResult.getEvents();
+                    final List<CommonEvent> events = support.asCommonEvents(resolvedEvents);
+                    // Counts what the server returned, not what survived the conversion - asCommonEvents
+                    // drops links whose target is gone, and a shorter list would rewind the cursor and
+                    // look like the end of the stream.
+                    final int returned = resolvedEvents.size();
+                    final boolean endOfStream = count > returned;
+                    return new StreamEventsSlice(start, events, start + returned, endOfStream);
                 })
                 .exceptionallyCompose(ex ->
                         CompletableFuture.failedFuture(ESGrpcEventStoreSupport.mapException(unwrap(ex), sid, ANY.getNo())));
@@ -228,8 +233,10 @@ public final class ESGrpcEventStoreAsync implements IESGrpcEventStoreAsync {
                 .resolveLinkTos();
         return bounded(es.readStream(sid.asString(), options), "readEventsBackward")
                 .thenApply(slice -> {
-                    final List<CommonEvent> events = support.asCommonEvents(slice.getEvents());
-                    long nextEventNumber = start - events.size();
+                    final List<ResolvedEvent> resolvedEvents = slice.getEvents();
+                    final List<CommonEvent> events = support.asCommonEvents(resolvedEvents);
+                    // Counts what the server returned - see the forward read.
+                    long nextEventNumber = start - resolvedEvents.size();
                     final boolean endOfStream = (start - count < 0);
                     if (endOfStream) {
                         nextEventNumber = 0;

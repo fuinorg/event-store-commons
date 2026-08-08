@@ -18,6 +18,15 @@
 package org.fuin.esc.esgrpc;
 
 import io.grpc.Status;
+import io.kurrent.dbclient.ResolvedEvent;
+import org.fuin.esc.api.EnhancedMimeType;
+import org.fuin.esc.api.SimpleSerializerDeserializerRegistry;
+import org.fuin.esc.api.TenantContext;
+import org.fuin.esc.api.IBase64Data;
+import org.fuin.esc.api.IBaseTypeFactory;
+import org.fuin.esc.api.IEscMeta;
+import org.fuin.esc.api.TenantId;
+import org.jspecify.annotations.Nullable;
 import org.fuin.esc.api.EscConnectionException;
 import org.fuin.esc.api.ExpectedVersion;
 import org.fuin.esc.api.ProjectionStreamId;
@@ -27,7 +36,9 @@ import org.fuin.esc.api.StreamReadOnlyException;
 import org.fuin.esc.api.TenantStreamId;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -214,6 +225,71 @@ public final class ESGrpcEventStoreSupportTest {
 
         // VERIFY: not wrapped again - the operation name and the elapsed timeout stay visible.
         assertThat(result).isSameAs(cause);
+    }
+
+    /**
+     * A projection stream keeps its links after the stream they point at has been deleted. Reads use
+     * {@code resolveLinkTos()}, so the server returns a resolved event whose {@code getEvent()} is
+     * {@code null} for such an entry.
+     * <p>
+     * Dereferencing it used to throw a {@link NullPointerException}, and because a projection re-reads the
+     * same slice on every run, a single dangling link stopped that projection permanently - the read model
+     * silently stopped updating for <b>every</b> aggregate, not only the deleted one. The symptom was
+     * "Error processing events for viewJob ..." once per scheduler tick, forever.
+     */
+    @Test
+    public void testALinkToADeletedEventIsSkippedRatherThanThrowing() {
+
+        // PREPARE - what the server returns for a link whose target is gone
+        final ResolvedEvent danglingLink = new ResolvedEvent(null, null, null);
+
+        // TEST & VERIFY - no exception, and the entry is simply not there
+        assertThat(support().asCommonEvents(List.of(danglingLink))).isEmpty();
+
+    }
+
+    @Test
+    public void testAnEmptySliceConvertsToAnEmptyList() {
+
+        assertThat(support().asCommonEvents(List.of())).isEmpty();
+
+    }
+
+    /**
+     * Builds a support instance. Only {@link ESGrpcEventStoreSupport#asCommonEvents(List)} is exercised
+     * here and it never reaches a (de)serializer for a skipped event, so empty registries are enough.
+     */
+    private static ESGrpcEventStoreSupport support() {
+        return new ESGrpcEventStoreSupport(
+                new SimpleSerializerDeserializerRegistry.Builder(
+                        EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8)).build(),
+                new SimpleSerializerDeserializerRegistry.Builder(
+                        EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8)).build(),
+                new NoTypesNeeded(),
+                EnhancedMimeType.create("application", "json", StandardCharsets.UTF_8),
+                new TenantContext.NoopTenantContext());
+    }
+
+    /**
+     * The constructor demands a factory, but converting a skipped event never calls one - so this exists
+     * only to satisfy the contract, and fails loudly if the test ever starts depending on it.
+     */
+    private static final class NoTypesNeeded implements IBaseTypeFactory {
+
+        @Override
+        public IBase64Data createBase64Data(final byte[] binaryData) {
+            throw new UnsupportedOperationException("Not needed for this test");
+        }
+
+        @Override
+        public IEscMeta createEscMeta(final String dataType, final EnhancedMimeType dataContentType,
+                                      @Nullable final String metaType,
+                                      @Nullable final EnhancedMimeType metaContentType,
+                                      @Nullable final Object meta, @Nullable final TenantId tenantId,
+                                      final List<String> categories) {
+            throw new UnsupportedOperationException("Not needed for this test");
+        }
+
     }
 
 }

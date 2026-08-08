@@ -207,9 +207,15 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
                     .resolveLinkTos();
 
             final ReadResult readResult = GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "readEventsForward");
-            final List<CommonEvent> events = support.asCommonEvents(readResult.getEvents());
-            final boolean endOfStream = count > events.size();
-            return new StreamEventsSlice(start, events, start + events.size(), endOfStream);
+            final List<ResolvedEvent> resolvedEvents = readResult.getEvents();
+            final List<CommonEvent> events = support.asCommonEvents(resolvedEvents);
+            // The cursor and the end-of-stream flag count what the server returned, NOT what survived the
+            // conversion. asCommonEvents drops links whose target is gone, and deriving the next event
+            // number from the shorter list would hand back a position already read - the reader would
+            // fetch the same slice forever - while a short slice would look like the end of the stream.
+            final int returned = resolvedEvents.size();
+            final boolean endOfStream = count > returned;
+            return new StreamEventsSlice(start, events, start + returned, endOfStream);
         } catch (ExecutionException ex) {
             throw ESGrpcEventStoreSupport.mapException(ex.getCause(), sid, ANY.getNo());
         } catch (InterruptedException ex) { // NOSONAR
@@ -231,8 +237,11 @@ public final class ESGrpcEventStore extends AbstractReadableEventStore implement
             final ReadStreamOptions options = ReadStreamOptions.get().backwards().fromRevision(start).maxCount(count)
                     .resolveLinkTos();
             final ReadResult slice = GrpcCalls.await(es.readStream(sid.asString(), options), callTimeout, "readEventsBackward");
-            final List<CommonEvent> events = support.asCommonEvents(slice.getEvents());
-            long nextEventNumber = start - events.size();
+            final List<ResolvedEvent> resolvedEvents = slice.getEvents();
+            final List<CommonEvent> events = support.asCommonEvents(resolvedEvents);
+            // Counts what the server returned rather than what survived the conversion - see the forward
+            // read for why.
+            long nextEventNumber = start - resolvedEvents.size();
             final boolean endOfStream = (start - count < 0);
             if (endOfStream) {
                 nextEventNumber = 0;
