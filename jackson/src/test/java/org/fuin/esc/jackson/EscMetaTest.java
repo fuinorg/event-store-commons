@@ -65,6 +65,11 @@ public class EscMetaTest extends AbstractTest {
         // VERIFY
         assertThatJson(currentJson).isEqualTo(expectedJson);
 
+        // The meta payload must be written exactly once. Asserted on the raw string on purpose:
+        // assertThatJson parses to a tree first, and a tree silently keeps only the last of two
+        // entries with the same key - so a duplicated write is invisible to the assertion above.
+        assertThat(currentJson.replaceAll("\\s", "")).containsOnlyOnce("\"MyMeta\":{");
+
     }
 
     @Test

@@ -50,7 +50,11 @@ public final class EscMetaJacksonSerializer extends StdSerializer<EscMeta> {
             if (escMeta.getMeta() instanceof Base64Data base64data) {
                 generator.writeStringField(IBase64Data.EL_ROOT_NAME, base64data.getEncoded());
             } else {
-                provider.defaultSerializeField(escMeta.getMetaType(), escMeta.getMeta(), generator);
+                // Exactly one write, through the registry: it emits the same JSON object as Jackson's
+                // default serialization when the meta type is JSON, and Base64 when it is not. An
+                // additional 'provider.defaultSerializeField(...)' here wrote the payload a second time
+                // under the same key - legal JSON that every parser collapses to the last entry, so it
+                // stayed invisible until something actually stored metadata.
                 final SerializedDataType serDataType = new SerializedDataType(Objects.requireNonNull(escMeta.getMetaType()));
                 EscJacksonUtils.serialize(generator, serializerRegistry,
                         serDataType, Objects.requireNonNull(escMeta.getMetaType()), escMeta.getMeta());
